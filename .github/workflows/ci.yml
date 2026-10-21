@@ -15,9 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pages: write
-      id-token: write
+      contents: read
 
     steps:
       # ── Checkout ──────────────────────────────────────────────
@@ -396,6 +394,52 @@ jobs:
           if-no-files-found: warn
 
       # ── Deploy to GitHub Pages ───────────────────────────────
+      # The deployment lives in its own job so it can depend on the
+      # Playwright suite. A browser regression must block publishing.
+
+  # ── Browser tests ──────────────────────────────────────────
+  # Runs the Playwright suite against the artifact produced above. It is
+  # wired in before the deployment so a broken client never reaches
+  # GitHub Pages.
+  e2e:
+    name: E2E Browser Tests
+    needs: build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e.yml
+    with:
+      artifact_name: eaglercraft-26.1.2-build
+      strict_game: false
+
+  # ── Deploy ─────────────────────────────────────────────────
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [build, e2e]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: eaglercraft-26.1.2-build
+          path: e2e-artifact
+
+      - name: Stage public/ for deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          src=$(bash tests/e2e/resolve-client-dir.sh e2e-artifact)
+          mkdir -p public
+          cp -R "${src}/." public/
+          ls -la public/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -404,4 +448,3 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
           commit_message: "deploy: EaglerCraftX 26.1.2 build"
-      # This content will not be added - let me use Edit instead

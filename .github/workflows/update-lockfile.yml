@@ -1,0 +1,40 @@
+name: Update package-lock.json
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    name: Regenerate lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # --package-lock-only resolves the dependency tree without installing
+      # anything, and --ignore-scripts keeps Playwright's browser download
+      # out of this job.
+      - name: Resolve dependency tree
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Upload lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-lock
+          path: package-lock.json
+          retention-days: 7
+          if-no-files-found: error

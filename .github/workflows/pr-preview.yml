@@ -45,11 +45,19 @@ jobs:
       - name: Compile TeaVM
         run: |
           ./gradlew --no-daemon :sources:generateJavaScript 2>&1 || true
+          # Only use the TeaVM output when it is a real build. TeaVM writes a
+          # tiny stub before it fails, which would replace the working
+          # committed bundle with a broken client.
           for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
             if [ -f "$path" ]; then
-              cp "$path" public/classes.js
-              echo "classes.js copied from $path"
-              break
+              SIZE=$(stat -c%s "$path" 2>/dev/null || echo 0)
+              if [ "$SIZE" -ge 50000 ]; then
+                cp "$path" public/classes.js
+                echo "classes.js copied from $path ($SIZE bytes)"
+                break
+              else
+                echo "WARNING: $path is only $SIZE bytes - keeping the committed bundle"
+              fi
             fi
           done
           for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
@@ -65,3 +73,14 @@ jobs:
           name: pr-preview-${{ github.event.pull_request.number }}
           path: public/
           retention-days: 7
+
+  # ── Browser tests ──────────────────────────────────────────
+  e2e-preview:
+    name: E2E Browser Tests
+    needs: build-preview
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e.yml
+    with:
+      artifact_name: pr-preview-${{ github.event.pull_request.number }}
+      strict_game: false

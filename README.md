@@ -20,6 +20,7 @@
 - [Comparison with 1.8](#comparison-with-18)
 - [Performance Benchmarks](#performance-benchmarks)
 - [Browser Compatibility](#browser-compatibility)
+- [End-to-End Tests](#end-to-end-tests)
 - [Known Limitations](#known-limitations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -790,6 +791,27 @@ Cross-Origin-Embedder-Policy: require-corp
 ```
 
 Without these headers, singleplayer will be disabled and only multiplayer will be available.
+
+---
+
+## End-to-End Tests
+
+The client is a TeaVM-compiled JavaScript bundle that boots inside a browser
+canvas, so a successful Gradle build does not guarantee a working client. A
+Playwright suite loads the real client in headless Chromium and checks that the
+bundle is not a stub, that `self.main` is exported, that WebGL2 is available,
+and that the shell boots without uncaught errors.
+
+```
+build  ──▶  e2e  ──▶  deploy
+```
+
+The GitHub Pages deployment depends on the browser tests, so a client that
+regresses in a browser never reaches production. Pull requests run the same
+suite against their preview build.
+
+See [docs/E2E.md](docs/E2E.md) for the full list of assertions, local usage and
+troubleshooting.
 
 ---
 

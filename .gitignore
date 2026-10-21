@@ -42,11 +42,9 @@ components.json
 eslint.config.mjs
 next-env.d.ts
 next.config.ts
-package.json
 bun.lock
 postcss.config.mjs
 tailwind.config.ts
-tsconfig.json
 vercel-cli-docs.json
 vercel-codenote.json
 vercel-docs.json
@@ -81,3 +79,10 @@ public/classes.js.map
 mc-jar/
 teavm-plugin/classes/
 sources/libs/eaglercraft-teavm-plugin.jar
+
+# Playwright (end-to-end test suite)
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+e2e-artifact/

@@ -1,0 +1,114 @@
+name: E2E Browser Tests
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: 'Artifact holding the built client. Leave empty to test the committed public/ directory.'
+        required: false
+        type: string
+        default: ''
+      strict_game:
+        description: 'Turn the informational game assertions into hard failures.'
+        required: false
+        type: boolean
+        default: false
+      node_version:
+        description: 'Node.js version used to run the suite.'
+        required: false
+        type: string
+        default: '24'
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: 'Artifact holding the built client (empty = committed public/)'
+        required: false
+        type: string
+        default: ''
+      strict_game:
+        description: 'Turn the informational game assertions into hard failures.'
+        required: false
+        type: boolean
+        default: false
+      node_version:
+        description: 'Node.js version used to run the suite.'
+        required: false
+        type: string
+        default: '24'
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Setup Node.js ─────────────────────────────────────────
+      - name: Setup Node.js ${{ inputs.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      # ── Download the built client ─────────────────────────────
+      - name: Download client artifact
+        if: ${{ inputs.artifact_name != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: e2e-artifact
+
+      - name: Resolve client directory
+        id: client
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.artifact_name }}" ]; then
+            dir=$(bash tests/e2e/resolve-client-dir.sh e2e-artifact)
+          else
+            dir="public"
+          fi
+          echo "dir=${dir}" >> "$GITHUB_OUTPUT"
+          echo "Serving client from ${dir}"
+          ls -la "${dir}"
+
+      # ── Install the test toolchain ────────────────────────────
+      # package-lock.json is committed, so npm ci gives an exact install.
+      # The fallback only kicks in on the very first run that introduces the
+      # suite, before the lockfile exists.
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "::warning::package-lock.json is missing, falling back to npm install"
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      # ── Run the suite ─────────────────────────────────────────
+      - name: Run Playwright suite
+        env:
+          E2E_PUBLIC_DIR: ${{ steps.client.outputs.dir }}
+          E2E_STRICT_GAME: ${{ inputs.strict_game && '1' || '0' }}
+        run: npx playwright test
+
+      # ── Always publish the evidence ───────────────────────────
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn

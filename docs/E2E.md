@@ -1,157 +1,100 @@
-# End-to-End Tests
+# End-to-end browser tests
 
-The EaglerCraftX 26.1.2 client is a TeaVM-compiled JavaScript bundle that boots
-inside a browser canvas. A Gradle build can succeed and still ship a client
-that throws on the first frame, fails to create a WebGL2 context, or silently
-falls back to a stub bundle. The Playwright suite in `tests/e2e/` closes that
-gap by loading the real client in headless Chromium and asserting on what
-actually happens in the page.
+The web client in `public/` is the EaglerCraftX shell plus the TeaVM compiled
+`classes.js`. This suite drives that client in a real Chromium browser so a
+broken bundle, a broken shell or a missing graphics backend fails the build
+before the client is published.
 
-## Layout
+## What runs where
 
-```
-tests/e2e/
-  server.mjs             Dependency-free static file server (Node built-ins only)
-  resolve-client-dir.sh  Finds index.html inside a downloaded CI artifact
-  env.ts                 Environment helpers (E2E_STRICT_GAME)
-  support.ts             Error collector, ready-state probe, helpers
-  assets.spec.ts         Static asset contract (content types, 404, client config)
-  bundle.spec.ts         Blocking checks on the published classes.js bundle
-  shell.spec.ts          Blocking checks on the page shell
-  webgl.spec.ts          Blocking checks on WebGL2 availability
-  game.spec.ts           Informational checks on the running game
-playwright.config.ts     Playwright configuration
-```
+| Workflow | File | Trigger |
+| --- | --- | --- |
+| `E2E Browser Tests` | `.github/workflows/e2e.yml` | `workflow_call` and `workflow_dispatch` |
+| `Build & Deploy` | `.github/workflows/ci.yml` | calls the reusable workflow after the client is built, before the Pages deploy |
+| `PR Preview` | `.github/workflows/pr-preview.yml` | calls the reusable workflow for pull requests |
 
-## What is asserted
+The reusable workflow checks the repository out, sets up Node.js, downloads the
+client artifact that the build job produced, installs Playwright Chromium with
+its system dependencies, runs the suite and always uploads the HTML report,
+screenshots and traces as artifacts.
 
-### Blocking (always fail the build)
+Because the deploy job depends on the browser tests, a client that no longer
+boots is never published.
 
-| Check | Where | Why it matters |
-|-------|-------|----------------|
-| `classes.js` is a real TeaVM bundle, not a stub | `bundle.spec.ts` | TeaVM writes a tiny placeholder before a failed compile. A stub that reaches `public/` produces a client that cannot start. |
-| `classes.js` is served over HTTP | `bundle.spec.ts` | The published client must be reachable at the path `index.html` references. |
-| The server does not serve files outside the client directory | `bundle.spec.ts` | Path traversal has to fail closed. |
-| `robots.txt` and `logo.svg` are served with the right content type | `assets.spec.ts` | Part of the published site contract. |
-| Unknown paths return 404 | `assets.spec.ts` | A missing asset must not be masked by a catch-all route. |
-| `window.eaglercraftXOpts` is well formed | `assets.spec.ts` | The client reads its container, asset paths and server list from this object. |
-| The bundle exports `$rt_exports.main` | `bundle.spec.ts` | Confirms the bundle was compiled with the expected entry point rather than truncated. |
-| `self.main` is a function at runtime | `bundle.spec.ts` | The bundle must actually attach the entry point to the global scope. |
-| The "Failed to load classes.js" overlay never appears | `bundle.spec.ts` | Catches a missing or mistyped `classes.js` reference in `index.html`. |
-| No uncaught shell errors | `bundle.spec.ts` | Errors raised outside the game bundle are startup bugs. |
-| Chromium can create a WebGL2 context | `webgl.spec.ts` | WebGL 2.0 is a hard requirement of the renderer. |
-| `#game_frame` exists and has a WebGL context | `webgl.spec.ts` | The canvas must be backed by a graphics context, not a dead element. |
+## Test files
 
-### Informational (only fail with `E2E_STRICT_GAME=1`)
+| File | Covers |
+| --- | --- |
+| `tests/e2e/bundle.spec.ts` | The published bundle is served over HTTP, is a full TeaVM build instead of a stub, and the server does not leak files outside the client directory. |
+| `tests/e2e/assets.spec.ts` | Static asset contract: metadata files, content types, 404 behaviour. |
+| `tests/e2e/shell.spec.ts` | The shell exposes its elements, `self.main` is exported, the client configuration is well formed, no failed bundle download is reported, no uncaught shell errors. |
+| `tests/e2e/webgl.spec.ts` | Chromium can create a WebGL2 context and the game canvas is backed by one. |
+| `tests/e2e/game.spec.ts` | The client reaches the title screen, the EPK archive is served, and no uncaught game runtime errors occur. |
 
-| Check | Where |
-|-------|-------|
-| The client reaches the title screen | `game.spec.ts` |
-| `assets.epk` is served | `game.spec.ts` |
-| No uncaught errors from the game runtime | `game.spec.ts` |
+### Blocking versus informational assertions
 
-The TeaVM port of Minecraft 26.1.2 is still in progress, so the game-level
-behaviour is reported rather than enforced by default. The counts are printed
-to the console so a trend is visible in the CI log, and a hard failure can be
-turned on per run:
+The MC 26.1.2 port is still in progress, so the game level assertions are
+informational by default and only become hard failures when
+`E2E_STRICT_GAME=1` is set:
 
-```yaml
-with:
-  strict_game: true
-```
+- the client reaching the title screen
+- `assets.epk` being served
+- the absence of uncaught errors from the TeaVM bundle
 
-## Local usage
+Everything else (shell loads, the bundle is a real TeaVM build, `self.main` is
+exported, WebGL2 is obtainable, no uncaught shell errors) always fails the run.
 
-The suite needs Node 20 or newer and a Chromium build:
+Set `E2E_STRICT_GAME` to `true` on the reusable workflow input to turn the
+informational assertions into hard failures.
+
+## Why the client page is shared
+
+Booting the client evaluates the whole TeaVM bundle and blocks the browser main
+thread while it does so. That takes about a minute per navigation, so the
+suite boots the client once per worker and shares that page between the tests
+(`tests/e2e/fixtures.ts`). Assertions that only need the HTTP surface use the
+`request` fixture and never open a page at all.
+
+The bootstrap wait is driven from Node instead of `page.waitForFunction`
+(`waitForClientBootstrap` in `tests/e2e/support.ts`). A page side predicate
+cannot be evaluated while the main thread is blocked, so a page side timeout
+would expire during the very block it is waiting for.
+
+## Running the suite locally
 
 ```bash
 npm ci
-npx playwright install --with-deps chromium
+npx playwright install chromium
 npm run e2e
+```
+
+The suite serves `public/` with the dependency free static server in
+`tests/e2e/server.mjs` and drives it through Playwright. Point it at a build
+output with `E2E_PUBLIC_DIR`:
+
+```bash
+E2E_PUBLIC_DIR=build/out npm run e2e
 ```
 
 Useful environment variables:
 
-| Variable | Default | Meaning |
-|----------|---------|---------|
-| `E2E_PUBLIC_DIR` | `public` | Directory that holds the client to serve |
-| `E2E_PORT` | `4173` | Port for the static server |
-| `E2E_HOST` | `127.0.0.1` | Host for the static server |
-| `E2E_STRICT_GAME` | `0` | Set to `1` to make the game assertions blocking |
+| Variable | Meaning |
+| --- | --- |
+| `E2E_PUBLIC_DIR` | Directory that holds the client. Defaults to `public`. |
+| `E2E_STRICT_GAME` | `1` turns the informational game assertions into hard failures. |
+| `E2E_PORT` / `E2E_HOST` | Address of the static server. Defaults to `127.0.0.1:4173`. |
+| `E2E_BROWSER_CHANNEL` | Playwright browser channel, for example `chrome` to use a system browser instead of the bundled Chromium. |
 
-To serve a different build:
+The report is written to `playwright-report/` and can be opened with:
 
 ```bash
-E2E_PUBLIC_DIR=path/to/built/public npm run e2e
+npm run e2e:report
 ```
-
-The HTML report is written to `playwright-report/` and can be opened with
-`npm run e2e:report`.
-
-## CI wiring
-
-### `.github/workflows/e2e.yml`
-
-A reusable workflow (`workflow_call`) plus a manual `workflow_dispatch` entry
-point. It:
-
-1. Checks out the repository.
-2. Sets up Node.js (default 24).
-3. Downloads the built client artifact when `artifact_name` is supplied.
-4. Resolves the client directory with `tests/e2e/resolve-client-dir.sh`.
-5. Installs the test toolchain and Playwright Chromium with system
-   dependencies.
-6. Runs `npx playwright test` against the client.
-7. Always uploads the HTML report, screenshots and traces as artifacts, even
-   when the suite fails.
-
-### `ci.yml` (main branch)
-
-The workflow is split into three jobs:
-
-```
-build  ──▶  e2e  ──▶  deploy
-```
-
-The `deploy` job depends on **both** `build` and `e2e`, so a browser
-regression blocks the GitHub Pages publish. The client is never pushed to
-production without having run in a real browser first.
-
-### `pr-preview.yml` (pull requests)
-
-Pull requests build a preview client and run the same reusable workflow
-against it. The preview step also refuses to overwrite `public/classes.js`
-with a TeaVM stub, so a broken compile cannot masquerade as a preview.
-
-## Regenerating the lockfile
-
-`package-lock.json` is committed so CI installs exact dependency versions with
-`npm ci`. It is regenerated on a GitHub runner rather than on a developer
-machine:
-
-1. Change `package.json`.
-2. Push to `main`. The **Update package-lock.json** workflow runs
-   automatically and commits the new `package-lock.json`.
-3. Or run the workflow manually with **Run workflow** when the lockfile needs
-   refreshing without a dependency change.
-
-The workflow resolves the dependency tree with `npm install
---package-lock-only --ignore-scripts`, so no packages are installed and
-Playwright never downloads a browser during the resolution step.
 
 ## Troubleshooting
 
-**`classes.js` fails the size check.** The TeaVM compile step did not produce
-a real bundle. Check the `teavm-log` artifact from the same run.
-
-**WebGL2 is unavailable in CI.** Headless Chromium has no GPU, so the suite
-runs with SwiftShader (`--enable-unsafe-swiftshader`,
-`--use-angle=swiftshader`). If the flags regress, the `webgl.spec.ts` checks
-are the first thing that fails.
-
-**The static server returns 403.** The requested path tried to escape the
-served root. `tests/e2e/server.mjs` rejects those requests on purpose.
-
-**A test times out.** The default per-test timeout is 90 seconds and the
-navigation timeout is 45 seconds. The TeaVM bundle is CPU heavy, so the suite
-runs with a single worker to keep timings predictable.
+A run that fails while the client is still booting usually means the bundle
+changed shape, not that the browser is at fault. The Playwright report
+contains the trace, the console output and the screenshot of the failing
+state. Upload it from the `Playwright browser tests` job and open the HTML
+report locally.

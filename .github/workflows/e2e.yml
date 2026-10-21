@@ -74,7 +74,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
-            path: e2e-artifact
+          path: e2e-artifact
 
       - name: Resolve client directory
         id: client

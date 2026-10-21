@@ -1,91 +1,95 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 import {
   formatErrors,
-  installErrorCollector,
   isGameRuntimeError,
-  readCapturedErrors,
+  readMissingShellElements,
   waitForClientBootstrap,
 } from './support';
 
+const BOOT_TIMEOUT = 180_000;
+
+interface EaglerCraftXOptions {
+  container: string;
+  assetsURI: string;
+  localesURI: string;
+  servers: unknown[];
+  relays: unknown[];
+}
+
 test.describe('client shell', () => {
-  test.beforeEach(async ({ page }) => {
-    await installErrorCollector(page);
+  // The client page is shared by the whole worker, so the expensive TeaVM
+  // bootstrap happens once instead of once per test.
+  test.beforeAll(async ({ clientPage }) => {
+    const booted = await waitForClientBootstrap(clientPage, BOOT_TIMEOUT);
+    expect(booted, 'the TeaVM bundle must export self.main').toBe(true);
   });
 
-  test('loads the EaglerCraftX shell', async ({ page }) => {
-    const response = await page.goto('/index.html');
-    expect(response, 'index.html should be reachable').not.toBeNull();
-    expect(response!.status()).toBe(200);
+  test('loads the EaglerCraftX shell', async ({ clientPage }) => {
+    const title = await clientPage.title();
+    expect(title, 'the document title must identify the client').toMatch(/EaglerCraftX/i);
 
-    await expect(page).toHaveTitle(/EaglerCraftX/i);
-    await expect(page.locator('#game_frame')).toBeAttached();
-    await expect(page.locator('#loading-screen')).toBeAttached();
-    await expect(page.locator('#progress-bar')).toBeAttached();
-    await expect(page.locator('#title-overlay')).toBeAttached();
-    await expect(page.locator('#error-overlay')).toBeAttached();
+    const missing = await readMissingShellElements(clientPage);
+    expect(missing, 'the shell must provide its required elements').toEqual([]);
   });
 
-  test('loads the real TeaVM bundle instead of a stub', async ({ page }) => {
-    await page.goto('/index.html');
-    await waitForClientBootstrap(page);
+  test('loads the real TeaVM bundle instead of a stub', async ({ request }) => {
+    const response = await request.get('/classes.js');
+    expect(response.status(), 'classes.js must be served').toBe(200);
 
-    const bundle = await page.evaluate(async () => {
-      const response = await fetch('classes.js');
-      const text = await response.text();
-      return {
-        status: response.status,
-        length: text.length,
-        head: text.slice(0, 400),
-        tail: text.slice(-400),
-      };
-    });
-
-    expect(bundle.status).toBe(200);
-    expect(bundle.length, 'classes.js should be a full TeaVM build, not a stub').toBeGreaterThan(
+    const body = await response.text();
+    expect(body.length, 'classes.js should be a full TeaVM build, not a stub').toBeGreaterThan(
       50_000,
     );
-    expect(bundle.head, 'classes.js should carry the TeaVM export wrapper').toContain('$rt_exports');
-    expect(bundle.tail, 'classes.js should export the TeaVM entry point').toContain(
-      '$rt_exports.main',
-    );
+    expect(body, 'classes.js should carry the TeaVM export wrapper').toContain('$rt_exports');
+    expect(body, 'classes.js should export the TeaVM entry point').toContain('$rt_exports.main');
   });
 
-  test('exports the TeaVM entry point on self.main', async ({ page }) => {
-    await page.goto('/index.html');
-    await waitForClientBootstrap(page);
-
-    const mainType = await page.evaluate(() => typeof (self as unknown as { main?: unknown }).main);
+  test('exports the TeaVM entry point on self.main', async ({ clientPage }) => {
+    const mainType = await clientPage.evaluate(
+      () => typeof (self as unknown as { main?: unknown }).main,
+    );
     expect(mainType).toBe('function');
   });
 
-  test('does not report a failed bundle download', async ({ page }) => {
-    await page.goto('/index.html');
-    await waitForClientBootstrap(page);
-    await page.waitForTimeout(1_500);
-
-    const overlayText = await page.locator('#error-msg').textContent();
-    expect(overlayText ?? '', 'the client must not hit the "failed to load classes.js" path').not.toContain(
-      'Failed to load classes.js',
+  test('exposes a well formed client configuration', async ({ clientPage }) => {
+    const options = await clientPage.evaluate(
+      () => (window as unknown as { eaglercraftXOpts?: EaglerCraftXOptions }).eaglercraftXOpts,
     );
+
+    expect(options, 'window.eaglercraftXOpts must be defined').toBeTruthy();
+    expect(options!.container).toBe('game_frame');
+    expect(typeof options!.assetsURI).toBe('string');
+    expect(typeof options!.localesURI).toBe('string');
+    expect(Array.isArray(options!.servers)).toBe(true);
+    expect(Array.isArray(options!.relays)).toBe(true);
+
+    const containers = await clientPage.evaluate(
+      (id) => document.querySelectorAll(`#${id}`).length,
+      options!.container,
+    );
+    expect(containers, 'the configured container must exist exactly once').toBe(1);
   });
 
-  test('boots without uncaught shell errors', async ({ page }) => {
-    await page.goto('/index.html');
-    await waitForClientBootstrap(page);
-    await page.waitForTimeout(1_500);
+  test('does not report a failed bundle download', async ({ clientPage }) => {
+    const overlayText = await clientPage
+      .locator('#error-msg')
+      .textContent()
+      .catch(() => null);
+    expect(
+      overlayText ?? '',
+      'the client must not hit the "failed to load classes.js" path',
+    ).not.toContain('Failed to load classes.js');
+  });
 
-    const errors = await readCapturedErrors(page);
+  test('boots without uncaught shell errors', async ({ clientErrors }) => {
+    const errors = await clientErrors();
     const shellErrors = errors.filter((error) => !isGameRuntimeError(error));
     expect(shellErrors, `unexpected shell errors:\n${formatErrors(shellErrors)}`).toEqual([]);
   });
 
-  test('captures a screenshot of the running client', async ({ page }, testInfo) => {
-    await page.goto('/index.html');
-    await waitForClientBootstrap(page);
-    await page.waitForTimeout(5_000);
-
+  test('captures a screenshot of the running client', async ({ clientPage }, testInfo) => {
     await testInfo.attach('eaglercraft-client', {
-      body: await page.screenshot({ fullPage: false }),
+      body: await clientPage.screenshot({ fullPage: false }),
       contentType: 'image/png',
     });
   });

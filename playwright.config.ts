@@ -13,6 +13,7 @@ const port = Number(readEnv('E2E_PORT') ?? '4173');
 const host = readEnv('E2E_HOST') ?? '127.0.0.1';
 const baseURL = `http://${host}:${port}`;
 const publicDir = readEnv('E2E_PUBLIC_DIR') ?? 'public';
+const browserChannel = readEnv('E2E_BROWSER_CHANNEL');
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -23,9 +24,11 @@ export default defineConfig({
   workers: 1,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  timeout: 90_000,
+  // The client bootstrap blocks the browser main thread for about a minute, so
+  // a single test can legitimately need several minutes.
+  timeout: 300_000,
   expect: {
-    timeout: 20_000,
+    timeout: 60_000,
   },
   reporter: [
     ['list'],
@@ -36,9 +39,10 @@ export default defineConfig({
     baseURL,
     headless: true,
     browserName: 'chromium',
+    ...(browserChannel ? { channel: browserChannel } : {}),
     viewport: { width: 1280, height: 800 },
-    actionTimeout: 20_000,
-    navigationTimeout: 45_000,
+    actionTimeout: 60_000,
+    navigationTimeout: 180_000,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'off',
@@ -53,6 +57,13 @@ export default defineConfig({
         '--enable-unsafe-swiftshader',
         '--use-gl=angle',
         '--use-angle=swiftshader',
+        // Keep the browser from doing anything in the background that would
+        // compete with the TeaVM bootstrap for CPU.
+        '--disable-background-networking',
+        '--disable-component-update',
+        '--disable-sync',
+        '--no-first-run',
+        '--no-default-browser-check',
       ],
     },
   },

@@ -66,13 +66,28 @@ export function formatErrors(errors: CapturedError[]): string {
   return JSON.stringify(errors, null, 2);
 }
 
-/** Waits until the TeaVM bundle has been evaluated and exported its entry point. */
-export async function waitForClientBootstrap(page: Page, timeout = 45_000): Promise<void> {
-  await page.waitForFunction(
-    () => typeof (self as unknown as { main?: unknown }).main === 'function',
-    undefined,
-    { timeout },
-  );
+/**
+ * Waits until the TeaVM bundle has been evaluated and exported its entry
+ * point.
+ *
+ * The check is driven from Node rather than with page.waitForFunction on
+ * purpose. The bootstrap blocks the browser main thread, so a page side
+ * predicate cannot even be evaluated until the block clears, and a page side
+ * timeout would expire while it is still blocked. Node side polling keeps the
+ * deadline honest.
+ */
+export async function waitForClientBootstrap(page: Page, timeoutMs = 180_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const ready = await page
+      .evaluate(() => typeof (self as unknown as { main?: unknown }).main === 'function')
+      .catch(() => false);
+    if (ready) {
+      return true;
+    }
+    await page.waitForTimeout(1_000);
+  }
+  return false;
 }
 
 export interface ReadyState {
@@ -104,4 +119,20 @@ export async function waitForReadyState(page: Page, timeoutMs: number): Promise<
     await page.waitForTimeout(500);
   }
   return false;
+}
+
+/** Ids that the shell must provide for the client to be able to boot. */
+export const SHELL_ELEMENT_IDS = [
+  'game_frame',
+  'loading-screen',
+  'progress-bar',
+  'title-overlay',
+  'error-overlay',
+] as const;
+
+/** Returns the shell element ids that are missing from the document. */
+export async function readMissingShellElements(page: Page): Promise<string[]> {
+  return page.evaluate((ids) => ids.filter((id) => !document.getElementById(id)), [
+    ...SHELL_ELEMENT_IDS,
+  ]);
 }

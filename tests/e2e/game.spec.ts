@@ -1,27 +1,26 @@
-import { expect, test } from '@playwright/test';
 import { isStrictGame } from './env';
+import { expect, test } from './fixtures';
 import {
   formatErrors,
-  installErrorCollector,
   isGameRuntimeError,
-  readCapturedErrors,
   readReadyState,
+  waitForClientBootstrap,
   waitForReadyState,
 } from './support';
 
 const strict = isStrictGame();
+const BOOT_TIMEOUT = 180_000;
 
 test.describe('game runtime', () => {
-  test.beforeEach(async ({ page }) => {
-    await installErrorCollector(page);
+  test.beforeAll(async ({ clientPage }) => {
+    const booted = await waitForClientBootstrap(clientPage, BOOT_TIMEOUT);
+    expect(booted, 'the TeaVM bundle must export self.main').toBe(true);
   });
 
-  test('reaches the title screen', async ({ page }) => {
-    await page.goto('/index.html');
-
-    const timeout = strict ? 90_000 : 30_000;
-    const reached = await waitForReadyState(page, timeout);
-    const state = await readReadyState(page);
+  test('reaches the title screen', async ({ clientPage }) => {
+    const timeout = strict ? 120_000 : 60_000;
+    const reached = await waitForReadyState(clientPage, timeout);
+    const state = await readReadyState(clientPage);
 
     if (strict) {
       expect(reached, 'the client must reach the title screen in strict mode').toBe(true);
@@ -32,10 +31,8 @@ test.describe('game runtime', () => {
     }
   });
 
-  test('serves the EPK asset archive', async ({ page }) => {
-    await page.goto('/index.html');
-
-    const response = await page.request.get('/assets.epk');
+  test('serves the EPK asset archive', async ({ request }) => {
+    const response = await request.get('/assets.epk');
     const status = response.status();
 
     if (strict) {
@@ -45,11 +42,8 @@ test.describe('game runtime', () => {
     }
   });
 
-  test('runs the client without uncaught game runtime errors', async ({ page }) => {
-    await page.goto('/index.html');
-    await page.waitForTimeout(8_000);
-
-    const errors = await readCapturedErrors(page);
+  test('runs the client without uncaught game runtime errors', async ({ clientErrors }) => {
+    const errors = await clientErrors();
     const runtimeErrors = errors.filter(isGameRuntimeError);
 
     if (strict) {

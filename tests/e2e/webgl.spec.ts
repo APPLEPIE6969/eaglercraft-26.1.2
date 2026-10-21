@@ -1,13 +1,14 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
+import { waitForClientBootstrap } from './support';
 
 test.describe('graphics', () => {
   test('Chromium can create a WebGL2 context', async ({ page }) => {
-    await page.goto('/index.html');
+    // A blank document is enough for the capability probe and keeps the test
+    // independent from the TeaVM bootstrap.
+    await page.setContent('<canvas id="probe" width="64" height="64"></canvas>');
 
     const gl = await page.evaluate(() => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
+      const canvas = document.getElementById('probe') as HTMLCanvasElement;
       const context = canvas.getContext('webgl2');
       if (!context) {
         return { webgl2: false, version: '', renderer: '' };
@@ -23,11 +24,11 @@ test.describe('graphics', () => {
     console.log(`[e2e] WebGL2 ${gl.version} — ${gl.renderer}`);
   });
 
-  test('the game canvas accepts a graphics context', async ({ page }) => {
-    await page.goto('/index.html');
-    await page.waitForTimeout(2_000);
+  test('the game canvas accepts a graphics context', async ({ clientPage }) => {
+    const booted = await waitForClientBootstrap(clientPage, 180_000);
+    expect(booted, 'the TeaVM bundle must export self.main').toBe(true);
 
-    const info = await page.evaluate(() => {
+    const info = await clientPage.evaluate(() => {
       const canvas = document.getElementById('game_frame') as HTMLCanvasElement | null;
       if (!canvas) {
         return { present: false, webgl2: false, webgl: false };

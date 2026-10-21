@@ -551,10 +551,289 @@ def patch_shared_constants(data):
     return data
 
 
+def patch_gl_getstring(data):
+    """
+    Patch WebGL glGetString calls.
+
+    WebGL contexts expose no getString() method — that is native OpenGL ES.
+    The WebGL equivalents are getParameter() with the same GL enum constants:
+      GL_VENDOR = 7936, GL_RENDERER = 7937, GL_VERSION = 7938,
+      GL_EXTENSIONS = 7939, GL_SHADING_LANGUAGE_VERSION = 35724.
+
+    TeaVM compiles the platform glue as e.g.
+      nlevi_PlatformOpenGL_gl.getString(7938)
+    which throws "gl.getString is not a function" and crashes boot inside
+    nlev_EaglerCraft_initialize. Requiring a numeric literal argument keeps
+    the rewrite away from unrelated Java-level getString() methods, which
+    are always receiver-calls without a constant argument.
+    """
+    import re as _re_gl
+    pattern = _re_gl.compile(r'\.getString\((\d+)\)')
+    count = 0
+
+    def _replace(m):
+        nonlocal count
+        count += 1
+        return f'.getParameter({m.group(1)})'
+
+    data = pattern.sub(_replace, data)
+    if count > 0:
+        print(f"  Replaced {count} gl.getString(N) calls with getParameter(N)")
+    else:
+        print("  No gl.getString(N) calls found (may already be patched)")
+    return data
+
+
+def ensure_safe_helper(data):
+    """
+    Ensure the __safe null-guard helper is defined at the top of the file.
+
+    Many patches (null-return stubs, .data field guards, null-safe method
+    calls, BigInt wrappers) emit references to __safe even when an
+    individual patch matched zero sites, so the helper must ALWAYS be
+    defined. Without it every wrapped site throws "__safe is not defined",
+    which the ClinitWrap swallows and leaves whole classes uninitialized.
+    """
+    if 'var __safe = function' in data:
+        print("  __safe helper already defined")
+        return data
+    helper = """
+// Null-return stub helper: returns obj as-is if non-null, shared stub if null.
+// The stub is a CALLABLE Proxy — can be used as both object and function.
+// ALL property accesses return the stub itself, so any chain works:
+//   __safe(null).a.b.c.d -> stub (no throw)
+//   __safe(null).method() -> stub (callable)
+//   __safe(null).data -> [] (array-like)
+//   __safe(null) + 1 -> 1 (numeric)
+//   __safe(null) + '' -> '' (string)
+var __safeStub = null;
+var __safe = function(obj) {
+    if (obj !== null && obj !== undefined) return obj;
+    if (__safeStub) return __safeStub;
+    var emptyArray = [];
+    __safeStub = new Proxy(function(){}, {
+        get: function(t, p) {
+            if (p === '$id$') return 0;
+            if (p === 'data') return emptyArray;
+            if (p === 'length') return 0;
+            if (p === 'valueOf') return function() { return 0; };
+            if (p === 'toString') return function() { return ''; };
+            if (p === 'constructor') return function() { return __safeStub; };
+            if (typeof p === 'symbol') return undefined;
+            if (typeof p === 'number') return undefined;
+            // Return null for ALL property accesses
+            // This allows while(x.field!==null) loops to terminate
+            // For method calls, use (obj.method||noop)() pattern which
+            // checks if method exists before calling
+            return null;
+        },
+        apply: function() {
+            // When called as a function, return null (not stub)
+            // This allows while(x.method()!==null) loops to terminate
+            return null;
+        },
+        has: function() { return true; }
+    });
+    return __safeStub;
+};
+"""
+    use_strict = '"use strict";\n'
+    if use_strict in data[:64]:
+        data = data.replace(use_strict, use_strict + helper, 1)
+    else:
+        data = helper + data
+    print("  Defined __safe null-guard helper at top of file")
+    return data
+
+
+def patch_mainclass_stack_trace(data):
+    """
+    Make the MainClass entry catch print the Java stack trace to console.
+
+    nlevit_MainClass_main wraps the whole client init in try/catch and only
+    forwards exception.getMessage() to the crash screen. For browser boot
+    failures (e.g. "Illegal invocation") the message alone is not enough to
+    localise the fault, while nlev_EaglerCraft_initialize's own catch block
+    already prints full stack traces via jl_Throwable_getStackTrace. Mirror
+    that behaviour so every crash is diagnosable from the console.
+    """
+    anchor = 'nlevit_MainClass_main = var$1 => {'
+    idx = data.find(anchor)
+    if idx < 0:
+        print("  WARNING: nlevit_MainClass_main not found")
+        return data
+    window_text = data[idx:idx + 4000]
+    marker = 'if ($$je instanceof jl_Throwable) {'
+    midx = window_text.find(marker)
+    if midx < 0:
+        print("  WARNING: MainClass catch marker not found")
+        return data
+    insert_at = idx + midx + len(marker)
+    stack_print = (
+        '\n                        try { var __st = (jl_Throwable_getStackTrace($$je)).data;'
+        ' for (var __i = 0; __i < __st.length; __i++)'
+        ' console.error("  at " + jl_StackTraceElement_toString(__st[__i])); }'
+        ' catch (__e2) { console.error("  (no stack trace available)"); }'
+    )
+    data = data[:insert_at] + stack_print + data[insert_at:]
+    print("  MainClass catch now prints stack trace to console")
+    return data
+
+
+def patch_audio_worklet_check(data):
+    """
+    Replace the audio-worklet feature probe with a non-invoking check.
+
+    'AudioContext.prototype.audioWorklet' invokes the native audioWorklet
+    accessor with a plain prototype object as receiver, which throws
+    "Illegal invocation" in Chromium and crashed nlevi_PlatformAudio__init
+    (killing the whole client init). The 'in' operator tests for the
+    property without invoking any getter.
+    """
+    old = "!!(window.AudioContext && AudioContext.prototype.audioWorklet) ? 1 : 0"
+    new = "(window.AudioContext && ('audioWorklet' in AudioContext.prototype)) ? 1 : 0"
+    if old in data:
+        data = data.replace(old, new)
+        print("  Replaced audioWorklet prototype access with 'in' check")
+    elif "'audioWorklet' in AudioContext.prototype" in data:
+        print("  audioWorklet check already patched")
+    else:
+        print("  WARNING: audioWorklet pattern not found")
+    return data
+
+
+def patch_long_time_functions(data):
+    """
+    Make the platform time helpers return TeaVM longs (BigInt).
+
+    TeaVM represents Java long as native JS BigInt, but the hand-written
+    js_body time helpers return plain JS numbers:
+      nlevit_ClientMain_getCurrentTimeMillis$js_body$_25
+      nlevi_PlatformRuntime_getCurrentTimeMillis0$js_body$_39
+      nlevi_PlatformRuntime_getTimeOrigin0$js_body$_40
+    The game tick feeds those numbers into Long_sub/Long_add, which then
+    throws "Cannot mix BigInt and other types, use explicit conversions"
+    and kills the frame loop on every animation frame. Wrap the raw number
+    in Long_fromNumber() so every helper returns a proper BigInt long.
+    """
+    fixes = [
+        (
+            "        return Math.floor(window.performance.now());\n    } else {\n        return Date.now();",
+            "        return Long_fromNumber(Math.floor(window.performance.now()));\n    } else {\n        return Long_fromNumber(Date.now());",
+        ),
+        (
+            "        return Math.floor(window.performance.timeOrigin);",
+            "        return Long_fromNumber(Math.floor(window.performance.timeOrigin));",
+        ),
+    ]
+    for old, new in fixes:
+        n = data.count(old)
+        if n:
+            data = data.replace(old, new)
+            print(f"  Wrapped {n} raw time return(s) in Long_fromNumber ({old.strip()[7:47]}...)")
+        else:
+            print(f"  WARNING time pattern not found: {old.strip()[:50]}")
+    return data
+
+
+def patch_long_arithmetic(data):
+    """
+    Harden every Long_* helper against non-BigInt operands.
+
+    TeaVM models Java long as native BigInt, so any stray plain JS number
+    that reaches Long_add/Long_sub/Long_compare/... throws "Cannot mix
+    BigInt and other types" (in the game tick that kills the entire frame
+    loop). Coerce operands through __toBigInt() instead of throwing.
+    """
+    helper = """
+var __toBigInt = function(v) {
+    if (typeof v === 'bigint') return v;
+    if (v === null || v === undefined) return 0n;
+    if (typeof v === 'number') {
+        if (v !== v || v === Infinity || v === -Infinity) return 0n;
+        return BigInt(Math.trunc(v));
+    }
+    try { return BigInt(v); } catch (e) { return 0n; }
+};
+"""
+    if 'var __toBigInt = function' not in data:
+        marker = 'var __safeAsIntN = function'
+        if marker in data:
+            data = data.replace(marker, helper + '\n' + marker, 1)
+            print("  Added __toBigInt coercion helper at top of file")
+        else:
+            data = helper + data
+            print("  Added __toBigInt coercion helper (prepended — __safeAsIntN marker missing)")
+
+    ops = [
+        ('Long_fromNumber = val => __safeAsIntN(64, BigInt(val >= 0 ? Math.floor(val) : Math.ceil(val)))',
+         'Long_fromNumber = val => { if (typeof val === "bigint") return __safeAsIntN(64, val); if (typeof val !== "number" || val !== val || val === Infinity || val === -Infinity) return 0n; return __safeAsIntN(64, BigInt(val >= 0 ? Math.floor(val) : Math.ceil(val))); }'),
+        ('Long_hi = val => Number(__safeAsIntN(64, val >> BigInt(32))) | 0',
+         'Long_hi = val => Number(__safeAsIntN(64, __toBigInt(val) >> BigInt(32))) | 0'),
+        ('Long_lo = val => Number(__safeAsIntN(32, val)) | 0',
+         'Long_lo = val => Number(__safeAsIntN(32, __toBigInt(val))) | 0'),
+        ('Long_eq = (a, b) => a === b',
+         'Long_eq = (a, b) => __toBigInt(a) === __toBigInt(b)'),
+        ('Long_ne = (a, b) => a !== b;',
+         'Long_ne = (a, b) => __toBigInt(a) !== __toBigInt(b);'),
+        ('Long_gt = (a, b) => a > b',
+         'Long_gt = (a, b) => __toBigInt(a) > __toBigInt(b)'),
+        ('Long_ge = (a, b) => a >= b',
+         'Long_ge = (a, b) => __toBigInt(a) >= __toBigInt(b)'),
+        ('Long_lt = (a, b) => a < b',
+         'Long_lt = (a, b) => __toBigInt(a) < __toBigInt(b)'),
+        ('Long_le = (a, b) => a <= b',
+         'Long_le = (a, b) => __toBigInt(a) <= __toBigInt(b)'),
+        ('Long_add = (a, b) => __safeAsIntN(64, a + b)',
+         'Long_add = (a, b) => __safeAsIntN(64, __toBigInt(a) + __toBigInt(b))'),
+        ('Long_neg = a => __safeAsIntN(64,  -a)',
+         'Long_neg = a => __safeAsIntN(64, -__toBigInt(a))'),
+        ('Long_sub = (a, b) => __safeAsIntN(64, a - b)',
+         'Long_sub = (a, b) => __safeAsIntN(64, __toBigInt(a) - __toBigInt(b))'),
+        ('Long_compare = (a, b) => a < b ?  -1 : a > b ? 1 : 0',
+         'Long_compare = (a, b) => { a = __toBigInt(a); b = __toBigInt(b); return a < b ? -1 : a > b ? 1 : 0; }'),
+        ('Long_mul = (a, b) => __safeAsIntN(64, a * b)',
+         'Long_mul = (a, b) => __safeAsIntN(64, __toBigInt(a) * __toBigInt(b))'),
+        ('Long_div = (a, b) => __safeAsIntN(64, a / b)',
+         'Long_div = (a, b) => __safeAsIntN(64, __toBigInt(a) / __toBigInt(b))'),
+        ('Long_udiv = (a, b) => __safeAsIntN(64, __safeAsUintN(64, a) / __safeAsUintN(64, b))',
+         'Long_udiv = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) / __safeAsUintN(64, __toBigInt(b)))'),
+        ('Long_rem = (a, b) => __safeAsIntN(64, a % b)',
+         'Long_rem = (a, b) => __safeAsIntN(64, __toBigInt(a) % __toBigInt(b))'),
+        ('Long_urem = (a, b) => __safeAsIntN(64, __safeAsUintN(64, a) % __safeAsUintN(64, b))',
+         'Long_urem = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) % __safeAsUintN(64, __toBigInt(b)))'),
+        ('Long_and = (a, b) => __safeAsIntN(64, a & b)',
+         'Long_and = (a, b) => __safeAsIntN(64, __toBigInt(a) & __toBigInt(b))'),
+        ('Long_or = (a, b) => __safeAsIntN(64, a | b)',
+         'Long_or = (a, b) => __safeAsIntN(64, __toBigInt(a) | __toBigInt(b))'),
+        ('Long_xor = (a, b) => __safeAsIntN(64, a ^ b)',
+         'Long_xor = (a, b) => __safeAsIntN(64, __toBigInt(a) ^ __toBigInt(b))'),
+        ('Long_shl = (a, b) => __safeAsIntN(64, a << BigInt(b & 63))',
+         'Long_shl = (a, b) => __safeAsIntN(64, __toBigInt(a) << BigInt(Number(b) & 63))'),
+        ('Long_shr = (a, b) => __safeAsIntN(64, a >> BigInt(b & 63))',
+         'Long_shr = (a, b) => __safeAsIntN(64, __toBigInt(a) >> BigInt(Number(b) & 63))'),
+        ('Long_shru = (a, b) => __safeAsIntN(64, __safeAsUintN(64, a) >> BigInt(b & 63))',
+         'Long_shru = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) >> BigInt(Number(b) & 63))'),
+    ]
+    count = 0
+    for old, new in ops:
+        if old in data:
+            data = data.replace(old, new, 1)
+            count += 1
+        else:
+            print(f"  WARNING Long pattern not found: {old[:64]}")
+    print(f"  Hardened {count}/{len(ops)} Long helpers with __toBigInt coercion")
+    return data
+
+
 def patch_classes_js(input_path, output_path):
     """Patch classes.js with default method workaround."""
     with open(input_path, 'r', encoding='utf-8') as f:
         data = f.read()
+
+    # __safe is referenced by many patches below — always define it first.
+    print("\nEnsuring __safe null-guard helper is defined...")
+    data = ensure_safe_helper(data)
 
     print(f"Scanning {len(data)} bytes for default method definitions...")
 
@@ -602,6 +881,19 @@ def patch_classes_js(input_path, output_path):
     # This fixes DataFixers DSL builder chain crashes (CY returns null → .fa() crashes)
     print("\nPatching null-return stubs...")
     data = patch_null_return_stubs(data)
+
+    # WebGL has no gl.getString() — rewrite to getParameter(GL_enum)
+    # (GL_VENDOR/GL_RENDERER/GL_VERSION lookups crash nlev_EaglerCraft_initialize)
+    print("\nPatching gl.getString → gl.getParameter...")
+    data = patch_gl_getstring(data)
+
+    # Crash screens without stack traces are undebuggable — print the stack
+    print("\nPatching MainClass catch to print stack traces...")
+    data = patch_mainclass_stack_trace(data)
+
+    # audioWorklet feature probe threw "Illegal invocation" and killed audio init
+    print("\nPatching audioWorklet feature check...")
+    data = patch_audio_worklet_check(data)
 
     # Patch the $id$ function to be null-safe
     # TeaVM has a function like: X=a=>{let b;b=a;if(!b.$id$)b.$id$=Y();return a.$id$;}
@@ -1168,6 +1460,16 @@ var __safeAsUintN = function(bits, val) {
             new_func = name_params + '{try{return ' + body + ';}catch(e){return 0;}}'
             data = data.replace(func_text, new_func, 1)
             print(f"  Patched {func_name} (try/catch wrapper)")
+    # Platform time helpers must return TeaVM longs (BigInt), not JS numbers.
+    # NOTE: must run after the BigInt wrappers section so Long_fromNumber is
+    # the final form when the Long_* helpers are rewritten below.
+    print("\nPatching platform time helpers to return BigInt longs...")
+    data = patch_long_time_functions(data)
+
+    # All Long_* helpers must tolerate stray plain numbers instead of throwing
+    print("\nHardening Long arithmetic against BigInt/number mixing...")
+    data = patch_long_arithmetic(data)
+
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
@@ -1428,65 +1730,9 @@ def patch_null_return_stubs(data):
     
     if count > 0:
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
-        # Add __safe helper at the top of the file
-        helper = """
-// Null-return stub helper: returns obj as-is if non-null, shared stub if null.
-// The stub is a CALLABLE Proxy — can be used as both object and function.
-// ALL property accesses return the stub itself, so any chain works:
-//   __safe(null).a.b.c.d -> stub (no throw)
-//   __safe(null).method() -> stub (callable)
-//   __safe(null).data -> [] (array-like)
-//   __safe(null) + 1 -> 1 (numeric)
-//   __safe(null) + '' -> '' (string)
-var __safeStub = null;
-var __safe = function(obj) {
-    if (obj !== null && obj !== undefined) return obj;
-    if (__safeStub) return __safeStub;
-    var emptyArray = [];
-    __safeStub = new Proxy(function(){}, {
-        get: function(t, p) {
-            if (p === '$id$') return 0;
-            if (p === 'data') return emptyArray;
-            if (p === 'length') return 0;
-            if (p === 'valueOf') return function() { return 0; };
-            if (p === 'toString') return function() { return ''; };
-            if (p === 'constructor') return function() { return __safeStub; };
-            if (typeof p === 'symbol') return undefined;
-            if (typeof p === 'number') return undefined;
-            // Return null for ALL property accesses
-            // This allows while(x.field!==null) loops to terminate
-            // For method calls, use (obj.method||noop)() pattern which
-            // checks if method exists before calling
-            return null;
-        },
-        apply: function() {
-            // When called as a function, return null (not stub)
-            // This allows while(x.method()!==null) loops to terminate
-            return null;
-        },
-        has: function() { return true; }
-    });
-    return __safeStub;
-};
-"""
-        # Scan classes.js for used 3-char method names
-        import re as _re3
-        _blacklist = {'get','set','put','add','run','fix','map','key','val','let','new','del','use','end','sum','min','max','mid','cap','log','abs','pow','exp','sin','cos','tan','hex','oct','bin','sub','mul','div','mod','rem','neg','not','and','xor','ior','shl','shr','cmp'}
-        _used3 = set()
-        for _m in _re3.finditer(r'\.([a-zA-Z_$][a-zA-Z0-9_$]{2})\(', data):
-            _n = _m.group(1)
-            if _n not in _blacklist:
-                _used3.add(_n)
-        _used3_str = ','.join(f"'{n}'" for n in sorted(_used3))
-        print(f"  Found {len(_used3)} used 3-char methods (excluding {len(_blacklist)} real Java methods)")
-        # Add 3-char no-ops to the stub's prototype (not Object.prototype)
-        helper = helper.replace('__USED3CHARS__', f'[{_used3_str}]')
-        
-        use_strict = '"use strict";\n'
-        if use_strict in patched:
-            patched = patched.replace(use_strict, use_strict + helper, 1)
-        else:
-            patched = helper + patched
+        # The helper itself is emitted unconditionally at the start of the
+        # pipeline (ensure_safe_helper) — many other patches reference __safe
+        # even when this patch matched zero sites.
     return patched
 
 if __name__ == '__main__':

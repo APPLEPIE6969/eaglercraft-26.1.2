@@ -1,4 +1,63 @@
-"use strict";
+
+
+var __toBigInt = function(v) {
+    if (typeof v === 'bigint') return v;
+    if (v === null || v === undefined) return 0n;
+    if (typeof v === 'number') {
+        if (v !== v || v === Infinity || v === -Infinity) return 0n;
+        return BigInt(Math.trunc(v));
+    }
+    try { return BigInt(v); } catch (e) { return 0n; }
+};
+
+var __safeAsIntN = function(bits, val) {
+    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
+    try { return BigInt.asIntN(bits, val); } catch(e) { return 0n; }
+};
+var __safeAsUintN = function(bits, val) {
+    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
+    try { return BigInt.asUintN(bits, val); } catch(e) { return 0n; }
+};
+
+
+// Null-return stub helper: returns obj as-is if non-null, shared stub if null.
+// The stub is a CALLABLE Proxy — can be used as both object and function.
+// ALL property accesses return the stub itself, so any chain works:
+//   __safe(null).a.b.c.d -> stub (no throw)
+//   __safe(null).method() -> stub (callable)
+//   __safe(null).data -> [] (array-like)
+//   __safe(null) + 1 -> 1 (numeric)
+//   __safe(null) + '' -> '' (string)
+var __safeStub = null;
+var __safe = function(obj) {
+    if (obj !== null && obj !== undefined) return obj;
+    if (__safeStub) return __safeStub;
+    var emptyArray = [];
+    __safeStub = new Proxy(function(){}, {
+        get: function(t, p) {
+            if (p === '$id$') return 0;
+            if (p === 'data') return emptyArray;
+            if (p === 'length') return 0;
+            if (p === 'valueOf') return function() { return 0; };
+            if (p === 'toString') return function() { return ''; };
+            if (p === 'constructor') return function() { return __safeStub; };
+            if (typeof p === 'symbol') return undefined;
+            if (typeof p === 'number') return undefined;
+            // Return null for ALL property accesses
+            // This allows while(x.field!==null) loops to terminate
+            // For method calls, use (obj.method||noop)() pattern which
+            // checks if method exists before calling
+            return null;
+        },
+        apply: function() {
+            // When called as a function, return null (not stub)
+            // This allows while(x.method()!==null) loops to terminate
+            return null;
+        },
+        has: function() { return true; }
+    });
+    return __safeStub;
+};
 (function(module) {
     if (typeof define === 'function' && define.amd) {
         define(['exports'], function(exports)  {
@@ -40,7 +99,7 @@ $rt_mainStarter = f => (args, callback) => {
     }
     let javaArgs = $rt_createArray($rt_objcls(), args.length);
     for (let i = 0;i < args.length;++i) {
-        javaArgs.data[i] = $rt_str(args[i]);
+        (__safe(javaArgs).data||[])[i] = $rt_str(args[i]);
     }
     $rt_startThread(() => {
         f.call(null, javaArgs);
@@ -167,38 +226,38 @@ $rt_ucmp = (a, b) => {
     return a < b ?  -1 : a > b ? 1 : 0;
 },
 Long_ZERO = BigInt(0),
-Long_create = (lo, hi) => BigInt.asIntN(64, BigInt.asUintN(64, BigInt(lo)) | BigInt.asUintN(64, BigInt(hi) << BigInt(32))),
-Long_fromInt = val => BigInt.asIntN(64, BigInt(val | 0)),
-Long_fromNumber = val => BigInt.asIntN(64, BigInt(val >= 0 ? Math.floor(val) : Math.ceil(val))),
+Long_create = (lo, hi) => __safeAsIntN(64, __safeAsUintN(64, BigInt(lo)) | __safeAsUintN(64, BigInt(hi) << BigInt(32))),
+Long_fromInt = val => __safeAsIntN(64, BigInt(val | 0)),
+Long_fromNumber = val => { if (typeof val === "bigint") return __safeAsIntN(64, val); if (typeof val !== "number" || val !== val || val === Infinity || val === -Infinity) return 0n; return __safeAsIntN(64, BigInt(val >= 0 ? Math.floor(val) : Math.ceil(val))); },
 Long_toNumber = val => Number(val),
-Long_hi = val => Number(BigInt.asIntN(64, val >> BigInt(32))) | 0,
-Long_lo = val => Number(BigInt.asIntN(32, val)) | 0,
-Long_eq = (a, b) => a === b,
-Long_ne = (a, b) => a !== b;
-let Long_gt = (a, b) => a > b,
-Long_ge = (a, b) => a >= b,
-Long_lt = (a, b) => a < b,
-Long_le = (a, b) => a <= b,
-Long_add = (a, b) => BigInt.asIntN(64, a + b),
-Long_neg = a => BigInt.asIntN(64,  -a),
-Long_sub = (a, b) => BigInt.asIntN(64, a - b),
-Long_compare = (a, b) => a < b ?  -1 : a > b ? 1 : 0,
+Long_hi = val => Number(__safeAsIntN(64, __toBigInt(val) >> BigInt(32))) | 0,
+Long_lo = val => Number(__safeAsIntN(32, __toBigInt(val))) | 0,
+Long_eq = (a, b) => __toBigInt(a) === __toBigInt(b),
+Long_ne = (a, b) => __toBigInt(a) !== __toBigInt(b);
+let Long_gt = (a, b) => __toBigInt(a) > __toBigInt(b),
+Long_ge = (a, b) => __toBigInt(a) >= __toBigInt(b),
+Long_lt = (a, b) => __toBigInt(a) < __toBigInt(b),
+Long_le = (a, b) => __toBigInt(a) <= __toBigInt(b),
+Long_add = (a, b) => __safeAsIntN(64, __toBigInt(a) + __toBigInt(b)),
+Long_neg = a => __safeAsIntN(64, -__toBigInt(a)),
+Long_sub = (a, b) => __safeAsIntN(64, __toBigInt(a) - __toBigInt(b)),
+Long_compare = (a, b) => { a = __toBigInt(a); b = __toBigInt(b); return a < b ? -1 : a > b ? 1 : 0; },
 Long_ucompare = (a, b) => {
-    a = BigInt.asUintN(64, a);
-    b = BigInt.asUintN(64, b);
+    a = __safeAsUintN(64, a);
+    b = __safeAsUintN(64, b);
     return a < b ?  -1 : a > b ? 1 : 0;
 },
-Long_mul = (a, b) => BigInt.asIntN(64, a * b),
-Long_div = (a, b) => BigInt.asIntN(64, a / b),
-Long_udiv = (a, b) => BigInt.asIntN(64, BigInt.asUintN(64, a) / BigInt.asUintN(64, b)),
-Long_rem = (a, b) => BigInt.asIntN(64, a % b),
-Long_urem = (a, b) => BigInt.asIntN(64, BigInt.asUintN(64, a) % BigInt.asUintN(64, b)),
-Long_and = (a, b) => BigInt.asIntN(64, a & b),
-Long_or = (a, b) => BigInt.asIntN(64, a | b),
-Long_xor = (a, b) => BigInt.asIntN(64, a ^ b),
-Long_shl = (a, b) => BigInt.asIntN(64, a << BigInt(b & 63)),
-Long_shr = (a, b) => BigInt.asIntN(64, a >> BigInt(b & 63)),
-Long_shru = (a, b) => BigInt.asIntN(64, BigInt.asUintN(64, a) >> BigInt(b & 63)),
+Long_mul = (a, b) => __safeAsIntN(64, __toBigInt(a) * __toBigInt(b)),
+Long_div = (a, b) => __safeAsIntN(64, __toBigInt(a) / __toBigInt(b)),
+Long_udiv = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) / __safeAsUintN(64, __toBigInt(b))),
+Long_rem = (a, b) => __safeAsIntN(64, __toBigInt(a) % __toBigInt(b)),
+Long_urem = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) % __safeAsUintN(64, __toBigInt(b))),
+Long_and = (a, b) => __safeAsIntN(64, __toBigInt(a) & __toBigInt(b)),
+Long_or = (a, b) => __safeAsIntN(64, __toBigInt(a) | __toBigInt(b)),
+Long_xor = (a, b) => __safeAsIntN(64, __toBigInt(a) ^ __toBigInt(b)),
+Long_shl = (a, b) => __safeAsIntN(64, __toBigInt(a) << BigInt(Number(b) & 63)),
+Long_shr = (a, b) => __safeAsIntN(64, __toBigInt(a) >> BigInt(Number(b) & 63)),
+Long_shru = (a, b) => __safeAsIntN(64, __safeAsUintN(64, __toBigInt(a)) >> BigInt(Number(b) & 63)),
 $rt_createArray = (cls, sz) => {
     let data = new Array(sz);
     data.fill(null);
@@ -239,23 +298,23 @@ $rt_arraycls = cls => {
         JavaArray.prototype.constructor = JavaArray;
         JavaArray.prototype.toString = function() {
             let str = "[";
-            for (let i = 0;i < this.data.length;++i) {
+            for (let i = 0;i < (__safe(this).data||[]).length;++i) {
                 if (i > 0) {
                     str += ", ";
                 }
-                str += this.data[i].toString();
+                str += (__safe(this).data||[])[i].toString();
             }
             str += "]";
             return str;
         };
         JavaArray.prototype.$clone0 = function() {
             let dataCopy;
-            if ('slice' in this.data) {
-                dataCopy = this.data.slice();
+            if ('slice' in (__safe(this).data||[])) {
+                dataCopy = (__safe(this).data||[]).slice();
             } else {
-                dataCopy = new this.data.constructor(this.data.length);
+                dataCopy = new (__safe(this).data||[]).constructor((__safe(this).data||[]).length);
                 for (let i = 0;i < dataCopy.length;++i) {
-                    dataCopy[i] = this.data[i];
+                    dataCopy[i] = (__safe(this).data||[])[i];
                 }
             }
             return new ($rt_arraycls(this.type))(dataCopy);
@@ -321,7 +380,7 @@ $rt_createMultiArrayImpl = (cls, arrays, dimensions, start) => {
         while (index < limit) {
             let arr = $rt_createUnfilledArray(cls, dim);
             for (let j = 0;j < dim;j = j + 1 | 0) {
-                arr.data[j] = arrays[index];
+                (__safe(arr).data||[])[j] = arrays[index];
                 index = index + 1 | 0;
             }
             arrays[packedIndex] = arr;
@@ -332,7 +391,7 @@ $rt_createMultiArrayImpl = (cls, arrays, dimensions, start) => {
     return arrays[0];
 };
 function $rt_arrayLength(array) {
-    return array.data.length;
+    return (__safe(array).data||[]).length;
 }
 let $rt_stringPool_instance,
 $rt_stringPool = strings => {
@@ -431,7 +490,7 @@ $rt_fillStack = (err, ex) => {
                 noStack = true;
                 break;
             }
-            javaStack.data[i] = elem;
+            (__safe(javaStack).data||[])[i] = elem;
         }
         if (!noStack) {
             $rt_setStack(ex, javaStack);
@@ -633,7 +692,7 @@ jl_String__init_3 = () => {
 },
 jl_String__init_2 = ($this, $characters) => {
     jl_String_$callClinit();
-    $this.$nativeString = $rt_charArrayToString($characters.data, 0, $characters.data.length);
+    $this.$nativeString = $rt_charArrayToString((__safe($characters).data||[]), 0, (__safe($characters).data||[]).length);
 },
 jl_String__init_ = var_0 => {
     let var_1 = new jl_String();
@@ -883,7 +942,7 @@ jl_String_toString = $this => {
 jl_String_toCharArray = $this => {
     let $array, var$2, $i, var$4;
     $array = $rt_createCharArray($this.$nativeString.length);
-    var$2 = $array.data;
+    var$2 = (__safe($array).data||[]);
     $i = 0;
     var$4 = var$2.length;
     while ($i < var$4) {
@@ -999,10 +1058,13 @@ jl_String_replaceAll = ($this, $regex, $replacement) => {
     return jl_AbstractStringBuilder_toString(var$3);
 },
 jl_String__clinit_ = () => {
+try {
+
     jl_String_EMPTY_CHARS = $rt_createCharArray(0);
     jl_String_EMPTY = jl_String__init_3();
     jl_String_CASE_INSENSITIVE_ORDER = new jl_String$_clinit_$lambda$_118_0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jlr_AnnotatedElement = $rt_classWithoutFields(0),
 jlr_GenericDeclaration = $rt_classWithoutFields(0),
 jlr_Type = $rt_classWithoutFields(0);
@@ -1242,7 +1304,7 @@ jl_Integer_valueOf = $i => {
                 jl_Integer_integerCache = $rt_createArray(jl_Integer, 256);
                 var$2 = 0;
                 while (true) {
-                    var$3 = jl_Integer_integerCache.data;
+                    var$3 = (__safe(jl_Integer_integerCache).data||[]);
                     if (var$2 >= var$3.length)
                         break a;
                     var$3[var$2] = jl_Integer__init_(var$2 - 128 | 0);
@@ -1250,7 +1312,7 @@ jl_Integer_valueOf = $i => {
                 }
             }
         }
-        return jl_Integer_integerCache.data[$i + 128 | 0];
+        return (__safe(jl_Integer_integerCache).data||[])[$i + 128 | 0];
     }
     return jl_Integer__init_($i);
 },
@@ -1338,8 +1400,11 @@ jl_Integer_numberOfTrailingZeros = $i => {
     return (32 - $n | 0) - 1 | 0;
 },
 jl_Integer__clinit_ = () => {
+try {
+
     jl_Integer_TYPE = $rt_cls($rt_intcls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jl_AbstractStringBuilder() {
     let a = this; jl_Object.call(a);
     a.$buffer = null;
@@ -1714,7 +1779,7 @@ jl_AbstractStringBuilder_insert1 = ($this, $index, $chars, $offset, $len) => {
     jl_AbstractStringBuilder_insertSpace($this, $index, $index + $len | 0);
     var$5 = $len + $offset | 0;
     while ($offset < var$5) {
-        var$6 = $chars.data;
+        var$6 = (__safe($chars).data||[]);
         var$7 = $this.$buffer.data;
         $len = $index + 1 | 0;
         var$8 = $offset + 1 | 0;
@@ -1725,7 +1790,7 @@ jl_AbstractStringBuilder_insert1 = ($this, $index, $chars, $offset, $len) => {
     return $this;
 },
 jl_AbstractStringBuilder_append2 = ($this, $chars) => {
-    return $this.$append6($chars, 0, $chars.data.length);
+    return $this.$append6($chars, 0, (__safe($chars).data||[]).length);
 },
 jl_AbstractStringBuilder_insertSpace = ($this, $start, $end) => {
     let var$3, $sz, $i, var$6;
@@ -1984,6 +2049,7 @@ nlevit_MainClass_main = var$1 => {
                 } catch ($$e) {
                     $$je = $rt_wrapException($$e);
                     if ($$je instanceof jl_Throwable) {
+                        try { var __st = (jl_Throwable_getStackTrace($$je)).data; for (var __i = 0; __i < __st.length; __i++) console.error("  at " + jl_StackTraceElement_toString(__st[__i])); } catch (__e2) { console.error("  (no stack trace available)"); }
                         var$2 = $$je;
                         var$2 = var$2.$getMessage();
                         var$3 = new jl_StringBuilder;
@@ -1999,8 +2065,11 @@ nlevit_MainClass_main = var$1 => {
     }
 },
 nlevit_MainClass__clinit_ = () => {
+try {
+
     return;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_ClassCastException = $rt_classWithoutFields(jl_RuntimeException),
 otp_Platform = $rt_classWithoutFields(),
 otp_Platform_clone = var$1 => {
@@ -2037,7 +2106,7 @@ otci_IntegerUtil_toUnsignedLogRadixString = (var$1, var$2) => {
     $mask = $radix - 1 | 0;
     $sz = (((32 - jl_Integer_numberOfLeadingZeros(var$1) | 0) + var$2 | 0) - 1 | 0) / var$2 | 0;
     $chars = $rt_createCharArray($sz);
-    var$7 = $chars.data;
+    var$7 = (__safe($chars).data||[]);
     $pos = $rt_imul($sz - 1 | 0, var$2);
     $target = 0;
     while ($pos >= 0) {
@@ -2140,6 +2209,8 @@ nlevit_ClientMain_getCanvas = () => {
     return nlevit_ClientMain_canvas;
 },
 nlevit_ClientMain__clinit_ = () => {
+try {
+
     nlevit_ClientMain_window = window;
     nlevit_ClientMain_document = otjdh_HTMLDocument_current();
     nlevit_ClientMain_initialized = 0;
@@ -2159,7 +2230,8 @@ nlevit_ClientMain__clinit_ = () => {
     nlevit_ClientMain_animationFrameId = 0;
     nlevit_ClientMain_eaglercraftInitialized = 0;
     nlevit_ClientMain_tickFunctor = null;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevit_ClientMain_tryCreateWebGL2$js_body$_20 = (var$1, var$2) => {
     try {
         var ctx = var$1.getContext('webgl2', var$2);
@@ -2178,9 +2250,9 @@ nlevit_ClientMain_createContextAttributes$js_body$_22 = var$1 => {
 },
 nlevit_ClientMain_getCurrentTimeMillis$js_body$_25 = () => {
     if (window.performance && window.performance.now) {
-        return Math.floor(window.performance.now());
+        return Long_fromNumber(Math.floor(window.performance.now()));
     } else {
-        return Date.now();
+        return Long_fromNumber(Date.now());
     }
 },
 nlevit_ClientMain_showCrashScreen0$js_body$_26 = var$1 => {
@@ -2354,7 +2426,7 @@ jl_Character_digit = ($ch, $radix) => {
             }
             jl_Character_digitMapping = var$6;
         }
-        var$6 = jl_Character_digitMapping.data;
+        var$6 = (__safe(jl_Character_digitMapping).data||[]);
         var$8 = 0;
         var$9 = (var$6.length / 2 | 0) - 1 | 0;
         a: {
@@ -2422,7 +2494,7 @@ let jl_Character_getType = $codePoint => {
             jl_Character_$$metadata$$4 = jl_Character_obtainClasses$$create();
         jl_Character_classMapping = otciu_UnicodeHelper_extractRle((jl_Character_$$metadata$$4.value !== null ? $rt_str(jl_Character_$$metadata$$4.value) : null));
     }
-    $classes = jl_Character_classMapping.data;
+    $classes = (__safe(jl_Character_classMapping).data||[]);
     $l = 0;
     $u = $classes.length - 1 | 0;
     while ($l <= $u) {
@@ -2513,9 +2585,12 @@ jl_Character_isWhitespace = $codePoint => {
     return 1;
 },
 jl_Character__clinit_ = () => {
+try {
+
     jl_Character_TYPE = $rt_cls($rt_charcls);
     jl_Character_characterCache = $rt_createArray(jl_Character, 128);
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Character_acquireLowerCaseMapping$$create = () => {
     return {"value" : "NY  H#F#U 4%F#O #F#/ d%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #a1# #%# #%# #%# %%# #%# #%# #%# #%# #%# #%# #%# %%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #<+#%# #%# #%# \'.3#%# #%# #{1#%# #w1%%# %J\'#k1#o1#%# #w1#!3# #23#*3#%# \'23#:3# #>3#%# #%# #%# #N3#%# #N3# %%# #N3#%# #J3%%# #%# #R3#%# \'%# /)#%# #)#%# #)#%# #%# #%# #%# #%# #%# #%# #%# #%# %%# #%# #%# #%# #%# #%# #%# #%# #%# %)#%# #%# #8)#L%#%# #%# #%# #"
     + "%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #a+# #%# #%# #%# #%# #%# #%# #%# #%# #%# /B45#%# #,/#645# %%# #P1#!\'#*\'#%# #%# #%# #%# #%# <-%# #%# \'%# 1&++ %_## #Z#)k%%g%% #F#W hA# 1%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# +]%# %%# #?#%# %a+\'N\'AF#b &#%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# 3%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #%# #^#%# #%# #%# #%# #%# #%# #%# %%# #%# #%# #%# #%# #%# #%# #%"
@@ -2581,9 +2656,9 @@ nlevi_PlatformOpenGL__init = () => {
         console.warn("EXT_color_buffer_float not available - float render targets may not work");
     if (nlevi_PlatformOpenGL_extTextureFloatLinear === null)
         console.warn("OES_texture_float_linear not available - float texture filtering may not work");
-    nlevi_PlatformOpenGL_glVersion = $rt_str(nlevi_PlatformOpenGL_gl.getString(7938));
-    nlevi_PlatformOpenGL_glVendor = $rt_str(nlevi_PlatformOpenGL_gl.getString(7936));
-    nlevi_PlatformOpenGL_glRenderer = $rt_str(nlevi_PlatformOpenGL_gl.getString(7937));
+    nlevi_PlatformOpenGL_glVersion = $rt_str(nlevi_PlatformOpenGL_gl.getParameter(7938));
+    nlevi_PlatformOpenGL_glVendor = $rt_str(nlevi_PlatformOpenGL_gl.getParameter(7936));
+    nlevi_PlatformOpenGL_glRenderer = $rt_str(nlevi_PlatformOpenGL_gl.getParameter(7937));
     var$1 = nlevi_PlatformOpenGL_glVersion;
     var$2 = new jl_StringBuilder;
     jl_AbstractStringBuilder__init_(var$2);
@@ -2661,8 +2736,11 @@ nlevi_PlatformOpenGL__wglBindVertexArray = $vao => {
     nlevi_PlatformOpenGL_gl.bindVertexArray($vao);
 },
 nlevi_PlatformOpenGL__clinit_ = () => {
+try {
+
     nlevi_PlatformOpenGL_contextLost = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformInput = $rt_classWithoutFields(),
 nlevi_PlatformInput_window = null,
 nlevi_PlatformInput_canvas = null,
@@ -2764,13 +2842,15 @@ nlevi_PlatformInput_updateTouchState = $event => {
     nlevi_PlatformInput_$callClinit();
     $i = 0;
     while ($i < 8) {
-        nlevi_PlatformInput_touchActive.data[$i] = 0;
+        (__safe(nlevi_PlatformInput_touchActive).data||[])[$i] = 0;
         $i = $i + 1 | 0;
     }
     nlevi_PlatformInput_touchCount = 0;
     nlevi_PlatformInput_updateTouchState0$js_body$_55($event);
 },
 nlevi_PlatformInput__clinit_ = () => {
+try {
+
     nlevi_PlatformInput_window = window;
     nlevi_PlatformInput_keyDown = $rt_createBooleanArray(256);
     nlevi_PlatformInput_keyDownOnce = $rt_createBooleanArray(256);
@@ -2802,7 +2882,8 @@ nlevi_PlatformInput__clinit_ = () => {
     nlevi_PlatformInput_eventCoordsY = $rt_createIntArray(256);
     nlevi_PlatformInput_eventWheels = $rt_createFloatArray(256);
     nlevi_PlatformInput_eventCount = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformInput_registerWheelListener0$js_body$_6 = () => {
     var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');
     if (c) {
@@ -2955,6 +3036,8 @@ nlevi_PlatformRuntime_localStorageGet = $key => {
     return $rt_str(nlevi_PlatformRuntime_localStorageGet0$js_body$_44($rt_ustr(jl_AbstractStringBuilder_toString(var$3))));
 },
 nlevi_PlatformRuntime__clinit_ = () => {
+try {
+
     nlevi_PlatformRuntime_window = window;
     nlevi_PlatformRuntime_namespace = $rt_s(24);
     nlevi_PlatformRuntime_pageVisible = 1;
@@ -2970,17 +3053,18 @@ nlevi_PlatformRuntime__clinit_ = () => {
     nlevi_PlatformRuntime_screenHeight = 0;
     nlevi_PlatformRuntime_serverWorkerRunning = 0;
     nlevi_PlatformRuntime_serverWorker = null;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformRuntime_getCurrentTimeMillis0$js_body$_39 = () => {
     if (window.performance && window.performance.now) {
-        return Math.floor(window.performance.now());
+        return Long_fromNumber(Math.floor(window.performance.now()));
     } else {
-        return Date.now();
+        return Long_fromNumber(Date.now());
     }
 },
 nlevi_PlatformRuntime_getTimeOrigin0$js_body$_40 = () => {
     if (window.performance && window.performance.timeOrigin) {
-        return Math.floor(window.performance.timeOrigin);
+        return Long_fromNumber(Math.floor(window.performance.timeOrigin));
     } else {
         return 0;
     }
@@ -3052,7 +3136,7 @@ nlevi_PlatformAudio__init = () => {
         console.warn("[PlatformAudio] Failed to create AudioContext");
         return;
     }
-    nlevi_PlatformAudio_audioWorkletAvailable = !!(window.AudioContext && AudioContext.prototype.audioWorklet) ? 1 : 0;
+    nlevi_PlatformAudio_audioWorkletAvailable = (window.AudioContext && ('audioWorklet' in AudioContext.prototype)) ? 1 : 0;
     nlevi_PlatformAudio_sampleRate = nlevi_PlatformAudio_audioContext.sampleRate;
     window.__eaglercraftAudioCtx = nlevi_PlatformAudio_audioContext;
     var$2 = nlevi_PlatformAudio_audioContext.createDynamicsCompressor();
@@ -3094,6 +3178,8 @@ nlevi_PlatformAudio__init = () => {
     console.log($rt_ustr(jl_AbstractStringBuilder_toString(var$2)));
 },
 nlevi_PlatformAudio__clinit_ = () => {
+try {
+
     nlevi_PlatformAudio_audioContext = null;
     nlevi_PlatformAudio_masterGain = null;
     nlevi_PlatformAudio_musicGain = null;
@@ -3110,7 +3196,8 @@ nlevi_PlatformAudio__clinit_ = () => {
     nlevi_PlatformAudio_bufferPoolCount = 0;
     nlevi_PlatformAudio_activeSources = $rt_createArray(jl_Object, 256);
     nlevi_PlatformAudio_activeSourceCount = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformAudio_createAudioContext$js_body$_25 = var$1 => {
     try {
         return new (window.AudioContext || window.webkitAudioContext)({ sampleRate : var$1 });
@@ -3176,6 +3263,8 @@ nlevi_PlatformApplication__init = () => {
     console.log("[PlatformApplication] Application lifecycle initialized (v26.1.2)");
 },
 nlevi_PlatformApplication__clinit_ = () => {
+try {
+
     nlevi_PlatformApplication_window = window;
     nlevi_PlatformApplication_document = otjdh_HTMLDocument_current();
     nlevi_PlatformApplication_initialized = 0;
@@ -3185,7 +3274,8 @@ nlevi_PlatformApplication__clinit_ = () => {
     nlevi_PlatformApplication_errorHandler = null;
     nlevi_PlatformApplication_fullscreenChangeHandler = null;
     nlevi_PlatformApplication_resizeHandler = null;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformApplication_setBeforeUnloadMessage$js_body$_30 = (var$1, var$2) => {
     var$1.preventDefault();
     var$1.returnValue = var$2;
@@ -3451,9 +3541,9 @@ nlevi_PlatformInput$registerKeyListeners$lambda$_2_0_handleEvent$exported$0 = (v
         var$1 = $rt_str(var$2.code);
         var$3 = nlevi_PlatformInput_mapKeyCode$js_body$_40($rt_ustr(var$1));
         if (var$3 >= 0 && var$3 < 256) {
-            var$4 = nlevi_PlatformInput_keyDown.data;
+            var$4 = (__safe(nlevi_PlatformInput_keyDown).data||[]);
             if (!var$4[var$3])
-                nlevi_PlatformInput_keyDownOnce.data[var$3] = 1;
+                (__safe(nlevi_PlatformInput_keyDownOnce).data||[])[var$3] = 1;
             var$4[var$3] = 1;
         }
         nlevi_PlatformInput_currentKeyStr = $rt_str(var$2.key);
@@ -3461,9 +3551,9 @@ nlevi_PlatformInput$registerKeyListeners$lambda$_2_0_handleEvent$exported$0 = (v
         var$1 = $rt_str(var$2.key);
         var$5 = nlevi_PlatformInput_eventCount;
         if (var$5 < 256) {
-            nlevi_PlatformInput_eventTypes.data[var$5] = 1;
-            nlevi_PlatformInput_eventKeys.data[var$5] = var$3;
-            nlevi_PlatformInput_eventKeyStrs.data[var$5] = var$1;
+            (__safe(nlevi_PlatformInput_eventTypes).data||[])[var$5] = 1;
+            (__safe(nlevi_PlatformInput_eventKeys).data||[])[var$5] = var$3;
+            (__safe(nlevi_PlatformInput_eventKeyStrs).data||[])[var$5] = var$1;
             nlevi_PlatformInput_eventCount = var$5 + 1 | 0;
         }
     }
@@ -3478,7 +3568,7 @@ nlevi_PlatformInput$registerKeyListeners$lambda$_2_1_handleEvent$exported$0 = (v
         var$1 = $rt_str(var$2.code);
         var$3 = nlevi_PlatformInput_mapKeyCode$js_body$_40($rt_ustr(var$1));
         if (var$3 >= 0 && var$3 < 256)
-            nlevi_PlatformInput_keyDown.data[var$3] = 0;
+            (__safe(nlevi_PlatformInput_keyDown).data||[])[var$3] = 0;
         nlevi_PlatformInput_currentKeyStr = $rt_str(var$2.key);
         nlevi_PlatformInput_currentKeyCode = var$1;
     }
@@ -3515,7 +3605,7 @@ nlevi_PlatformInput$registerMouseListeners$lambda$_3_0_handleEvent$exported$0 = 
     if (!nlevi_PlatformInput_pointerLocked) {
         var$3 = var$2.button;
         if (var$3 >= 0 && var$3 < 8)
-            nlevi_PlatformInput_mouseDown.data[var$3] = 1;
+            (__safe(nlevi_PlatformInput_mouseDown).data||[])[var$3] = 1;
     }
 },
 nlevi_PlatformInput$registerMouseListeners$lambda$_3_1 = $rt_classWithoutFields(),
@@ -3527,7 +3617,7 @@ nlevi_PlatformInput$registerMouseListeners$lambda$_3_1_handleEvent$exported$0 = 
     if (!nlevi_PlatformInput_pointerLocked) {
         var$3 = var$2.button;
         if (var$3 >= 0 && var$3 < 8)
-            nlevi_PlatformInput_mouseDown.data[var$3] = 0;
+            (__safe(nlevi_PlatformInput_mouseDown).data||[])[var$3] = 0;
     }
 },
 nlevi_PlatformInput$registerMouseListeners$lambda$_3_2 = $rt_classWithoutFields(),
@@ -3587,8 +3677,8 @@ nlevi_PlatformInput$registerTouchListeners$lambda$_4_3_handleEvent$exported$0 = 
     var$2.preventDefault();
     var$3 = 0;
     while (var$3 < 8) {
-        nlevi_PlatformInput_touchActive.data[var$3] = 0;
-        var$4 = nlevi_PlatformInput_touchPoints.data;
+        (__safe(nlevi_PlatformInput_touchActive).data||[])[var$3] = 0;
+        var$4 = (__safe(nlevi_PlatformInput_touchPoints).data||[]);
         var$4[var$3].data[0] = 0.0;
         var$4[var$3].data[1] = 0.0;
         var$4[var$3].data[2] = 0.0;
@@ -3634,7 +3724,7 @@ nlevi_PlatformInput$registerGamepadListeners$lambda$_9_1_handleEvent$exported$0 
             nlevi_PlatformInput_gamepadConnected = 0;
             var$4 = 0;
             while (true) {
-                var$5 = nlevi_PlatformInput_gamepadAxes.data;
+                var$5 = (__safe(nlevi_PlatformInput_gamepadAxes).data||[]);
                 if (var$4 >= var$5.length)
                     break;
                 var$5[var$4] = 0.0;
@@ -3642,7 +3732,7 @@ nlevi_PlatformInput$registerGamepadListeners$lambda$_9_1_handleEvent$exported$0 
             }
             var$6 = 0;
             while (true) {
-                var$5 = nlevi_PlatformInput_gamepadButtons.data;
+                var$5 = (__safe(nlevi_PlatformInput_gamepadButtons).data||[]);
                 if (var$6 >= var$5.length)
                     break a;
                 var$5[var$6] = 0;
@@ -3969,7 +4059,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                 $stack = jl_Throwable_getStackTrace($t);
                 $i = 0;
                 while (true) {
-                    var$13 = $stack.data;
+                    var$13 = (__safe($stack).data||[]);
                     if ($i >= jl_Math_min(var$13.length, 10))
                         break;
                     $displayData = jl_StackTraceElement_toString(var$13[$i]);
@@ -3988,6 +4078,8 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
     }
 },
 nlev_EaglerCraft__clinit_ = () => {
+try {
+
     nlev_EaglerCraft_gameState = 0;
     nlev_EaglerCraft_initialized = 0;
     nlev_EaglerCraft_paused = 0;
@@ -3997,7 +4089,8 @@ nlev_EaglerCraft__clinit_ = () => {
     nlev_EaglerCraft_totalFrames = Long_ZERO;
     nlev_EaglerCraft_totalTicks = Long_ZERO;
     nlev_EaglerCraft_minecraftInstance = null;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jl_StackTraceElement() {
     let a = this; jl_Object.call(a);
     a.$declaringClass = null;
@@ -4075,8 +4168,11 @@ nleva_PlatformWebService_init = () => {
     console.log("[PlatformWebService] Service locator initialized");
 },
 nleva_PlatformWebService__clinit_ = () => {
+try {
+
     nleva_PlatformWebService_initialized = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlev_EaglerProfile = $rt_classWithoutFields(),
 nlev_EaglerProfile_username = null,
 nlev_EaglerProfile_skinModel = 0,
@@ -4506,6 +4602,8 @@ nlev_EaglerProfile_clampFloat = ($value, $min, $max) => {
     return jl_Math_max0($min, jl_Math_min0($max, $value));
 },
 nlev_EaglerProfile__clinit_ = () => {
+try {
+
     let var$1, var$2;
     var$1 = jl_Math_random() * 1000.0 | 0;
     var$2 = new jl_StringBuilder;
@@ -4529,7 +4627,8 @@ nlev_EaglerProfile__clinit_ = () => {
     nlev_EaglerProfile_heldItemTooltips = 1;
     nlev_EaglerProfile_mipmapLevels = 4;
     nlev_EaglerProfile_loaded = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nleva_EaglerShaderImpl = $rt_classWithoutFields(),
 nleva_EaglerShaderImpl_cachingEnabled = 0,
 nleva_EaglerShaderImpl_shadersCompiled = 0,
@@ -4770,6 +4869,8 @@ nleva_EaglerShaderImpl_getShaderStats = () => {
     return jl_AbstractStringBuilder_toString(var$5);
 },
 nleva_EaglerShaderImpl__clinit_ = () => {
+try {
+
     nleva_EaglerShaderImpl_cachingEnabled = 1;
     nleva_EaglerShaderImpl_shadersCompiled = 0;
     nleva_EaglerShaderImpl_programsLinked = 0;
@@ -4781,7 +4882,8 @@ nleva_EaglerShaderImpl__clinit_ = () => {
     nleva_EaglerShaderImpl_titleResolutionUniform = null;
     nleva_EaglerShaderImpl_titleTimeUniform = null;
     nleva_EaglerShaderImpl_titleInitialized = 0;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 cmbp_Window$WindowEventHandler = $rt_classWithoutFields(0);
 function nmc_Minecraft() {
     let a = this; jl_Object.call(a);
@@ -4864,7 +4966,7 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
     $stack = jl_Throwable_getStackTrace($t);
     $i = 0;
     while (true) {
-        var$7 = $stack.data;
+        var$7 = (__safe($stack).data||[]);
         if ($i >= jl_Math_min(var$7.length, 8))
             break;
         $gameConfig = jl_StackTraceElement_toString(var$7[$i]);
@@ -5171,8 +5273,11 @@ jl_Float_parseFloat = $string => {
     $rt_throw($string);
 },
 jl_Float__clinit_ = () => {
+try {
+
     jl_Float_TYPE = $rt_cls($rt_floatcls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jl_Boolean() {
     jl_Object.call(this);
     this.$value5 = 0;
@@ -5211,10 +5316,13 @@ jl_Boolean_parseBoolean = $s => {
     return var$3;
 },
 jl_Boolean__clinit_ = () => {
+try {
+
     jl_Boolean_TRUE = jl_Boolean__init_(1);
     jl_Boolean_FALSE = jl_Boolean__init_(0);
     jl_Boolean_TYPE = $rt_cls($rt_booleancls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ji_File() {
     jl_Object.call(this);
     this.$path = null;
@@ -5279,13 +5387,16 @@ ji_File_fs = () => {
     return otrf_VirtualFileSystemProvider_instance;
 },
 ji_File__clinit_ = () => {
+try {
+
     ji_File_fs();
     ji_File_separatorChar = 47;
     ji_File_separator = jl_String_valueOf0(47);
     ji_File_fs();
     ji_File_pathSeparatorChar = 58;
     ji_File_pathSeparator = jl_String_valueOf0(58);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function nmcm_GameConfig$FolderData() {
     let a = this; jl_Object.call(a);
     a.$gameDirectory = null;
@@ -5409,8 +5520,11 @@ cmap_PropertyMap__init_ = () => {
     return var_0;
 },
 cmap_PropertyMap__clinit_ = () => {
+try {
+
     cmap_PropertyMap_EMPTY = cmap_PropertyMap__init_();
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function nmcm_GameConfig$GameData() {
     let a = this; jl_Object.call(a);
     a.$demo = 0;
@@ -5480,6 +5594,8 @@ nmcm_GameConfig$QuickPlayVariant__init_ = (var_0, var_1) => {
     return var_2;
 },
 nmcm_GameConfig$QuickPlayVariant__clinit_ = () => {
+try {
+
     let var$1, var$2, var$3;
     nmcm_GameConfig$QuickPlayVariant_DISABLED = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(147), 0);
     nmcm_GameConfig$QuickPlayVariant_SINGLEPLAYER = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(148), 1);
@@ -5493,7 +5609,8 @@ nmcm_GameConfig$QuickPlayVariant__clinit_ = () => {
     var$3[2] = nmcm_GameConfig$QuickPlayVariant_MULTIPLAYER;
     var$3[3] = var$1;
     nmcm_GameConfig$QuickPlayVariant_$VALUES = var$2;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function nmcm_GameConfig() {
     let a = this; jl_Object.call(a);
     a.$user0 = null;
@@ -5527,11 +5644,11 @@ otcit_FloatSynthesizer_synthesizeFloat = ($mantissa, $exp, $negative) => {
     otcit_FloatSynthesizer_$callClinit();
     $indexInTable = 50 + $exp | 0;
     if ($mantissa && $indexInTable >= 0) {
-        var$5 = otcit_FloatSynthesizer_mantissa10Table.data;
+        var$5 = (__safe(otcit_FloatSynthesizer_mantissa10Table).data||[]);
         if ($indexInTable >= var$5.length)
             return !$negative ? Infinity : (-Infinity);
         $binMantissa = otcit_FloatAnalyzer_mulAndShiftRight($mantissa, var$5[$indexInTable], 0);
-        $binExp = otcit_FloatSynthesizer_exp10Table.data[$indexInTable] - 1 | 0;
+        $binExp = (__safe(otcit_FloatSynthesizer_exp10Table).data||[])[$indexInTable] - 1 | 0;
         $binMantissaShift = (32 - jl_Integer_numberOfLeadingZeros($binMantissa) | 0) - 30 | 0;
         $mantissa = $binMantissaShift >= 0 ? $binMantissa >>> $binMantissaShift | 0 : $binMantissa << ( -$binMantissaShift | 0);
         $exp = $binExp + $binMantissaShift | 0;
@@ -5554,12 +5671,15 @@ otcit_FloatSynthesizer_synthesizeFloat = ($mantissa, $exp, $negative) => {
     return $rt_intBitsToFloat(!$negative ? 0 : (-2147483648));
 },
 otcit_FloatSynthesizer__clinit_ = () => {
+try {
+
     otcit_FloatSynthesizer_mantissa10Table = $rt_createIntArrayFromData([(-1598972629), (-924973963), (-82475629), (-1662160004), (-1003958181), (-181205903), (-1723866425), (-1081091207), (-277622185), (-1784126602), (-1156416428), (-371778711), (-1842974431), (-1229976214), (-463728444), (-1900443013), (-1301811943), (-553523104), (-1956564676), (-1371964021), (-641213203), (-2011370988), (-1440471911), (-726848064), (-2064892776), (-1507374146), (-810475859), (-2117160148), (-1572708361), (-892143627), (-41437709),
     (-1636511304), (-971897307), (-141129809), (-1698818867), (-1049781759), (-238485375), (-1759666096), (-1125840795), (-333559170), (-1819087217), (-1200117198), (-426404673), (-1877115657), (-1272652747), (-517074110), (-1933784055), (-1343488244), (-605618481), (-1989124287), (-1412663534), (-692087594), (-2043167482), (-1480217529), (-776530087), (-2095944040), (-1546188227), (-858993459), (-2147483648), (-1610612736), (-939524096), (-100663296), (-1673527296), (-1018167296), (-198967296), (-1734967296),
     (-1094967296), (-294967296), (-1794967296), (-1169967296), (-388717296), (-1853561046), (-1243209483), (-480270030), (-1910781505), (-1314735057), (-569676998), (-1966660859), (-1384584250), (-656988489), (-2021230542), (-1452796353), (-742253617), (-2074521247), (-1519409734), (-825520344), (-2126562951), (-1584461865), (-906835507), (-59802560), (-1647989336), (-986244846), (-159064233), (-1710027882), (-1063793028), (-255999461), (-1770612399), (-1139523675), (-350662770), (-1829776967)]);
     otcit_FloatSynthesizer_exp10Table = $rt_createIntArrayFromData([(-35), (-32), (-29), (-25), (-22), (-19), (-15), (-12), (-9), (-5), (-2), 1, 5, 8, 11, 15, 18, 21, 25, 28, 31, 35, 38, 41, 45, 48, 51, 55, 58, 61, 64, 68, 71, 74, 78, 81, 84, 88, 91, 94, 98, 101, 104, 108, 111, 114, 118, 121, 124, 128, 131, 134, 138, 141, 144, 148, 151, 154, 158, 161, 164, 167, 171, 174, 177, 181, 184, 187, 191, 194, 197, 201, 204, 207, 211, 214, 217, 221, 224, 227, 231, 234, 237, 241, 244, 247, 251, 254, 257, 260, 264, 267,
     270, 274, 277, 280, 284, 287, 290, 294]);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jl_Long() {
     jl_Number.call(this);
     this.$value0 = Long_ZERO;
@@ -5697,8 +5817,11 @@ jl_Long_compareUnsigned = (var$1, var$2) => {
     return Long_ucompare(var$1, var$2);
 },
 jl_Long__clinit_ = () => {
+try {
+
     jl_Long_TYPE = $rt_cls($rt_longcls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_UUID() {
     jl_Object.call(this);
     this.$value6 = null;
@@ -6213,11 +6336,14 @@ cmbp_RenderTarget_create = ($this, $width, $height, $useDepth, $useStencil) => {
     ju_HashMap_put(var$6, var$7, var$8);
 },
 cmbp_RenderTarget__clinit_ = () => {
+try {
+
     cmbp_RenderTarget_fbMap = ju_HashMap__init_();
     cmbp_RenderTarget_texMap = ju_HashMap__init_();
     cmbp_RenderTarget_nextFBId = 1;
     cmbp_RenderTarget_nextTexId = 1;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nmcgs_Screen = $rt_classWithoutFields();
 function nmcgs_TitleScreen() {
     let a = this; nmcgs_Screen.call(a);
@@ -6264,7 +6390,7 @@ otcit_FloatAnalyzer_analyze = ($d, $result) => {
             $exponent = $exponent + (-1) | 0;
         }
     }
-    var$6 = otcit_FloatAnalyzer_exp10Table.data;
+    var$6 = (__safe(otcit_FloatAnalyzer_exp10Table).data||[]);
     $mantissa = 0;
     $decExponent = var$6.length;
     if ($mantissa > $decExponent) {
@@ -6293,25 +6419,25 @@ otcit_FloatAnalyzer_analyze = ($d, $result) => {
         $decExponent =  -$decExponent | 0;
     $mantissa = $decExponent + 1 | 0;
     $mantissaShift = 9 + ($exponent - var$6[$mantissa] | 0) | 0;
-    $decMantissa = otcit_FloatAnalyzer_mulAndShiftRight($bits, otcit_FloatAnalyzer_mantissa10Table.data[$mantissa], $mantissaShift);
+    $decMantissa = otcit_FloatAnalyzer_mulAndShiftRight($bits, (__safe(otcit_FloatAnalyzer_mantissa10Table).data||[])[$mantissa], $mantissaShift);
     if ($decMantissa < otcit_FloatAnalyzer_MAX_MANTISSA) {
         while ($rt_ucmp($decMantissa, otcit_FloatAnalyzer_MAX_MANTISSA) <= 0) {
             $decExponent = $decExponent + (-1) | 0;
             $decMantissa = ($decMantissa * 10 | 0) + 9 | 0;
         }
-        var$6 = otcit_FloatAnalyzer_exp10Table.data;
+        var$6 = (__safe(otcit_FloatAnalyzer_exp10Table).data||[]);
         $mantissa = $decExponent + 1 | 0;
         $mantissaShift = 9 + ($exponent - var$6[$mantissa] | 0) | 0;
-        $decMantissa = otcit_FloatAnalyzer_mulAndShiftRight($bits, otcit_FloatAnalyzer_mantissa10Table.data[$mantissa], $mantissaShift);
+        $decMantissa = otcit_FloatAnalyzer_mulAndShiftRight($bits, (__safe(otcit_FloatAnalyzer_mantissa10Table).data||[])[$mantissa], $mantissaShift);
     }
     $mantissa = $bits << 1;
     $bits = $mantissa + 1 | 0;
-    var$6 = otcit_FloatAnalyzer_mantissa10Table.data;
+    var$6 = (__safe(otcit_FloatAnalyzer_mantissa10Table).data||[]);
     $exponent = $decExponent + 1 | 0;
     $upperPos = var$6[$exponent];
     $upperPos_0 = $mantissaShift - 1 | 0;
     $decMantissaHi = otcit_FloatAnalyzer_mulAndShiftRight($bits, $upperPos, $upperPos_0);
-    $decMantissaLow = otcit_FloatAnalyzer_mulAndShiftRight($mantissa - 1 | 0, otcit_FloatAnalyzer_mantissa10Table.data[$exponent], $upperPos_0);
+    $decMantissaLow = otcit_FloatAnalyzer_mulAndShiftRight($mantissa - 1 | 0, (__safe(otcit_FloatAnalyzer_mantissa10Table).data||[])[$exponent], $upperPos_0);
     $lowerPos = 1;
     while (true) {
         $lowerPos_0 = $lowerPos * 10 | 0;
@@ -6347,13 +6473,16 @@ otcit_FloatAnalyzer_mulAndShiftRight = ($a, $b, $shift) => {
     return Long_lo(Long_shru(Long_mul(Long_and(Long_fromInt($a), Long_create(4294967295, 0)), Long_and(Long_fromInt($b), Long_create(4294967295, 0))), 32 - $shift | 0));
 },
 otcit_FloatAnalyzer__clinit_ = () => {
+try {
+
     otcit_FloatAnalyzer_MAX_MANTISSA = $rt_udiv((-1), 10);
     otcit_FloatAnalyzer_mantissa10Table = $rt_createIntArrayFromData([(-18543760), (-873828468), (-1558056233), (-2105438446), (-791721136), (-1492370368), (-2052889754), (-707643228), (-1425108042), (-1999079893), (-621547450), (-1356231419), (-1943978595), (-533385374), (-1285701758), (-1887554866), (-443107408), (-1213479385), (-1829776968), (-350662770), (-1139523676), (-1770612400), (-255999462), (-1063793029), (-1710027882), (-159064234), (-986244846), (-1647989336), (-59802560), (-906835507), (-1584461865),
     (-2126562952), (-825520345), (-1519409735), (-2074521247), (-742253618), (-1452796353), (-2021230542), (-656988489), (-1384584251), (-1966660860), (-569676998), (-1314735058), (-1910781505), (-480270031), (-1243209484), (-1853561046), (-388717296), (-1169967296), (-1794967296), (-294967296), (-1094967296), (-1734967296), (-198967296), (-1018167296), (-1673527296), (-100663296), (-939524096), (-1610612736), (-2147483648), (-858993460), (-1546188227), (-2095944041), (-776530088), (-1480217529), (-2043167483),
     (-692087595), (-1412663535), (-1989124287), (-605618482), (-1343488245), (-1933784055), (-517074110), (-1272652747), (-1877115657), (-426404674), (-1200117198), (-1819087218), (-333559171), (-1125840796), (-1759666096), (-238485376), (-1049781760), (-1698818867), (-141129810), (-971897307), (-1636511305), (-41437710), (-892143627), (-1572708361), (-2117160148), (-810475859), (-1507374147), (-2064892777), (-726848065), (-1440471911), (-2011370988), (-641213203), (-1371964022), (-1956564688)]);
     otcit_FloatAnalyzer_exp10Table = $rt_createIntArrayFromData([(-37), (-34), (-31), (-28), (-24), (-21), (-18), (-14), (-11), (-8), (-4), (-1), 2, 6, 9, 12, 16, 19, 22, 26, 29, 32, 36, 39, 42, 46, 49, 52, 56, 59, 62, 65, 69, 72, 75, 79, 82, 85, 89, 92, 95, 99, 102, 105, 109, 112, 115, 119, 122, 125, 129, 132, 135, 139, 142, 145, 149, 152, 155, 158, 162, 165, 168, 172, 175, 178, 182, 185, 188, 192, 195, 198, 202, 205, 208, 212, 215, 218, 222, 225, 228, 232, 235, 238, 242, 245, 248, 252, 255, 258, 261, 265,
     268, 271, 275, 278, 281, 285, 288, 291]);
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_AutoCloseable = $rt_classWithoutFields(0),
 ji_Closeable = $rt_classWithoutFields(0),
 ji_Flushable = $rt_classWithoutFields(0);
@@ -6485,7 +6614,7 @@ ju_HashMap_rehash0 = ($this, $capacity) => {
         $entry = var$5[$i];
         var$5[$i] = null;
         while ($entry !== null) {
-            var$5 = $newData.data;
+            var$5 = (__safe($newData).data||[]);
             $index = $entry.$origKeyHash & $length;
             $next = $entry.$next2;
             $entry.$next2 = var$5[$index];
@@ -6628,6 +6757,8 @@ ju_Locale_getDefault = () => {
     return ju_Locale_defaultLocale;
 },
 ju_Locale__clinit_ = () => {
+try {
+
     let $localeName, $countryIndex;
     ju_Locale_CANADA = ju_Locale__init_($rt_s(158), $rt_s(159));
     ju_Locale_CANADA_FRENCH = ju_Locale__init_($rt_s(160), $rt_s(159));
@@ -6656,7 +6787,8 @@ ju_Locale__clinit_ = () => {
     $localeName = (otciu_CLDRHelper_$$metadata$$10.value !== null ? $rt_str(otciu_CLDRHelper_$$metadata$$10.value) : null);
     $countryIndex = jl_String_indexOf0($localeName, 95);
     ju_Locale_defaultLocale = ju_Locale__init_1(jl_String_substring($localeName, 0, $countryIndex), jl_String_substring0($localeName, $countryIndex + 1 | 0), $rt_s(1));
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 otjc_Crypto = $rt_classWithoutFields();
 function ju_Formatter$FormatWriter() {
     let a = this; jl_Object.call(a);
@@ -7254,7 +7386,7 @@ otciu_UnicodeHelper_decodeCaseMapping = $text => {
     $flow = otci_CharFlow__init_(jl_String_toCharArray($text));
     $sz = otci_Base46_decodeUnsigned($flow);
     $data = $rt_createIntArray($sz * 2 | 0);
-    var$5 = $data.data;
+    var$5 = (__safe($data).data||[]);
     $last = 0;
     $i = 0;
     while ($i < $sz) {
@@ -7269,13 +7401,13 @@ otciu_UnicodeHelper_decodeCaseMapping = $text => {
 otciu_UnicodeHelper_createCharMapping = $data => {
     let $result, var$3, $last, $lastValue, $i, var$7, $key, $value, var$10, var$11;
     $result = $rt_createIntArray(65536);
-    var$3 = $result.data;
+    var$3 = (__safe($result).data||[]);
     $last = 0;
     $lastValue = 0;
     $i = 0;
     a: {
         while (true) {
-            var$7 = $data.data;
+            var$7 = (__safe($data).data||[]);
             if ($i >= var$7.length)
                 break a;
             $key = var$7[$i];
@@ -7306,9 +7438,9 @@ otciu_UnicodeHelper_decodeByte = $c => {
 otciu_UnicodeHelper_extractRle = $encoded => {
     let $ranges, var$3, $buffer, var$5, $index, $rangeIndex, $codePoint, $i, $pos, $b, $count, $j, $digit, var$15, $chunk;
     $ranges = $rt_createArray(otciu_UnicodeHelper$Range, 16384);
-    var$3 = $ranges.data;
+    var$3 = (__safe($ranges).data||[]);
     $buffer = $rt_createByteArray(16384);
-    var$5 = $buffer.data;
+    var$5 = (__safe($buffer).data||[]);
     $index = 0;
     $rangeIndex = 0;
     $codePoint = 0;
@@ -7664,9 +7796,9 @@ otci_Base46_decode = $seq => {
 ju_Arrays = $rt_classWithoutFields(),
 ju_Arrays_copyOf = ($array, $length) => {
     let $result, var$4, $sz, $i;
-    $array = $array.data;
+    $array = (__safe($array).data||[]);
     $result = $rt_createByteArray($length);
-    var$4 = $result.data;
+    var$4 = (__safe($result).data||[]);
     $sz = jl_Math_min($length, $array.length);
     $i = 0;
     while ($i < $sz) {
@@ -7677,12 +7809,12 @@ ju_Arrays_copyOf = ($array, $length) => {
 },
 ju_Arrays_copyOf0 = ($original, $newLength) => {
     let var$3, $result, $sz, $i;
-    var$3 = $original.data;
+    var$3 = (__safe($original).data||[]);
     $result = jlr_Array_newInstance(jl_Class_getComponentType(jl_Object_getClass($original)), $newLength);
     $sz = jl_Math_min($newLength, var$3.length);
     $i = 0;
     while ($i < $sz) {
-        $result.data[$i] = var$3[$i];
+        (__safe($result).data||[])[$i] = var$3[$i];
         $i = $i + 1 | 0;
     }
     return $result;
@@ -7695,14 +7827,14 @@ ju_Arrays_fill0 = ($a, $fromIndex, $toIndex, $val) => {
         $rt_throw(var$5);
     }
     while ($fromIndex < $toIndex) {
-        var$6 = $a.data;
+        var$6 = (__safe($a).data||[]);
         var$7 = $fromIndex + 1 | 0;
         var$6[$fromIndex] = $val;
         $fromIndex = var$7;
     }
 },
 ju_Arrays_fill = ($a, $val) => {
-    ju_Arrays_fill0($a, 0, $a.data.length, $val);
+    ju_Arrays_fill0($a, 0, (__safe($a).data||[]).length, $val);
 };
 function otrfm_AbstractInMemoryVirtualFile() {
     let a = this; jl_Object.call(a);
@@ -7907,14 +8039,14 @@ jur_Pattern_processDecomposedChar = $this => {
     $curSymb = (-1);
     $curSymbIndex = (-1);
     if (!jur_Lexer_isEmpty($this.$lexemes) && jur_Lexer_isLetter($this.$lexemes)) {
-        $codePointsHangul = $codePoints.data;
+        $codePointsHangul = (__safe($codePoints).data||[]);
         $curSymb = jur_Lexer_next($this.$lexemes);
         $codePointsHangul[0] = $curSymb;
         $curSymbIndex = $curSymb - 4352 | 0;
     }
     if ($curSymbIndex >= 0 && $curSymbIndex < 19) {
         $codePointsHangul = $rt_createCharArray(3);
-        $codePoints = $codePointsHangul.data;
+        $codePoints = (__safe($codePointsHangul).data||[]);
         $codePoints[0] = $curSymb & 65535;
         var$5 = $this.$lexemes;
         var$6 = var$5.$ch;
@@ -7938,7 +8070,7 @@ jur_Pattern_processDecomposedChar = $this => {
             return jur_UCICharSet__init_($codePoints[0]);
         return jur_CICharSet__init_($codePoints[0]);
     }
-    $codePointsHangul = $codePoints.data;
+    $codePointsHangul = (__safe($codePoints).data||[]);
     $curSymb = 1;
     while ($curSymb < 4 && !jur_Lexer_isEmpty($this.$lexemes) && jur_Lexer_isLetter($this.$lexemes)) {
         $readCodePoints = $curSymb + 1 | 0;
@@ -8756,7 +8888,7 @@ jl_System_arraycopy = ($src, $srcPos, $dest, $destPos, $length) => {
                                 var$10 = $srcPos;
                                 while ($i < $length) {
                                     c: {
-                                        var$11 = $srcArray.data;
+                                        var$11 = (__safe($srcArray).data||[]);
                                         var$12 = var$10 + 1 | 0;
                                         $elem = var$11[var$10];
                                         if ($elem !== null) {
@@ -9120,14 +9252,17 @@ jur_AbstractSet_processSecondPass = $this => {
     }
 },
 jur_AbstractSet__clinit_ = () => {
+try {
+
     jur_AbstractSet_counter = 1;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Iterable = $rt_classWithoutFields(0),
 ju_Collection = $rt_classWithoutFields(0),
 ju_AbstractCollection = $rt_classWithoutFields(),
 ju_AbstractCollection_toArray = ($this, $a) => {
     let var$2, $i, $i_0, var$5, var$6;
-    var$2 = $a.data;
+    var$2 = (__safe($a).data||[]);
     $i = $this.$size;
     $i_0 = var$2.length;
     if ($i_0 < $i)
@@ -9140,7 +9275,7 @@ ju_AbstractCollection_toArray = ($this, $a) => {
     $i_0 = 0;
     var$5 = ju_AbstractList_iterator($this);
     while (ju_AbstractList$1_hasNext(var$5)) {
-        var$2 = $a.data;
+        var$2 = (__safe($a).data||[]);
         var$6 = $i_0 + 1 | 0;
         var$2[$i_0] = ju_AbstractList$1_next(var$5);
         $i_0 = var$6;
@@ -9289,11 +9424,14 @@ jur_FSet_hasConsumed = ($this, $mr) => {
     return 0;
 },
 jur_FSet__clinit_ = () => {
+try {
+
     let var$1;
     var$1 = new jur_FSet$PossessiveFSet;
     jur_AbstractSet__init_(var$1);
     jur_FSet_posFSet = var$1;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jur_Lexer() {
     let a = this; jl_Object.call(a);
     a.$pattern0 = null;
@@ -10119,7 +10257,7 @@ jur_PatternSyntaxException_getMessage = $this => {
     var$2 = $this.$index2;
     if (var$2 >= 1) {
         $temp = $rt_createCharArray(var$2);
-        var$4 = $temp.data;
+        var$4 = (__safe($temp).data||[]);
         var$2 = 0;
         var$5 = var$4.length;
         if (var$2 > var$5) {
@@ -10700,13 +10838,16 @@ ju_Collections_$callClinit = () => {
     ju_Collections__clinit_();
 },
 ju_Collections__clinit_ = () => {
+try {
+
     ju_Collections_EMPTY_SET = new ju_Collections$1;
     ju_Collections_EMPTY_MAP = new ju_Collections$2;
     ju_Collections_EMPTY_LIST = new ju_Collections$3;
     ju_Collections_EMPTY_ITERATOR = new ju_Collections$4;
     ju_Collections_EMPTY_LIST_ITERATOR = new ju_Collections$5;
     ju_Collections_reverseOrder = new ju_Collections$_clinit_$lambda$_59_0;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jur_Matcher$1() {
     let a = this; jl_Object.call(a);
     a.$grN = 0;
@@ -10914,11 +11055,14 @@ jur_AbstractCharClass_getPredefinedClass = ($name, $negative) => {
     return jur_AbstractCharClass$LazyCharClass_getValue(var$4[1], $negative);
 },
 jur_AbstractCharClass__clinit_ = () => {
+try {
+
     let var$1;
     var$1 = new jur_AbstractCharClass$PredefinedCharacterClasses;
     jur_AbstractCharClass$PredefinedCharacterClasses_$callClinit();
     jur_AbstractCharClass_charClasses = var$1;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_MissingResourceException() {
     let a = this; jl_RuntimeException.call(a);
     a.$className = null;
@@ -11554,6 +11698,8 @@ jur_AbstractCharClass$PredefinedCharacterClasses_$callClinit = () => {
     jur_AbstractCharClass$PredefinedCharacterClasses__clinit_();
 },
 jur_AbstractCharClass$PredefinedCharacterClasses__clinit_ = () => {
+try {
+
     let var$1, var$2, var$3, var$4;
     jur_AbstractCharClass$PredefinedCharacterClasses_space = jur_AbstractCharClass$LazySpace__init_();
     jur_AbstractCharClass$PredefinedCharacterClasses_digit = jur_AbstractCharClass$LazyDigit__init_0();
@@ -12530,7 +12676,8 @@ jur_AbstractCharClass$PredefinedCharacterClasses__clinit_ = () => {
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(30, 0);
     var$2[193] = var$3;
     jur_AbstractCharClass$PredefinedCharacterClasses_contents = var$1;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jur_AbstractCharClass$LazyCharClass() {
     let a = this; jl_Object.call(a);
     a.$posValue = null;
@@ -13077,7 +13224,7 @@ jur_HangulDecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResu
     } else
         $decompCurSymb = null;
     if ($decompCurSymb !== null) {
-        var$15 = $decompCurSymb.data;
+        var$15 = (__safe($decompCurSymb).data||[]);
         $i = 0;
         $strIndex = var$15.length;
         $syllIndex = $this.$decomposedCharLength;
@@ -13092,7 +13239,7 @@ jur_HangulDecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResu
         }
         return (-1);
     }
-    $decompSyllable = $decompSyllable.data;
+    $decompSyllable = (__safe($decompSyllable).data||[]);
     $decompSyllable[0] = $curSymb;
     $lIndex = $curSymb - 4352 | 0;
     if ($lIndex >= 0 && $lIndex < 19) {
@@ -13310,17 +13457,17 @@ jur_DecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResult) =>
     var$7 = $strIndex + $this.$readCharsForCodePoint | 0;
     $decCurCodePoint = jur_Lexer_getDecomposition($curChar);
     if ($decCurCodePoint === null) {
-        $decCurCodePoint = $decCodePoint.data;
+        $decCurCodePoint = (__safe($decCodePoint).data||[]);
         $strIndex = 1;
         $decCurCodePoint[0] = $curChar;
     } else {
-        $strIndex = $decCurCodePoint.data.length;
+        $strIndex = (__safe($decCurCodePoint).data||[]).length;
         jl_System_fastArraycopy($decCurCodePoint, 0, $decCodePoint, 0, $strIndex);
         $strIndex = 0 + $strIndex | 0;
     }
     a: {
         if (var$7 < $rightBound) {
-            var$9 = $decCodePoint.data;
+            var$9 = (__safe($decCodePoint).data||[]);
             $curChar = jur_DecomposedCharSet_codePointAt($this, var$7, $testString, $rightBound);
             while ($strIndex < 4) {
                 if (!(($curChar != 832 ? 0 : 1) | ($curChar != 833 ? 0 : 1) | ($curChar != 835 ? 0 : 1) | ($curChar != 836 ? 0 : 1))) {
@@ -13350,7 +13497,7 @@ jur_DecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResult) =>
     }
     if ($strIndex != $this.$decomposedCharLength0)
         return (-1);
-    $decCurCodePoint = $decCodePoint.data;
+    $decCurCodePoint = (__safe($decCodePoint).data||[]);
     $curChar = 0;
     while (true) {
         if ($curChar >= $strIndex)
@@ -15756,8 +15903,11 @@ jl_Double_parseDouble = $string => {
     $rt_throw($string);
 },
 jl_Double__clinit_ = () => {
+try {
+
     jl_Double_TYPE = $rt_cls($rt_doublecls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jur_AbstractCharClass$1() {
     let a = this; jur_AbstractCharClass.call(a);
     a.$val$lHS = null;
@@ -15972,6 +16122,8 @@ otji_JSWrapper$Helper_$callClinit = () => {
     otji_JSWrapper$Helper__clinit_();
 },
 otji_JSWrapper$Helper__clinit_ = () => {
+try {
+
     let var$1;
     otji_JSWrapper$Helper_hashCodes = new WeakMap();
     otji_JSWrapper$Helper_wrappers = !(typeof WeakRef !== 'undefined' ? 1 : 0) ? null : new WeakMap();
@@ -15991,7 +16143,8 @@ otji_JSWrapper$Helper__clinit_ = () => {
         var$1 = new FinalizationRegistry(otji_JS_function(otji_JSWrapper_unwrap(var$1), "accept"));
     }
     otji_JSWrapper$Helper_numberFinalizationRegistry = var$1;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 otjc_JSUndefined = $rt_classWithoutFields(),
 otcit_DoubleSynthesizer = $rt_classWithoutFields(),
 otcit_DoubleSynthesizer_mantissa10Table = null,
@@ -16005,11 +16158,11 @@ otcit_DoubleSynthesizer_synthesizeDouble = ($mantissa, $exp, $negative) => {
     otcit_DoubleSynthesizer_$callClinit();
     $indexInTable = 330 + $exp | 0;
     if (Long_ne($mantissa, Long_ZERO) && $indexInTable >= 0) {
-        var$5 = otcit_DoubleSynthesizer_mantissa10Table.data;
+        var$5 = (__safe(otcit_DoubleSynthesizer_mantissa10Table).data||[]);
         if ($indexInTable >= var$5.length)
             return !$negative ? Infinity : (-Infinity);
         $binMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, var$5[$indexInTable], 0);
-        $binExp = otcit_DoubleSynthesizer_exp10Table.data[$indexInTable];
+        $binExp = (__safe(otcit_DoubleSynthesizer_exp10Table).data||[])[$indexInTable];
         $binMantissaShift = (64 - jl_Long_numberOfLeadingZeros($binMantissa) | 0) - 58 | 0;
         $binMantissa = $binMantissaShift >= 0 ? Long_shru($binMantissa, $binMantissaShift) : Long_shl($binMantissa,  -$binMantissaShift | 0);
         $binExp = $binExp + $binMantissaShift | 0;
@@ -16046,16 +16199,18 @@ otcit_DoubleSynthesizer_calcDecMantissa = ($mantissa, $lowerBit, $indexInTable, 
     otcit_DoubleSynthesizer_$callClinit();
     $half = $lowerBit >>> 1 | 0;
     otcit_DoubleAnalyzer_$callClinit();
-    $shift = 7 - (otcit_DoubleAnalyzer_exp10Table.data[$indexInTable] - $binExp | 0) | 0;
-    $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, otcit_DoubleAnalyzer_mantissa10Table.data[$indexInTable], $shift);
+    $shift = 7 - ((__safe(otcit_DoubleAnalyzer_exp10Table).data||[])[$indexInTable] - $binExp | 0) | 0;
+    $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$indexInTable], $shift);
     $lowerPos = Long_fromInt($half);
-    $decMantissaHi = otcit_DoubleAnalyzer_mulAndShiftRight(Long_add($mantissa, $lowerPos), otcit_DoubleAnalyzer_mantissa10Table.data[$indexInTable], $shift);
-    $lowerPos = otcit_DoubleAnalyzer_findLowerDistance($decMantissa, otcit_DoubleAnalyzer_mulAndShiftRight(Long_sub($mantissa, $lowerPos), otcit_DoubleAnalyzer_mantissa10Table.data[$indexInTable], $shift));
+    $decMantissaHi = otcit_DoubleAnalyzer_mulAndShiftRight(Long_add($mantissa, $lowerPos), (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$indexInTable], $shift);
+    $lowerPos = otcit_DoubleAnalyzer_findLowerDistance($decMantissa, otcit_DoubleAnalyzer_mulAndShiftRight(Long_sub($mantissa, $lowerPos), (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$indexInTable], $shift));
     $upperPos = otcit_DoubleAnalyzer_findUpperDistance($decMantissa, $decMantissaHi);
     $posCmp = jl_Long_compareUnsigned($lowerPos, $upperPos);
     return $posCmp > 0 ? Long_mul(jl_Long_divideUnsigned($decMantissa, $lowerPos), $lowerPos) : $posCmp < 0 ? Long_add(Long_mul(jl_Long_divideUnsigned($decMantissa, $upperPos), $upperPos), $upperPos) : Long_mul(jl_Long_divideUnsigned(Long_add($decMantissa, Long_div($upperPos, Long_fromInt(2))), $upperPos), $upperPos);
 },
 otcit_DoubleSynthesizer__clinit_ = () => {
+try {
+
     otcit_DoubleSynthesizer_mantissa10Table = $rt_createLongArrayFromData([Long_create(136053384, 4203730336), Long_create(85033365, 2627331460), Long_create(106291706, 3284164325), Long_create(1206606457, 4105205406), Long_create(3975354508, 2565753378), Long_create(2821709486, 3207191723), Long_create(2453395034, 4008989654), Long_create(459630072, 2505618534), Long_create(2722021238, 3132023167), Long_create(2328784724, 3915028959), Long_create(3066103188, 2446893099), Long_create(2758887162, 3058616374),
     Long_create(1301125304, 3823270468), Long_create(2960686963, 2389544042), Long_create(1553375056, 2986930053), Long_create(3015460644, 3733662566), Long_create(810921078, 2333539104), Long_create(1013651348, 2916923880), Long_create(1267064185, 3646154850), Long_create(1865656940, 2278846781), Long_create(3405812998, 2848558476), Long_create(4257266248, 3560698095), Long_create(4271404141, 2225436309), Long_create(2118029704, 2781795387), Long_create(1573795306, 3477244234), Long_create(2057363890, 2173277646),
     Long_create(424221215, 2716597058), Long_create(2677760167, 3395746322), Long_create(1199716561, 4244682903), Long_create(2360435586, 2652926814), Long_create(803060835, 3316158518), Long_create(3151309692, 4145198147), Long_create(1432697645, 2590748842), Long_create(3938355705, 3238436052), Long_create(627977335, 4048045066), Long_create(1466227658, 2530028166), Long_create(3980268221, 3162535207), Long_create(3901593452, 3953169009), Long_create(827883171, 2470730631), Long_create(4256079436, 3088413288),
@@ -16111,7 +16266,8 @@ otcit_DoubleSynthesizer__clinit_ = () => {
     1476, 1479, 1482, 1486, 1489, 1492, 1496, 1499, 1502, 1506, 1509, 1512, 1516, 1519, 1522, 1526, 1529, 1532, 1536, 1539, 1542, 1546, 1549, 1552, 1556, 1559, 1562, 1566, 1569, 1572, 1575, 1579, 1582, 1585, 1589, 1592, 1595, 1599, 1602, 1605, 1609, 1612, 1615, 1619, 1622, 1625, 1629, 1632, 1635, 1639, 1642, 1645, 1649, 1652, 1655, 1659, 1662, 1665, 1668, 1672, 1675, 1678, 1682, 1685, 1688, 1692, 1695, 1698, 1702, 1705, 1708, 1712, 1715, 1718, 1722, 1725, 1728, 1732, 1735, 1738, 1742, 1745, 1748, 1752, 1755,
     1758, 1761, 1765, 1768, 1771, 1775, 1778, 1781, 1785, 1788, 1791, 1795, 1798, 1801, 1805, 1808, 1811, 1815, 1818, 1821, 1825, 1828, 1831, 1835, 1838, 1841, 1845, 1848, 1851, 1855, 1858, 1861, 1864, 1868, 1871, 1874, 1878, 1881, 1884, 1888, 1891, 1894, 1898, 1901, 1904, 1908, 1911, 1914, 1918, 1921, 1924, 1928, 1931, 1934, 1938, 1941, 1944, 1948, 1951, 1954, 1957, 1961, 1964, 1967, 1971, 1974, 1977, 1981, 1984, 1987, 1991, 1994, 1997, 2001, 2004, 2007, 2011, 2014, 2017, 2021, 2024, 2027, 2031, 2034, 2037,
     2041, 2044, 2047, 2051, 2054, 2057, 2060, 2064, 2067, 2070, 2074, 2077, 2080, 2084, 2087, 2090, 2094, 2097, 2100, 2104, 2107, 2110, 2114]);
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 ju_IllegalFormatException = $rt_classWithoutFields(jl_IllegalArgumentException);
 function ju_UnknownFormatConversionException() {
     ju_IllegalFormatException.call(this);
@@ -16161,7 +16317,7 @@ otcit_DoubleAnalyzer_analyze = ($d, $result) => {
             $exponent = $exponent + (-1) | 0;
         }
     }
-    var$6 = otcit_DoubleAnalyzer_exp10Table.data;
+    var$6 = (__safe(otcit_DoubleAnalyzer_exp10Table).data||[]);
     $binExponentCorrection = $exponent << 16 >> 16;
     $mantissaShift = 0;
     $decExponent = var$6.length;
@@ -16191,25 +16347,25 @@ otcit_DoubleAnalyzer_analyze = ($d, $result) => {
         $decExponent =  -$decExponent | 0;
     $posCmp = $decExponent + 1 | 0;
     $mantissaShift = 12 + ($exponent - var$6[$posCmp] | 0) | 0;
-    $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, otcit_DoubleAnalyzer_mantissa10Table.data[$posCmp], $mantissaShift);
+    $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$posCmp], $mantissaShift);
     if (Long_le($decMantissa, otcit_DoubleAnalyzer_MAX_MANTISSA)) {
         while (jl_Long_compareUnsigned($decMantissa, otcit_DoubleAnalyzer_MAX_MANTISSA) <= 0) {
             $decExponent = $decExponent + (-1) | 0;
             $decMantissa = Long_add(Long_mul($decMantissa, Long_fromInt(10)), Long_fromInt(9));
         }
-        var$6 = otcit_DoubleAnalyzer_exp10Table.data;
+        var$6 = (__safe(otcit_DoubleAnalyzer_exp10Table).data||[]);
         $binExponentCorrection = $decExponent + 1 | 0;
         $mantissaShift = 12 + ($exponent - var$6[$binExponentCorrection] | 0) | 0;
-        $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, otcit_DoubleAnalyzer_mantissa10Table.data[$binExponentCorrection], $mantissaShift);
+        $decMantissa = otcit_DoubleAnalyzer_mulAndShiftRight($mantissa, (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$binExponentCorrection], $mantissaShift);
     }
     $mantissa = Long_shl($mantissa, 1);
     $bits = Long_add($mantissa, Long_fromInt(1));
-    var$6 = otcit_DoubleAnalyzer_mantissa10Table.data;
+    var$6 = (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[]);
     $binExponentCorrection = $decExponent + 1 | 0;
     $decMantissaHi = var$6[$binExponentCorrection];
     $exponent = $mantissaShift - 1 | 0;
     $decMantissaHi = otcit_DoubleAnalyzer_mulAndShiftRight($bits, $decMantissaHi, $exponent);
-    $lowerPos = otcit_DoubleAnalyzer_findLowerDistance($decMantissa, otcit_DoubleAnalyzer_mulAndShiftRight(Long_sub($mantissa, Long_fromInt(1)), otcit_DoubleAnalyzer_mantissa10Table.data[$binExponentCorrection], $exponent));
+    $lowerPos = otcit_DoubleAnalyzer_findLowerDistance($decMantissa, otcit_DoubleAnalyzer_mulAndShiftRight(Long_sub($mantissa, Long_fromInt(1)), (__safe(otcit_DoubleAnalyzer_mantissa10Table).data||[])[$binExponentCorrection], $exponent));
     $upperPos = otcit_DoubleAnalyzer_findUpperDistance($decMantissa, $decMantissaHi);
     $posCmp = jl_Long_compareUnsigned($lowerPos, $upperPos);
     $mantissa = $posCmp > 0 ? Long_mul(jl_Long_divideUnsigned($decMantissa, $lowerPos), $lowerPos) : $posCmp < 0 ? Long_add(Long_mul(jl_Long_divideUnsigned($decMantissa, $upperPos), $upperPos), $upperPos) : Long_mul(jl_Long_divideUnsigned(Long_add($decMantissa, Long_div($upperPos, Long_fromInt(2))), $upperPos), $upperPos);
@@ -16265,6 +16421,8 @@ otcit_DoubleAnalyzer_mulAndShiftRight = ($a, $b, $shift) => {
     return Long_add(Long_add(Long_add(Long_shl(Long_mul($b4, $a4), 32 + $shift | 0), Long_shl(Long_add(Long_mul($b4, $a3), Long_mul($b3, $a4)), 16 + $shift | 0)), Long_shl(Long_add(Long_add(Long_mul($b4, $a2), Long_mul($b3, $a3)), Long_mul($b2, $a4)), $shift)), Long_shru(Long_add(Long_add(Long_add(Long_mul($b3, $a1), Long_mul($b2, $a2)), Long_mul($b1, $a3)), Long_shl(Long_add(Long_add(Long_add(Long_mul($b4, $a1), Long_mul($b3, $a2)), Long_mul($b2, $a3)), Long_mul($b1, $a4)), 16)), 32 - $shift | 0));
 },
 otcit_DoubleAnalyzer__clinit_ = () => {
+try {
+
     otcit_DoubleAnalyzer_MAX_MANTISSA = jl_Long_divideUnsigned(Long_fromInt(-1), Long_fromInt(10));
     otcit_DoubleAnalyzer_resultForLog10 = otcit_DoubleAnalyzer$Result__init_();
     otcit_DoubleAnalyzer_mantissa10Table = $rt_createLongArrayFromData([Long_create(3251292512, 2194092222), Long_create(1766094183, 3510547556), Long_create(553881887, 2808438045), Long_create(443105509, 2246750436), Long_create(3285949193, 3594800697), Long_create(910772436, 2875840558), Long_create(2446604867, 2300672446), Long_create(2196580869, 3681075914), Long_create(2616258154, 2944860731), Long_create(1234013064, 2355888585), Long_create(1974420903, 3769421736), Long_create(720543263, 3015537389), Long_create(1435428070, 2412429911),
@@ -16322,7 +16480,8 @@ otcit_DoubleAnalyzer__clinit_ = () => {
     1482, 1485, 1488, 1492, 1495, 1498, 1502, 1505, 1508, 1512, 1515, 1518, 1522, 1525, 1528, 1532, 1535, 1538, 1542, 1545, 1548, 1552, 1555, 1558, 1562, 1565, 1568, 1572, 1575, 1578, 1581, 1585, 1588, 1591, 1595, 1598, 1601, 1605, 1608, 1611, 1615, 1618, 1621, 1625, 1628, 1631, 1635, 1638, 1641, 1645, 1648, 1651, 1655, 1658, 1661, 1665, 1668, 1671, 1674, 1678, 1681, 1684, 1688, 1691, 1694, 1698, 1701, 1704, 1708, 1711, 1714, 1718, 1721, 1724, 1728, 1731, 1734, 1738, 1741, 1744, 1748, 1751, 1754, 1758, 1761,
     1764, 1767, 1771, 1774, 1777, 1781, 1784, 1787, 1791, 1794, 1797, 1801, 1804, 1807, 1811, 1814, 1817, 1821, 1824, 1827, 1831, 1834, 1837, 1841, 1844, 1847, 1851, 1854, 1857, 1861, 1864, 1867, 1870, 1874, 1877, 1880, 1884, 1887, 1890, 1894, 1897, 1900, 1904, 1907, 1910, 1914, 1917, 1920, 1924, 1927, 1930, 1934, 1937, 1940, 1944, 1947, 1950, 1954, 1957, 1960, 1963, 1967, 1970, 1973, 1977, 1980, 1983, 1987, 1990, 1993, 1997, 2000, 2003, 2007, 2010, 2013, 2017, 2020, 2023, 2027, 2030, 2033, 2037, 2040, 2043,
     2047, 2050, 2053, 2057, 2060, 2063, 2066, 2070, 2073, 2076, 2080, 2083, 2086, 2090, 2093, 2096, 2100, 2103, 2106, 2110, 2113, 2116, 2120]);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_DuplicateFormatFlagsException() {
     ju_IllegalFormatException.call(this);
     this.$flags3 = null;
@@ -16355,6 +16514,8 @@ jl_Byte_$callClinit = () => {
     jl_Byte__clinit_();
 },
 jl_Byte__clinit_ = () => {
+try {
+
     let var$1, var$2, var$3, var$4, var$5;
     jl_Byte_TYPE = $rt_cls($rt_bytecls);
     jl_Byte_$callClinit();
@@ -16369,7 +16530,8 @@ jl_Byte__clinit_ = () => {
         var$3 = var$3 + 1 | 0;
     }
     jl_Byte_byteCache = var$1;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Short = $rt_classWithoutFields(jl_Number),
 jl_Short_TYPE = null,
 jl_Short_$callClinit = () => {
@@ -16377,8 +16539,11 @@ jl_Short_$callClinit = () => {
     jl_Short__clinit_();
 },
 jl_Short__clinit_ = () => {
+try {
+
     jl_Short_TYPE = $rt_cls($rt_shortcls);
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_IllegalFormatCodePointException() {
     ju_IllegalFormatException.call(this);
     this.$codePoint = 0;
@@ -16652,7 +16817,7 @@ jt_DecimalFormat__init_0 = (var_0, var_1) => {
 },
 jt_DecimalFormat_fieldsToText = ($this, $fields, $buffer) => {
     let var$3, var$4;
-    $fields = $fields.data;
+    $fields = (__safe($fields).data||[]);
     var$3 = $fields.length;
     var$4 = 0;
     while (var$4 < var$3) {
@@ -16705,7 +16870,7 @@ jt_DecimalFormat_formatExponent0 = ($this, $mantissa, $exponent, $sign, $buffer)
     $exponentLength = $this.$multiplier;
     if ($exponentLength != 1) {
         $multiplierDigits = jt_DecimalFormat_fastLn100($this, $exponentLength);
-        $tenMultiplier = jt_DecimalFormat_POW10_INT_ARRAY.data[$multiplierDigits];
+        $tenMultiplier = (__safe(jt_DecimalFormat_POW10_INT_ARRAY).data||[])[$multiplierDigits];
         $exponentLength = $this.$multiplier;
         if ($tenMultiplier == $exponentLength)
             $exponent = $exponent + $multiplierDigits | 0;
@@ -16748,7 +16913,7 @@ jt_DecimalFormat_formatExponent0 = ($this, $mantissa, $exponent, $sign, $buffer)
     $exponentPos = jl_Math_max($i, 0);
     $i_0 = $mantissaLength - 1 | 0;
     while ($i_0 >= $exponentPos) {
-        $mantissaDigitMask = jt_DecimalFormat_POW10_ARRAY.data[$i_0];
+        $mantissaDigitMask = (__safe(jt_DecimalFormat_POW10_ARRAY).data||[])[$i_0];
         jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, Long_lo(Long_div($mantissa, $mantissaDigitMask))));
         $mantissa = Long_rem($mantissa, $mantissaDigitMask);
         $i_0 = $i_0 + (-1) | 0;
@@ -16773,7 +16938,7 @@ jt_DecimalFormat_formatExponent0 = ($this, $mantissa, $exponent, $sign, $buffer)
         $i = $i - 1 | 0;
         b: {
             while ($i >= $limit) {
-                $mantissaDigitMask = jt_DecimalFormat_POW10_ARRAY.data[$i];
+                $mantissaDigitMask = (__safe(jt_DecimalFormat_POW10_ARRAY).data||[])[$i];
                 jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, Long_lo(Long_div($mantissa, $mantissaDigitMask))));
                 $mantissa = Long_rem($mantissa, $mantissaDigitMask);
                 $count = $count + 1 | 0;
@@ -16797,7 +16962,7 @@ jt_DecimalFormat_formatExponent0 = ($this, $mantissa, $exponent, $sign, $buffer)
     }
     $i = jl_Math_max($this.$exponentDigits, jt_DecimalFormat_fastLn100($this, $multiplierDigits) + 1 | 0) - 1 | 0;
     while ($i >= 0) {
-        $exponentDigit = jt_DecimalFormat_POW10_INT_ARRAY.data[$i];
+        $exponentDigit = (__safe(jt_DecimalFormat_POW10_INT_ARRAY).data||[])[$i];
         jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, $multiplierDigits / $exponentDigit | 0));
         $multiplierDigits = $multiplierDigits % $exponentDigit | 0;
         $i = $i + (-1) | 0;
@@ -16811,7 +16976,7 @@ jt_DecimalFormat_formatRegular0 = ($this, $mantissa, $exponent, $sign, $buffer) 
     $exponent = $this.$multiplier;
     if ($exponent != 1) {
         $multiplierDigits = jt_DecimalFormat_fastLn100($this, $exponent);
-        $tenMultiplier = jt_DecimalFormat_POW10_INT_ARRAY.data[$multiplierDigits];
+        $tenMultiplier = (__safe(jt_DecimalFormat_POW10_INT_ARRAY).data||[])[$multiplierDigits];
         $exponent = $this.$multiplier;
         if ($tenMultiplier == $exponent)
             $significantFracDigits = $significantFracDigits + $multiplierDigits | 0;
@@ -16855,7 +17020,7 @@ jt_DecimalFormat_formatRegular0 = ($this, $mantissa, $exponent, $sign, $buffer) 
     $mantissaDigit = $mantissaLength - 1 | 0;
     $i_0 = 0;
     while ($i_0 < $significantIntDigits) {
-        var$19 = jt_DecimalFormat_POW10_ARRAY.data;
+        var$19 = (__safe(jt_DecimalFormat_POW10_ARRAY).data||[]);
         $exponent = $mantissaDigit + (-1) | 0;
         $mantissaDigitMask = var$19[$mantissaDigit];
         jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, jl_Math_abs(Long_lo(Long_div($mantissa, $mantissaDigitMask)))));
@@ -16911,7 +17076,7 @@ jt_DecimalFormat_formatRegular0 = ($this, $mantissa, $exponent, $sign, $buffer) 
                     if (Long_eq($mantissa, Long_ZERO))
                         break;
                     $i_0 = $i_0 + 1 | 0;
-                    $mantissaDigitMask = jt_DecimalFormat_POW10_ARRAY.data[$mantissaDigit];
+                    $mantissaDigitMask = (__safe(jt_DecimalFormat_POW10_ARRAY).data||[])[$mantissaDigit];
                     jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, jl_Math_abs(Long_lo(Long_div($mantissa, $mantissaDigitMask)))));
                     $mantissa = Long_rem($mantissa, $mantissaDigitMask);
                     $mantissaDigit = $mantissaDigit + (-1) | 0;
@@ -17043,7 +17208,7 @@ jt_DecimalFormat_formatExponent = ($this, $value, $buffer) => {
     }
     $i = jl_Math_max($this.$exponentDigits, jt_DecimalFormat_fastLn100($this, $exponent) + 1 | 0) - 1 | 0;
     while ($i >= 0) {
-        $exponentDigit = jt_DecimalFormat_POW10_INT_ARRAY.data[$i];
+        $exponentDigit = (__safe(jt_DecimalFormat_POW10_INT_ARRAY).data||[])[$i];
         jl_AbstractStringBuilder_append($buffer, jt_DecimalFormat_forDigit($this, $exponent / $exponentDigit | 0));
         $exponent = $exponent % $exponentDigit | 0;
         $i = $i + (-1) | 0;
@@ -17176,7 +17341,7 @@ jt_DecimalFormat_applyRounding0 = ($this, $mantissa, $mantissaLength, $exponent,
     let $rounding, var$6, var$7, var$8;
     a: {
         jt_DecimalFormat_$callClinit();
-        $rounding = jt_DecimalFormat_POW10_ARRAY.data[$mantissaLength - $exponent | 0];
+        $rounding = (__safe(jt_DecimalFormat_POW10_ARRAY).data||[])[$mantissaLength - $exponent | 0];
         jt_DecimalFormat$1_$callClinit();
         switch (jt_DecimalFormat$1_$SwitchMap$java$math$RoundingMode.data[$this.$roundingMode.$ordinal]) {
             case 1:
@@ -17359,10 +17524,13 @@ jt_DecimalFormat_forDigit = ($this, $n) => {
     return ($this.$symbols.$zeroDigit + $n | 0) & 65535;
 },
 jt_DecimalFormat__clinit_ = () => {
+try {
+
     jt_DecimalFormat_POW10_ARRAY = $rt_createLongArrayFromData([Long_fromInt(1), Long_fromInt(10), Long_fromInt(100), Long_fromInt(1000), Long_fromInt(10000), Long_fromInt(100000), Long_fromInt(1000000), Long_fromInt(10000000), Long_fromInt(100000000), Long_fromInt(1000000000), Long_create(1410065408, 2), Long_create(1215752192, 23), Long_create(3567587328, 232), Long_create(1316134912, 2328), Long_create(276447232, 23283), Long_create(2764472320, 232830), Long_create(1874919424, 2328306), Long_create(1569325056, 23283064),
     Long_create(2808348672, 232830643)]);
     jt_DecimalFormat_POW10_INT_ARRAY = $rt_createIntArrayFromData([1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000]);
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 ju_Formattable = $rt_classWithoutFields(0);
 function jm_BigDecimal() {
     let a = this; jl_Number.call(a);
@@ -17437,7 +17605,7 @@ jm_BigDecimal_valueOf0 = ($unscaledVal, $scale) => {
     if (!$scale)
         return jm_BigDecimal_valueOf($unscaledVal);
     if (Long_eq($unscaledVal, Long_ZERO) && $scale >= 0) {
-        var$3 = jm_BigDecimal_ZERO_SCALED_BY.data;
+        var$3 = (__safe(jm_BigDecimal_ZERO_SCALED_BY).data||[]);
         if ($scale < var$3.length)
             return var$3[$scale];
     }
@@ -17446,7 +17614,7 @@ jm_BigDecimal_valueOf0 = ($unscaledVal, $scale) => {
 jm_BigDecimal_valueOf = $unscaledVal => {
     jm_BigDecimal_$callClinit();
     if (Long_ge($unscaledVal, Long_ZERO) && Long_lt($unscaledVal, Long_fromInt(11)))
-        return jm_BigDecimal_BI_SCALED_BY_ZERO.data[Long_lo($unscaledVal)];
+        return (__safe(jm_BigDecimal_BI_SCALED_BY_ZERO).data||[])[Long_lo($unscaledVal)];
     return jm_BigDecimal__init_2($unscaledVal, 0);
 },
 jm_BigDecimal_multiply = ($this, $multiplicand) => {
@@ -17586,6 +17754,8 @@ jm_BigDecimal_bitLength = $smallValue => {
     return 64 - jl_Long_numberOfLeadingZeros($smallValue) | 0;
 },
 jm_BigDecimal__clinit_ = () => {
+try {
+
     let var$1, var$2, var$3, $i, $j;
     jm_BigDecimal_ZERO = jm_BigDecimal__init_(0, 0);
     jm_BigDecimal_ONE = jm_BigDecimal__init_(1, 0);
@@ -17649,14 +17819,14 @@ jm_BigDecimal__clinit_ = () => {
     jm_BigDecimal_ZERO_SCALED_BY = $rt_createArray(jm_BigDecimal, 11);
     jm_BigDecimal_CH_ZEROS = $rt_createCharArray(100);
     $i = 0;
-    while ($i < jm_BigDecimal_ZERO_SCALED_BY.data.length) {
-        jm_BigDecimal_BI_SCALED_BY_ZERO.data[$i] = jm_BigDecimal__init_($i, 0);
-        jm_BigDecimal_ZERO_SCALED_BY.data[$i] = jm_BigDecimal__init_(0, $i);
-        jm_BigDecimal_CH_ZEROS.data[$i] = 48;
+    while ($i < (__safe(jm_BigDecimal_ZERO_SCALED_BY).data||[]).length) {
+        (__safe(jm_BigDecimal_BI_SCALED_BY_ZERO).data||[])[$i] = jm_BigDecimal__init_($i, 0);
+        (__safe(jm_BigDecimal_ZERO_SCALED_BY).data||[])[$i] = jm_BigDecimal__init_(0, $i);
+        (__safe(jm_BigDecimal_CH_ZEROS).data||[])[$i] = 48;
         $i = $i + 1 | 0;
     }
     while (true) {
-        var$1 = jm_BigDecimal_CH_ZEROS.data;
+        var$1 = (__safe(jm_BigDecimal_CH_ZEROS).data||[]);
         if ($i >= var$1.length)
             break;
         var$1[$i] = 48;
@@ -17664,24 +17834,25 @@ jm_BigDecimal__clinit_ = () => {
     }
     $j = 0;
     while (true) {
-        var$1 = jm_BigDecimal_LONG_FIVE_POW_BIT_LENGTH.data;
+        var$1 = (__safe(jm_BigDecimal_LONG_FIVE_POW_BIT_LENGTH).data||[]);
         if ($j >= var$1.length)
             break;
-        var$1[$j] = jm_BigDecimal_bitLength(jm_BigDecimal_LONG_FIVE_POW.data[$j]);
+        var$1[$j] = jm_BigDecimal_bitLength((__safe(jm_BigDecimal_LONG_FIVE_POW).data||[])[$j]);
         $j = $j + 1 | 0;
     }
     $j = 0;
     while (true) {
-        var$1 = jm_BigDecimal_LONG_TEN_POW_BIT_LENGTH.data;
+        var$1 = (__safe(jm_BigDecimal_LONG_TEN_POW_BIT_LENGTH).data||[]);
         if ($j >= var$1.length)
             break;
-        var$1[$j] = jm_BigDecimal_bitLength(jm_BigDecimal_LONG_TEN_POW.data[$j]);
+        var$1[$j] = jm_BigDecimal_bitLength((__safe(jm_BigDecimal_LONG_TEN_POW).data||[])[$j]);
         $j = $j + 1 | 0;
     }
     jm_Multiplication_$callClinit();
     jm_BigDecimal_TEN_POW = jm_Multiplication_bigTenPows;
     jm_BigDecimal_FIVE_POW = jm_Multiplication_bigFivePows;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 otjc_JSWeakRef = $rt_classWithoutFields(),
 otji_JSWrapper$Helper$FinalizationRegistryConsumer = $rt_classWithoutFields(0),
 otji_JSWrapper$Helper$_clinit_$lambda$_3_0 = $rt_classWithoutFields(),
@@ -17797,6 +17968,8 @@ jm_RoundingMode__init_ = (var_0, var_1, var_2) => {
     return var_3;
 },
 jm_RoundingMode__clinit_ = () => {
+try {
+
     let var$1, var$2, var$3;
     jm_RoundingMode_UP = jm_RoundingMode__init_($rt_s(447), 0, 0);
     jm_RoundingMode_DOWN = jm_RoundingMode__init_($rt_s(448), 1, 1);
@@ -17818,7 +17991,8 @@ jm_RoundingMode__clinit_ = () => {
     var$3[6] = jm_RoundingMode_HALF_EVEN;
     var$3[7] = var$1;
     jm_RoundingMode_$VALUES = var$2;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_Currency() {
     jl_Object.call(this);
     this.$resource = null;
@@ -17909,8 +18083,8 @@ jm_Multiplication_multiplyByInt = ($res, $a, $aSize, $factor) => {
     $carry = Long_ZERO;
     $i = 0;
     while ($i < $aSize) {
-        var$7 = $res.data;
-        $carry = jm_Multiplication_unsignedMultAddAdd($a.data[$i], $factor, Long_lo($carry), 0);
+        var$7 = (__safe($res).data||[]);
+        $carry = jm_Multiplication_unsignedMultAddAdd((__safe($a).data||[])[$i], $factor, Long_lo($carry), 0);
         var$7[$i] = Long_lo($carry);
         $carry = Long_shru($carry, 32);
         $i = $i + 1 | 0;
@@ -17926,8 +18100,8 @@ jm_Multiplication_square = ($a, $aLen, $res) => {
         $i_0 = $i + 1 | 0;
         $j = $i_0;
         while ($j < $aLen) {
-            var$8 = $a.data;
-            var$9 = $res.data;
+            var$8 = (__safe($a).data||[]);
+            var$9 = (__safe($res).data||[]);
             $i_1 = var$8[$i];
             $index = var$8[$j];
             var$12 = $i + $j | 0;
@@ -17936,27 +18110,27 @@ jm_Multiplication_square = ($a, $aLen, $res) => {
             $carry = Long_shru($carry, 32);
             $j = $j + 1 | 0;
         }
-        $res.data[$i + $aLen | 0] = Long_lo($carry);
+        (__safe($res).data||[])[$i + $aLen | 0] = Long_lo($carry);
         $i = $i_0;
     }
     $i_1 = $aLen << 1;
     $index = 0;
     var$13 = 0;
     while (var$13 < $i_1) {
-        var$8 = $res.data;
+        var$8 = (__safe($res).data||[]);
         $i = var$8[var$13];
         var$8[var$13] = $i << 1 | $index;
         $index = $i >>> 31 | 0;
         var$13 = var$13 + 1 | 0;
     }
     if ($index)
-        $res.data[$i_1] = $index;
+        (__safe($res).data||[])[$i_1] = $index;
     $carry = Long_ZERO;
     $i_1 = 0;
     $index = 0;
     while ($i_1 < $aLen) {
-        var$8 = $a.data;
-        var$9 = $res.data;
+        var$8 = (__safe($a).data||[]);
+        var$9 = (__safe($res).data||[]);
         $carry = jm_Multiplication_unsignedMultAddAdd(var$8[$i_1], var$8[$i_1], var$9[$index], Long_lo($carry));
         var$9[$index] = Long_lo($carry);
         $carry = Long_shru($carry, 32);
@@ -17973,7 +18147,7 @@ jm_Multiplication_powerOf10 = $exp => {
     let $intExp, var$3, $powerOfFive, $longExp, var$6;
     jm_Multiplication_$callClinit();
     $intExp = Long_lo($exp);
-    var$3 = jm_Multiplication_bigTenPows.data;
+    var$3 = (__safe(jm_Multiplication_bigTenPows).data||[]);
     if (Long_lt($exp, Long_fromInt(var$3.length)))
         return var$3[$intExp];
     if (Long_le($exp, Long_fromInt(50))) {
@@ -17981,15 +18155,15 @@ jm_Multiplication_powerOf10 = $exp => {
         return jm_BigInteger_pow(jm_BigInteger_TEN, $intExp);
     }
     if (Long_le($exp, Long_fromInt(1000)))
-        return jm_BigInteger_shiftLeft(jm_BigInteger_pow(jm_Multiplication_bigFivePows.data[1], $intExp), $intExp);
+        return jm_BigInteger_shiftLeft(jm_BigInteger_pow((__safe(jm_Multiplication_bigFivePows).data||[])[1], $intExp), $intExp);
     if (Long_gt(Long_add(Long_fromInt(1), Long_fromNumber(Long_toNumber($exp) / 2.4082399653118496)), Long_fromInt(1000000))) {
         $powerOfFive = new jl_ArithmeticException;
         jl_RuntimeException__init_($powerOfFive, $rt_s(455));
         $rt_throw($powerOfFive);
     }
     if (Long_le($exp, Long_fromInt(2147483647)))
-        return jm_BigInteger_shiftLeft(jm_BigInteger_pow(jm_Multiplication_bigFivePows.data[1], $intExp), $intExp);
-    $powerOfFive = jm_BigInteger_pow(jm_Multiplication_bigFivePows.data[1], 2147483647);
+        return jm_BigInteger_shiftLeft(jm_BigInteger_pow((__safe(jm_Multiplication_bigFivePows).data||[])[1], $intExp), $intExp);
+    $powerOfFive = jm_BigInteger_pow((__safe(jm_Multiplication_bigFivePows).data||[])[1], 2147483647);
     $longExp = Long_sub($exp, Long_fromInt(2147483647));
     $intExp = Long_lo(Long_rem($exp, Long_fromInt(2147483647)));
     var$6 = $powerOfFive;
@@ -17998,7 +18172,7 @@ jm_Multiplication_powerOf10 = $exp => {
         var$6 = jm_BigInteger_multiply(var$6, $powerOfFive);
         $exp = Long_sub($exp, Long_fromInt(2147483647));
     }
-    $powerOfFive = jm_BigInteger_shiftLeft(jm_BigInteger_multiply(var$6, jm_BigInteger_pow(jm_Multiplication_bigFivePows.data[1], $intExp)), 2147483647);
+    $powerOfFive = jm_BigInteger_shiftLeft(jm_BigInteger_multiply(var$6, jm_BigInteger_pow((__safe(jm_Multiplication_bigFivePows).data||[])[1], $intExp)), 2147483647);
     while (Long_gt($longExp, Long_fromInt(2147483647))) {
         $powerOfFive = jm_BigInteger_shiftLeft($powerOfFive, 2147483647);
         $longExp = Long_sub($longExp, Long_fromInt(2147483647));
@@ -18010,6 +18184,8 @@ jm_Multiplication_unsignedMultAddAdd = ($a, $b, $c, $d) => {
     return Long_add(Long_add(Long_mul(Long_and(Long_fromInt($a), Long_create(4294967295, 0)), Long_and(Long_fromInt($b), Long_create(4294967295, 0))), Long_and(Long_fromInt($c), Long_create(4294967295, 0))), Long_and(Long_fromInt($d), Long_create(4294967295, 0)));
 },
 jm_Multiplication__clinit_ = () => {
+try {
+
     let $fivePow, $i, var$3, var$4;
     jm_Multiplication_tenPows = $rt_createIntArrayFromData([1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000]);
     jm_Multiplication_fivePows = $rt_createIntArrayFromData([1, 5, 25, 125, 625, 3125, 15625, 78125, 390625, 1953125, 9765625, 48828125, 244140625, 1220703125]);
@@ -18018,20 +18194,21 @@ jm_Multiplication__clinit_ = () => {
     $fivePow = Long_fromInt(1);
     $i = 0;
     while ($i <= 18) {
-        jm_Multiplication_bigFivePows.data[$i] = jm_BigInteger_valueOf($fivePow);
-        jm_Multiplication_bigTenPows.data[$i] = jm_BigInteger_valueOf(Long_shl($fivePow, $i));
+        (__safe(jm_Multiplication_bigFivePows).data||[])[$i] = jm_BigInteger_valueOf($fivePow);
+        (__safe(jm_Multiplication_bigTenPows).data||[])[$i] = jm_BigInteger_valueOf(Long_shl($fivePow, $i));
         $fivePow = Long_mul($fivePow, Long_fromInt(5));
         $i = $i + 1 | 0;
     }
-    while ($i < jm_Multiplication_bigTenPows.data.length) {
-        var$3 = jm_Multiplication_bigFivePows.data;
+    while ($i < (__safe(jm_Multiplication_bigTenPows).data||[]).length) {
+        var$3 = (__safe(jm_Multiplication_bigFivePows).data||[]);
         var$4 = $i - 1 | 0;
         var$3[$i] = jm_BigInteger_multiply(var$3[var$4], var$3[1]);
-        var$3 = jm_Multiplication_bigTenPows.data;
+        var$3 = (__safe(jm_Multiplication_bigTenPows).data||[]);
         var$3[$i] = jm_BigInteger_multiply(var$3[var$4], jm_BigInteger_TEN);
         $i = $i + 1 | 0;
     }
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 otcic_CurrencyHelper = $rt_classWithoutFields(),
 otcic_CurrencyHelper_$$metadata$$0 = null,
 otcic_CurrencyHelper_$$metadata$$1 = null,
@@ -18159,7 +18336,7 @@ jm_BigInteger_valueOf = $val => {
     }
     if (Long_gt($val, Long_fromInt(10)))
         return jm_BigInteger__init_1(1, $val);
-    return jm_BigInteger_SMALL_VALUES.data[Long_lo($val)];
+    return (__safe(jm_BigInteger_SMALL_VALUES).data||[])[Long_lo($val)];
 },
 jm_BigInteger_abs = $this => {
     if ($this.$sign < 0)
@@ -18403,7 +18580,7 @@ jm_BigInteger_pow = ($this, $exp) => {
                     $x = $x + 1 | 0;
                 }
                 var$4 = $rt_imul($x, $exp);
-                var$5 = jm_BigInteger_TWO_POWS.data;
+                var$5 = (__safe(jm_BigInteger_TWO_POWS).data||[]);
                 if (var$4 < var$5.length)
                     var$2 = var$5[var$4];
                 else {
@@ -18462,7 +18639,7 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
     $divisorLen = $divisor.$numberLength;
     $divisorDigits = $divisor.$digits;
     if ($divisorLen == 1) {
-        $thisLen = $divisorDigits.data[0];
+        $thisLen = (__safe($divisorDigits).data||[])[0];
         $divisorDigits = $this.$digits;
         $divisorLen = $this.$numberLength;
         $thisSign = $this.$sign;
@@ -18470,14 +18647,14 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
             $divisorSign = $thisSign != $divisorSign ? (-1) : 1;
             $thisDigits = $rt_createIntArray($divisorLen);
             $quotientDigits = $rt_createIntArray(1);
-            $quotientDigits.data[0] = jm_Division_divideArrayByInt($thisDigits, $divisorDigits, $divisorLen, $thisLen);
+            (__safe($quotientDigits).data||[])[0] = jm_Division_divideArrayByInt($thisDigits, $divisorDigits, $divisorLen, $thisLen);
             $divisor = jm_BigInteger__init_($divisorSign, $divisorLen, $thisDigits);
             $result0 = jm_BigInteger__init_($thisSign, 1, $quotientDigits);
             jm_BigInteger_cutOffLeadingZeroes($divisor);
             jm_BigInteger_cutOffLeadingZeroes($result0);
             $thisDigits = $rt_wrapArray(jm_BigInteger, [$divisor, $result0]);
         } else {
-            var$10 = Long_and(Long_fromInt($divisorDigits.data[0]), Long_create(4294967295, 0));
+            var$10 = Long_and(Long_fromInt((__safe($divisorDigits).data||[])[0]), Long_create(4294967295, 0));
             var$11 = Long_and(Long_fromInt($thisLen), Long_create(4294967295, 0));
             var$12 = Long_div(var$10, var$11);
             var$10 = Long_rem(var$10, var$11);
@@ -18494,7 +18671,7 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
     $cmp = $rt_compare($thisLen, $divisorLen);
     if ((!$cmp ? jm_Elementary_compareArrays($thisDigits, $divisorDigits, $thisLen) : $cmp <= 0 ? (-1) : 1) < 0) {
         $divisorDigits = $rt_createArray(jm_BigInteger, 2);
-        $thisDigits = $divisorDigits.data;
+        $thisDigits = (__safe($divisorDigits).data||[]);
         jm_BigInteger_$callClinit();
         $thisDigits[0] = jm_BigInteger_ZERO;
         $thisDigits[1] = $this;
@@ -18586,7 +18763,7 @@ jm_BigInteger_remainder = ($this, $divisor) => {
             var$8 = Long_fromInt(Long_hi((jm_Division_divideLongByInt(Long_add(Long_shl(var$8, 32), Long_and(Long_fromInt(var$9[$thisLen]), Long_create(4294967295, 0))), var$7))));
             $thisLen = $thisLen + (-1) | 0;
         }
-        $resDigits.data[0] = Long_lo(var$8);
+        (__safe($resDigits).data||[])[0] = Long_lo(var$8);
     }
     $result = jm_BigInteger__init_($this.$sign, $divisorLen, $resDigits);
     jm_BigInteger_cutOffLeadingZeroes($result);
@@ -18626,6 +18803,8 @@ jm_BigInteger_getFirstNonzeroDigit = $this => {
     return $this.$firstNonzeroDigit;
 },
 jm_BigInteger__clinit_ = () => {
+try {
+
     let var$1, var$2, $i;
     jm_BigInteger_ZERO = jm_BigInteger__init_0(0, 0);
     jm_BigInteger_ONE = jm_BigInteger__init_0(1, 1);
@@ -18649,13 +18828,14 @@ jm_BigInteger__clinit_ = () => {
     jm_BigInteger_TWO_POWS = $rt_createArray(jm_BigInteger, 32);
     $i = 0;
     while (true) {
-        var$1 = jm_BigInteger_TWO_POWS.data;
+        var$1 = (__safe(jm_BigInteger_TWO_POWS).data||[]);
         if ($i >= var$1.length)
             break;
         var$1[$i] = jm_BigInteger_valueOf(Long_shl(Long_fromInt(1), $i));
         $i = $i + 1 | 0;
     }
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jur_BackReferencedSingleSet = $rt_classWithoutFields(jur_SingleSet),
 jur_BackReferencedSingleSet_find = ($this, $startSearch, $testString, $matchResult) => {
     let $res, $lastIndex, $saveStart;
@@ -19409,10 +19589,13 @@ jl_AbstractStringBuilder$Constants_$callClinit = () => {
     jl_AbstractStringBuilder$Constants__clinit_();
 },
 jl_AbstractStringBuilder$Constants__clinit_ = () => {
+try {
+
     jl_AbstractStringBuilder$Constants_longLogPowersOfTen = $rt_createLongArrayFromData([Long_fromInt(1), Long_fromInt(10), Long_fromInt(100), Long_fromInt(10000), Long_fromInt(100000000), Long_create(1874919424, 2328306)]);
     jl_AbstractStringBuilder$Constants_doubleAnalysisResult = new otcit_DoubleAnalyzer$Result;
     jl_AbstractStringBuilder$Constants_floatAnalysisResult = new otcit_FloatAnalyzer$Result;
-};
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function otcit_FloatAnalyzer$Result() {
     let a = this; jl_Object.call(a);
     a.$mantissa0 = 0;
@@ -19427,6 +19610,8 @@ jt_DecimalFormat$1_$callClinit = () => {
     jt_DecimalFormat$1__clinit_();
 },
 jt_DecimalFormat$1__clinit_ = () => {
+try {
+
     let var$1, var$2;
     jm_RoundingMode_$callClinit();
     var$1 = $rt_createIntArray((jm_RoundingMode_$VALUES.$clone0()).data.length);
@@ -19440,7 +19625,8 @@ jt_DecimalFormat$1__clinit_ = () => {
     var$2[jm_RoundingMode_HALF_DOWN.$ordinal] = 6;
     var$2[jm_RoundingMode_HALF_UP.$ordinal] = 7;
     var$2[jm_RoundingMode_HALF_EVEN.$ordinal] = 8;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_ArithmeticException = $rt_classWithoutFields(jl_RuntimeException),
 jm_BitLevel = $rt_classWithoutFields(),
 jm_BitLevel_shiftLeft0 = ($source, $count) => {
@@ -19458,16 +19644,16 @@ jm_BitLevel_shiftLeft = ($result, $source, $intCount, $count) => {
     let var$5, $rightShiftCount, $i, var$8, $i_0, var$10;
     a: {
         if (!$count)
-            jl_System_fastArraycopy($source, 0, $result, $intCount, $result.data.length - $intCount | 0);
+            jl_System_fastArraycopy($source, 0, $result, $intCount, (__safe($result).data||[]).length - $intCount | 0);
         else {
-            var$5 = $result.data;
+            var$5 = (__safe($result).data||[]);
             $rightShiftCount = 32 - $count | 0;
             $i = var$5.length - 1 | 0;
             var$5[$i] = 0;
             while (true) {
                 if ($i <= $intCount)
                     break a;
-                var$8 = $source.data;
+                var$8 = (__safe($source).data||[]);
                 $i_0 = var$5[$i];
                 var$10 = ($i - $intCount | 0) - 1 | 0;
                 var$5[$i] = $i_0 | (var$8[var$10] >>> $rightShiftCount | 0);
@@ -19478,7 +19664,7 @@ jm_BitLevel_shiftLeft = ($result, $source, $intCount, $count) => {
     }
     $i_0 = 0;
     while ($i_0 < $intCount) {
-        $result.data[$i_0] = 0;
+        (__safe($result).data||[])[$i_0] = 0;
         $i_0 = $i_0 + 1 | 0;
     }
 },
@@ -19525,7 +19711,7 @@ jm_BitLevel_shiftRight = ($source, $count) => {
                     break a;
                 }
             }
-            var$10 = $resDigits.data;
+            var$10 = (__safe($resDigits).data||[]);
             var$11 = 0;
             while (true) {
                 $i = $rt_compare(var$11, $resLength);
@@ -19550,24 +19736,24 @@ jm_BitLevel_shiftRight0 = ($result, $resultLen, $source, $intCount, $count) => {
     $allZero = 1;
     $i = 0;
     while ($i < $intCount) {
-        $allZero = $allZero & ($source.data[$i] ? 0 : 1);
+        $allZero = $allZero & ((__safe($source).data||[])[$i] ? 0 : 1);
         $i = $i + 1 | 0;
     }
     if (!$count)
         jl_System_fastArraycopy($source, $intCount, $result, 0, $resultLen);
     else {
-        var$8 = $source.data;
+        var$8 = (__safe($source).data||[]);
         $leftShiftCount = 32 - $count | 0;
         $allZero = $allZero & (var$8[$i] << $leftShiftCount ? 0 : 1);
         var$10 = 0;
         var$11 = $resultLen - 1 | 0;
         while (var$10 < var$11) {
-            $source = $result.data;
+            $source = (__safe($result).data||[]);
             $resultLen = var$10 + $intCount | 0;
             $source[var$10] = (var$8[$resultLen] >>> $count | 0) | var$8[$resultLen + 1 | 0] << $leftShiftCount;
             var$10 = var$10 + 1 | 0;
         }
-        $result.data[var$10] = var$8[var$10 + $intCount | 0] >>> $count | 0;
+        (__safe($result).data||[])[var$10] = var$8[var$10 + $intCount | 0] >>> $count | 0;
     }
     return $allZero;
 },
@@ -19576,25 +19762,25 @@ jm_Elementary_compareArrays = ($a, $b, $size) => {
     let $i, var$5;
     $i = $size - 1 | 0;
     while ($i >= 0) {
-        var$5 = $b.data;
-        if ($a.data[$i] != var$5[$i])
+        var$5 = (__safe($b).data||[]);
+        if ((__safe($a).data||[])[$i] != var$5[$i])
             break;
         $i = $i + (-1) | 0;
     }
     if ($i < 0)
         $size = 0;
     else {
-        $b = $b.data;
-        $size = Long_ge(Long_and(Long_fromInt($a.data[$i]), Long_create(4294967295, 0)), Long_and(Long_fromInt($b[$i]), Long_create(4294967295, 0))) ? 1 : (-1);
+        $b = (__safe($b).data||[]);
+        $size = Long_ge(Long_and(Long_fromInt((__safe($a).data||[])[$i]), Long_create(4294967295, 0)), Long_and(Long_fromInt($b[$i]), Long_create(4294967295, 0))) ? 1 : (-1);
     }
     return $size;
 },
 jm_Elementary_add = ($a, $aSize, $b, $bSize) => {
     let $res, var$6, var$7, var$8, var$9;
-    $a = $a.data;
-    $b = $b.data;
+    $a = (__safe($a).data||[]);
+    $b = (__safe($b).data||[]);
     $res = $rt_createIntArray($aSize + 1 | 0);
-    var$6 = $res.data;
+    var$6 = (__safe($res).data||[]);
     var$7 = Long_add(Long_and(Long_fromInt($a[0]), Long_create(4294967295, 0)), Long_and(Long_fromInt($b[0]), Long_create(4294967295, 0)));
     var$6[0] = Long_lo(var$7);
     var$8 = Long_shr(var$7, 32);
@@ -19634,19 +19820,19 @@ jm_Elementary_add = ($a, $aSize, $b, $bSize) => {
 jm_Elementary_subtract = ($a, $aSize, $b, $bSize) => {
     let $res, var$6, var$7, var$8, var$9, var$10, var$11;
     $res = $rt_createIntArray($aSize);
-    var$6 = $res.data;
+    var$6 = (__safe($res).data||[]);
     var$7 = Long_ZERO;
     var$8 = 0;
     while (var$8 < $bSize) {
-        var$9 = $a.data;
-        var$10 = $b.data;
+        var$9 = (__safe($a).data||[]);
+        var$10 = (__safe($b).data||[]);
         var$11 = Long_add(var$7, Long_sub(Long_and(Long_fromInt(var$9[var$8]), Long_create(4294967295, 0)), Long_and(Long_fromInt(var$10[var$8]), Long_create(4294967295, 0))));
         var$6[var$8] = Long_lo(var$11);
         var$7 = Long_shr(var$11, 32);
         var$8 = var$8 + 1 | 0;
     }
     while (var$8 < $aSize) {
-        var$11 = Long_add(var$7, Long_and(Long_fromInt($a.data[var$8]), Long_create(4294967295, 0)));
+        var$11 = Long_add(var$7, Long_and(Long_fromInt((__safe($a).data||[])[var$8]), Long_create(4294967295, 0)));
         var$6[var$8] = Long_lo(var$11);
         var$7 = Long_shr(var$11, 32);
         var$8 = var$8 + 1 | 0;
@@ -19656,7 +19842,7 @@ jm_Elementary_subtract = ($a, $aSize, $b, $bSize) => {
 jm_Division = $rt_classWithoutFields(),
 jm_Division_divide = ($quot, $quotLength, $a, $j, $b, $bLength) => {
     let var$7, $normA, $normB, $k, $divisorShift, $firstDivisorDigit, $i, var$14, var$15, var$16, $res, $rem, $rOverflowed, $carry, $product, $longR, $borrow;
-    var$7 = $b.data;
+    var$7 = (__safe($b).data||[]);
     $normA = $rt_createIntArray($j + 1 | 0);
     $normB = $rt_createIntArray($bLength + 1 | 0);
     $k = $bLength - 1 | 0;
@@ -19668,8 +19854,8 @@ jm_Division_divide = ($quot, $quotLength, $a, $j, $b, $bLength) => {
         jl_System_fastArraycopy($a, 0, $normA, 0, $j);
         jl_System_fastArraycopy($b, 0, $normB, 0, $bLength);
     }
-    var$7 = $normB.data;
-    $a = $normA.data;
+    var$7 = (__safe($normB).data||[]);
+    $a = (__safe($normA).data||[]);
     $firstDivisorDigit = var$7[$k];
     $i = $quotLength - 1 | 0;
     var$14 = $bLength - 2 | 0;
@@ -19734,7 +19920,7 @@ jm_Division_divide = ($quot, $quotLength, $a, $j, $b, $bLength) => {
             }
         }
         if ($quot !== null)
-            $quot.data[$i] = var$16;
+            (__safe($quot).data||[])[$i] = var$16;
         $j = $j + (-1) | 0;
         $i = $i + (-1) | 0;
     }
@@ -19754,7 +19940,7 @@ jm_Division_divideArrayByInt = ($dest, $src, $srcLength, $divisor) => {
     $divisor = $divisor & 1;
     var$9 = Long_shl($bLong, 1);
     while ($i >= 0) {
-        var$10 = $src.data;
+        var$10 = (__safe($src).data||[]);
         $temp = Long_or(Long_shl($rem, 32), Long_and(Long_fromInt(var$10[$i]), Long_create(4294967295, 0)));
         if (Long_ge($temp, Long_ZERO)) {
             $quot = Long_div($temp, $bLong);
@@ -19775,7 +19961,7 @@ jm_Division_divideArrayByInt = ($dest, $src, $srcLength, $divisor) => {
                 }
             }
         }
-        $dest.data[$i] = Long_lo(Long_and($quot, Long_create(4294967295, 0)));
+        (__safe($dest).data||[])[$i] = Long_lo(Long_and($quot, Long_create(4294967295, 0)));
         $i = $i + (-1) | 0;
     }
     return Long_lo($rem);
@@ -19817,9 +20003,12 @@ jt_DecimalFormat$Constants_$callClinit = () => {
     jt_DecimalFormat$Constants__clinit_();
 },
 jt_DecimalFormat$Constants__clinit_ = () => {
+try {
+
     jt_DecimalFormat$Constants_doubleAnalysisResult = new otcit_DoubleAnalyzer$Result;
     jt_DecimalFormat$Constants_floatAnalysisResult = new otcit_FloatAnalyzer$Result;
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 ju_ConcurrentModificationException = $rt_classWithoutFields(jl_RuntimeException),
 jm_Conversion = $rt_classWithoutFields(),
 jm_Conversion_digitFitInInt = null,
@@ -19829,9 +20018,12 @@ jm_Conversion_$callClinit = () => {
     jm_Conversion__clinit_();
 },
 jm_Conversion__clinit_ = () => {
+try {
+
     jm_Conversion_digitFitInInt = $rt_createIntArrayFromData([(-1), (-1), 31, 19, 15, 13, 11, 11, 10, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5]);
     jm_Conversion_bigRadices = $rt_createIntArrayFromData([(-2147483648), 1162261467, 1073741824, 1220703125, 362797056, 1977326743, 1073741824, 387420489, 1000000000, 214358881, 429981696, 815730721, 1475789056, 170859375, 268435456, 410338673, 612220032, 893871739, 1280000000, 1801088541, 113379904, 148035889, 191102976, 244140625, 308915776, 387420489, 481890304, 594823321, 729000000, 887503681, 1073741824, 1291467969, 1544804416, 1838265625, 60466176]);
-},
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jt_DecimalFormat$PerMillField = $rt_classWithoutFields(),
 jt_DecimalFormat$PerMillField_render = ($this, $format, $buffer) => {
     jl_AbstractStringBuilder_append($buffer, $format.$symbols.$perMill);
@@ -20382,6 +20574,149 @@ let $rt_jso_marker = Symbol('jsoClass');
     c.accept = $rt_callWithReceiver(otji_JSWrapper$Helper$_clinit_$lambda$_3_1_accept$exported$0);
 })();
 $rt_exports.main = $rt_export_main;
+
+
+// ============================================================
+// TeaVM Default Method Patcher (hybrid: prototype + registry)
+// Works with both obfuscated and unobfuscated builds.
+// ============================================================
+// This code is inserted INSIDE the TeaVM IIFE, so it has direct access
+// to closure variables. However, obfuscated builds mangle variable
+// names (FnY→ETN, GN→Gf, etc.) so we can't hardcode them.
+// Instead, we scan for the metadata Symbol by its description
+// "teavm_meta" and find the class registry by checking candidate arrays.
+(function() {
+    var __registry = {'meta_checks': 'null', 'registry_checks': '(typeof lClasses!=="undefined"&&Array.isArray(lClasses)&&lClasses.length>100?lClasses:null)'};
+
+
+    // === Find the metadata Symbol ===
+    // Try detected names first (from Python scan of source code)
+    var meta = null;
+    // Fallback: try known unobfuscated names
+    if (!meta) try { if (typeof GN !== 'undefined') meta = GN; } catch(e) {}
+    if (!meta) try { if (typeof $rt_meta !== 'undefined') meta = $rt_meta; } catch(e) {}
+
+    // For obfuscated builds, find Symbol("teavm_meta") by scanning
+    if (!meta) {
+        var globalObj = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
+        var checked = 0;
+        for (var key in globalObj) {
+            if (checked > 2000) break;
+            try {
+                var val = globalObj[key];
+                if (typeof val === 'function' && val.prototype) {
+                    var symKeys = Object.getOwnPropertySymbols(val);
+                    for (var k = 0; k < symKeys.length; k++) {
+                        if (symKeys[k].toString() === 'Symbol(teavm_meta)') {
+                            meta = symKeys[k];
+                            break;
+                        }
+                    }
+                    if (meta) break;
+                    checked++;
+                }
+            } catch(e) {}
+        }
+    }
+
+    if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
+
+    // === Find the class registry array ===
+    // Try detected names first (from Python scan of source code)
+    var allClasses = (typeof lClasses!=="undefined"&&Array.isArray(lClasses)&&lClasses.length>100?lClasses:null);
+    // Fallback: try known unobfuscated names
+    if (!allClasses) try { if (typeof FnY !== 'undefined' && Array.isArray(FnY) && FnY.length > 100) allClasses = FnY; } catch(e) {}
+    if (!allClasses) try { if (typeof Fnk !== 'undefined' && Array.isArray(Fnk) && Fnk.length > 100) allClasses = Fnk; } catch(e) {}
+    if (!allClasses) try { if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses) && $rt_allClasses.length > 100) allClasses = $rt_allClasses; } catch(e) {}
+
+    // For obfuscated builds, scan global scope for large arrays
+    if (!allClasses) {
+        var globalObj2 = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
+        var bestCandidate = null;
+        var bestLen = 0;
+        for (var key in globalObj2) {
+            try {
+                var val = globalObj2[key];
+                if (Array.isArray(val) && val.length > 500) {
+                    var sample = val[0];
+                    if (sample && typeof sample === 'function' && sample[meta]) {
+                        if (val.length > bestLen) { bestLen = val.length; bestCandidate = val; }
+                    }
+                }
+            } catch(e) {}
+        }
+        if (bestCandidate) allClasses = bestCandidate;
+    }
+
+    if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
+    console.log('[DefaultMethodPatcher] count=' + allClasses.length + ' meta=' + (typeof meta === 'symbol' ? meta.toString() : String(meta)));
+
+    var __funcs = {};
+    // Only use eval-based lookup for unobfuscated builds (registry non-empty)
+    if (Object.keys(__registry).length > 0) {
+        for (var __n in __registry) {
+            try { __funcs[__n] = eval(__n); } catch(e) {}
+            for (var __m in __registry[__n]) {
+                try { __funcs[__registry[__n][__m]] = eval(__registry[__n][__m]); } catch(e) {}
+            }
+        }
+    }
+
+    var patched = 0, classesPatched = 0;
+    for (var i = 0; i < allClasses.length; i++) {
+        var cls = allClasses[i];
+        if (!cls || !cls.prototype || !cls[meta]) continue;
+        var clsMeta = cls[meta];
+        if (!clsMeta.superinterfaces || clsMeta.superinterfaces.length === 0) continue;
+        var classPatched = false;
+        for (var j = 0; j < clsMeta.superinterfaces.length; j++) {
+            var iface = clsMeta.superinterfaces[j];
+            if (!iface) continue;
+
+            // Method 1: Copy from interface prototype
+            var proto = iface.prototype;
+            for (var key in proto) {
+                if (typeof proto[key] === 'function' && key !== 'constructor') {
+                    if (!Object.prototype.hasOwnProperty.call(cls.prototype, key)) {
+                        (function(key, fn) {
+                            cls.prototype[key] = function() {
+                                var args = [this];
+                                for (var k = 0; k < arguments.length; k++) args.push(arguments[k]);
+                                return fn.apply(null, args);
+                            };
+                        })(key, proto[key]);
+                        patched++; classPatched = true;
+                    }
+                }
+            }
+
+            // Method 2: Copy from registry (for DCE'd methods not on prototype)
+            for (var ifaceName in __registry) {
+                var ifaceFunc = __funcs[ifaceName];
+                if (!ifaceFunc || ifaceFunc !== iface) continue;
+                var methods = __registry[ifaceName];
+                for (var vmethod in methods) {
+                    if (!Object.prototype.hasOwnProperty.call(cls.prototype, vmethod)) {
+                        var func = __funcs[methods[vmethod]];
+                        if (typeof func === 'function') {
+                            (function(vmethod, func) {
+                                cls.prototype[vmethod] = function() {
+                                    var args = [this];
+                                    for (var k = 0; k < arguments.length; k++) args.push(arguments[k]);
+                                    return func.apply(null, args);
+                                };
+                            })(vmethod, func);
+                            patched++; classPatched = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (classPatched) classesPatched++;
+    }
+    console.log('[DefaultMethodPatcher] Patched ' + patched + ' methods across ' + classesPatched + ' classes');
+})();
+
 }));
 
 //# sourceMappingURL=classes.js.map

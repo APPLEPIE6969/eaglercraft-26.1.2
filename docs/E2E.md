@@ -126,13 +126,18 @@ with a TeaVM stub, so a broken compile cannot masquerade as a preview.
 ## Regenerating the lockfile
 
 `package-lock.json` is committed so CI installs exact dependency versions with
-`npm ci`. Regenerate it on a GitHub runner instead of locally:
+`npm ci`. It is regenerated on a GitHub runner rather than on a developer
+machine:
 
-1. Run the **Update package-lock.json** workflow (`update-lockfile.yml`).
-2. Download the `package-lock` artifact.
-3. Commit the new `package-lock.json` to `main`.
+1. Change `package.json`.
+2. Push to `main`. The **Update package-lock.json** workflow runs
+   automatically and commits the new `package-lock.json`.
+3. Or run the workflow manually with **Run workflow** when the lockfile needs
+   refreshing without a dependency change.
 
-The workflow also runs automatically when `package.json` changes on `main`.
+The workflow resolves the dependency tree with `npm install
+--package-lock-only --ignore-scripts`, so no packages are installed and
+Playwright never downloads a browser during the resolution step.
 
 ## Troubleshooting
 

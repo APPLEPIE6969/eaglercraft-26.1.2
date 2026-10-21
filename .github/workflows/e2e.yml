@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: '24'
+      browser_channel:
+        description: 'Playwright browser channel. Empty uses the bundled Chromium, "chrome" uses the system browser.'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       artifact_name:
@@ -35,6 +40,11 @@ on:
         required: false
         type: string
         default: '24'
+      browser_channel:
+        description: 'Playwright browser channel. Empty uses the bundled Chromium, "chrome" uses the system browser.'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -43,7 +53,9 @@ jobs:
   playwright:
     name: Playwright browser tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # The TeaVM client bootstrap blocks the browser main thread for about a
+    # minute, so the suite needs a generous budget to finish on a cold runner.
+    timeout-minutes: 60
 
     steps:
       # ── Checkout ──────────────────────────────────────────────
@@ -62,7 +74,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
-          path: e2e-artifact
+            path: e2e-artifact
 
       - name: Resolve client directory
         id: client
@@ -92,6 +104,7 @@ jobs:
           fi
 
       - name: Install Playwright Chromium
+        if: ${{ inputs.browser_channel == '' }}
         run: npx playwright install --with-deps chromium
 
       # ── Run the suite ─────────────────────────────────────────
@@ -99,7 +112,8 @@ jobs:
         env:
           E2E_PUBLIC_DIR: ${{ steps.client.outputs.dir }}
           E2E_STRICT_GAME: ${{ inputs.strict_game && '1' || '0' }}
-        run: npx playwright test
+          E2E_BROWSER_CHANNEL: ${{ inputs.browser_channel }}
+        run: env -u DBUS_SESSION_BUS_ADDRESS npx playwright test
 
       # ── Always publish the evidence ───────────────────────────
       - name: Upload Playwright report

@@ -1,10 +1,46 @@
-import type { Page } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import type { Page, TestInfo } from '@playwright/test';
 
 export interface CapturedError {
   message: string;
   source: string;
   line: number;
   column: number;
+}
+
+// ========== Console recorder ==========
+
+export interface ConsoleEntry {
+  /** Epoch millis at which the message was emitted. */
+  at: number;
+  /** Console message severity: log, info, warning, error, ... */
+  type: string;
+  text: string;
+}
+
+export interface ConsoleRecorder {
+  /** Snapshot of every console message captured so far. */
+  entries(): ConsoleEntry[];
+  /** Every captured message rendered as "[type] text" lines. */
+  text(): string;
+}
+
+/**
+ * Records every console message the page emits. The recorder must be
+ * installed before the page navigates, because the client logs its boot
+ * milestones (platform init, Minecraft construction, EPK parsing) while
+ * the bundle evaluates — long before any test could ask for them.
+ */
+export function installConsoleRecorder(page: Page): ConsoleRecorder {
+  const entries: ConsoleEntry[] = [];
+  page.on('console', (message) => {
+    entries.push({ at: Date.now(), type: message.type(), text: message.text() });
+  });
+  return {
+    entries: () => [...entries],
+    text: () => entries.map((entry) => `[${entry.type}] ${entry.text}`).join('\n'),
+  };
 }
 
 /** Any uncaught error raised from the TeaVM bundle is a game runtime error. */
@@ -135,4 +171,110 @@ export async function readMissingShellElements(page: Page): Promise<string[]> {
   return page.evaluate((ids) => ids.filter((id) => !document.getElementById(id)), [
     ...SHELL_ELEMENT_IDS,
   ]);
+}
+
+// ========== Game session state ==========
+
+export interface GameSessionState {
+  /** The TeaVM bundle has been evaluated and exported its entry point. */
+  mainExported: boolean;
+  /** The loading screen is still shown (bootstrap in progress). */
+  loadingVisible: boolean;
+  /** The title overlay is shown (the client is interactive). */
+  titleVisible: boolean;
+  /** The shell error overlay (window.onerror path) is showing. */
+  crashOverlayVisible: boolean;
+  /** ClientMain.showCrashScreen replaced the page body with a crash view. */
+  crashScreenShown: boolean;
+  /** Raw text of the FPS counter, e.g. "60 FPS" (null before the title screen). */
+  fpsText: string | null;
+}
+
+/**
+ * Reads the full observable state of a game session from the DOM. Unlike
+ * readReadyState this also covers the crash paths and the FPS counter, so a
+ * test can tell "booting", "in game" and "crashed" apart.
+ */
+export async function readGameSessionState(page: Page): Promise<GameSessionState> {
+  return page.evaluate(() => {
+    const loading = document.getElementById('loading-screen');
+    const title = document.getElementById('title-overlay');
+    const errorOverlay = document.getElementById('error-overlay');
+    const fps = document.getElementById('title-fps');
+    const loadingVisible =
+      loading !== null &&
+      !loading.classList.contains('hidden') &&
+      getComputedStyle(loading).display !== 'none';
+    const titleVisible = title !== null && getComputedStyle(title).display !== 'none';
+    const crashOverlayVisible =
+      errorOverlay !== null && errorOverlay.classList.contains('visible');
+    const crashScreenShown = Boolean(document.querySelector('h2'));
+    return {
+      mainExported: typeof (self as unknown as { main?: unknown }).main === 'function',
+      loadingVisible,
+      titleVisible,
+      crashOverlayVisible,
+      crashScreenShown,
+      fpsText: fps && fps.textContent ? fps.textContent : null,
+    };
+  });
+}
+
+/**
+ * Extracts the frames-per-second number from the FPS counter text
+ * ("60 FPS" -> 60). Returns 0 when the counter has no reading yet, so the
+ * caller can fail with a plain toBeGreaterThan(0) assertion.
+ */
+export function parseFps(fpsText: string | null): number {
+  if (!fpsText) {
+    return 0;
+  }
+  const match = fpsText.match(/(\d+(?:\.\d+)?)\s*FPS/i);
+  return match ? Number(match[1]) : 0;
+}
+
+/**
+ * Waits until the FPS counter publishes its first reading. The counter is
+ * driven by requestAnimationFrame and only starts reporting roughly a second
+ * after the title screen appears, so it cannot be asserted at the moment the
+ * overlay becomes visible. Returns the latest session state together with
+ * the parsed reading.
+ */
+export async function waitForFpsReading(
+  page: Page,
+  timeoutMs = 15_000,
+): Promise<{ state: GameSessionState; fps: number }> {
+  const deadline = Date.now() + timeoutMs;
+  let state = await readGameSessionState(page);
+  let fps = parseFps(state.fpsText);
+  while (fps <= 0 && Date.now() < deadline) {
+    await page.waitForTimeout(500);
+    state = await readGameSessionState(page);
+    fps = parseFps(state.fpsText);
+  }
+  return { state, fps };
+}
+
+// ========== Milestone screenshots ==========
+
+/** Directory that receives the milestone screenshots (relative to the repo root). */
+export const SCREENSHOTS_DIR = 'screenshots';
+
+/**
+ * Takes a screenshot, saves it to the screenshots/ directory and attaches it
+ * to the Playwright report under the given milestone name. Playwright
+ * captures through the browser compositor, so this also works while the
+ * client bootstrap blocks the page main thread.
+ */
+export async function attachMilestoneScreenshot(
+  page: Page,
+  testInfo: TestInfo,
+  name: string,
+): Promise<Buffer> {
+  const shot = await page.screenshot({ fullPage: false });
+  const dir = resolve(process.cwd(), SCREENSHOTS_DIR);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, `${name}.png`), shot);
+  await testInfo.attach(name, { body: shot, contentType: 'image/png' });
+  return shot;
 }

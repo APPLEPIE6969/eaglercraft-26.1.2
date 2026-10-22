@@ -1,5 +1,6 @@
 import { expect, test } from './fixtures';
 import {
+  attachMilestoneScreenshot,
   formatErrors,
   isGameRuntimeError,
   readMissingShellElements,
@@ -88,9 +89,6 @@ test.describe('client shell', () => {
   });
 
   test('captures a screenshot of the running client', async ({ clientPage }, testInfo) => {
-    await testInfo.attach('eaglercraft-client', {
-      body: await clientPage.screenshot({ fullPage: false }),
-      contentType: 'image/png',
-    });
+    await attachMilestoneScreenshot(clientPage, testInfo, 'shell-client');
   });
 });

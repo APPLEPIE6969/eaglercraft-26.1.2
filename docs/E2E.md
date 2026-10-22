@@ -27,9 +27,10 @@ boots is never published.
 | --- | --- |
 | `tests/e2e/bundle.spec.ts` | The published bundle is served over HTTP, is a full TeaVM build instead of a stub, and the server does not leak files outside the client directory. |
 | `tests/e2e/assets.spec.ts` | Static asset contract: metadata files, content types, 404 behaviour. |
-| `tests/e2e/shell.spec.ts` | The shell exposes its elements, `self.main` is exported, the client configuration is well formed, no failed bundle download is reported, no uncaught shell errors. |
+| `tests/e2e/shell.spec.ts` | The shell exposes its elements, `self.main` is exported, the client configuration is well formed, no failed bundle download is reported, no uncaught shell errors, screenshot of the running client. |
 | `tests/e2e/webgl.spec.ts` | Chromium can create a WebGL2 context and the game canvas is backed by one. |
 | `tests/e2e/game.spec.ts` | The client reaches the title screen, the EPK archive is served, and no uncaught game runtime errors occur. |
+| `tests/e2e/ingame.spec.ts` | The full "go in game" journey on a fresh page: loading screen → bundle boot → title screen → engine milestones (WebGL2 context, `EaglerCraft.initialize()` complete, Minecraft instance constructed, EPK parsed) → the game loop keeps rendering. Takes a milestone screenshot at every stage. |
 | `tests/e2e/multiplayer.spec.ts` | Multiplayer gateway smoke test: a real browser performs the Eagler WS handshake (0x01), login (0x03 → 0x04 status 0), and a chat round-trip (0x05) through `GatewaySmokeMain` → `McBridge` → `McProtocolStub`, plus a negative login case. Skipped automatically when the gateway jars have not been built. |
 
 ### Blocking versus informational assertions
@@ -45,8 +46,27 @@ informational by default and only become hard failures when
 Everything else (shell loads, the bundle is a real TeaVM build, `self.main` is
 exported, WebGL2 is obtainable, no uncaught shell errors) always fails the run.
 
+The `ingame.spec.ts` assertions are always blocking: the engine milestones it
+checks (Minecraft instance constructed, EPK parsed, the loop rendering at a
+positive FPS) are the client's own boot log lines, so a regression there means
+the client really did stop "going in game".
+
 Set `E2E_STRICT_GAME` to `true` on the reusable workflow input to turn the
 informational assertions into hard failures.
+
+## Screenshots
+
+`ingame.spec.ts` captures the journey as four milestone screenshots
+(`01-loading-screen`, `02-bundle-booted`, `03-title-screen`,
+`04-running-in-game`), and `shell.spec.ts` captures the shared client page as
+`shell-client`. Each screenshot is attached to the HTML report under its
+milestone name and also written to the `screenshots/` directory (gitignored
+locally, uploaded as a CI artifact next to the Playwright report). When a run
+fails, these files show exactly how far the client got before it died.
+
+`ingame.spec.ts` also attaches a `session-summary.json` with the relative
+timestamps of the boot milestones, the parsed EPK size/entry count, the FPS
+samples and any uncaught page errors.
 
 ## Why the client page is shared
 

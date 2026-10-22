@@ -124,5 +124,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            screenshots/
           retention-days: 14
           if-no-files-found: warn

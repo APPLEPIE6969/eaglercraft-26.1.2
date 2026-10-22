@@ -86,6 +86,7 @@ playwright-report/
 blob-report/
 .playwright/
 e2e-artifact/
+screenshots/
 
 # Local build outputs (recreated by gradle/javac)
 sources/teavm-plugin/classes/

@@ -1,0 +1,5 @@
+name: EaglercraftXBungee
+main: net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.EaglercraftXBungee
+version: 1.3.2
+author: lax1dude
+description: EaglerCraft WebSocket gateway for BungeeCord (26.1.2)

@@ -29,3 +29,11 @@ project(':buildtools').projectDir = file('buildtools')
 // Main game sources - TeaVM compilation target
 include ':sources'
 project(':sources').projectDir = file('sources')
+
+// Gateway WebSocket servers (browser multiplayer entry points)
+include ':PlaceholderServer'
+project(':PlaceholderServer').projectDir = file('gateway/PlaceholderServer')
+include ':EaglercraftXBungee'
+project(':EaglercraftXBungee').projectDir = file('gateway/EaglercraftXBungee')
+include ':EaglercraftXVelocity'
+project(':EaglercraftXVelocity').projectDir = file('gateway/EaglercraftXVelocity')

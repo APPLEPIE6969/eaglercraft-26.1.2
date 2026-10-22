@@ -1,23 +1,29 @@
 plugins {
     id 'java'
     id 'eclipse'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '9.0.0'
 }
 
 group = 'net.lax1dude.eaglercraft.v2_6.plugin'
 version = '1.3.2'
-archivesBaseName = 'EaglercraftXBungee'
+base { archivesName = 'EaglercraftXBungee' }
 
 repositories {
     mavenCentral()
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url = 'https://repo.md-5.net/content/groups/public/' }
+    // NOTE: bungeecord-api releases are now published to Maven Central.
+    // The historical repos (oss.sonatype.org snapshots, repo.md-5.net) are
+    // unreachable as of this build and have been dropped.
+    // Mojang's libs repo hosts com.mojang:* transitives (brigadier, ...).
+    maven { url = uri('https://libraries.minecraft.net') }
 }
 
 dependencies {
-    implementation 'net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT'
+    implementation 'net.md-5:bungeecord-api:1.20-R0.2'
     implementation 'io.netty:netty-all:4.1.97.Final'
     implementation 'org.java-websocket:Java-WebSocket:1.5.4'
+    // Java-WebSocket needs slf4j-api; BungeeCord does not ship a binding,
+    // so bundle slf4j-api + slf4j-simple (both relocated, see shadowJar).
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.yaml:snakeyaml:2.2'
     compileOnly 'com.github.oshi:oshi-core:6.4.6'
@@ -45,11 +51,17 @@ shadowJar {
     mergeServiceFiles()
     relocate 'org.java_websocket', 'net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.deps.websocket'
     relocate 'com.google.gson', 'net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.deps.gson'
+    relocate 'org.yaml.snakeyaml', 'net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.deps.snakeyaml'
+    // slf4j is relocated (api + simple binding) so the plugin never clashes
+    // with any slf4j the proxy itself may carry; the ServiceLoader provider
+    // file is rewritten by mergeServiceFiles() accordingly.
+    relocate 'org.slf4j', 'net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.deps.slf4j'
     archiveClassifier.set('')
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.release = 11
     options.compilerArgs += ['-Xlint:deprecation']
 }
 

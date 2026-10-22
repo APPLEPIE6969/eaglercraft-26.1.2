@@ -93,3 +93,13 @@ sources/teavm/patch/jdk-classes/
 
 # Gateway plugin sources are deliverables, not build artifacts
 !gateway/*/src/
+# TeaVM patch sources + relocated-lib jars must ship to CI (patch_teavm_jar.py)
+!scripts/
+scripts/*
+!scripts/teavm-patches/
+!scripts/patch_teavm_jar.py
+!scripts/patch_classlib_jar.py
+!scripts/patch_dfu_jar.py
+!scripts/patch_dfu_final.py
+!scripts/patch_default_methods.py
+!scripts/patch_teavm_asm.py

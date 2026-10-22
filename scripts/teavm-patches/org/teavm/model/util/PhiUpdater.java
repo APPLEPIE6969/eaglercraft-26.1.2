@@ -1,0 +1,827 @@
+/*
+ *  Copyright 2016 Alexey Andreev.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package org.teavm.model.util;
+
+import org.teavm.hppc.IntArrayDeque;
+import org.teavm.hppc.IntDeque;
+import org.teavm.hppc.IntHashSet;
+import org.teavm.hppc.IntObjectHashMap;
+import org.teavm.hppc.IntObjectMap;
+import org.teavm.hppc.IntSet;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.function.Predicate;
+import org.teavm.common.DominatorTree;
+import org.teavm.common.Graph;
+import org.teavm.common.GraphUtils;
+import org.teavm.common.IntegerArray;
+import org.teavm.model.BasicBlock;
+import org.teavm.model.Incoming;
+import org.teavm.model.Instruction;
+import org.teavm.model.InvokeDynamicInstruction;
+import org.teavm.model.Outgoing;
+import org.teavm.model.Phi;
+import org.teavm.model.Program;
+import org.teavm.model.Sigma;
+import org.teavm.model.TryCatchBlock;
+import org.teavm.model.Variable;
+import org.teavm.model.instructions.AbstractInstructionVisitor;
+import org.teavm.model.instructions.ArrayLengthInstruction;
+import org.teavm.model.instructions.AssignInstruction;
+import org.teavm.model.instructions.BinaryBranchingInstruction;
+import org.teavm.model.instructions.BinaryInstruction;
+import org.teavm.model.instructions.BoundCheckInstruction;
+import org.teavm.model.instructions.BranchingInstruction;
+import org.teavm.model.instructions.CastInstruction;
+import org.teavm.model.instructions.CastIntegerInstruction;
+import org.teavm.model.instructions.CastNumberInstruction;
+import org.teavm.model.instructions.ClassConstantInstruction;
+import org.teavm.model.instructions.CloneArrayInstruction;
+import org.teavm.model.instructions.ConstructArrayInstruction;
+import org.teavm.model.instructions.ConstructInstruction;
+import org.teavm.model.instructions.ConstructMultiArrayInstruction;
+import org.teavm.model.instructions.DoubleConstantInstruction;
+import org.teavm.model.instructions.ExitInstruction;
+import org.teavm.model.instructions.FloatConstantInstruction;
+import org.teavm.model.instructions.GetElementInstruction;
+import org.teavm.model.instructions.GetFieldInstruction;
+import org.teavm.model.instructions.InstructionVisitor;
+import org.teavm.model.instructions.IntegerConstantInstruction;
+import org.teavm.model.instructions.InvokeInstruction;
+import org.teavm.model.instructions.IsInstanceInstruction;
+import org.teavm.model.instructions.LongConstantInstruction;
+import org.teavm.model.instructions.MonitorEnterInstruction;
+import org.teavm.model.instructions.MonitorExitInstruction;
+import org.teavm.model.instructions.NegateInstruction;
+import org.teavm.model.instructions.NullCheckInstruction;
+import org.teavm.model.instructions.NullConstantInstruction;
+import org.teavm.model.instructions.PutElementInstruction;
+import org.teavm.model.instructions.PutFieldInstruction;
+import org.teavm.model.instructions.RaiseInstruction;
+import org.teavm.model.instructions.StringConstantInstruction;
+import org.teavm.model.instructions.SwitchInstruction;
+import org.teavm.model.instructions.UnwrapArrayInstruction;
+
+// PATCHED: use() no longer throws AssertionError("Variable used before
+// definition") when a variable is referenced before its first definition on
+// the walked path; it returns the unmapped (original) variable instead, i.e.
+// the identity mapping, so AGGRESSIVE-optimized builds of MC 26.x classes
+// compile instead of crashing the optimizer. Imports were also rewritten to
+// TeaVM's relocated hppc (org.teavm.hppc) to match the build classpath.
+// See scripts/patch_teavm_jar.py.
+public class PhiUpdater {
+    private Program program;
+    private Graph cfg;
+    private DominatorTree domTree;
+    private Graph domGraph;
+    private int[][] domFrontiers;
+    private Variable[] variableMap;
+    private boolean[] variableDefined;
+    private int[] variableDefinitionCount;
+    private List<List<Variable>> definedVersions = new ArrayList<>();
+    private BasicBlock currentBlock;
+    private Phi[][] phiMap;
+    private int[][] phiIndexMap;
+    private List<List<Phi>> synthesizedPhisByBlock = new ArrayList<>();
+    private IntObjectMap<Phi> phisByReceiver = new IntObjectHashMap<>();
+    private BitSet usedPhis = new BitSet();
+    private boolean[] usedDefinitions;
+    private IntegerArray variableToSourceMap = new IntegerArray(10);
+    private List<Phi> synthesizedPhis = new ArrayList<>();
+    private Sigma[][] sigmas;
+    private Predicate<Instruction> sigmaPredicate = instruction -> false;
+    private int[][][] frontierVariableCache;
+    private Variable[][] pendingVariableMap;
+
+    public int getSourceVariable(int var) {
+        if (var >= variableToSourceMap.size()) {
+            return -1;
+        }
+        return variableToSourceMap.get(var);
+    }
+
+    public List<Phi> getSynthesizedPhis() {
+        return synthesizedPhis;
+    }
+
+    public void updatePhis(Program program, int parameterCount) {
+        Variable[] parameters = new Variable[parameterCount];
+        for (int i = 0; i < parameters.length; ++i) {
+            parameters[i] = program.variableAt(i);
+        }
+        updatePhis(program, parameters);
+    }
+
+    public Sigma[] getSigmasAt(int blockIndex) {
+        Sigma[] result = sigmas[blockIndex];
+        return result != null ? result.clone() : null;
+    }
+
+    public void setSigmaPredicate(Predicate<Instruction> sigmaPredicate) {
+        this.sigmaPredicate = sigmaPredicate;
+    }
+
+    public void updatePhis(Program program, Variable[] parameters) {
+        if (program.basicBlockCount() == 0) {
+            return;
+        }
+        frontierVariableCache = new int[program.basicBlockCount()][][];
+        this.program = program;
+        phisByReceiver.clear();
+        cfg = ProgramUtils.buildControlFlowGraph(program);
+        domTree = GraphUtils.buildDominatorTree(cfg);
+        domGraph = GraphUtils.buildDominatorGraph(domTree, program.basicBlockCount());
+        pendingVariableMap = new Variable[program.basicBlockCount()][];
+
+        variableMap = new Variable[program.variableCount()];
+        usedDefinitions = new boolean[program.variableCount()];
+        variableDefinitionCount = new int[program.variableCount()];
+        for (int i = 0; i < parameters.length; ++i) {
+            variableMap[i] = parameters[i];
+            usedDefinitions[i] = true;
+            variableDefinitionCount[i] = 1;
+        }
+
+        for (int i = 0; i < program.variableCount(); ++i) {
+            variableToSourceMap.add(-1);
+        }
+        definedVersions.addAll(Collections.nCopies(program.variableCount(), null));
+
+        phiMap = new Phi[program.basicBlockCount()][];
+        phiIndexMap = new int[program.basicBlockCount()][];
+        for (int i = 0; i < phiMap.length; ++i) {
+            phiMap[i] = new Phi[program.variableCount()];
+            phiIndexMap[i] = new int[program.variableCount()];
+        }
+        domFrontiers = GraphUtils.findDominanceFrontiers(cfg, domTree);
+
+        synthesizedPhisByBlock.clear();
+
+        for (int i = 0; i < program.basicBlockCount(); ++i) {
+            synthesizedPhisByBlock.add(new ArrayList<>());
+        }
+
+        estimateSigmas();
+        estimatePhis();
+        renameVariables();
+        propagatePhiUsageInformation();
+        addSynthesizedPhis();
+    }
+
+    private void estimateSigmas() {
+        TransitionExtractor transitionExtractor = new TransitionExtractor();
+        UsageExtractor usageExtractor = new UsageExtractor();
+
+        sigmas = new Sigma[program.basicBlockCount()][];
+        for (int i = 0; i < sigmas.length; ++i) {
+            BasicBlock block = program.basicBlockAt(i);
+            Instruction instruction = block.getLastInstruction();
+            if (instruction == null) {
+                continue;
+            }
+
+            instruction.acceptVisitor(transitionExtractor);
+            BasicBlock[] targets = transitionExtractor.getTargets();
+            if (targets == null || targets.length < 2) {
+                continue;
+            }
+
+            if (!sigmaPredicate.test(instruction)) {
+                continue;
+            }
+
+            instruction.acceptVisitor(usageExtractor);
+            Variable[] variables = usageExtractor.getUsedVariables();
+
+            Sigma[] sigmasInBlock = new Sigma[variables.length];
+            for (int j = 0; j < sigmasInBlock.length; ++j) {
+                Sigma sigma = new Sigma(block, variables[j]);
+                sigmasInBlock[j] = sigma;
+                for (BasicBlock target : targets) {
+                    Outgoing outgoing = new Outgoing(variables[j], target);
+                    sigma.getOutgoings().add(outgoing);
+                }
+            }
+            sigmas[i] = sigmasInBlock;
+        }
+    }
+
+    private void estimatePhis() {
+        calculateDefinitions();
+
+        DefinitionExtractor definitionExtractor = new DefinitionExtractor();
+        variableDefined = new boolean[program.variableCount()];
+
+        IntDeque stack = new IntArrayDeque();
+        stack.addLast(0);
+        while (!stack.isEmpty()) {
+            int i = stack.removeLast();
+            currentBlock = program.basicBlockAt(i);
+
+            if (currentBlock.getExceptionVariable() != null) {
+                markAssignment(currentBlock.getExceptionVariable(), currentBlock);
+            }
+
+            for (Phi phi : currentBlock.getPhis()) {
+                markAssignment(phi.getReceiver(), currentBlock);
+            }
+
+            for (Instruction insn : currentBlock) {
+                currentBlock = program.basicBlockAt(i);
+                insn.acceptVisitor(definitionExtractor);
+                for (Variable var : definitionExtractor.getDefinedVariables()) {
+                    markAssignment(var, currentBlock);
+                }
+            }
+
+            var sigmasAtBlock = sigmas[i];
+            if (sigmasAtBlock != null) {
+                for (var sigma : sigmasAtBlock) {
+                    for (var outgoing : sigma.getOutgoings()) {
+                        markAssignment(outgoing.getValue(), outgoing.getTarget());
+                    }
+                }
+            }
+
+            for (int successor : domGraph.outgoingEdges(i)) {
+                stack.addLast(successor);
+            }
+        }
+    }
+
+    private void calculateDefinitions() {
+        var defExtractor = new DefinitionExtractor();
+        for (var block : program.getBasicBlocks()) {
+            increaseDefinitionCount(block.getExceptionVariable());
+            for (var phi : block.getPhis()) {
+                increaseDefinitionCount(phi.getReceiver());
+            }
+            for (var instruction : block) {
+                instruction.acceptVisitor(defExtractor);
+                for (var definedVar : defExtractor.getDefinedVariables()) {
+                    increaseDefinitionCount(definedVar);
+                }
+            }
+            var sigmas = getSigmasAt(block.getIndex());
+            if (sigmas != null) {
+                for (var sigma : sigmas) {
+                    for (var i = 0; i < sigma.getOutgoings().size(); ++i) {
+                        increaseDefinitionCount(sigma.getValue());
+                    }
+                }
+            }
+        }
+    }
+
+    private void increaseDefinitionCount(Variable var) {
+        if (var != null) {
+            variableDefinitionCount[var.getIndex()]++;
+        }
+    }
+
+    private void renameVariables() {
+        Deque<BasicBlock> stack = new ArrayDeque<>();
+        for (int i = 0; i < program.basicBlockCount(); ++i) {
+            if (domGraph.incomingEdgesCount(i) == 0) {
+                stack.push(program.basicBlockAt(i));
+                pendingVariableMap[i] = variableMap.clone();
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            Collections.fill(definedVersions, null);
+
+            currentBlock = stack.pop();
+            int index = currentBlock.getIndex();
+            variableMap = pendingVariableMap[index];
+            pendingVariableMap[index] = null;
+
+            if (currentBlock.getExceptionVariable() != null) {
+                currentBlock.setExceptionVariable(define(currentBlock.getExceptionVariable()));
+            }
+
+            for (Phi phi : synthesizedPhisByBlock.get(index)) {
+                Variable var = program.createVariable();
+                var.setDebugName(phi.getReceiver().getDebugName());
+                var.setLabel(phi.getReceiver().getLabel());
+                mapVariable(phi.getReceiver().getIndex(), var);
+                phisByReceiver.put(var.getIndex(), phi);
+                phi.setReceiver(var);
+            }
+            for (Phi phi : currentBlock.getPhis()) {
+                phi.setReceiver(define(phi.getReceiver()));
+            }
+
+            for (Instruction insn : currentBlock) {
+                insn.acceptVisitor(consumer);
+            }
+
+            int[] successors = domGraph.outgoingEdges(index);
+
+            Sigma[] nextSigmas = sigmas[index];
+            if (nextSigmas != null) {
+                for (Sigma sigma : sigmas[index]) {
+                    sigma.setValue(use(sigma.getValue()));
+                }
+            }
+
+            var oldVariableMap = variableMap;
+            for (int j = successors.length - 1; j >= 0; --j) {
+                int successor = successors[j];
+                var variables = oldVariableMap.clone();
+                pendingVariableMap[successor] = variables;
+                stack.push(program.basicBlockAt(successor));
+                variableMap = variables;
+            }
+
+            IntSet exceptionHandlingSuccessors = new IntHashSet();
+            for (TryCatchBlock tryCatch : currentBlock.getTryCatchBlocks()) {
+                exceptionHandlingSuccessors.add(tryCatch.getHandler().getIndex());
+            }
+
+            for (int successor : cfg.outgoingEdges(index)) {
+                variableMap = domTree.immediateDominatorOf(successor) == currentBlock.getIndex()
+                        ? pendingVariableMap[successor]
+                        : oldVariableMap.clone();
+                if (nextSigmas != null) {
+                    for (var sigma : nextSigmas) {
+                        for (var outgoing : sigma.getOutgoings()) {
+                            if (outgoing.getTarget().getIndex() == successor) {
+                                outgoing.setValue(define(outgoing.getValue()));
+                            }
+                        }
+                    }
+                }
+                renameOutgoingPhis(successor, exceptionHandlingSuccessors.contains(successor));
+            }
+        }
+    }
+
+    private void addSynthesizedPhis() {
+        for (int i = 0; i < program.basicBlockCount(); ++i) {
+            for (Phi phi : synthesizedPhisByBlock.get(i)) {
+                if (!usedPhis.get(phi.getReceiver().getIndex())) {
+                    continue;
+                }
+                if (!phi.getIncomings().isEmpty()) {
+                    program.basicBlockAt(i).getPhis().add(phi);
+                    synthesizedPhis.add(phi);
+                }
+            }
+        }
+    }
+
+    private void propagatePhiUsageInformation() {
+        IntDeque worklist = new IntArrayDeque();
+        for (int receiverIndex : phisByReceiver.keys().toArray()) {
+            if (usedPhis.get(receiverIndex)) {
+                worklist.addLast(receiverIndex);
+            }
+        }
+
+        IntSet visited = new IntHashSet();
+        while (!worklist.isEmpty()) {
+            int varIndex = worklist.removeFirst();
+            if (!visited.add(varIndex)) {
+                continue;
+            }
+            usedPhis.set(varIndex);
+
+            Phi phi = phisByReceiver.get(varIndex);
+            if (phi != null) {
+                for (Incoming incoming : phi.getIncomings()) {
+                    if (!visited.contains(incoming.getValue().getIndex())) {
+                        worklist.addLast(incoming.getValue().getIndex());
+                    }
+                }
+            }
+        }
+    }
+
+    private void renameOutgoingPhis(int successor, boolean allVersions) {
+        int[] phiIndexes = phiIndexMap[successor];
+        List<Phi> phis = synthesizedPhisByBlock.get(successor);
+
+        for (int j = 0; j < phis.size(); ++j) {
+            Phi phi = phis.get(j);
+            Variable var = variableMap[phiIndexes[j]];
+            if (var != null) {
+                List<Variable> versions = definedVersions.get(phiIndexes[j]);
+                if (versions != null && allVersions) {
+                    for (Variable version : versions) {
+                        Incoming incoming = new Incoming();
+                        incoming.setSource(currentBlock);
+                        incoming.setValue(version);
+                        phi.getIncomings().add(incoming);
+                    }
+                }
+
+                Incoming incoming = new Incoming();
+                incoming.setSource(currentBlock);
+                incoming.setValue(var);
+                phi.getIncomings().add(incoming);
+                phi.getReceiver().setDebugName(var.getDebugName());
+            }
+        }
+
+        for (var phi : program.basicBlockAt(successor).getPhis()) {
+            for (var incoming : phi.getIncomings()) {
+                if (incoming.getSource() == currentBlock) {
+                    var value = variableMap[incoming.getValue().getIndex()];
+                    if (value != null) {
+                        incoming.setValue(value);
+                        usedPhis.set(value.getIndex());
+                    } else {
+                        usedPhis.set(incoming.getValue().getIndex());
+                    }
+                }
+            }
+        }
+    }
+
+    private void markAssignment(Variable var, BasicBlock targetBlock) {
+        if (variableDefinitionCount[var.getIndex()] < 2) {
+            variableDefined[var.getIndex()] = true;
+            return;
+        }
+
+        Deque<BasicBlock> worklist = new ArrayDeque<>();
+        worklist.push(targetBlock);
+        var isCurrentlyFrontier = currentBlock != targetBlock && cfg.incomingEdgesCount(targetBlock.getIndex()) > 1;
+
+        if (variableDefined[var.getIndex()]) {
+            for (TryCatchBlock tryCatch : currentBlock.getTryCatchBlocks()) {
+                placePhi(tryCatch.getHandler().getIndex(), var, currentBlock, worklist);
+            }
+        } else {
+            variableDefined[var.getIndex()] = true;
+        }
+
+        while (!worklist.isEmpty()) {
+            BasicBlock block = worklist.pop();
+            var frontiers = isCurrentlyFrontier ? new int[] { block.getIndex() } : domFrontiers[block.getIndex()];
+            isCurrentlyFrontier = false;
+
+            if (frontiers != null) {
+                for (int frontier : frontiers) {
+                    placePhi(frontier, var, block, worklist);
+                }
+            }
+        }
+    }
+
+    private int[][] getIncomingVariablesForFrontier(int frontier) {
+        int[][] result = frontierVariableCache[frontier];
+        if (result == null) {
+            List<List<Variable>> builder = new ArrayList<>(Collections.nCopies(program.basicBlockCount(), null));
+            for (Phi phi : program.basicBlockAt(frontier).getPhis()) {
+                for (Incoming incoming : phi.getIncomings()) {
+                    List<Variable> variables = builder.get(incoming.getSource().getIndex());
+                    if (variables == null) {
+                        variables = new ArrayList<>();
+                        builder.set(incoming.getSource().getIndex(), variables);
+                    }
+                    variables.add(incoming.getValue());
+                }
+            }
+
+            result = new int[program.basicBlockCount()][];
+            for (int i = 0; i < result.length; ++i) {
+                List<Variable> builderVariables = builder.get(i);
+                if (builderVariables == null) {
+                    continue;
+                }
+                int[] resultVariables = new int[builderVariables.size()];
+                for (int j = 0; j < resultVariables.length; ++j) {
+                    resultVariables[j] = builderVariables.get(j).getIndex();
+                }
+                result[i] = resultVariables;
+            }
+
+            frontierVariableCache[frontier] = result;
+        }
+        return result;
+    }
+
+    private void placePhi(int frontier, Variable var, BasicBlock block, Deque<BasicBlock> worklist) {
+        BasicBlock frontierBlock = program.basicBlockAt(frontier);
+        if (frontierBlock.getExceptionVariable() == var) {
+            return;
+        }
+
+        int[] frontierIncomingVariables = getIncomingVariablesForFrontier(frontier)[block.getIndex()];
+        if (frontierIncomingVariables != null) {
+            for (int incoming : frontierIncomingVariables) {
+                if (incoming == var.getIndex()) {
+                    return;
+                }
+            }
+        }
+
+        Phi phi = phiMap[frontier][var.getIndex()];
+        if (phi == null) {
+            phi = new Phi();
+            phi.setReceiver(var);
+            phiIndexMap[frontier][synthesizedPhisByBlock.get(frontier).size()] = var.getIndex();
+            synthesizedPhisByBlock.get(frontier).add(phi);
+            phiMap[frontier][var.getIndex()] = phi;
+            worklist.push(frontierBlock);
+        }
+    }
+
+    private Variable define(Variable var) {
+        Variable old = variableMap[var.getIndex()];
+        if (old != null) {
+            if (definedVersions.get(var.getIndex()) == null) {
+                definedVersions.set(var.getIndex(), new ArrayList<>());
+            }
+            definedVersions.get(var.getIndex()).add(old);
+        }
+
+        Variable original = var;
+        var = introduce(var);
+        mapVariable(original.getIndex(), var);
+        return var;
+    }
+
+    private void mapVariable(int index, Variable var) {
+        variableMap[index] = var;
+        while (variableToSourceMap.size() <= var.getIndex()) {
+            variableToSourceMap.add(-1);
+        }
+        variableToSourceMap.set(var.getIndex(), index);
+    }
+
+    private Variable introduce(Variable var) {
+        if (!usedDefinitions[var.getIndex()]) {
+            usedDefinitions[var.getIndex()] = true;
+        } else {
+            Variable old = var;
+            var = program.createVariable();
+            var.setDebugName(old.getDebugName());
+            var.setLabel(old.getLabel());
+        }
+
+        return var;
+    }
+
+    private Variable use(Variable var) {
+        Variable mappedVar = variableMap[var.getIndex()];
+        if (mappedVar == null) {
+            // PATCHED: return the unmapped variable instead of crashing. TeaVM 0.15
+            // throws AssertionError("Variable used before definition") on some MC
+            // 26.x methods whose bytecode reaches SSA construction before every
+            // variable is definitely assigned. Falling back to the identity mapping
+            // (the original variable itself) keeps the optimizer running. usedPhis
+            // is intentionally untouched: this variable is not a phi receiver, and
+            // both consumers (addSynthesizedPhis and propagatePhiUsageInformation)
+            // only ever query phi variable indices.
+            return var;
+        }
+        usedPhis.set(mappedVar.getIndex());
+        return mappedVar;
+    }
+
+    private InstructionVisitor consumer = new AbstractInstructionVisitor() {
+        @Override
+        public void visit(ClassConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(NullConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(IntegerConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(LongConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(FloatConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(DoubleConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(StringConstantInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(BinaryInstruction insn) {
+            insn.setFirstOperand(use(insn.getFirstOperand()));
+            insn.setSecondOperand(use(insn.getSecondOperand()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(NegateInstruction insn) {
+            insn.setOperand(use(insn.getOperand()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(AssignInstruction insn) {
+            insn.setAssignee(use(insn.getAssignee()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(BranchingInstruction insn) {
+            insn.setOperand(use(insn.getOperand()));
+        }
+
+        @Override
+        public void visit(BinaryBranchingInstruction insn) {
+            insn.setFirstOperand(use(insn.getFirstOperand()));
+            insn.setSecondOperand(use(insn.getSecondOperand()));
+        }
+        @Override
+        public void visit(SwitchInstruction insn) {
+            insn.setCondition(use(insn.getCondition()));
+        }
+
+        @Override
+        public void visit(ExitInstruction insn) {
+            if (insn.getValueToReturn() != null) {
+                insn.setValueToReturn(use(insn.getValueToReturn()));
+            }
+        }
+
+        @Override
+        public void visit(RaiseInstruction insn) {
+            insn.setException(use(insn.getException()));
+        }
+
+        @Override
+        public void visit(ConstructArrayInstruction insn) {
+            insn.setSize(use(insn.getSize()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(ConstructInstruction insn) {
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(ConstructMultiArrayInstruction insn) {
+            List<Variable> dimensions = insn.getDimensions();
+            for (int i = 0; i < dimensions.size(); ++i) {
+                dimensions.set(i, use(dimensions.get(i)));
+            }
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(GetFieldInstruction insn) {
+            if (insn.getInstance() != null) {
+                insn.setInstance(use(insn.getInstance()));
+            }
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(PutFieldInstruction insn) {
+            if (insn.getInstance() != null) {
+                insn.setInstance(use(insn.getInstance()));
+            }
+            insn.setValue(use(insn.getValue()));
+        }
+
+        @Override
+        public void visit(GetElementInstruction insn) {
+            insn.setArray(use(insn.getArray()));
+            insn.setIndex(use(insn.getIndex()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(PutElementInstruction insn) {
+            insn.setArray(use(insn.getArray()));
+            insn.setIndex(use(insn.getIndex()));
+            insn.setValue(use(insn.getValue()));
+        }
+
+        @Override
+        public void visit(InvokeInstruction insn) {
+            insn.replaceArguments(v -> use(v));
+            if (insn.getInstance() != null) {
+                insn.setInstance(use(insn.getInstance()));
+            }
+            if (insn.getReceiver() != null) {
+                insn.setReceiver(define(insn.getReceiver()));
+            }
+        }
+
+        @Override
+        public void visit(InvokeDynamicInstruction insn) {
+            List<Variable> args = insn.getArguments();
+            for (int i = 0; i < args.size(); ++i) {
+                args.set(i, use(args.get(i)));
+            }
+            if (insn.getInstance() != null) {
+                insn.setInstance(use(insn.getInstance()));
+            }
+            if (insn.getReceiver() != null) {
+                insn.setReceiver(define(insn.getReceiver()));
+            }
+        }
+
+        @Override
+        public void visit(IsInstanceInstruction insn) {
+            insn.setValue(use(insn.getValue()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(CastInstruction insn) {
+            insn.setValue(use(insn.getValue()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(CastNumberInstruction insn) {
+            insn.setValue(use(insn.getValue()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(CastIntegerInstruction insn) {
+            insn.setValue(use(insn.getValue()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(ArrayLengthInstruction insn) {
+            insn.setArray(use(insn.getArray()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(UnwrapArrayInstruction insn) {
+            insn.setArray(use(insn.getArray()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(CloneArrayInstruction insn) {
+            insn.setArray(use(insn.getArray()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(NullCheckInstruction insn) {
+            insn.setValue(use(insn.getValue()));
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+
+        @Override
+        public void visit(MonitorEnterInstruction insn) {
+            insn.setObjectRef(use(insn.getObjectRef()));
+        }
+
+        @Override
+        public void visit(MonitorExitInstruction insn) {
+            insn.setObjectRef(use(insn.getObjectRef()));
+        }
+
+        @Override
+        public void visit(BoundCheckInstruction insn) {
+            insn.setIndex(use(insn.getIndex()));
+            if (insn.getArray() != null) {
+                insn.setArray(use(insn.getArray()));
+            }
+            insn.setReceiver(define(insn.getReceiver()));
+        }
+    };
+}
+

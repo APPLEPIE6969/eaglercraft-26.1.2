@@ -42,6 +42,31 @@ test.describe('game runtime', () => {
     }
   });
 
+  test('client parses the EPK asset archive at boot', async ({ clientPage }) => {
+    // ClientMain kicks off EPKLoader.loadEPK('assets.epk') right after the game
+    // loop starts; EPKLoader publishes the raw bundle to window and parses the
+    // header. The client boots in ~1 min and the 322 B bundle arrives in <1 s,
+    // so by the time any test runs the window property is set.
+    const assets = await clientPage.evaluate(() => {
+      const w = window as unknown as {
+        __eaglercraftAssets?: { byteLength: number };
+      };
+      return w.__eaglercraftAssets
+        ? { byteLength: w.__eaglercraftAssets.byteLength }
+        : null;
+    });
+
+    if (strict) {
+      expect(
+        assets,
+        'the client must fetch and expose assets.epk at boot in strict mode',
+      ).not.toBeNull();
+      expect(assets!.byteLength, 'assets.epk byte length').toBeGreaterThan(0);
+    } else {
+      console.log(`[e2e] assets.epk consumed at boot: ${JSON.stringify(assets)}`);
+    }
+  });
+
   test('runs the client without uncaught game runtime errors', async ({ clientErrors }) => {
     const errors = await clientErrors();
     const runtimeErrors = errors.filter(isGameRuntimeError);

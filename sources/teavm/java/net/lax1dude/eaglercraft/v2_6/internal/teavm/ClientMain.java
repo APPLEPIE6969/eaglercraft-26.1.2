@@ -146,6 +146,11 @@ public class ClientMain {
 
                         startGameLoop();
 
+                        // Boot the asset bundle download in the background. The client
+                        // runs fine without it (fonts/lang fall back to defaults), so a
+                        // missing or corrupt assets.epk must never block or crash boot.
+                        beginAssetBundleLoad();
+
                 } catch (Throwable t) {
                         log("[ClientMain] CRASH: " + t.getClass().getName() + ": " + t.getMessage());
                         showCrashScreen("Failed to initialize EaglerCraft 26.1.2!\n\n" + t.getMessage());
@@ -247,6 +252,29 @@ public class ClientMain {
                 };
 
                 animationFrameId = requestAnimationFrame(tickFunctor);
+        }
+
+        /**
+         * Kicks off the background download of the asset bundle (assets.epk).
+         * Non-fatal on any failure: the client boots and renders with default
+         * assets when the bundle is unavailable, and EPKLoader reports the
+         * outcome through the browser console.
+         */
+        private static void beginAssetBundleLoad() {
+                try {
+                        log("[ClientMain] Requesting asset bundle (assets.epk)...");
+                        EPKLoader.loadEPK("assets.epk",
+                                        data -> log("[ClientMain] Asset bundle ready: "
+                                                        + data.getByteLength() + " bytes"),
+                                        (loaded, total) -> {
+                                                if (total > 0 && (loaded & 0x3FFFFF) < 65536) {
+                                                        log("[ClientMain] Asset bundle: " + (loaded >> 20)
+                                                                        + " / " + (total >> 20) + " MiB");
+                                                }
+                                        });
+                } catch (Throwable t) {
+                        warn("[ClientMain] Asset bundle load could not start: " + t);
+                }
         }
 
         /**

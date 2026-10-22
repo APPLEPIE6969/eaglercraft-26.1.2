@@ -53,6 +53,9 @@ public class EPKLoader {
         /** Callback for load progress. */
         private static ProgressCallback progressCallback = null;
 
+        /** Raw bytes of the asset bundle once fully loaded, or null before that. */
+        private static ArrayBuffer epkData = null;
+
         /** Callback interface for EPK load completion. */
         @JSFunctor
         public interface LoadCallback extends JSObject {
@@ -96,6 +99,22 @@ public class EPKLoader {
          */
         public static int getLoadState() {
                 return loadState;
+        }
+
+        /**
+         * Gets the raw bytes of the loaded asset bundle.
+         *
+         * @return The EPK data, or null if the bundle has not finished loading
+         */
+        public static ArrayBuffer getEPKData() {
+                return epkData;
+        }
+
+        /**
+         * Returns true when the asset bundle has been downloaded and stored.
+         */
+        public static boolean isEPKLoaded() {
+                return loadState == LOAD_STATE_LOADED && epkData != null;
         }
 
         /**
@@ -188,13 +207,41 @@ public class EPKLoader {
 
         /**
          * Called by JavaScript when the EPK file has been fully loaded.
+         * Stores the raw bundle, exposes it to the bootstrap page, and
+         * sanity-checks the archive structure before notifying the caller.
          */
         private static void __onLoadComplete(ArrayBuffer data) {
                 loadState = LOAD_STATE_LOADED;
+                epkData = data;
+                __exposeAssetBundle(data);
+                int fileCount = parseEPKHeader0(data);
+                if (fileCount >= 0) {
+                        ClientMain.log("[EPKLoader] Asset bundle parsed: " + data.getByteLength() + " bytes, "
+                                        + fileCount + " entries");
+                        ArrayBuffer lang = extractFile(data, "lang/en_US.json");
+                        ClientMain.log("[EPKLoader] lang/en_US.json: "
+                                        + (lang != null ? lang.getByteLength() + " bytes" : "not present"));
+                } else {
+                        ClientMain.warn("[EPKLoader] Asset bundle header invalid (" + data.getByteLength()
+                                        + " bytes) - continuing without assets");
+                }
                 if (loadCallback != null) {
                         loadCallback.call(data);
                 }
         }
+
+        /**
+         * Publishes the loaded bundle to the page (window.__eaglercraftAssets) and
+         * dispatches an eaglercraftAssetsLoaded event so the bootstrap page and
+         * automated tests can observe that the client consumed the archive.
+         */
+        @JSBody(params = { "data" }, script = ""
+                        + "window.__eaglercraftAssets = data;"
+                        + "try {"
+                        + "  window.dispatchEvent(new CustomEvent('eaglercraftAssetsLoaded',"
+                        + "    { detail: { byteLength: data.byteLength } }));"
+                        + "} catch (e) {}")
+        private static native void __exposeAssetBundle(ArrayBuffer data);
 
         /**
          * Called by JavaScript periodically during loading to report progress.
@@ -239,12 +286,15 @@ public class EPKLoader {
 
         /**
          * Native implementation of EPK header parsing.
+         * NOTE: the magic FIELD is 8 bytes ("EAGPKG!" + NUL pad), so the 8-char
+         * read must be compared against its first 7 chars -- comparing the full
+         * 8-char string to 'EAGPKG!' could never match and always returned -1.
          */
         @JSBody(params = { "data" }, script = ""
                         + "var view = new DataView(data);"
                         + "var magic = '';"
                         + "for (var i = 0; i < 8; i++) { magic += String.fromCharCode(view.getUint8(i)); }"
-                        + "if (magic !== 'EAGPKG!') return -1;"
+                        + "if (magic.substring(0, 7) !== 'EAGPKG!') return -1;"
                         + "if (view.byteLength < 20) return -1;"
                         + "var version = view.getUint16(8, true);"
                         + "var fileCount = view.getUint32(12, true);"

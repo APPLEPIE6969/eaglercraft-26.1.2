@@ -90,11 +90,6 @@
             <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);">WebGL2 Client - Protocol 775</div>
             <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;" id="title-fps"></div>
         </div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
-            <div style="font-size:1rem;color:rgba(255,255,255,0.7);padding:12px 24px;background:rgba(0,0,0,0.3);border-radius:8px;">
-                MC 26.1.2 classes compiling via TeaVM - Game engine port in progress
-            </div>
-        </div>
     </div>
 
     <!-- Error Overlay -->
@@ -195,6 +190,14 @@
                             if (fpsEl) fpsEl.textContent = frameCount + " FPS";
                             frameCount = 0;
                             lastTime = now;
+                        }
+                        // Once the client enters a world the shell overlay gets
+                        // out of the way - vanilla has no DOM chrome over the HUD
+                        // (the telemetry bridge reports inWorld).
+                        var game = window.__eaglercraftGame;
+                        if (game && game.inWorld) {
+                            document.getElementById("title-overlay").style.display = "none";
+                            return; // stop the FPS loop
                         }
                         requestAnimationFrame(updateFPS);
                     }

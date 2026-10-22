@@ -60,8 +60,10 @@ public class TitleScreen extends Screen {
                 realms.setActive(false);
                 this.addRenderableWidget(realms);
 
-                // Options row: vanilla does topPos += 36 after the third row.
-                topPos += 36;
+                // Vanilla accumulates the row position: createNormalMenuOptions
+                // returns the Realms row (topPos + 48), then init() moves 36px
+                // further down to the options row (height/4 + 84 total).
+                topPos += 48 + 36;
 
                 // Language icon button (vanilla: 20x20 sprite icon, left of Options)
                 Button language = new Button(centerX - 124, topPos, 20, 20, "", button -> { });

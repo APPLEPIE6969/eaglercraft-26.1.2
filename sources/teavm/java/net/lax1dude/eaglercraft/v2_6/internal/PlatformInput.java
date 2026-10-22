@@ -668,11 +668,18 @@ public class PlatformInput {
         @JSBody(params = {}, script = ""
                         + "var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');"
                         + "if (c && c.requestPointerLock) {"
+                        + "  var r;"
                         + "  if (c.requestPointerLock.length > 0) {"
-                        + "    c.requestPointerLock({ unadjustedMovement: true });"
+                        + "    r = c.requestPointerLock({ unadjustedMovement: true });"
                         + "  } else {"
-                        + "    c.requestPointerLock();"
+                        + "    r = c.requestPointerLock();"
                         + "  }"
+                        // Chrome 111+ returns a promise that REJECTS when the
+                        // document lacks transient activation (e.g. the request
+                        // comes from the game loop rather than the click event
+                        // itself). Swallow the rejection - the pointer stays
+                        // unlocked and the next real canvas click retries.
+                        + "  if (r && typeof r.catch === 'function') r.catch(function() {});"
                         + "}")
         private static native void requestPointerLock0();
 

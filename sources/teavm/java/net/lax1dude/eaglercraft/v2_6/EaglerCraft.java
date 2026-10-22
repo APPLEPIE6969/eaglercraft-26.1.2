@@ -557,15 +557,17 @@ public class EaglerCraft {
                 }
 
                 // Button press/release edges -> MC's MouseHandler. A press
-                // while in world (no screen open) grabs the pointer, like
-                // vanilla's click-to-capture.
+                // while ALREADY in world (no screen open before this edge)
+                // grabs the pointer, like vanilla's click-to-capture. The
+                // click that opens the world must not capture the pointer in
+                // the same breath: the press lands on the menu, not the game.
                 for (int button = 0; button < MOUSE_BUTTONS_POLLED; button++) {
                         boolean down = PlatformInput.isMouseDown(button);
                         if (down != lastMouseButtons[button]) {
                                 lastMouseButtons[button] = down;
+                                boolean wasInGame = mc.screen == null && mc.isLevelLoaded();
                                 mh.cursorPressed(0L, button, down ? 1 : 0, 0);
-                                if (down && mc.screen == null && mc.isLevelLoaded()
-                                                && !PlatformInput.isPointerLocked()) {
+                                if (down && wasInGame && !PlatformInput.isPointerLocked()) {
                                         mh.grabMouse();
                                 }
                         }

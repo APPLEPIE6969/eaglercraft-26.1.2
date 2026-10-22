@@ -135,8 +135,11 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         this.mainRenderTarget.create(
                                 this.window.getWidth(), this.window.getHeight(), true, false);
 
-                        // Step 6: Set initial screen
-                        this.screen = new TitleScreen();
+                        // Step 6: Set initial screen. Must go through
+                        // setScreen (not a bare field assignment) so the
+                        // screen's init() runs and its widgets (the
+                        // Singleplayer button) actually get created.
+                        this.setScreen(new TitleScreen());
 
                         ClientMain.log("[Minecraft] Construction complete");
 

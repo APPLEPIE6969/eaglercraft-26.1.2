@@ -285,6 +285,8 @@ export async function attachMilestoneScreenshot(
 export interface GameTelemetryButton {
   id: string;
   label: string;
+  /** Whether the widget accepts clicks (vanilla `active` state). */
+  active?: boolean;
   x: number;
   y: number;
   w: number;

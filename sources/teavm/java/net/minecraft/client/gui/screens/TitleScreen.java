@@ -39,11 +39,12 @@ public class TitleScreen extends Screen {
                 int topPos = this.height / 4 + 48;
                 int centerX = this.width / 2;
 
-                // Row 1: Singleplayer (live - loads the milestone's minimal world)
+                // Row 1: Singleplayer (live - opens the world selection screen,
+                // exactly what vanilla's button does)
                 this.addRenderableWidget(Button.builder("Singleplayer", button -> {
                         if (this.minecraft != null) {
-                                ClientMain.log("[TitleScreen] Singleplayer pressed -> loading world '" + DEFAULT_WORLD_NAME + "'");
-                                this.minecraft.doWorldLoad(DEFAULT_WORLD_NAME);
+                                ClientMain.log("[TitleScreen] Singleplayer pressed -> SelectWorldScreen");
+                                this.minecraft.setScreen(new SelectWorldScreen(this));
                         }
                 })).setPosition(centerX - Button.BIG_WIDTH / 2, topPos);
 
@@ -67,6 +68,7 @@ public class TitleScreen extends Screen {
 
                 // Language icon button (vanilla: 20x20 sprite icon, left of Options)
                 Button language = new Button(centerX - 124, topPos, 20, 20, "", button -> { });
+                language.setIcon("icon/language");
                 language.setActive(false);
                 this.addRenderableWidget(language);
 
@@ -85,6 +87,7 @@ public class TitleScreen extends Screen {
 
                 // Accessibility icon button (vanilla: 20x20 sprite icon, right of Quit)
                 Button accessibility = new Button(centerX + 104, topPos, 20, 20, "", button -> { });
+                accessibility.setIcon("icon/accessibility");
                 accessibility.setActive(false);
                 this.addRenderableWidget(accessibility);
         }

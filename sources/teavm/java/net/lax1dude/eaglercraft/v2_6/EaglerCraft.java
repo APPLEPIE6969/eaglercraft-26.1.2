@@ -817,9 +817,11 @@ public class EaglerCraft {
         }
 
         /**
-         * Serializes the current screen's buttons for the telemetry bridge:
-         * {@code [{"id":"singleplayer","label":"Singleplayer","x":..,"y":..,"w":..,"h":..}]}
-         * with bounds in GUI-scaled pixels.
+         * Serializes the current screen's widgets for the telemetry bridge:
+         * {@code [{"id":"singleplayer","label":"singleplayer","x":..,"y":..,"w":..,"h":..}]}
+         * with bounds in GUI-scaled pixels. Buttons derive their id from
+         * the message; other widgets (like the world-list entry) provide
+         * one through {@code getTelemetryId()}.
          */
         private static String buildButtonsJson(net.minecraft.client.Minecraft mc) {
                 net.minecraft.client.gui.screens.Screen screen = mc.getScreen();
@@ -829,23 +831,21 @@ public class EaglerCraft {
                 StringBuilder sb = new StringBuilder("[");
                 boolean first = true;
                 for (net.minecraft.client.gui.components.AbstractWidget widget : screen.children()) {
-                        if (!(widget instanceof net.minecraft.client.gui.components.Button)) {
+                        String id = widget.getTelemetryId();
+                        if (id == null || id.isEmpty()) {
                                 continue;
                         }
-                        net.minecraft.client.gui.components.Button button =
-                                (net.minecraft.client.gui.components.Button) widget;
-                        String id = button.getMessage() == null ? "button"
-                                : button.getMessage().toLowerCase().replaceAll("[^a-z0-9]+", "");
                         if (!first) {
                                 sb.append(",");
                         }
                         first = false;
                         sb.append("{\"id\":\"").append(id).append("\"")
                                 .append(",\"label\":\"").append(id).append("\"")
-                                .append(",\"x\":").append(button.getX())
-                                .append(",\"y\":").append(button.getY())
-                                .append(",\"w\":").append(button.getWidth())
-                                .append(",\"h\":").append(button.getHeight())
+                                .append(",\"active\":").append(widget.isActive())
+                                .append(",\"x\":").append(widget.getX())
+                                .append(",\"y\":").append(widget.getY())
+                                .append(",\"w\":").append(widget.getWidth())
+                                .append(",\"h\":").append(widget.getHeight())
                                 .append("}");
                 }
                 sb.append("]");

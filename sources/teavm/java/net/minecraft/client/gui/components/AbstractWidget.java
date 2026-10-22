@@ -81,6 +81,16 @@ public abstract class AbstractWidget {
         protected void onClick() {
         }
 
+        /**
+         * The stable id this widget reports to the e2e telemetry bridge
+         * (docs/E2E.md), or null when it should stay out of the bridge's
+         * buttons array. Buttons derive theirs from the message; custom
+         * widgets like the world-list entry override this.
+         */
+        public String getTelemetryId() {
+                return null;
+        }
+
         // ========== Accessors ==========
 
         public int getX() {

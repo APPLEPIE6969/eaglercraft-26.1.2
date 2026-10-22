@@ -68,13 +68,18 @@ public class Gui {
         }
 
         /**
-         * The center crosshair: a 15x15 plus, 1px arms. Vanilla blits the
-         * hud/crosshair sprite at ((guiWidth - 15) / 2, (guiHeight - 15) / 2),
+         * The center crosshair: vanilla blits the hud/crosshair sprite
+         * (Mojang's own pixels) at ((guiWidth - 15) / 2, (guiHeight - 15) / 2),
          * so the box origin - not the screen midpoint - defines the center.
+         * Falls back to the procedural 1px-arm plus while the sprite PNGs
+         * are still downloading.
          */
         private void renderCrosshair(int guiWidth, int guiHeight) {
                 int x0 = (guiWidth - CROSSHAIR_SIZE) / 2;
                 int y0 = (guiHeight - CROSSHAIR_SIZE) / 2;
+                if (EaglerGuiImpl.drawSprite("hud/crosshair", x0, y0, CROSSHAIR_SIZE, CROSSHAIR_SIZE)) {
+                        return;
+                }
                 int cx = x0 + CROSSHAIR_SIZE / 2;
                 int cy = y0 + CROSSHAIR_SIZE / 2;
 
@@ -85,36 +90,44 @@ public class Gui {
         }
 
         /**
-         * The bottom-center hotbar: 9 slots in a bordered panel with the
-         * vanilla 1px overlap selection frame around the selected slot.
+         * The bottom-center hotbar: vanilla blits the hud/hotbar sprite
+         * (182x22 of Mojang's own pixels) at (w/2-91, h-22) with the 24x23
+         * hud/hotbar_selection sprite one pixel up/left of the selected
+         * slot, stepping 20px per slot. Falls back to the procedural
+         * panel while the sprite PNGs are still downloading.
          */
         private void renderHotbar(int guiWidth, int guiHeight) {
                 int x0 = (guiWidth - HOTBAR_WIDTH) / 2;
                 int y0 = guiHeight - HOTBAR_HEIGHT;
 
-                // Panel background + border
-                EaglerGuiImpl.fillRect(x0 - 1, y0 - 1, HOTBAR_WIDTH + 2, HOTBAR_HEIGHT + 2, COLOR_HOTBAR_BORDER);
-                EaglerGuiImpl.fillRect(x0, y0, HOTBAR_WIDTH, HOTBAR_HEIGHT, COLOR_HOTBAR_BG);
+                boolean spriteDrawn = EaglerGuiImpl.drawSprite("hud/hotbar", x0, y0, HOTBAR_WIDTH, HOTBAR_HEIGHT);
+                if (!spriteDrawn) {
+                        // Panel background + border
+                        EaglerGuiImpl.fillRect(x0 - 1, y0 - 1, HOTBAR_WIDTH + 2, HOTBAR_HEIGHT + 2, COLOR_HOTBAR_BORDER);
+                        EaglerGuiImpl.fillRect(x0, y0, HOTBAR_WIDTH, HOTBAR_HEIGHT, COLOR_HOTBAR_BG);
 
-                // Slot separators
-                for (int slot = 1; slot < 9; slot++) {
-                        EaglerGuiImpl.fillRect(x0 + slot * SLOT_SIZE + 1, y0, 1, HOTBAR_HEIGHT, COLOR_SLOT_LINE);
+                        // Slot separators
+                        for (int slot = 1; slot < 9; slot++) {
+                                EaglerGuiImpl.fillRect(x0 + slot * SLOT_SIZE + 1, y0, 1, HOTBAR_HEIGHT, COLOR_SLOT_LINE);
+                        }
+                        EaglerGuiImpl.fillRect(x0, y0, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
+                        EaglerGuiImpl.fillRect(x0, y0 + HOTBAR_HEIGHT - 1, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
                 }
-                EaglerGuiImpl.fillRect(x0, y0, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
-                EaglerGuiImpl.fillRect(x0, y0 + HOTBAR_HEIGHT - 1, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
 
                 // Selection frame: vanilla blits the 24x23 hud/hotbar_selection
                 // sprite one pixel up/left of the hotbar origin, stepping 20px
                 // per slot.
                 int selX = x0 + selectedHotbarSlot * SLOT_SIZE - 1;
                 int selY = y0 - 1;
-                for (int i = 0; i < 24; i++) {
-                        EaglerGuiImpl.fillRect(selX + i, selY, 1, 1, COLOR_SELECTOR);
-                        EaglerGuiImpl.fillRect(selX + i, selY + 22, 1, 1, COLOR_SELECTOR);
-                }
-                for (int i = 1; i < 22; i++) {
-                        EaglerGuiImpl.fillRect(selX, selY + i, 1, 1, COLOR_SELECTOR);
-                        EaglerGuiImpl.fillRect(selX + 23, selY + i, 1, 1, COLOR_SELECTOR);
+                if (!EaglerGuiImpl.drawSprite("hud/hotbar_selection", selX, selY, 24, 23)) {
+                        for (int i = 0; i < 24; i++) {
+                                EaglerGuiImpl.fillRect(selX + i, selY, 1, 1, COLOR_SELECTOR);
+                                EaglerGuiImpl.fillRect(selX + i, selY + 22, 1, 1, COLOR_SELECTOR);
+                        }
+                        for (int i = 1; i < 22; i++) {
+                                EaglerGuiImpl.fillRect(selX, selY + i, 1, 1, COLOR_SELECTOR);
+                                EaglerGuiImpl.fillRect(selX + 23, selY + i, 1, 1, COLOR_SELECTOR);
+                        }
                 }
 
                 // Debug line: world identity + clock, bottom-left above the hotbar

@@ -8,19 +8,22 @@ import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
 /**
  * EaglerCraft 26.1.2 browser override for the MC {@code Button}.
  *
- * <p>Draws a vanilla-style beveled gray panel with a centered label from
- * the 5x7 bitmap font, and fires {@link OnPress} when left-clicked.
- * Rendering goes through {@link EaglerGuiImpl}'s batched quad pipeline.</p>
+ * <p>Blits the real Mojang sprite (the same PNG the official 26.1.2
+ * client ships) with the vanilla nine-slice scaling the sprite metadata
+ * declares ({@code border: 3}), and fires {@link OnPress} when
+ * left-clicked. Rendering goes through {@link EaglerGuiImpl}'s batched
+ * textured-quad pipeline.</p>
  *
  * <p>Geometry and render states mirror the decompiled 26.1.2 widget
  * (see docs/UI-FIDELITY.md): width constants {@code SMALL_WIDTH=120},
- * {@code DEFAULT_WIDTH=150}, {@code BIG_WIDTH=200}, height 20; the label
- * is white while active and {@code 0xFFA0A0A0} while disabled; hover is
- * expressed by the body highlight (the modern highlighted sprite), never
- * by a yellow label. Vanilla blits three nine-slice sprites
- * (widget/button, widget/button_highlighted, widget/button_disabled);
- * until the PNG pipeline exists this class approximates them with
- * solid quads.</p>
+ * {@code DEFAULT_WIDTH=150}, {@code BIG_WIDTH=200}, height 20; three
+ * sprites - widget/button (active), widget/button_highlighted (hover),
+ * widget/button_disabled - selected exactly like vanilla
+ * {@code WidgetSprites.get(active, hovered)}; the label is white while
+ * active and {@code 0xFFA0A0A0} while disabled; hover changes the body
+ * sprite only, never the label color. Until the sprite PNGs arrive
+ * (they download asynchronously) the procedural solid-quad look is the
+ * fallback.</p>
  */
 public class Button extends AbstractWidget {
 
@@ -30,7 +33,7 @@ public class Button extends AbstractWidget {
         /** Vanilla default button width (GUI pixels). */
         public static final int DEFAULT_WIDTH = 150;
 
-        /** Vanilla large button width (GUI pixels). */
+        /** Vanilla big button width (GUI pixels). */
         public static final int BIG_WIDTH = 200;
 
         /** Vanilla button height (GUI pixels). */
@@ -39,6 +42,13 @@ public class Button extends AbstractWidget {
         /** Vanilla default spacing between stacked widgets. */
         public static final int DEFAULT_SPACING = 8;
 
+        /**
+         * Nine-slice border of the widget/button sprites, straight from
+         * their .png.mcmeta: {@code {"type":"nine_slice", "width":200,
+         * "height":20, "border":3}}.
+         */
+        public static final int SPRITE_BORDER = 3;
+
         /** Press callback, mirroring MC's Button.OnPress. */
         public interface OnPress {
                 void onPress(Button button);
@@ -46,6 +56,12 @@ public class Button extends AbstractWidget {
 
         private final String message;
         private final OnPress onPress;
+
+        /**
+         * Optional icon sprite (e.g. "icon/language") drawn centered over
+         * the panel, the way vanilla's SpriteIconButton does.
+         */
+        private String iconSprite = null;
 
         private static final int COLOR_BODY = 0xFF6F6F6F;
         private static final int COLOR_BODY_HOVER = 0xFF8291B8;
@@ -72,18 +88,58 @@ public class Button extends AbstractWidget {
                 return new Button(0, 0, BIG_WIDTH, HEIGHT, message, onPress);
         }
 
+        /**
+         * Sets a centered icon sprite drawn over the panel (vanilla
+         * SpriteIconButton / CommonButtons.language behavior).
+         */
+        public Button setIcon(String spriteName) {
+                this.iconSprite = spriteName;
+                return this;
+        }
+
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
                 if (!visible) return;
                 this.hovered = active && isInside(mouseX, mouseY);
 
+                // Vanilla sprite selection: WidgetSprites.get(active, hovered)
+                String sprite = !active ? "widget/button_disabled"
+                        : (hovered ? "widget/button_highlighted" : "widget/button");
+                boolean spriteDrawn = EaglerGuiImpl.drawSprite9(sprite, x, y, width, height, SPRITE_BORDER);
+
+                if (!spriteDrawn) {
+                        // Fallback: procedural bevel approximation of the sprite
+                        renderProceduralPanel();
+                }
+
+                if (iconSprite != null) {
+                        // Centered 1:1 blit (vanilla CenteredIcon: (w - iw) / 2)
+                        int iw = Math.min(15, width);
+                        int ih = Math.min(15, height);
+                        EaglerGuiImpl.drawSprite(iconSprite,
+                                x + (width - iw) / 2.0f, y + (height - ih) / 2.0f, iw, ih);
+                }
+
+                if (message.isEmpty()) {
+                        return;
+                }
+                // Centered label with shadow (vanilla centers vertically in the 20px cell)
+                int textWidth = EaglerGuiImpl.widthOf(message);
+                float tx = x + (width - textWidth) / 2.0f;
+                float ty = y + (height - EaglerFont.GLYPH_HEIGHT) / 2.0f;
+                EaglerGuiImpl.drawText(message, tx, ty,
+                        active ? COLOR_TEXT : COLOR_TEXT_DISABLED, true);
+        }
+
+        /**
+         * The pre-sprite-pipeline bevel approximation, kept as the
+         * fallback for the frames before the PNGs finish loading.
+         */
+        private void renderProceduralPanel() {
                 if (active) {
-                        // 1px black outline around the whole button
                         EaglerGuiImpl.fillRect(x, y, width, height, COLOR_BORDER);
-                        // Body: highlighted tint on hover (vanilla widget/button_highlighted)
                         EaglerGuiImpl.fillRect(x + 1, y + 1, width - 2, height - 2,
                                 hovered ? COLOR_BODY_HOVER : COLOR_BODY);
-                        // Bevel: light top + left, dark bottom + right
                         EaglerGuiImpl.fillRect(x + 1, y + 1, width - 2, 1,
                                 hovered ? COLOR_BEVEL_LIGHT : COLOR_BEVEL_DARK);
                         EaglerGuiImpl.fillRect(x + 1, y + 1, 1, height - 2,
@@ -91,8 +147,6 @@ public class Button extends AbstractWidget {
                         EaglerGuiImpl.fillRect(x + 1, y + height - 2, width - 2, 1, COLOR_BEVEL_LIGHT);
                         EaglerGuiImpl.fillRect(x + width - 2, y + 1, 1, height - 2, COLOR_BEVEL_LIGHT);
                 } else {
-                        // Disabled: vanilla widget/button_disabled - darkened panel,
-                        // grey label, no hover highlight.
                         EaglerGuiImpl.fillRect(x, y, width, height, COLOR_BORDER);
                         EaglerGuiImpl.fillRect(x + 1, y + 1, width - 2, height - 2, COLOR_BODY_DISABLED);
                         EaglerGuiImpl.fillRect(x + 1, y + 1, width - 2, 1, COLOR_BEVEL_DISABLED);
@@ -100,13 +154,6 @@ public class Button extends AbstractWidget {
                         EaglerGuiImpl.fillRect(x + 1, y + height - 2, width - 2, 1, COLOR_BEVEL_DISABLED);
                         EaglerGuiImpl.fillRect(x + width - 2, y + 1, 1, height - 2, COLOR_BEVEL_DISABLED);
                 }
-
-                // Centered label with shadow (vanilla centers vertically in the 20px cell)
-                int textWidth = EaglerGuiImpl.widthOf(message);
-                float tx = x + (width - textWidth) / 2.0f;
-                float ty = y + (height - EaglerFont.GLYPH_HEIGHT) / 2.0f;
-                EaglerGuiImpl.drawText(message, tx, ty,
-                        active ? COLOR_TEXT : COLOR_TEXT_DISABLED, true);
         }
 
         @Override
@@ -121,5 +168,16 @@ public class Button extends AbstractWidget {
          */
         public String getMessage() {
                 return message;
+        }
+
+        /**
+         * The bridge id, derived from the message exactly like the
+         * telemetry serializer derives it ("Play Selected World" ->
+         * "playselectedworld").
+         */
+        @Override
+        public String getTelemetryId() {
+                return message == null ? null
+                        : message.toLowerCase().replaceAll("[^a-z0-9]+", "");
         }
 }

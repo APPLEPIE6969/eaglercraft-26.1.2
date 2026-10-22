@@ -349,6 +349,43 @@ test.describe('go in game', () => {
     await page.waitForTimeout(100); // let a hover frame render
     await page.mouse.click(coords!.cssX, coords!.cssY);
 
+    // ── Vanilla 26.1.2 opens the Select World screen, not the world ──
+    const selectDeadline = Date.now() + 15_000;
+    let selectState = await readGameTelemetry(page);
+    while (
+      Date.now() < selectDeadline &&
+      !(selectState?.screen ?? '').includes('SelectWorldScreen')
+    ) {
+      await page.waitForTimeout(250);
+      selectState = await readGameTelemetry(page);
+    }
+    expect(
+      (selectState?.screen ?? '').includes('SelectWorldScreen'),
+      `clicking Singleplayer must open the Select World screen (last telemetry: ${JSON.stringify(selectState)})`,
+    ).toBe(true);
+    await attachMilestoneScreenshot(page, testInfo, '06-select-world-screen');
+
+    // ── Select the world row (vanilla: click to select, Play enables) ──
+    const entry = await getButtonCssCoords(page, 'newworld');
+    expect(
+      entry,
+      `the Select World screen must expose the "newworld" row in the bridge's buttons array (got: ${JSON.stringify(selectState?.buttons)})`,
+    ).not.toBeNull();
+    await page.mouse.click(entry!.cssX, entry!.cssY);
+    await page.waitForTimeout(150);
+
+    // ── Play Selected World (enabled by the selection) ──
+    const play = await getButtonCssCoords(page, 'playselectedworld');
+    expect(
+      play,
+      'selecting a world must enable the "playselectedworld" button',
+    ).not.toBeNull();
+    expect(
+      play!.button.active,
+      'the Play Selected World button must be active once a world is selected',
+    ).toBe(true);
+    await page.mouse.click(play!.cssX, play!.cssY);
+
     // ── The world must load and the HUD must take over ──
     const deadline = Date.now() + 30_000;
     let worldState = await readGameTelemetry(page);
@@ -358,7 +395,7 @@ test.describe('go in game', () => {
     }
     expect(
       worldState?.inWorld,
-      `the client must flip inWorld=true after clicking Singleplayer (last telemetry: ${JSON.stringify(worldState)})`,
+      `the client must flip inWorld=true after clicking Play Selected World (last telemetry: ${JSON.stringify(worldState)})`,
     ).toBe(true);
     expect(
       worldState?.screen,
@@ -374,6 +411,8 @@ test.describe('go in game', () => {
       gated: false,
       path: 'singleplayer-click',
       clickedButton: coords!.button,
+      worldEntry: entry!.button,
+      playButton: play!.button,
       guiScale: coords!.guiScale,
       telemetry: worldState,
       uncaughtPageErrors: pageErrors,

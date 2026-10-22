@@ -73,9 +73,15 @@ logic tick (20 TPS) and immediately on crash:
   "inWorld": false,
   "ticks": 42,
   "guiScale": 3,
-  "buttons": [{ "id": "singleplayer", "label": "singleplayer", "x": 113, "y": 108, "w": 200, "h": 20 }]
+  "buttons": [{ "id": "singleplayer", "label": "singleplayer", "active": true, "x": 113, "y": 108, "w": 200, "h": 20 }]
 }
 ```
+
+The `buttons` array carries every widget with a telemetry id: menu buttons
+(id derived from the message, e.g. `playselectedworld`) and custom widgets
+like the world-list row of the Select World screen (`newworld`). `active`
+mirrors the vanilla widget state — a disabled button reports `false` and
+ignores clicks.
 
 1. **Bridge path** (`enters a world and reaches the HUD`): when
    `canEnterWorld` is `true`, the bridge must also expose an
@@ -85,13 +91,15 @@ logic tick (20 TPS) and immediately on crash:
    page errors, and captures a `06-in-world-hud` screenshot.
 
 2. **Real menu path** (`clicks the real Singleplayer button and reaches
-   the HUD`): the bridge is used only to *locate* the button — the test
-   converts its GUI-pixel bounds to viewport coordinates via `guiScale`
-   and the canvas' backing/CSS ratio, then performs a genuine trusted
-   `page.mouse.click` on it. Hit-testing must fire the world-load path
-   with no synthetic events: `inWorld` flips, the screen closes
-   (`screen: "in-game"`), and a `07-in-world-hud-click` screenshot is
-   captured.
+   the HUD`): the bridge is used only to *locate* widgets — the test
+   converts their GUI-pixel bounds to viewport coordinates via `guiScale`
+   and the canvas' backing/CSS ratio, then performs genuine trusted
+   `page.mouse.click` calls, no synthetic events. The journey is the
+   vanilla one: click `singleplayer` → the Select World screen must open
+   (`06-select-world-screen` screenshot) → click the `newworld` row (which
+   must enable `playselectedworld`) → click **Play Selected World**.
+   `inWorld` must flip, the screen must close (`screen: "in-game"`), and a
+   `07-in-world-hud-click` screenshot is captured.
 
 Both tests **skip with evidence** while `canEnterWorld` is `false` (or the
 bundle predates the bridge): a `05-world-entry-gate` /
@@ -105,8 +113,9 @@ the `test-results/` artifact. The client-side flag lives in
 `ingame.spec.ts` captures the journey as milestone screenshots
 (`01-loading-screen`, `02-bundle-booted`, `03-title-screen`,
 `04-running-in-game`, plus `05-world-entry-gate` / `06-in-world-hud` from
-the bridge test and `05-singleplayer-menu` / `07-in-world-hud-click` from
-the Singleplayer click test), and `shell.spec.ts` captures the shared client
+the bridge test and `05-singleplayer-menu` / `06-select-world-screen` /
+`07-in-world-hud-click` from the Singleplayer click test), and
+`shell.spec.ts` captures the shared client
 page as `shell-client`. Each screenshot is attached to the HTML report under its
 milestone name and also written to the `screenshots/` directory (gitignored
 locally, uploaded as a CI artifact next to the Playwright report). When a run

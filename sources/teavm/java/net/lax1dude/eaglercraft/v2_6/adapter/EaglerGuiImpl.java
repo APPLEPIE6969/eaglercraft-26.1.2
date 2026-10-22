@@ -11,21 +11,25 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
 /**
  * Batched 2D renderer for the browser GUI (menus, HUD overlay).
  *
- * <p>Minecraft 26.1.2 draws every 2D element (button panels, hotbar,
- * crosshair, text) as colored quads. On the desktop those go through the
- * core-renderer pipelines; in EaglerCraft they are batched here into a
- * single dynamic VBO and drawn with one {@code drawArrays} call per
- * flush. Positions are in GUI-scaled pixels with the origin at the
- * top-left corner of the canvas, which matches how {@code Screen} and
- * its widgets address the screen.</p>
+ * <p>Minecraft 26.1.2 draws every 2D element as either a colored quad or
+ * a sprite blit (widget/button*, hud/hotbar, hud/crosshair ...). Both
+ * paths are batched here into a single dynamic VBO and drawn with one
+ * {@code drawArrays} call per flush: solid quads sample a 1x1 white
+ * texture tinted by the vertex color, sprite blits sample the real
+ * Mojang PNG (loaded by {@link GuiSprites}). Positions are in
+ * GUI-scaled pixels with the origin at the top-left corner of the
+ * canvas, which matches how {@code Screen} and its widgets address the
+ * screen.</p>
  *
  * <h3>Frame protocol</h3>
  * <ol>
  *   <li>{@link #begin} once per frame with the GUI-scaled dimensions
- *       (cheap; subsequent calls just update the resolution uniform).</li>
- *   <li>Any number of {@link #fillRect} / {@link #drawText} calls.
- *       The batch re-binds its program/VAO lazily, so other GL code
- *       (e.g. the title-screen gradient shader) may run in between.</li>
+ *       (also polls {@link GuiSprites} uploads).</li>
+ *   <li>Any number of {@link #fillRect} / {@link #drawSprite} /
+ *       {@link #drawText} calls. Switching textures transparently
+ *       flushes the queued quads for the previous texture first, and the
+ *       batch re-binds its program/VAO lazily, so other GL code (e.g.
+ *       the title-screen gradient shader) may run in between.</li>
  *   <li>{@link #flush} to draw everything queued so far. Call again
  *       after any interleaved GL work that must stay underneath the
  *       next batch of quads.</li>
@@ -33,15 +37,16 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
  *
  * <p>Depth testing is disabled while a batch draws (GUI pixels are all
  * at z=0 and would otherwise z-fight); the previous depth-test enable
- * state is restored on flush.</p>
+ * state is restored on flush. Blending is expected to be enabled by the
+ * caller ({@code RenderSystem.enableBlend}) - sprite alpha needs it.</p>
  */
 public final class EaglerGuiImpl {
 
         /** Vertex count per quad (two triangles). */
         private static final int VERTICES_PER_QUAD = 6;
 
-        /** Floats per vertex: x, y, r, g, b, a. */
-        private static final int FLOATS_PER_VERTEX = 6;
+        /** Floats per vertex: x, y, r, g, b, a, u, v. */
+        private static final int FLOATS_PER_VERTEX = 8;
 
         /** Maximum quads queued before an automatic mid-batch flush. */
         private static final int MAX_QUADS = 16384;
@@ -52,7 +57,11 @@ public final class EaglerGuiImpl {
         private static JSObject uResolution = null;
         private static int aPos = -1;
         private static int aColor = -1;
+        private static int aUv = -1;
         private static Float32Array vertexBuffer = null;
+
+        /** Texture the currently queued quads sample from. */
+        private static JSObject currentTexture = null;
 
         private static boolean initialized = false;
         private static boolean batchOpen = false;
@@ -69,7 +78,8 @@ public final class EaglerGuiImpl {
 
         /**
          * Compiles the GUI shader program and allocates the dynamic
-         * vertex buffer. Runs once per page load.
+         * vertex buffer. Runs once per page load. Also kicks off the
+         * vanilla sprite PNG downloads.
          */
         private static void init(WebGL2RenderingContext gl) {
                 if (initialized) return;
@@ -78,21 +88,26 @@ public final class EaglerGuiImpl {
                         + "precision highp float;\n"
                         + "in vec2 a_pos;\n"
                         + "in vec4 a_color;\n"
+                        + "in vec2 a_uv;\n"
                         + "uniform vec2 u_resolution;\n"
                         + "out vec4 v_color;\n"
+                        + "out vec2 v_uv;\n"
                         + "void main() {\n"
                         + "  vec2 ndc = vec2(a_pos.x / u_resolution.x * 2.0 - 1.0,"
                         + " 1.0 - a_pos.y / u_resolution.y * 2.0);\n"
                         + "  gl_Position = vec4(ndc, 0.0, 1.0);\n"
                         + "  v_color = a_color;\n"
+                        + "  v_uv = a_uv;\n"
                         + "}\n";
 
                 String fsh = "#version 300 es\n"
                         + "precision mediump float;\n"
                         + "in vec4 v_color;\n"
+                        + "in vec2 v_uv;\n"
+                        + "uniform sampler2D u_tex;\n"
                         + "out vec4 fragColor;\n"
                         + "void main() {\n"
-                        + "  fragColor = v_color;\n"
+                        + "  fragColor = texture(u_tex, v_uv) * v_color;\n"
                         + "}\n";
 
                 guiProgram = EaglerShaderImpl.createProgramFromSource(vsh, fsh, "gui_2d");
@@ -102,8 +117,14 @@ public final class EaglerGuiImpl {
                 }
 
                 uResolution = EaglerShaderImpl.getUniformLocation(guiProgram, "u_resolution");
+                int uSampler = EaglerShaderImpl.getUniformLocation(guiProgram, "u_tex");
                 aPos = EaglerShaderImpl.getAttribLocation(guiProgram, "a_pos");
                 aColor = EaglerShaderImpl.getAttribLocation(guiProgram, "a_color");
+                aUv = EaglerShaderImpl.getAttribLocation(guiProgram, "a_uv");
+
+                PlatformOpenGL._wglUseProgram(guiProgram);
+                PlatformOpenGL._wglActiveTexture(WebGL2RenderingContext.TEXTURE0);
+                PlatformOpenGL._wglUniform1i(uSampler, 0);
 
                 guiVAO = PlatformOpenGL._wglCreateVertexArray();
                 guiVBO = PlatformOpenGL._wglCreateBuffer();
@@ -121,13 +142,21 @@ public final class EaglerGuiImpl {
                 PlatformOpenGL._wglEnableVertexAttribArray(aColor);
                 PlatformOpenGL._wglVertexAttribPointer(aColor, 4,
                         WebGL2RenderingContext.FLOAT, false, stride, 8);
+                PlatformOpenGL._wglEnableVertexAttribArray(aUv);
+                PlatformOpenGL._wglVertexAttribPointer(aUv, 2,
+                        WebGL2RenderingContext.FLOAT, false, stride, 24);
 
                 PlatformOpenGL._wglBindVertexArray(null);
                 PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, null);
 
+                // Start downloading the vanilla sprite PNGs; they upload on
+                // later begin() polls. Solid fills work from frame one via
+                // the 1x1 white texture.
+                GuiSprites.requestAll();
+
                 initialized = true;
                 if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
-                        ClientMain.log("[EaglerGuiImpl] 2D GUI renderer initialized");
+                        ClientMain.log("[EaglerGuiImpl] 2D GUI renderer initialized (textured pipeline)");
                 }
         }
 
@@ -143,6 +172,7 @@ public final class EaglerGuiImpl {
                 if (!initialized) return;
                 guiWidth = Math.max(1, width);
                 guiHeight = Math.max(1, height);
+                GuiSprites.pollPending();
                 if (!batchOpen) {
                         openBatch(gl);
                 } else {
@@ -164,6 +194,12 @@ public final class EaglerGuiImpl {
                         PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, guiVBO);
                         PlatformOpenGL._wglBindVertexArray(guiVAO);
                         PlatformOpenGL._wglBufferSubData(WebGL2RenderingContext.ARRAY_BUFFER, 0, vertexBuffer);
+                        if (currentTexture == null) {
+                                currentTexture = GuiSprites.getWhiteTexture();
+                        }
+                        if (currentTexture != null) {
+                                PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_2D, currentTexture);
+                        }
                         PlatformOpenGL._wglDrawArrays(WebGL2RenderingContext.TRIANGLES, 0, queuedVertices);
                         PlatformOpenGL._wglBindVertexArray(null);
                         PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, null);
@@ -194,15 +230,17 @@ public final class EaglerGuiImpl {
                         flush(gl);
                         openBatch(gl);
                 }
+                ensureTexture(GuiSprites.getWhiteTexture());
 
                 float x2 = x + w;
                 float y2 = y + h;
-                putVertex(x, y, r, g, b, a);
-                putVertex(x, y2, r, g, b, a);
-                putVertex(x2, y2, r, g, b, a);
-                putVertex(x, y, r, g, b, a);
-                putVertex(x2, y2, r, g, b, a);
-                putVertex(x2, y, r, g, b, a);
+                // Center of the 1x1 white texture: the color tint does the work
+                putVertex(x, y, r, g, b, a, 0.5f, 0.5f);
+                putVertex(x, y2, r, g, b, a, 0.5f, 0.5f);
+                putVertex(x2, y2, r, g, b, a, 0.5f, 0.5f);
+                putVertex(x, y, r, g, b, a, 0.5f, 0.5f);
+                putVertex(x2, y2, r, g, b, a, 0.5f, 0.5f);
+                putVertex(x2, y, r, g, b, a, 0.5f, 0.5f);
         }
 
         /**
@@ -214,6 +252,133 @@ public final class EaglerGuiImpl {
                         ((argb >> 8) & 0xFF) / 255.0f,
                         (argb & 0xFF) / 255.0f,
                         ((argb >> 24) & 0xFF) / 255.0f);
+        }
+
+        /**
+         * Blits a vanilla sprite PNG (loaded by {@link GuiSprites}) at
+         * {@code (x, y)} sized {@code w x h} in GUI pixels. The full
+         * texture is mapped onto the quad - use {@link #drawSprite9} for
+         * the nine-slice borders vanilla applies to button panels.
+         *
+         * @return false when the sprite is not loaded yet; callers fall
+         *         back to their procedural rendering in that case.
+         */
+        public static boolean drawSprite(String name, float x, float y, float w, float h) {
+                if (!GuiSprites.isReady(name)) return false;
+                return drawTexture(GuiSprites.texture(name),
+                        0.0f, 0.0f, 1.0f, 1.0f, x, y, w, h);
+        }
+
+        /**
+         * Nine-slice blit of a vanilla sprite, matching the
+         * {@code gui.scaling: nine_slice} metadata the real 26.1.2
+         * resources declare (widget/button* declare {@code border: 3}):
+         * the {@code border}-pixel edges map 1:1 from the sprite edges,
+         * the source middle stretches to fill the destination middle.
+         *
+         * @return false when the sprite is not loaded yet.
+         */
+        public static boolean drawSprite9(String name, float x, float y, float w, float h, int border) {
+                if (!GuiSprites.isReady(name)) return false;
+                JSObject tex = GuiSprites.texture(name);
+                if (w <= 0 || h <= 0) return true;
+
+                // Never let the borders overlap the dest middle
+                float b = Math.min(border, Math.min(w / 2.0f, h / 2.0f));
+
+                // Destination spans: [edge, middle, edge]
+                float[] dx = { x, x + b, x + w - b, x + w };
+                float[] dy = { y, y + b, y + h - b, y + h };
+                // Source UV spans: edges are 1:1 (border px of the sprite),
+                // the middle spans whatever the sprite has between them.
+                float bU = b / (float) GuiSprites.widthOf(name);
+                float bV = b / (float) GuiSprites.heightOf(name);
+                float[] su = { 0.0f, bU, 1.0f - bU, 1.0f };
+                float[] sv = { 0.0f, bV, 1.0f - bV, 1.0f };
+
+                for (int row = 0; row < 3; row++) {
+                        for (int col = 0; col < 3; col++) {
+                                float px0 = dx[col], px1 = dx[col + 1];
+                                float py0 = dy[row], py1 = dy[row + 1];
+                                if (px1 - px0 <= 0.0f || py1 - py0 <= 0.0f) continue;
+                                drawTexture(tex, su[col], sv[row], su[col + 1], sv[row + 1],
+                                        px0, py0, px1, py1);
+                        }
+                }
+                return true;
+        }
+
+        /**
+         * Tiled blit of a repeating background texture (vanilla
+         * menu_background / menu_list_background are 16x16 tiles). The
+         * pattern can be anchored at an arbitrary pixel offset so tiles
+         * stay fixed relative to the screen while the list scrolls, the
+         * way vanilla passes scroll-dependent u/v offsets.
+         *
+         * @return false when the sprite is not loaded yet.
+         */
+        public static boolean drawSpriteTiled(String name, float x, float y, float w, float h,
+                        float uOffPx, float vOffPx) {
+                if (!GuiSprites.isReady(name)) return false;
+                JSObject tex = GuiSprites.texture(name);
+                int tw = GuiSprites.widthOf(name);
+                int th = GuiSprites.heightOf(name);
+                if (tw <= 0 || th <= 0 || w <= 0 || h <= 0) return true;
+
+                int offX = ((int) uOffPx) % tw;
+                if (offX < 0) offX += tw;
+                int offY = ((int) vOffPx) % th;
+                if (offY < 0) offY += th;
+
+                float twF = (float) tw;
+                float thF = (float) th;
+                for (float ty = y; ty < y + h; ty += thF) {
+                        for (float tx = x; tx < x + w; tx += twF) {
+                                // Source window inside the tile (offset + clip)
+                                float su0 = (offX + (tx - x)) / twF;
+                                float sv0 = (offY + (ty - y)) / thF;
+                                float su1 = su0 + Math.min(twF, x + w - tx) / twF;
+                                float sv1 = sv0 + Math.min(thF, y + h - ty) / thF;
+                                if (su1 > 1.0f) {
+                                        // tile wraps: draw up to the seam then repeat
+                                        float seam = (1.0f - su0) * twF;
+                                        drawTexture(tex, su0, sv0, 1.0f, sv1, tx, ty, tx + seam, ty + Math.min(thF, y + h - ty));
+                                        drawTexture(tex, 0.0f, sv0, su1 - 1.0f, sv1, tx + seam, ty, tx + (su1 - 1.0f) * twF, ty + Math.min(thF, y + h - ty));
+                                } else if (sv1 > 1.0f) {
+                                        float seam = (1.0f - sv0) * thF;
+                                        drawTexture(tex, su0, sv0, su1, 1.0f, tx, ty, tx + Math.min(twF, x + w - tx), ty + seam);
+                                        drawTexture(tex, su0, 0.0f, su1, sv1 - 1.0f, tx, ty + seam, tx + Math.min(twF, x + w - tx), ty + (sv1 - 1.0f) * thF);
+                                } else {
+                                        drawTexture(tex, su0, sv0, su1, sv1, tx, ty, tx + (su1 - su0) * twF, ty + (sv1 - sv0) * thF);
+                                }
+                        }
+                }
+                return true;
+        }
+
+        /**
+         * Blits an explicit sub-rectangle of a texture. Source coords are
+         * normalized UVs (v=0 is the image top row).
+         */
+        private static boolean drawTexture(JSObject tex, float u0, float v0, float u1, float v1,
+                        float x0, float y0, float x1, float y1) {
+                WebGL2RenderingContext gl = ClientMain.getWebGL2();
+                if (gl == null || !initialized || tex == null) return false;
+                if (!batchOpen) {
+                        openBatch(gl);
+                }
+                if (queuedVertices + VERTICES_PER_QUAD > MAX_QUADS * VERTICES_PER_QUAD) {
+                        flush(gl);
+                        openBatch(gl);
+                }
+                ensureTexture(tex);
+                putVertex(x0, y0, 1, 1, 1, 1, u0, v0);
+                putVertex(x0, y1, 1, 1, 1, 1, u0, v1);
+                putVertex(x1, y1, 1, 1, 1, 1, u1, v1);
+                putVertex(x0, y0, 1, 1, 1, 1, u0, v0);
+                putVertex(x1, y1, 1, 1, 1, 1, u1, v1);
+                putVertex(x1, y0, 1, 1, 1, 1, u1, v0);
+                return true;
         }
 
         /**
@@ -280,7 +445,26 @@ public final class EaglerGuiImpl {
                 batchOpen = true;
         }
 
-        private static void putVertex(float x, float y, float r, float g, float b, float a) {
+        /**
+         * Switches the texture the queued quads sample from. All queued
+         * quads share one texture, so switching flushes the outgoing
+         * texture's quads first and re-opens the batch under the new
+         * texture (the batch is always open again when this returns).
+         */
+        private static void ensureTexture(JSObject tex) {
+                if (tex == null || tex == currentTexture) return;
+                WebGL2RenderingContext gl = ClientMain.getWebGL2();
+                if (gl != null) {
+                        if (batchOpen && queuedVertices > 0) {
+                                flush(gl); // draws with the outgoing texture
+                        }
+                        openBatch(gl);
+                }
+                currentTexture = tex;
+        }
+
+        private static void putVertex(float x, float y, float r, float g, float b, float a,
+                        float u, float v) {
                 int base = queuedVertices * FLOATS_PER_VERTEX;
                 vertexBuffer.set(base, x);
                 vertexBuffer.set(base + 1, y);
@@ -288,6 +472,8 @@ public final class EaglerGuiImpl {
                 vertexBuffer.set(base + 3, g);
                 vertexBuffer.set(base + 4, b);
                 vertexBuffer.set(base + 5, a);
+                vertexBuffer.set(base + 6, u);
+                vertexBuffer.set(base + 7, v);
                 queuedVertices++;
         }
 }

@@ -318,6 +318,11 @@ jobs:
           else
             echo "ERROR: TeaVM compilation failed - showing last 200 lines" | tee -a teavm.log
             tail -200 teavm.log
+            # A failed compile must fail the job. Without this, the pipeline
+            # silently kept the committed classes.js, deployed stale code and
+            # reported green (this actually happened: a duplicate-method error
+            # shipped as a "successful" run with the old bundle).
+            exit 1
           fi
 
       # ── Upload TeaVM log (always, even on failure) ──────────

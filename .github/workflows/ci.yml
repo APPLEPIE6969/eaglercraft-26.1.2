@@ -94,52 +94,69 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-home-cache-cleanup: true
+          # The gradle-home cache poisoned past runs: an upstream-era run
+          # cached ALREADY-PATCHED TeaVM jars, which broke the patch step
+          # (its patterns no longer matched) and left cache state that made
+          # configuration-phase resolves die silently (~5s, stderr hidden).
+          # The patch step now starts from freshly downloaded pristine jars
+          # (see next step), so the cache buys nothing worth its failure
+          # modes - disable it entirely for determinism.
+          cache-disabled: true
 
       # ── Download TeaVM deps and patch JARs BEFORE Gradle loads classes ──
       - name: Download and patch TeaVM dependencies
         run: |
-          echo "Downloading TeaVM dependencies..."
+          echo "Resolving TeaVM dependencies (stderr visible on purpose)..."
           cd /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
-          ./gradlew :sources:dependencies --configuration teavmClasspath --no-daemon 2>/dev/null || true
-          
-          echo "Patching teavm-core JAR (suppress PhiUpdater assertion)..."
-          TEAVM_CORE=$(find ~/.gradle/caches -name "teavm-core-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$TEAVM_CORE" ]; then
-            python3 scripts/patch_teavm_jar.py "$TEAVM_CORE" "$TEAVM_CORE.tmp"
-            mv "$TEAVM_CORE.tmp" "$TEAVM_CORE"
-            echo "Patched teavm-core: $TEAVM_CORE"
-          fi
-          
-          echo "Patching teavm-classlib JAR (add missing methods)..."
-          TEAVM_CL=$(find ~/.gradle/caches -name "teavm-classlib-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$TEAVM_CL" ]; then
-            python3 scripts/patch_classlib_jar.py "$TEAVM_CL" "$TEAVM_CL.tmp"
-            mv "$TEAVM_CL.tmp" "$TEAVM_CL"
-            echo "Patched teavm-classlib: $TEAVM_CL"
-          else
-            echo "WARNING: teavm-classlib JAR not found!"
-          fi
-          
-          echo "Patching DFU jar (replace null returns with non-null)..."
-          DFU_JAR=$(find ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$DFU_JAR" ]; then
-            python3 scripts/patch_dfu_jar.py "$DFU_JAR" "$DFU_JAR.tmp"
-            mv "$DFU_JAR.tmp" "$DFU_JAR"
-            echo "Patched DFU jar: $DFU_JAR"
-          else
-            echo "WARNING: DFU jar not found!"
-          fi
-          
-          echo "Patching teavm-relocated-libs-asm JAR (accept class file version 70 for JDK 26)..."
-          TEAVM_ASM=$(find ~/.gradle/caches -name "teavm-relocated-libs-asm-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$TEAVM_ASM" ]; then
-            python3 scripts/patch_teavm_asm.py "$TEAVM_ASM" "$TEAVM_ASM.tmp"
-            mv "$TEAVM_ASM.tmp" "$TEAVM_ASM"
-            echo "Patched teavm-asm: $TEAVM_ASM"
-          else
-            echo "WARNING: teavm-relocated-libs-asm JAR not found!"
-          fi
+          ./gradlew :sources:dependencies --configuration teavmClasspath --no-daemon || \
+            echo "WARNING: gradle resolve failed (exit $?); patched jars will be seeded into the cache from Maven Central instead"
+
+          PRISTINE_DIR=$(mktemp -d)
+          # Patch a PRISTINE Maven Central download, then overwrite the cache
+          # copy (or seed one). Idempotent regardless of cache state: pristine,
+          # already-patched (restored from a past run), or absent.
+          patch_teavm_artifact() {
+            local group_path="$1" artifact="$2" version="$3" script="$4"
+            local cache_jar
+            cache_jar=$(find "$HOME/.gradle/caches/modules-2" -path "*${group_path}/${artifact}/${version}/*" -name "${artifact}-${version}.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+            local pristine="$PRISTINE_DIR/${artifact}.jar"
+            local url_group
+            url_group=$(echo "$group_path" | tr '.' '/')
+            echo "Downloading pristine ${artifact}-${version} from Maven Central..."
+            curl -sfL -o "$pristine" "https://repo1.maven.org/maven2/${url_group}/${artifact}/${version}/${artifact}-${version}.jar" \
+              || { echo "ERROR: download failed for ${artifact}-${version}"; exit 1; }
+            python3 "$script" "$pristine" "$pristine.patched"
+            if [ -n "$cache_jar" ]; then
+              cp "$pristine.patched" "$cache_jar"
+              echo "Overwrote cache copy: $cache_jar"
+            else
+              # Seed the gradle artifact cache (files-2.1 layout, dir named by
+              # the PRISTINE sha1 as Maven metadata expects) so the later build
+              # resolves to the patched jar even without a prior resolve.
+              local sha1 seed_dir
+              sha1=$(sha1sum "$pristine" | cut -d' ' -f1)
+              seed_dir="$HOME/.gradle/caches/modules-2/files-2.1/${group_path}/${artifact}/${version}/${sha1}"
+              mkdir -p "$seed_dir"
+              cp "$pristine.patched" "$seed_dir/${artifact}-${version}.jar"
+              echo "Seeded gradle cache (no prior copy): $seed_dir"
+            fi
+          }
+
+          echo "Patching teavm-core (suppress PhiUpdater assertion)..."
+          patch_teavm_artifact org.teavm teavm-core 0.15.0 scripts/patch_teavm_jar.py
+
+          echo "Patching teavm-classlib (add missing methods)..."
+          patch_teavm_artifact org.teavm teavm-classlib 0.15.0 scripts/patch_classlib_jar.py
+
+          echo "Patching teavm-relocated-libs-asm (accept class file version 70 for JDK 26)..."
+          patch_teavm_artifact org.teavm teavm-relocated-libs-asm 0.15.0 scripts/patch_teavm_asm.py
+
+          # NOTE: DFU is deliberately NOT patched here. It is a Mojang library
+          # wired as a file dependency (sources/libs/datafixerupper-*.jar,
+          # materialized by the workspace init step - not in the gradle cache),
+          # and the current fix replaces the final DataFixer/Schema classes
+          # with un-finaled compiled patches downstream ("Create DFU patches"
+          # step, fed into sources/teavm/patch/dfu-classes).
 
       # ── Make scripts executable ──────────────────────────────
       - name: Make scripts executable

@@ -473,24 +473,14 @@ teavm {
     }
 
     js {
-        // OBFUSCATED build — TeaVM shortens all function/variable names
-        // (cms_Codec_$listOf → a, b, c etc.) producing a much smaller file.
-        //
-        // Previous: obfuscated=false produced 60MB classes.js which froze
-        // browsers during parsing ("Page doesn't respond"). JS parsing is
-        // synchronous and can't be made non-blocking on the main thread.
-        //
-        // Now: obfuscated=true should produce ~15MB classes.js that parses
-        // in 2-5 seconds. The default-method patcher's runtime prototype
-        // scanner (Method 1) works regardless of obfuscation because it
-        // inspects interface objects at runtime, not name patterns.
-        //
-        // Text patches (File.toPath, FileChannel.open, clinit wrapping, etc.)
-        // rely on unobfuscated function names and will be silently skipped.
-        // These patches fix null-safety and platform issues. If the game
-        // crashes without them, we'll need to move the fixes to Java source
-        // patches (sources/teavm/patch/) which survive obfuscation.
-        obfuscated = true
+        // UNOBFUSCATED — the platform-layer build stays unobfuscated so the
+        // post-build patcher (scripts/patch_default_methods.py) can apply its
+        // full fix set (clinit wrapping, File.toPath, Long time helpers, ...),
+        // which rely on readable function names. The obfuscated variant skips
+        // those patches and hits an unpatched class-init crash in the
+        // Minecraft constructor (TypeError reading 'length' of undefined).
+        // Platform-only output is ~1MB unobfuscated, so parse time is fine.
+        obfuscated = false
 
         sourceMap = true
 

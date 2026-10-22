@@ -382,6 +382,21 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 return this.singleplayerServer != null;
         }
 
+        // ========== Level / World ==========
+
+        public Object getLevel() {
+                return this.level;
+        }
+
+        /**
+         * True once the client is in a loaded world (the in-game HUD stage).
+         * The e2e telemetry bridge exposes this as
+         * {@code window.__eaglercraftGame.inWorld}.
+         */
+        public boolean isLevelLoaded() {
+                return this.level != null;
+        }
+
         // ========== Version ==========
 
         public String getLaunchedVersion() {

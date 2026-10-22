@@ -213,6 +213,10 @@ public class EaglerCraft {
                         // Signal to the browser that the game is ready
                         ClientMain.__eaglercraftReady();
 
+                        // Publish the initial game telemetry snapshot so the
+                        // browser (and the e2e suite) can observe engine state
+                        pushGameTelemetry();
+
                 } catch (Throwable t) {
                         gameState = STATE_CRASHED;
                         String message = "EaglerCraft initialization failed!\n\n"
@@ -564,6 +568,9 @@ public class EaglerCraft {
                         }
                 }
                 totalTicks++;
+
+                // Refresh the telemetry bridge once per game tick (20 TPS)
+                pushGameTelemetry();
         }
 
         /**
@@ -700,6 +707,70 @@ public class EaglerCraft {
                 return minecraftInstance;
         }
 
+        // ========== World entry capability / telemetry bridge ==========
+
+        /**
+         * Reports whether the client can currently drive the Singleplayer →
+         * world → HUD path that the stage-6 e2e test exercises.
+         *
+         * <p>World entry is not implemented yet: TitleScreen has no menu
+         * wiring, WorldLoader is a stub and Minecraft has no level-load path,
+         * so this returns false. When the client gains a working world-entry
+         * path, this must flip to true and the telemetry bridge must also
+         * expose an {@code enterWorld()} function that resolves once the HUD
+         * is up and {@link net.minecraft.client.Minecraft#isLevelLoaded()} would
+         * report true — that is the contract documented in docs/E2E.md, which the
+         * capability-gated e2e test relies on.</p>
+         */
+        public static boolean canEnterWorld() {
+                // TODO: replace with a real capability check when the
+                // world-entry path lands, e.g. the presence of a wired
+                // Singleplayer action on TitleScreen.
+                return false;
+        }
+
+        /**
+         * Pushes a snapshot of the game state to the browser as
+         * {@code window.__eaglercraftGame}.
+         *
+         * <p>Fields: {@code canEnterWorld} (see {@link #canEnterWorld()}),
+         * {@code gameState} (one of the STATE_* constants), {@code screen}
+         * (the current screen's class name, or "in-game" when no screen is
+         * set, or "none" when no Minecraft instance exists), {@code inWorld}
+         * (true once a level is loaded) and {@code ticks} (game ticks
+         * processed). Called at the end of initialization, once per game
+         * logic tick (20 TPS) and immediately on crash, so consumers always
+         * see a fresh snapshot without having to poll Java.</p>
+         */
+        private static void pushGameTelemetry() {
+                String screen = "none";
+                boolean inWorld = false;
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                        net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
+                        screen = mc.getScreen() == null ? "in-game" : mc.getScreen().getClass().getName();
+                        inWorld = mc.isLevelLoaded();
+                }
+                try {
+                        pushGameTelemetry0(canEnterWorld(), gameState, screen, inWorld,
+                                        (int) Math.min(totalTicks, Integer.MAX_VALUE));
+                } catch (Throwable t) {
+                        // Telemetry must never break the game loop
+                }
+        }
+
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks" }, script =
+                "if (typeof window !== 'undefined') {"
+                + " window.__eaglercraftGame = {"
+                + " canEnterWorld: canEnterWorld,"
+                + " gameState: gameState,"
+                + " screen: screenName,"
+                + " inWorld: inWorld,"
+                + " ticks: ticks"
+                + " };"
+                + "}")
+        private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
+                        boolean inWorld, int ticks);
+
         // ========== Shutdown / Crash ==========
 
         /**
@@ -740,6 +811,9 @@ public class EaglerCraft {
                 gameState = STATE_CRASHED;
                 ClientMain.error("[EaglerCraft] CRASH: " + message);
                 ClientMain.showCrashScreen("EaglerCraft crashed!\n\n" + message);
+
+                // Reflect the crash in the telemetry bridge immediately
+                pushGameTelemetry();
         }
 
         // ========== Display Configuration ==========

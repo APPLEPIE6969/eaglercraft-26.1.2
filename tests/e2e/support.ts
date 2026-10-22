@@ -278,3 +278,74 @@ export async function attachMilestoneScreenshot(
   await testInfo.attach(name, { body: shot, contentType: 'image/png' });
   return shot;
 }
+
+// ========== Game telemetry bridge ==========
+
+export interface GameTelemetry {
+  /** The client reports a working Singleplayer → world → HUD path. */
+  canEnterWorld: boolean;
+  /** EaglerCraft STATE_* constant: 2 = running, 3 = paused, 5 = crashed. */
+  gameState: number;
+  /** Current screen class name, "in-game" when no screen, "none" without an engine. */
+  screen: string;
+  /** True once a level is loaded (the HUD stage). */
+  inWorld: boolean;
+  /** Game logic ticks processed since boot (20 TPS). */
+  ticks: number;
+}
+
+/**
+ * Reads the `window.__eaglercraftGame` telemetry object that the TeaVM
+ * adapter pushes at the end of initialization, once per game logic tick and
+ * immediately on crash. Returns null when the bundle predates the bridge
+ * (for example a stale `public/` that has not been rebuilt yet), which lets
+ * callers distinguish "bridge missing" from "capability absent".
+ */
+export async function readGameTelemetry(page: Page): Promise<GameTelemetry | null> {
+  return page.evaluate(() => {
+    const bridge = (window as unknown as { __eaglercraftGame?: Partial<GameTelemetry> })
+      .__eaglercraftGame;
+    if (!bridge || typeof bridge !== 'object') {
+      return null;
+    }
+    return {
+      canEnterWorld: bridge.canEnterWorld === true,
+      gameState: typeof bridge.gameState === 'number' ? bridge.gameState : -1,
+      screen: typeof bridge.screen === 'string' ? bridge.screen : '',
+      inWorld: bridge.inWorld === true,
+      ticks: typeof bridge.ticks === 'number' ? bridge.ticks : -1,
+    };
+  });
+}
+
+// ========== Session summary ==========
+
+/**
+ * Writes a text artifact into the test's output directory (under
+ * test-results/) and attaches it to the Playwright report. The write
+ * matters: folder-layout HTML reports do not persist text attachments, but
+ * everything under test-results/ is uploaded as a CI artifact, so the file
+ * survives there. The output directory is created on demand because
+ * Playwright only materializes it lazily.
+ */
+export async function writeTestArtifact(
+  testInfo: TestInfo,
+  name: string,
+  body: string,
+  contentType = 'application/json',
+): Promise<void> {
+  mkdirSync(testInfo.outputDir, { recursive: true });
+  writeFileSync(join(testInfo.outputDir, name), body);
+  await testInfo.attach(name, { body, contentType });
+}
+
+/**
+ * Attaches a JSON session summary to the Playwright report and writes it to
+ * the test's output directory. See writeTestArtifact for why both happen.
+ */
+export async function attachSessionSummary(
+  testInfo: TestInfo,
+  summary: Record<string, unknown>,
+): Promise<void> {
+  await writeTestArtifact(testInfo, 'session-summary.json', JSON.stringify(summary, null, 2));
+}

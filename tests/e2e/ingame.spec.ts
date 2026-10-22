@@ -2,12 +2,15 @@ import type { ConsoleRecorder, ConsoleEntry } from './support';
 import { expect, test } from './fixtures';
 import {
   attachMilestoneScreenshot,
+  attachSessionSummary,
   installConsoleRecorder,
   parseFps,
   readGameSessionState,
+  readGameTelemetry,
   waitForClientBootstrap,
   waitForFpsReading,
   waitForReadyState,
+  writeTestArtifact,
 } from './support';
 
 const BOOT_TIMEOUT = 150_000;
@@ -139,20 +142,15 @@ test.describe('go in game', () => {
         /Asset bundle parsed|First frame|Starting game loop/.test(entry.text),
       )
       .map((entry) => ({ at: entry.at - startedAt, text: entry.text }));
-    await testInfo.attach('session-summary.json', {
-      body: JSON.stringify(
-        {
-          titleScreenMs,
-          milestones: milestoneEvents,
-          assetsEpk: epk,
-          fps: { firstSample: first.fps, secondSample: fpsAfter },
-          uncaughtPageErrors: pageErrors,
-          consoleMessageCount: entries.length,
-        },
-        null,
-        2,
-      ),
-      contentType: 'application/json',
+    const endTelemetry = await readGameTelemetry(page);
+    await attachSessionSummary(testInfo, {
+      titleScreenMs,
+      milestones: milestoneEvents,
+      assetsEpk: epk,
+      fps: { firstSample: first.fps, secondSample: fpsAfter },
+      gameTelemetry: endTelemetry,
+      uncaughtPageErrors: pageErrors,
+      consoleMessageCount: entries.length,
     });
 
     // ── The session must not have thrown anything uncaught ──
@@ -161,6 +159,114 @@ test.describe('go in game', () => {
       `the session must run without uncaught page errors:\n${pageErrors.join('\n')}`,
     ).toEqual([]);
 
+    await context.close();
+  });
+
+  /**
+   * Stage 6 of the "go in game" journey: Singleplayer → world → HUD.
+   *
+   * This test is capability-gated: it fully boots the client, then reads the
+   * `window.__eaglercraftGame` telemetry bridge that the adapter pushes. When
+   * the client does not yet report `canEnterWorld` (or the bundle predates
+   * the bridge), the test skips with that evidence attached — a screenshot of
+   * the gate state plus a `game-telemetry.json` capture. The moment the
+   * client flips `canEnterWorld` to true, this test activates and enforces
+   * the world-entry contract documented in docs/E2E.md.
+   */
+  test('enters a world and reaches the HUD (capability-gated)', async ({ browser }, testInfo) => {
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 60_000);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(String(error?.message ?? error)));
+
+    // Boot to the running title screen — the same milestones the journey test
+    // asserts in detail; here they are the preconditions for the gate read.
+    await page.goto('/index.html', { waitUntil: 'commit' });
+    expect(
+      await waitForClientBootstrap(page, BOOT_TIMEOUT),
+      'the TeaVM bundle must export self.main',
+    ).toBe(true);
+    expect(
+      await waitForReadyState(page, READY_TIMEOUT),
+      'the client must reach the title screen before the world-entry gate',
+    ).toBe(true);
+    await waitForFpsReading(page, 15_000);
+
+    // ── The capability gate ──
+    const telemetry = await readGameTelemetry(page);
+    // Folder-layout reports do not persist text attachments, so the copy in
+    // test-results/ is what survives in the CI artifact.
+    await writeTestArtifact(testInfo, 'game-telemetry.json', JSON.stringify(telemetry, null, 2));
+    await attachMilestoneScreenshot(page, testInfo, '05-world-entry-gate');
+
+    if (!telemetry) {
+      await attachSessionSummary(testInfo, {
+        gated: true,
+        reason: 'telemetry-bridge-missing',
+        uncaughtPageErrors: pageErrors,
+      });
+      test.skip(
+        true,
+        'the deployed bundle predates the __eaglercraftGame telemetry bridge — rebuild the client to activate the world-entry stage',
+      );
+      return;
+    }
+    if (!telemetry.canEnterWorld) {
+      await attachSessionSummary(testInfo, {
+        gated: true,
+        reason: 'world-entry-not-implemented',
+        telemetry,
+        uncaughtPageErrors: pageErrors,
+      });
+      test.skip(
+        true,
+        `the client cannot enter a world yet (telemetry: ${JSON.stringify(telemetry)}) — this test activates automatically once canEnterWorld flips to true`,
+      );
+      return;
+    }
+
+    // ── Stage 6: drive the Singleplayer → world → HUD path ──
+    // Contract (docs/E2E.md): a client that reports canEnterWorld=true must
+    // also expose enterWorld() on the bridge, resolving once the HUD is up.
+    const hasEnterWorld = await page.evaluate(() => {
+      const bridge = (window as unknown as { __eaglercraftGame?: { enterWorld?: unknown } })
+        .__eaglercraftGame;
+      return typeof bridge?.enterWorld === 'function';
+    });
+    expect(
+      hasEnterWorld,
+      'canEnterWorld=true requires enterWorld() on the __eaglercraftGame bridge (docs/E2E.md, world-entry contract)',
+    ).toBe(true);
+    await page.evaluate(() => {
+      const bridge = (
+        window as unknown as { __eaglercraftGame: { enterWorld: () => Promise<void> | void } }
+      ).__eaglercraftGame;
+      return Promise.resolve(bridge.enterWorld());
+    });
+
+    // The bridge must flip inWorld once the level is loaded and the HUD is up.
+    const deadline = Date.now() + 30_000;
+    let worldState = await readGameTelemetry(page);
+    while (!worldState?.inWorld && Date.now() < deadline) {
+      await page.waitForTimeout(250);
+      worldState = await readGameTelemetry(page);
+    }
+    expect(
+      worldState?.inWorld,
+      `the client must flip inWorld=true after enterWorld() (last telemetry: ${JSON.stringify(worldState)})`,
+    ).toBe(true);
+    expect(
+      pageErrors,
+      `entering a world must not throw uncaught page errors:\n${pageErrors.join('\n')}`,
+    ).toEqual([]);
+
+    await attachMilestoneScreenshot(page, testInfo, '06-in-world-hud');
+    await attachSessionSummary(testInfo, {
+      gated: false,
+      telemetry: worldState,
+      uncaughtPageErrors: pageErrors,
+    });
     await context.close();
   });
 });

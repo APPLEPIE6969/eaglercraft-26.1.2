@@ -103,6 +103,17 @@ public class Window {
                 }
         }
 
+        /**
+         * Re-reads the canvas dimensions from the browser into this
+         * Window's cached fields. The cache can be empty (0x0) while the
+         * page is still laying out during construction; Minecraft calls
+         * this from resizeDisplay once the real size is known so the GUI
+         * scale and the screens re-initialize against actual pixels.
+         */
+        public void refreshCachedSize() {
+                updateCanvasSize();
+        }
+
         @JSBody(script = "var c = document.querySelector('canvas'); return c ? (c.clientWidth || window.innerWidth) : 0;")
         private static native int getCanvasWidth0();
 

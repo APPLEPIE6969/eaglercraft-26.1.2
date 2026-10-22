@@ -203,6 +203,14 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         // Update timing
                         this.currentTime = PlatformRuntime.getCurrentTimeMillis();
 
+                        // Re-sync with the browser canvas. The cache is empty
+                        // (0x0) while the page is still laying out during
+                        // construction, so the first real frame sizes the
+                        // canvas and everything downstream (GUI scale, menu
+                        // widgets, render target) re-initializes here. This
+                        // also picks up real browser resizes within a tick.
+                        this.syncCanvasSize();
+
                         // Tick input handlers
                         if (this.keyboardHandler != null) {
                                 this.keyboardHandler.tick();
@@ -264,23 +272,51 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
         public void resizeDisplay() {
                 int width = PlatformRuntime.getCanvasDrawableWidth();
                 int height = PlatformRuntime.getCanvasDrawableHeight();
-                if (width <= 0 || height <= 0) return;
+                if (width <= 0 || height <= 0 || this.window == null) return;
 
-                // Resize render target
+                // Pull the fresh canvas dimensions into the Window. (Vanilla
+                // has the GLFW framebuffer callback do this; here the browser
+                // cache is the source of truth, refreshed per frame by
+                // PlatformRuntime.update.) Do NOT call window.onResize from
+                // here: it invokes eventHandler.resizeDisplay() and would
+                // recurse forever.
+                this.window.refreshCachedSize();
+
+                // Recompute the GUI scale against the real dimensions
+                this.window.setGuiScale(this.window.calculateScale(Integer.MAX_VALUE, false));
+
+                // Resize the render target
                 if (this.mainRenderTarget != null) {
                         this.mainRenderTarget.resize(width, height);
                 }
 
-                // Update GUI scale
-                if (this.window != null) {
-                        this.window.onResize(width, height);
-                }
-
-                // Notify current screen
+                // Re-initialize the current screen (vanilla re-runs init on
+                // resize — this is what repositions the menu widgets)
                 if (this.screen != null) {
                         this.screen.resize(this,
                                 this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
                 }
+        }
+
+        /**
+         * Applies a resize whenever the browser canvas no longer matches
+         * the Window's cached dimensions (the layout-settling transition
+         * and real browser resizes alike). Cheap no-op once settled.
+         */
+        private void syncCanvasSize() {
+                int drawableW = PlatformRuntime.getCanvasDrawableWidth();
+                int drawableH = PlatformRuntime.getCanvasDrawableHeight();
+                if (drawableW <= 0 || drawableH <= 0 || this.window == null) return;
+
+                int newScale = this.window.calculateScale(Integer.MAX_VALUE, false);
+                if (drawableW == this.window.getWidth() && drawableH == this.window.getHeight()
+                        && newScale == this.window.getGuiScale()) {
+                        return; // settled
+                }
+
+                ClientMain.log("[Minecraft] Canvas settled at " + drawableW + "x" + drawableH
+                        + ", GUI scale " + newScale + " -> re-initializing screens");
+                resizeDisplay();
         }
 
         /**

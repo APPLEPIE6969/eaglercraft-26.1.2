@@ -385,7 +385,14 @@ export async function getButtonCssCoords(
     if (!button) {
       return null;
     }
-    const canvas = document.querySelector('canvas');
+    // The shell hosts TWO canvases: its own empty #game_frame container
+    // and the real game canvas ClientMain appends inside it. The game
+    // canvas is the event target and the size reference — querying the
+    // first canvas in the document would pick the container with its
+    // default 300x150 backing attributes and wreck the ratio.
+    const canvas =
+      (document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null) ??
+      document.querySelector('canvas');
     if (!canvas || canvas.width === 0) {
       return null;
     }

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
+import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
@@ -20,135 +21,159 @@ import net.minecraft.client.gui.screens.Screen;
  */
 public class GameRenderer {
 
-	private final Minecraft minecraft;
-	private float zoom = 1.0f;
-	private float zoomX;
-	private float zoomY;
-	private Object mainCamera; // Camera
+        private final Minecraft minecraft;
+        private float zoom = 1.0f;
+        private float zoomX;
+        private float zoomY;
+        private Object mainCamera; // Camera
 
-	public GameRenderer(Minecraft minecraft) {
-		this.minecraft = minecraft;
-		this.mainCamera = new Camera();
-	}
+        public GameRenderer(Minecraft minecraft) {
+                this.minecraft = minecraft;
+                this.mainCamera = new Camera();
+        }
 
-	/**
-	 * Renders one frame.
-	 *
-	 * @param partialTick   Interpolation factor (0.0 to 1.0) between ticks
-	 * @param currentTimeMs Current time in milliseconds
-	 * @param renderLevel   Whether to render the 3D world
-	 */
-	public void render(float partialTick, long currentTimeMs, boolean renderLevel) {
-		try {
-			int width = PlatformRuntime.getCanvasDrawableWidth();
-			int height = PlatformRuntime.getCanvasDrawableHeight();
-			if (width <= 0 || height <= 0) return;
+        /**
+         * Renders one frame.
+         *
+         * <p>Frame layout (vanilla order): clear -> HUD (when in a world) ->
+         * screen (menus + widgets) on top. Everything 2D goes through
+         * {@link EaglerGuiImpl}'s batched quad pipeline; the batch re-binds
+         * lazily, so interleaved GL work (the title gradient) stays safe.</p>
+         *
+         * @param partialTick   Interpolation factor (0.0 to 1.0) between ticks
+         * @param currentTimeMs Current time in milliseconds
+         * @param renderLevel   Whether to render the 3D world
+         */
+        public void render(float partialTick, long currentTimeMs, boolean renderLevel) {
+                int pxWidth = PlatformRuntime.getCanvasDrawableWidth();
+                int pxHeight = PlatformRuntime.getCanvasDrawableHeight();
+                if (pxWidth <= 0 || pxHeight <= 0) return;
 
-			// Clear the framebuffer
-			PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);
-			PlatformOpenGL._wglClear(
-				WebGL2RenderingContext.COLOR_BUFFER_BIT
-				| WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+                WebGL2RenderingContext gl = ClientMain.getWebGL2();
+                if (gl == null) return;
 
-			// Reset render state
-			RenderSystem.enableDepthTest();
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
+                int guiWidth = minecraft.getWindow().getGuiScaledWidth();
+                int guiHeight = minecraft.getWindow().getGuiScaledHeight();
+                if (guiWidth <= 0 || guiHeight <= 0) return;
 
-			// Render current screen if present
-			Screen screen = minecraft.screen;
-			if (screen != null) {
-				PoseStack poseStack = new PoseStack();
-				screen.render(poseStack, 0, 0, partialTick);
-			}
+                try {
+                        // Clear to the vanilla overworld sky color
+                        PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);
+                        PlatformOpenGL._wglClear(
+                                WebGL2RenderingContext.COLOR_BUFFER_BIT
+                                | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
 
-		} catch (Throwable t) {
-			// Don't let render errors crash the game loop
-			if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
-				ClientMain.warn("[GameRenderer] render error: " + t.getMessage());
-			}
-		}
-	}
+                        // GUI state: blended translucent quads, no depth writes
+                        RenderSystem.enableBlend();
+                        RenderSystem.defaultBlendFunc();
+                        RenderSystem.disableDepthTest();
 
-	/**
-	 * Returns the main camera.
-	 */
-	public Camera getMainCamera() {
-		return (Camera) mainCamera;
-	}
+                        EaglerGuiImpl.begin(gl, guiWidth, guiHeight);
 
-	/**
-	 * Performs ray picking (object selection).
-	 * Stub - no ray picking in the browser override yet.
-	 */
-	public void pick(float partialTick) {
-		// no-op
-	}
+                        // HUD overlay (crosshair + hotbar) when inside a world;
+                        // flushed now so any screen below draws over it
+                        if (minecraft.isLevelLoaded()) {
+                                minecraft.getGui().render(new PoseStack(), partialTick);
+                        }
+                        EaglerGuiImpl.flush(gl);
 
-	/**
-	 * Gets the zoom level.
-	 */
-	public float getZoom() {
-		return zoom;
-	}
+                        // Current screen (menus + widgets), with the real mouse pos
+                        Screen screen = minecraft.screen;
+                        if (screen != null) {
+                                screen.render(new PoseStack(),
+                                        (int) minecraft.getMouseHandler().xpos(),
+                                        (int) minecraft.getMouseHandler().ypos(),
+                                        partialTick);
+                        }
+                        EaglerGuiImpl.flush(gl);
 
-	/**
-	 * Sets the zoom level.
-	 */
-	public void setZoom(float zoom, float zoomX, float zoomY) {
-		this.zoom = zoom;
-		this.zoomX = zoomX;
-		this.zoomY = zoomY;
-	}
+                } catch (Throwable t) {
+                        // Don't let render errors crash the game loop
+                        if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+                                ClientMain.warn("[GameRenderer] render error: " + t.getMessage());
+                        }
+                }
+        }
 
-	/**
-	 * Closes/shuts down the renderer.
-	 */
-	public void close() {
-		// no-op
-	}
+        /**
+         * Returns the main camera.
+         */
+        public Camera getMainCamera() {
+                return (Camera) mainCamera;
+        }
 
-	/**
-	 * Called when the window resizes.
-	 */
-	public void resize(int width, int height) {
-		// Update projection matrix - handled by render() on next frame
-	}
+        /**
+         * Performs ray picking (object selection).
+         * Stub - no ray picking in the browser override yet.
+         */
+        public void pick(float partialTick) {
+                // no-op
+        }
 
-	/**
-	 * Camera stub - holds position and orientation data.
-	 */
-	public static class Camera {
-		private double x, y, z;
-		private float yaw, pitch;
-		private boolean thirdPerson;
+        /**
+         * Gets the zoom level.
+         */
+        public float getZoom() {
+                return zoom;
+        }
 
-		public Camera() {
-			this.x = 0;
-			this.y = 64; // Default world height
-			this.z = 0;
-			this.yaw = 0;
-			this.pitch = 0;
-			this.thirdPerson = false;
-		}
+        /**
+         * Sets the zoom level.
+         */
+        public void setZoom(float zoom, float zoomX, float zoomY) {
+                this.zoom = zoom;
+                this.zoomX = zoomX;
+                this.zoomY = zoomY;
+        }
 
-		public double getX() { return x; }
-		public double getY() { return y; }
-		public double getZ() { return z; }
-		public float getYaw() { return yaw; }
-		public float getPitch() { return pitch; }
-		public boolean isThirdPerson() { return thirdPerson; }
+        /**
+         * Closes/shuts down the renderer.
+         */
+        public void close() {
+                // no-op
+        }
 
-		public void setPosition(double x, double y, double z) {
-			this.x = x; this.y = y; this.z = z;
-		}
+        /**
+         * Called when the window resizes.
+         */
+        public void resize(int width, int height) {
+                // Update projection matrix - handled by render() on next frame
+        }
 
-		public void setRotation(float yaw, float pitch) {
-			this.yaw = yaw; this.pitch = pitch;
-		}
+        /**
+         * Camera stub - holds position and orientation data.
+         */
+        public static class Camera {
+                private double x, y, z;
+                private float yaw, pitch;
+                private boolean thirdPerson;
 
-		public void setThirdPerson(boolean thirdPerson) {
-			this.thirdPerson = thirdPerson;
-		}
-	}
+                public Camera() {
+                        this.x = 0;
+                        this.y = 64; // Default world height
+                        this.z = 0;
+                        this.yaw = 0;
+                        this.pitch = 0;
+                        this.thirdPerson = false;
+                }
+
+                public double getX() { return x; }
+                public double getY() { return y; }
+                public double getZ() { return z; }
+                public float getYaw() { return yaw; }
+                public float getPitch() { return pitch; }
+                public boolean isThirdPerson() { return thirdPerson; }
+
+                public void setPosition(double x, double y, double z) {
+                        this.x = x; this.y = y; this.z = z;
+                }
+
+                public void setRotation(float yaw, float pitch) {
+                        this.yaw = yaw; this.pitch = pitch;
+                }
+
+                public void setThirdPerson(boolean thirdPerson) {
+                        this.thirdPerson = thirdPerson;
+                }
+        }
 }

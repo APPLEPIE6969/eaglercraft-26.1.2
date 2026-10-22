@@ -21,6 +21,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.sounds.SoundManager;
@@ -107,6 +108,12 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         this.window = new Window(this, null,
                                 gameConfig.display, "EaglerCraft " + EaglerCraftConfig.VERSION);
                         ClientMain.log("[Minecraft] Window: " + this.window.getWidth() + "x" + this.window.getHeight());
+
+                        // Step 2b: pick the GUI scale (vanilla auto rule: largest
+                        // integer scale that still shows a 320x240 GUI)
+                        this.window.setGuiScale(this.window.calculateScale(Integer.MAX_VALUE, false));
+                        ClientMain.log("[Minecraft] GUI scale: " + this.window.getGuiScale()
+                                + " -> " + this.window.getGuiScaledWidth() + "x" + this.window.getGuiScaledHeight());
 
                         // Step 3: Initialize Options
                         this.options = new Options(this, new java.io.File("/eaglercraft"));
@@ -203,7 +210,17 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
                         // Tick current screen if present
                         if (this.screen != null) {
-                                // Screen tick handled during render
+                                this.screen.tick();
+                        }
+
+                        // Tick the loaded world (advances the game clock)
+                        if (this.level instanceof ClientLevel clientLevel) {
+                                clientLevel.tick();
+                        }
+
+                        // Tick the HUD
+                        if (this.gui != null) {
+                                this.gui.tick();
                         }
 
                         // Update FPS counter
@@ -258,7 +275,8 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
                 // Notify current screen
                 if (this.screen != null) {
-                        this.screen.resize(this, width, height);
+                        this.screen.resize(this,
+                                this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
                 }
         }
 
@@ -410,7 +428,7 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 }
                 this.screen = screen;
                 if (screen != null) {
-                        screen.init(this, this.window.getScreenWidth(), this.window.getScreenHeight());
+                        screen.init(this, this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
                 }
         }
 
@@ -560,8 +578,38 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 return null;
         }
 
+        /**
+         * Enters a world the Singleplayer way: constructs the client-side
+         * {@link ClientLevel}, swaps it in, closes the menu, and leaves
+         * the mouse free (the browser grants pointer lock only on a real
+         * canvas click, which EaglerCraft requests on the next click while
+         * in world).
+         *
+         * <p>The e2e telemetry bridge exposes this state as
+         * {@code window.__eaglercraftGame.inWorld}.</p>
+         */
         public void doWorldLoad(String levelName) {
-                // no-op
+                if (this.isLevelLoaded()) {
+                        ClientMain.log("[Minecraft] doWorldLoad ignored: already in a world");
+                        return;
+                }
+
+                ClientMain.log("[Minecraft] Loading world: " + levelName);
+                try {
+                        ClientLevel clientLevel = new ClientLevel(levelName, "minecraft:overworld");
+                        this.setLevel(clientLevel);
+                        this.setScreen(null); // no menu = in-game; the HUD renders
+                        this.missTime = 0;
+                        ClientMain.log("[Minecraft] World loaded: " + clientLevel
+                                + " (HUD active)");
+                } catch (Throwable t) {
+                        ClientMain.error("[Minecraft] World load failed: " + t.getMessage());
+                        StackTraceElement[] stack = t.getStackTrace();
+                        for (int i = 0; i < Math.min(stack.length, 8); i++) {
+                                ClientMain.error("  at " + stack[i].toString());
+                        }
+                        throw new RuntimeException("World load failed", t);
+                }
         }
 
         // ========== Level / World ==========

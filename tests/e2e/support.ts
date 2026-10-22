@@ -281,6 +281,16 @@ export async function attachMilestoneScreenshot(
 
 // ========== Game telemetry bridge ==========
 
+/** A button on the current screen, with its bounds in GUI-scaled pixels. */
+export interface GameTelemetryButton {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface GameTelemetry {
   /** The client reports a working Singleplayer → world → HUD path. */
   canEnterWorld: boolean;
@@ -292,6 +302,10 @@ export interface GameTelemetry {
   inWorld: boolean;
   /** Game logic ticks processed since boot (20 TPS). */
   ticks: number;
+  /** The GUI scale factor menus and the HUD are laid out with. */
+  guiScale: number;
+  /** Buttons on the current screen with bounds in GUI pixels. */
+  buttons: GameTelemetryButton[];
 }
 
 /**
@@ -299,23 +313,93 @@ export interface GameTelemetry {
  * adapter pushes at the end of initialization, once per game logic tick and
  * immediately on crash. Returns null when the bundle predates the bridge
  * (for example a stale `public/` that has not been rebuilt yet), which lets
- * callers distinguish "bridge missing" from "capability absent".
+ * callers distinguish "bridge missing" from "capability absent". The bridge
+ * object additionally carries an `enterWorld()` function (see the world-entry
+ * contract in docs/E2E.md) which is not part of this data snapshot.
  */
 export async function readGameTelemetry(page: Page): Promise<GameTelemetry | null> {
   return page.evaluate(() => {
-    const bridge = (window as unknown as { __eaglercraftGame?: Partial<GameTelemetry> })
-      .__eaglercraftGame;
+    const bridge = (
+      window as unknown as { __eaglercraftGame?: Record<string, unknown> }
+    ).__eaglercraftGame;
     if (!bridge || typeof bridge !== 'object') {
       return null;
     }
+    const rawButtons = Array.isArray(bridge.buttons) ? bridge.buttons : [];
     return {
       canEnterWorld: bridge.canEnterWorld === true,
       gameState: typeof bridge.gameState === 'number' ? bridge.gameState : -1,
       screen: typeof bridge.screen === 'string' ? bridge.screen : '',
       inWorld: bridge.inWorld === true,
       ticks: typeof bridge.ticks === 'number' ? bridge.ticks : -1,
+      guiScale: typeof bridge.guiScale === 'number' && bridge.guiScale > 0 ? bridge.guiScale : 1,
+      buttons: rawButtons
+        .filter(
+          (b): b is Record<string, unknown> =>
+            Boolean(b) && typeof b === 'object' && typeof (b as { id?: unknown }).id === 'string',
+        )
+        .map((b) => {
+          const rec = b as Record<string, unknown>;
+          return {
+            id: String(rec.id),
+            label: typeof rec.label === 'string' ? rec.label : String(rec.id),
+            x: typeof rec.x === 'number' ? rec.x : 0,
+            y: typeof rec.y === 'number' ? rec.y : 0,
+            w: typeof rec.w === 'number' ? rec.w : 0,
+            h: typeof rec.h === 'number' ? rec.h : 0,
+          };
+        }),
     };
   });
+}
+
+export interface ButtonCssCoords {
+  button: GameTelemetryButton;
+  guiScale: number;
+  /** Viewport CSS x of the button center (what page.mouse.click expects). */
+  cssX: number;
+  /** Viewport CSS y of the button center. */
+  cssY: number;
+}
+
+/**
+ * Computes the viewport click position of a button reported on the telemetry
+ * bridge, so tests can drive the REAL menu path with trusted mouse events
+ * instead of dispatching synthetic DOM events.
+ *
+ * Units: button bounds are in GUI pixels; one GUI pixel is `guiScale` canvas
+ * backing pixels; the viewport sees the canvas at
+ * `canvas.clientWidth / canvas.width` of its backing size (1/dpr).
+ */
+export async function getButtonCssCoords(
+  page: Page,
+  buttonId: string,
+): Promise<ButtonCssCoords | null> {
+  return page.evaluate((id) => {
+    const bridge = (
+      window as unknown as {
+        __eaglercraftGame?: { guiScale?: number; buttons?: GameTelemetryButton[] };
+      }
+    ).__eaglercraftGame;
+    const button = (bridge?.buttons ?? []).find((b) => b && b.id === id);
+    if (!button) {
+      return null;
+    }
+    const canvas = document.querySelector('canvas');
+    if (!canvas || canvas.width === 0) {
+      return null;
+    }
+    const guiScale =
+      typeof bridge?.guiScale === 'number' && bridge.guiScale > 0 ? bridge.guiScale : 1;
+    const backingToCss = canvas.clientWidth / canvas.width;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      button,
+      guiScale,
+      cssX: rect.left + (button.x + button.w / 2) * guiScale * backingToCss,
+      cssY: rect.top + (button.y + button.h / 2) * guiScale * backingToCss,
+    };
+  }, buttonId);
 }
 
 // ========== Session summary ==========

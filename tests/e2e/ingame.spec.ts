@@ -3,6 +3,7 @@ import { expect, test } from './fixtures';
 import {
   attachMilestoneScreenshot,
   attachSessionSummary,
+  getButtonCssCoords,
   installConsoleRecorder,
   parseFps,
   readGameSessionState,
@@ -264,6 +265,116 @@ test.describe('go in game', () => {
     await attachMilestoneScreenshot(page, testInfo, '06-in-world-hud');
     await attachSessionSummary(testInfo, {
       gated: false,
+      path: 'bridge-enterWorld',
+      telemetry: worldState,
+      uncaughtPageErrors: pageErrors,
+    });
+    await context.close();
+  });
+
+  /**
+   * Stage 6 through the real menu: clicks the actual Singleplayer button
+   * with trusted mouse events (no bridge shortcuts) and requires the client
+   * to land in the world with the HUD up.
+   *
+   * This is the human journey exactly as a player runs it: move the mouse
+   * over the button, press left button, the button's hit-testing fires the
+   * world-load path. The telemetry bridge is used only to LOCATE the button
+   * (its bounds in GUI pixels) and to OBSERVE the result (inWorld) — never
+   * to trigger the transition.
+   */
+  test('clicks the real Singleplayer button and reaches the HUD (capability-gated)', async ({ browser }, testInfo) => {
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 60_000);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(String(error?.message ?? error)));
+
+    // Boot to the running title screen — same preconditions as the bridge test
+    await page.goto('/index.html', { waitUntil: 'commit' });
+    expect(
+      await waitForClientBootstrap(page, BOOT_TIMEOUT),
+      'the TeaVM bundle must export self.main',
+    ).toBe(true);
+    expect(
+      await waitForReadyState(page, READY_TIMEOUT),
+      'the client must reach the title screen before the Singleplayer click',
+    ).toBe(true);
+    await waitForFpsReading(page, 15_000);
+
+    // ── The capability gate ──
+    const telemetry = await readGameTelemetry(page);
+    await writeTestArtifact(testInfo, 'game-telemetry.json', JSON.stringify(telemetry, null, 2));
+    await attachMilestoneScreenshot(page, testInfo, '05-singleplayer-menu');
+
+    if (!telemetry) {
+      await attachSessionSummary(testInfo, {
+        gated: true,
+        reason: 'telemetry-bridge-missing',
+        uncaughtPageErrors: pageErrors,
+      });
+      test.skip(
+        true,
+        'the deployed bundle predates the __eaglercraftGame telemetry bridge — rebuild the client to activate the Singleplayer click stage',
+      );
+      return;
+    }
+    if (!telemetry.canEnterWorld) {
+      await attachSessionSummary(testInfo, {
+        gated: true,
+        reason: 'world-entry-not-implemented',
+        telemetry,
+        uncaughtPageErrors: pageErrors,
+      });
+      test.skip(
+        true,
+        `the client cannot enter a world yet (telemetry: ${JSON.stringify(telemetry)}) — this test activates automatically once canEnterWorld flips to true`,
+      );
+      return;
+    }
+
+    // ── Contract: the title screen must carry the real Singleplayer button ──
+    const coords = await getButtonCssCoords(page, 'singleplayer');
+    expect(
+      coords,
+      `canEnterWorld=true requires a "singleplayer" button in the bridge's buttons array (got: ${JSON.stringify(telemetry.buttons)})`,
+    ).not.toBeNull();
+    expect(
+      coords!.button.w,
+      'the Singleplayer button must have a non-empty hit box',
+    ).toBeGreaterThan(0);
+
+    // ── The human action: press left mouse button on the button ──
+    await page.mouse.move(coords!.cssX, coords!.cssY);
+    await page.waitForTimeout(100); // let a hover frame render
+    await page.mouse.click(coords!.cssX, coords!.cssY);
+
+    // ── The world must load and the HUD must take over ──
+    const deadline = Date.now() + 30_000;
+    let worldState = await readGameTelemetry(page);
+    while (!worldState?.inWorld && Date.now() < deadline) {
+      await page.waitForTimeout(250);
+      worldState = await readGameTelemetry(page);
+    }
+    expect(
+      worldState?.inWorld,
+      `the client must flip inWorld=true after clicking Singleplayer (last telemetry: ${JSON.stringify(worldState)})`,
+    ).toBe(true);
+    expect(
+      worldState?.screen,
+      'the title screen must close once the world is loaded',
+    ).toBe('in-game');
+    expect(
+      pageErrors,
+      `entering a world via the menu must not throw uncaught page errors:\n${pageErrors.join('\n')}`,
+    ).toEqual([]);
+
+    await attachMilestoneScreenshot(page, testInfo, '07-in-world-hud-click');
+    await attachSessionSummary(testInfo, {
+      gated: false,
+      path: 'singleplayer-click',
+      clickedButton: coords!.button,
+      guiScale: coords!.guiScale,
       telemetry: worldState,
       uncaughtPageErrors: pageErrors,
     });

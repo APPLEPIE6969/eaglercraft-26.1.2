@@ -146,6 +146,18 @@ public class EaglerCraft {
         /** Tracks whether the MC tick has ever succeeded. */
         private static boolean mcTickSucceeded = false;
 
+        // ========== Input edge tracking (see processInput) ==========
+
+        /** Number of mouse buttons polled for press/release edges. */
+        private static final int MOUSE_BUTTONS_POLLED = 3;
+
+        /** Last frame's button states, for edge detection. */
+        private static final boolean[] lastMouseButtons = new boolean[MOUSE_BUTTONS_POLLED];
+
+        /** Last frame's mouse position in canvas CSS pixels (-1 = never moved). */
+        private static int lastMouseX = -1;
+        private static int lastMouseY = -1;
+
         // ========== Initialization ==========
 
         /**
@@ -528,16 +540,36 @@ public class EaglerCraft {
          * </pre>
          */
         private static void processInput() {
-                // Input polling is handled by PlatformInput, which updates
-                // its internal state arrays on each DOM event. MC code reads
-                // the state through PlatformWebService convenience methods.
-                //
-                // In the full implementation, we would also:
-                // - Check for new key press events and queue them for MC's KeyboardListener
-                // - Check for mouse button click events and queue them for MC's MouseListener
-                // - Handle pointer lock state changes
-                // - Process IME composition events for CJK input
-                // - Handle gamepad input mapping
+                if (!(minecraftInstance instanceof net.minecraft.client.Minecraft)) {
+                        return;
+                }
+                net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
+                net.minecraft.client.MouseHandler mh = mc.getMouseHandler();
+
+                // Absolute position: PlatformInput reports canvas CSS pixels;
+                // MouseHandler converts them to GUI-scaled pixels.
+                int mouseX = PlatformInput.getMouseX();
+                int mouseY = PlatformInput.getMouseY();
+                if (mouseX != lastMouseX || mouseY != lastMouseY) {
+                        lastMouseX = mouseX;
+                        lastMouseY = mouseY;
+                        mh.handleMouseMove(0L, mouseX, mouseY);
+                }
+
+                // Button press/release edges -> MC's MouseHandler. A press
+                // while in world (no screen open) grabs the pointer, like
+                // vanilla's click-to-capture.
+                for (int button = 0; button < MOUSE_BUTTONS_POLLED; button++) {
+                        boolean down = PlatformInput.isMouseDown(button);
+                        if (down != lastMouseButtons[button]) {
+                                lastMouseButtons[button] = down;
+                                mh.cursorPressed(0L, button, down ? 1 : 0, 0);
+                                if (down && mc.screen == null && mc.isLevelLoaded()
+                                                && !PlatformInput.isPointerLocked()) {
+                                        mh.grabMouse();
+                                }
+                        }
+                }
         }
 
         /**
@@ -555,6 +587,18 @@ public class EaglerCraft {
          * </pre>
          */
         private static void gameLogicTick() {
+                // Consume a queued enterWorld() request from the telemetry
+                // bridge before anything else so the same tick flips inWorld
+                if (consumeWorldEntryRequest()) {
+                        if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                                net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
+                                if (!mc.isLevelLoaded()) {
+                                        ClientMain.log("[EaglerCraft] enterWorld() requested via telemetry bridge");
+                                        mc.doWorldLoad(net.minecraft.client.gui.screens.TitleScreen.DEFAULT_WORLD_NAME);
+                                }
+                        }
+                }
+
                 if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
                         try {
                                 net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
@@ -594,12 +638,12 @@ public class EaglerCraft {
                 // We only render our fallback title screen if MC isn't running.
 
                 if (minecraftInstance instanceof net.minecraft.client.Minecraft && mcTickSucceeded) {
-                        // MC handles its own rendering through its game loop.
-                        // The MC instance's run() method manages tick + render.
-                        // We just need to clear the framebuffer as a safety net.
-                        PlatformOpenGL._wglClear(
-                                WebGL2RenderingContext.COLOR_BUFFER_BIT
-                                | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+                        // MC owns the frame: GameRenderer.render clears the
+                        // framebuffer, draws the HUD (when in a world) and the
+                        // current screen with its widgets, and flushes the 2D
+                        // batch. Nothing else needs to touch the framebuffer.
+                        ((net.minecraft.client.Minecraft) minecraftInstance).render(true);
+                        firstFrameRendered = true;
                         return;
                 }
 
@@ -713,20 +757,16 @@ public class EaglerCraft {
          * Reports whether the client can currently drive the Singleplayer →
          * world → HUD path that the stage-6 e2e test exercises.
          *
-         * <p>World entry is not implemented yet: TitleScreen has no menu
-         * wiring, WorldLoader is a stub and Minecraft has no level-load path,
-         * so this returns false. When the client gains a working world-entry
-         * path, this must flip to true and the telemetry bridge must also
-         * expose an {@code enterWorld()} function that resolves once the HUD
-         * is up and {@link net.minecraft.client.Minecraft#isLevelLoaded()} would
-         * report true — that is the contract documented in docs/E2E.md, which the
-         * capability-gated e2e test relies on.</p>
+         * <p>The path is implemented: TitleScreen carries a real Button
+         * widget with hit-testing, the press loads a {@link net.minecraft.client.multiplayer.ClientLevel}
+         * through {@code Minecraft.doWorldLoad}, and the HUD (crosshair +
+         * hotbar) renders through the batched 2D pipeline. The telemetry
+         * bridge exposes the matching {@code enterWorld()} function which
+         * feeds the same code path — that is the contract documented in
+         * docs/E2E.md, enforced by the capability-gated e2e test.</p>
          */
         public static boolean canEnterWorld() {
-                // TODO: replace with a real capability check when the
-                // world-entry path lands, e.g. the presence of a wired
-                // Singleplayer action on TitleScreen.
-                return false;
+                return true;
         }
 
         /**
@@ -737,39 +777,97 @@ public class EaglerCraft {
          * {@code gameState} (one of the STATE_* constants), {@code screen}
          * (the current screen's class name, or "in-game" when no screen is
          * set, or "none" when no Minecraft instance exists), {@code inWorld}
-         * (true once a level is loaded) and {@code ticks} (game ticks
-         * processed). Called at the end of initialization, once per game
-         * logic tick (20 TPS) and immediately on crash, so consumers always
-         * see a fresh snapshot without having to poll Java.</p>
+         * (true once a level is loaded), {@code ticks} (game ticks
+         * processed), {@code guiScale} (the active GUI scale factor) and
+         * {@code buttons} (the current screen's buttons with their bounds
+         * in GUI pixels, so automation can click the real menu). The object
+         * also carries an {@code enterWorld()} function that queues a
+         * world-entry request consumed on the next game tick — the same
+         * path the Singleplayer button drives. Called at the end of
+         * initialization, once per game logic tick (20 TPS) and immediately
+         * on crash, so consumers always see a fresh snapshot without having
+         * to poll Java.</p>
          */
         private static void pushGameTelemetry() {
                 String screen = "none";
                 boolean inWorld = false;
+                int guiScale = 1;
+                String buttonsJson = "[]";
                 if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
                         net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
                         screen = mc.getScreen() == null ? "in-game" : mc.getScreen().getClass().getName();
                         inWorld = mc.isLevelLoaded();
+                        guiScale = mc.getWindow() != null ? mc.getWindow().getGuiScale() : 1;
+                        buttonsJson = buildButtonsJson(mc);
                 }
                 try {
                         pushGameTelemetry0(canEnterWorld(), gameState, screen, inWorld,
-                                        (int) Math.min(totalTicks, Integer.MAX_VALUE));
+                                        (int) Math.min(totalTicks, Integer.MAX_VALUE), guiScale, buttonsJson);
                 } catch (Throwable t) {
                         // Telemetry must never break the game loop
                 }
         }
 
-        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks" }, script =
+        /**
+         * Serializes the current screen's buttons for the telemetry bridge:
+         * {@code [{"id":"singleplayer","label":"Singleplayer","x":..,"y":..,"w":..,"h":..}]}
+         * with bounds in GUI-scaled pixels.
+         */
+        private static String buildButtonsJson(net.minecraft.client.Minecraft mc) {
+                net.minecraft.client.gui.screens.Screen screen = mc.getScreen();
+                if (screen == null) {
+                        return "[]";
+                }
+                StringBuilder sb = new StringBuilder("[");
+                boolean first = true;
+                for (net.minecraft.client.gui.components.AbstractWidget widget : screen.children()) {
+                        if (!(widget instanceof net.minecraft.client.gui.components.Button)) {
+                                continue;
+                        }
+                        net.minecraft.client.gui.components.Button button =
+                                (net.minecraft.client.gui.components.Button) widget;
+                        String id = button.getMessage() == null ? "button"
+                                : button.getMessage().toLowerCase().replaceAll("[^a-z0-9]+", "");
+                        if (!first) {
+                                sb.append(",");
+                        }
+                        first = false;
+                        sb.append("{\"id\":\"").append(id).append("\"")
+                                .append(",\"label\":\"").append(id).append("\"")
+                                .append(",\"x\":").append(button.getX())
+                                .append(",\"y\":").append(button.getY())
+                                .append(",\"w\":").append(button.getWidth())
+                                .append(",\"h\":").append(button.getHeight())
+                                .append("}");
+                }
+                sb.append("]");
+                return sb.toString();
+        }
+
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson" }, script =
                 "if (typeof window !== 'undefined') {"
                 + " window.__eaglercraftGame = {"
                 + " canEnterWorld: canEnterWorld,"
                 + " gameState: gameState,"
                 + " screen: screenName,"
                 + " inWorld: inWorld,"
-                + " ticks: ticks"
+                + " ticks: ticks,"
+                + " guiScale: guiScale,"
+                + " buttons: JSON.parse(buttonsJson),"
+                + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
-                        boolean inWorld, int ticks);
+                        boolean inWorld, int ticks, int guiScale, String buttonsJson);
+
+        /**
+         * Consumes a pending {@code enterWorld()} request from the bridge:
+         * returns (and clears) whether the browser set the request flag
+         * since the last game tick.
+         */
+        @JSBody(script = "if (typeof window !== 'undefined' && window.__eaglercraftWorldEntryRequested === true) {"
+                + " window.__eaglercraftWorldEntryRequested = false; return true; } return false;")
+        private static native boolean consumeWorldEntryRequest();
 
         // ========== Shutdown / Crash ==========
 

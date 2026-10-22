@@ -30,7 +30,7 @@ boots is never published.
 | `tests/e2e/shell.spec.ts` | The shell exposes its elements, `self.main` is exported, the client configuration is well formed, no failed bundle download is reported, no uncaught shell errors, screenshot of the running client. |
 | `tests/e2e/webgl.spec.ts` | Chromium can create a WebGL2 context and the game canvas is backed by one. |
 | `tests/e2e/game.spec.ts` | The client reaches the title screen, the EPK archive is served, and no uncaught game runtime errors occur. |
-| `tests/e2e/ingame.spec.ts` | The full "go in game" journey on a fresh page: loading screen → bundle boot → title screen → engine milestones (WebGL2 context, `EaglerCraft.initialize()` complete, Minecraft instance constructed, EPK parsed) → the game loop keeps rendering. Takes a milestone screenshot at every stage and attaches a session summary. Also runs the capability-gated world-entry stage described below. |
+| `tests/e2e/ingame.spec.ts` | The full "go in game" journey on a fresh page: loading screen → bundle boot → title screen → engine milestones (WebGL2 context, `EaglerCraft.initialize()` complete, Minecraft instance constructed, EPK parsed) → the game loop keeps rendering. Takes a milestone screenshot at every stage and attaches a session summary. Also runs the two capability-gated world-entry stages described below (bridge `enterWorld()` and the real Singleplayer click). |
 | `tests/e2e/multiplayer.spec.ts` | Multiplayer gateway smoke test: a real browser performs the Eagler WS handshake (0x01), login (0x03 → 0x04 status 0), and a chat round-trip (0x05) through `GatewaySmokeMain` → `McBridge` → `McProtocolStub`, plus a negative login case. Skipped automatically when the gateway jars have not been built. |
 
 ### Blocking versus informational assertions
@@ -54,53 +54,60 @@ the client really did stop "going in game".
 Set `E2E_STRICT_GAME` to `true` on the reusable workflow input to turn the
 informational assertions into hard failures.
 
-### World-entry stage (capability-gated)
+### World-entry stages (capability-gated)
 
-The final stage of the journey — Singleplayer → world → HUD — cannot be
-automated until the client actually renders that path (today `TitleScreen` has
-no menu wiring, `WorldLoader` is a stub and the HUD is a no-op). Instead of
-waiting, `ingame.spec.ts` carries a capability-gated test that is already
-wired for the day the path lands:
+The final stage of the journey — Singleplayer → world → HUD — is
+implemented in the client: `TitleScreen` carries a real `Button` widget
+with hit-testing, a press loads a minimal `ClientLevel` through
+`Minecraft.doWorldLoad`, and the HUD (crosshair + hotbar) renders through
+the batched 2D pipeline. `ingame.spec.ts` runs two gated tests over that
+path, both reading the `window.__eaglercraftGame` telemetry bridge that
+`EaglerCraft.java` pushes at the end of initialization, once per game
+logic tick (20 TPS) and immediately on crash:
 
-1. The test boots the client to the running title screen, then reads the
-   `window.__eaglercraftGame` telemetry bridge that `EaglerCraft.java` pushes
-   at the end of initialization, once per game logic tick (20 TPS) and
-   immediately on crash:
+```json
+{
+  "canEnterWorld": true,
+  "gameState": 2,
+  "screen": "net.minecraft.client.gui.screens.TitleScreen",
+  "inWorld": false,
+  "ticks": 42,
+  "guiScale": 3,
+  "buttons": [{ "id": "singleplayer", "label": "singleplayer", "x": 113, "y": 108, "w": 200, "h": 20 }]
+}
+```
 
-   ```json
-   {
-     "canEnterWorld": false,
-     "gameState": 2,
-     "screen": "net.minecraft.client.gui.screens.TitleScreen",
-     "inWorld": false,
-     "ticks": 42
-   }
-   ```
+1. **Bridge path** (`enters a world and reaches the HUD`): when
+   `canEnterWorld` is `true`, the bridge must also expose an
+   `enterWorld()` function; calling it queues a request that the next
+   game tick feeds through the same `doWorldLoad` path the button drives.
+   The test then requires `inWorld` to flip within 30 seconds, no uncaught
+   page errors, and captures a `06-in-world-hud` screenshot.
 
-2. If the bridge is missing (a bundle older than the bridge) or
-   `canEnterWorld` is `false`, the test **skips with evidence**: a
-   `05-world-entry-gate` screenshot, a `game-telemetry.json` capture and a
-   `session-summary.json` explaining the gate reason land in the report and
-   the `test-results/` artifact.
+2. **Real menu path** (`clicks the real Singleplayer button and reaches
+   the HUD`): the bridge is used only to *locate* the button — the test
+   converts its GUI-pixel bounds to viewport coordinates via `guiScale`
+   and the canvas' backing/CSS ratio, then performs a genuine trusted
+   `page.mouse.click` on it. Hit-testing must fire the world-load path
+   with no synthetic events: `inWorld` flips, the screen closes
+   (`screen: "in-game"`), and a `07-in-world-hud-click` screenshot is
+   captured.
 
-3. The moment the client reports `canEnterWorld: true`, the test activates
-   and enforces the world-entry **contract**: the bridge must also expose
-   `enterWorld()` (resolving once the level is loaded and the HUD is up),
-   the bridge must flip `inWorld` to `true` within 30 seconds, the
-   transition must not throw uncaught page errors, and a `06-in-world-hud`
-   screenshot is captured. The client-side flip lives in
-   `EaglerCraft.canEnterWorld()`.
-
-So the test is pre-armed: no redesign is needed when the menu wiring lands —
-the client flip alone turns the skip into a real end-to-end assertion.
+Both tests **skip with evidence** while `canEnterWorld` is `false` (or the
+bundle predates the bridge): a `05-world-entry-gate` /
+`05-singleplayer-menu` screenshot, a `game-telemetry.json` capture and a
+`session-summary.json` explaining the gate reason land in the report and
+the `test-results/` artifact. The client-side flag lives in
+`EaglerCraft.canEnterWorld()`.
 
 ## Screenshots
 
 `ingame.spec.ts` captures the journey as milestone screenshots
 (`01-loading-screen`, `02-bundle-booted`, `03-title-screen`,
-`04-running-in-game`, and `05-world-entry-gate` from the capability-gated
-world-entry test), and `shell.spec.ts` captures the shared client page as
-`shell-client`. Each screenshot is attached to the HTML report under its
+`04-running-in-game`, plus `05-world-entry-gate` / `06-in-world-hud` from
+the bridge test and `05-singleplayer-menu` / `07-in-world-hud-click` from
+the Singleplayer click test), and `shell.spec.ts` captures the shared client
+page as `shell-client`. Each screenshot is attached to the HTML report under its
 milestone name and also written to the `screenshots/` directory (gitignored
 locally, uploaded as a CI artifact next to the Playwright report). When a run
 fails, these files show exactly how far the client got before it died.

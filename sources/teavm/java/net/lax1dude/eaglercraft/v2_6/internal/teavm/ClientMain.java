@@ -186,27 +186,66 @@ public class ClientMain {
                 }
 
                 HTMLElement container = document.getElementById(containerId);
-                if (container == null) {
-                        // Fallback: create container if not found
-                        container = document.getBody();
+                HTMLElement appendTarget = null;
+
+                // A <canvas> container swallows the game canvas as fallback
+                // content: browsers never render a canvas's child elements,
+                // so the game canvas would keep a 0x0 layout box forever -
+                // no size, no mouse events, and the platform's canvas cache
+                // would stay empty. When the container is a canvas (the
+                // shell ships #game_frame as one), hide it and overlay the
+                // real canvas on the viewport instead; proper element
+                // containers (a <div>) keep the classic contain behavior.
+                boolean containerIsCanvas = false;
+                if (container != null) {
+                        containerIsCanvas = isCanvasElement(container);
+                }
+                if (container == null || containerIsCanvas) {
+                        if (containerIsCanvas) {
+                                container.getStyle().setProperty("display", "none");
+                        }
+                        appendTarget = document.getBody();
+                } else {
+                        appendTarget = container;
                 }
 
                 // Create the canvas element
                 canvas = (HTMLCanvasElement) document.createElement("canvas");
                 canvas.setId("EaglerCraftX_26_1_2_Canvas");
-                canvas.getStyle().setProperty("width", "100%");
-                canvas.getStyle().setProperty("height", "100%");
+                if (appendTarget == container) {
+                        canvas.getStyle().setProperty("width", "100%");
+                        canvas.getStyle().setProperty("height", "100%");
+                } else {
+                        // Overlaying the viewport directly
+                        canvas.getStyle().setProperty("position", "fixed");
+                        canvas.getStyle().setProperty("top", "0");
+                        canvas.getStyle().setProperty("left", "0");
+                        canvas.getStyle().setProperty("width", "100vw");
+                        canvas.getStyle().setProperty("height", "100vh");
+                        // Below the shell overlays (loading 1000, title 100,
+                        // error 2000), above the static page background
+                        canvas.getStyle().setProperty("z-index", "1");
+                }
                 canvas.getStyle().setProperty("display", "block");
                 canvas.getStyle().setProperty("outline", "none");
                 canvas.getStyle().setProperty("image-rendering", "pixelated");
                 canvas.setAttribute("tabindex", "0");
                 canvas.setAttribute("autocomplete", "off");
 
-                container.appendChild(canvas);
+                appendTarget.appendChild(canvas);
 
                 // Create WebGL2 context with attributes
                 webgl = createWebGL2Context(canvas);
         }
+
+        /**
+         * Returns whether the element is a {@code <canvas>}. Plain JS on
+         * purpose: the DOM API surface used here must not depend on any
+         * specific TeaVM DOM interface beyond HTMLElement.
+         */
+        @JSBody(params = { "el" }, script =
+                "return !!(el && el.tagName && String(el.tagName).toLowerCase() === 'canvas');")
+        private static native boolean isCanvasElement(HTMLElement el);
 
         /**
          * Creates a WebGL2 rendering context on the given canvas.

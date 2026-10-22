@@ -29,7 +29,13 @@ test.describe('graphics', () => {
     expect(booted, 'the TeaVM bundle must export self.main').toBe(true);
 
     const info = await clientPage.evaluate(() => {
-      const canvas = document.getElementById('game_frame') as HTMLCanvasElement | null;
+      // The real game canvas is the one ClientMain creates (the shell's
+      // #game_frame is only a placeholder container; the game canvas is a
+      // viewport overlay). Fall back to the placeholder for bundles that
+      // still nest inside it.
+      const canvas =
+        (document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null) ??
+        (document.getElementById('game_frame') as HTMLCanvasElement | null);
       if (!canvas) {
         return { present: false, webgl2: false, webgl: false };
       }
@@ -38,7 +44,7 @@ test.describe('graphics', () => {
       return { present: true, webgl2, webgl };
     });
 
-    expect(info.present, '#game_frame must exist').toBe(true);
+    expect(info.present, 'the game canvas must exist').toBe(true);
     expect(
       info.webgl2 || info.webgl,
       'the game canvas must be backed by a WebGL context',

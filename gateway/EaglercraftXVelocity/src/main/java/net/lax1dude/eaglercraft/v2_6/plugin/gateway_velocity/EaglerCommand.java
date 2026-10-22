@@ -31,6 +31,17 @@ public class EaglerCommand implements SimpleCommand {
                 "EaglercraftXVelocity " + EaglercraftXVelocity.SERVER_BRAND
                         + " - ws://0.0.0.0:" + l.getPort()
                         + ", " + l.getTotalAccepted() + " handshake(s) this session"));
+        VelocitySessionRegistry registry = l.getRegistry();
+        if (registry != null) {
+            java.util.Collection<VelocityEaglerSession> sessions = registry.all();
+            invocation.source().sendMessage(net.kyori.adventure.text.Component.text(
+                    "Eagler players online: " + sessions.size()));
+            for (VelocityEaglerSession s : sessions) {
+                invocation.source().sendMessage(net.kyori.adventure.text.Component.text(
+                        " - " + s.getName() + " (" + s.getUniqueId() + ")"
+                                + " bridge=" + (s.isConnected() ? "up" : "down")));
+            }
+        }
     }
 
     @Override

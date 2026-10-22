@@ -30,6 +30,7 @@ boots is never published.
 | `tests/e2e/shell.spec.ts` | The shell exposes its elements, `self.main` is exported, the client configuration is well formed, no failed bundle download is reported, no uncaught shell errors. |
 | `tests/e2e/webgl.spec.ts` | Chromium can create a WebGL2 context and the game canvas is backed by one. |
 | `tests/e2e/game.spec.ts` | The client reaches the title screen, the EPK archive is served, and no uncaught game runtime errors occur. |
+| `tests/e2e/multiplayer.spec.ts` | Multiplayer gateway smoke test: a real browser performs the Eagler WS handshake (0x01), login (0x03 → 0x04 status 0), and a chat round-trip (0x05) through `GatewaySmokeMain` → `McBridge` → `McProtocolStub`, plus a negative login case. Skipped automatically when the gateway jars have not been built. |
 
 ### Blocking versus informational assertions
 

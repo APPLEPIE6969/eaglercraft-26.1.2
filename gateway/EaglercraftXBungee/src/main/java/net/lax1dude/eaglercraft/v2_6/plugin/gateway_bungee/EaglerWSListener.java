@@ -7,14 +7,21 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import net.lax1dude.eaglercraft.v2_6.placeholder_server.mc.McPacketIds;
+import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.config.ServerInfo;
+
 /**
- * Embedded Eagler WebSocket listener for EaglercraftXBungee.
+ * Embedded Eagler WebSocket listener for EaglercraftXBungee — gateway
+ * milestone #2.
  *
  * <p>Wire protocol (binary frames only, big-endian u16 string lengths):</p>
  * <pre>
@@ -22,14 +29,23 @@ import org.java_websocket.server.WebSocketServer;
  *   S→C  0x01 accept      [0x01][u16 n][n bytes server brand][u16 n][n bytes motd]
  *   C→S  0x02 ping        [0x02][opaque payload]  (echoed back verbatim)
  *   S→C  0x02 pong        [0x02][same payload]
+ *   C→S  0x03 login       [0x03][u16 n][username][u16 m][auth token]   (milestone 2)
+ *   S→C  0x04 login result[0x04][u8 status][u16 n][message]            (milestone 2)
+ *   C→S  0x05 chat        [0x05][u16 n][utf-8 text]                    (milestone 2)
+ *   S→C  0x05 chat        [0x05][u16 n][utf-8 text]                    (milestone 2)
  *   S→C  0xFF kick        [0xFF][u16 n][n bytes utf-8 reason]  — followed by close(1000)
  * </pre>
  *
- * <p>This is the same protocol the standalone PlaceholderServer exercises and
- * the browser client's PlatformNetworking layer speaks; keeping the two in
- * sync is intentional. Guardrails: handshake timeout, duplicate handshake,
- * username validation, unknown packet ids, text frames, 1 MiB frame cap
- * (close 1009), sliding-window packet rate limit, max connections.</p>
+ * <p>Milestone 2 flow: after the handshake the client sends 0x03; the
+ * listener validates the username (charset, duplicates, forwarding enabled),
+ * creates an {@link EaglerPlayerSession}, registers it and starts the MC
+ * bridge towards the configured default server. Status codes for 0x04:
+ * 0 = ok, 1 = invalid username, 2 = name taken, 3 = forwarding disabled,
+ * 4 = rejected (message carries the reason).</p>
+ *
+ * <p>Guardrails carried over from milestone 1: handshake timeout, duplicate
+ * handshake, username validation, unknown packet ids, text frames, 1 MiB
+ * frame cap (close 1009), sliding-window packet rate limit, max connections.</p>
  */
 public class EaglerWSListener extends WebSocketServer {
 
@@ -38,7 +54,34 @@ public class EaglerWSListener extends WebSocketServer {
 
     static final byte PKT_HANDSHAKE = 0x01;
     static final byte PKT_PING = 0x02;
+    static final byte PKT_LOGIN = 0x03;
+    static final byte PKT_LOGIN_RESULT = 0x04;
+    static final byte PKT_CHAT = 0x05;
     static final byte PKT_KICK = (byte) 0xFF;
+
+    /** 0x04 status codes. */
+    static final int ST_OK = 0;
+    static final int ST_INVALID_USERNAME = 1;
+    static final int ST_NAME_TAKEN = 2;
+    static final int ST_FORWARDING_DISABLED = 3;
+    static final int ST_REJECTED = 4;
+
+    /** Vanilla username charset, enforced before a session is created. */
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("[A-Za-z0-9_]{1,16}");
+
+    /** Creates the session object for a logged-in connection. */
+    public interface SessionFactory {
+        EaglerPlayerSession create(String username, EaglerPlayerSession.FrameSink sink,
+                InetSocketAddress remote);
+    }
+
+    /** Per-connection state machine data. */
+    private static final class ConnState {
+        Thread handshakeTimeout;
+        volatile boolean handshaken;
+        volatile long pingStart;
+        volatile EaglerPlayerSession session;
+    }
 
     private final String motd;
     private final String serverBrand;
@@ -48,15 +91,24 @@ public class EaglerWSListener extends WebSocketServer {
     private final boolean verbose;
     private final Logger log;
 
+    private final EaglerSessionRegistry registry;
+    private final SessionFactory sessionFactory;
+    private final Supplier<ServerInfo> defaultServerSupplier;
+    private final McPacketIds mcIds;
+    private final String virtualHost;
+    private final int bridgeConnectTimeoutMs;
+
     private final Set<WebSocket> conns = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private final Set<WebSocket> handshaken = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final AtomicInteger totalAccepted = new AtomicInteger();
 
     private static final ConcurrentHashMap<WebSocket, long[]> rateWindows = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<WebSocket, int[]> rateCursors = new ConcurrentHashMap<>();
 
     public EaglerWSListener(int port, String motd, String serverBrand, int maxConnections,
-            long handshakeTimeoutMs, int packetsPerMinute, boolean verbose, Logger log) {
+            long handshakeTimeoutMs, int packetsPerMinute, boolean verbose, Logger log,
+            EaglerSessionRegistry registry, SessionFactory sessionFactory,
+            Supplier<ServerInfo> defaultServerSupplier, McPacketIds mcIds,
+            String virtualHost, int bridgeConnectTimeoutMs) {
         super(new InetSocketAddress(port));
         this.motd = motd;
         this.serverBrand = serverBrand;
@@ -65,7 +117,16 @@ public class EaglerWSListener extends WebSocketServer {
         this.packetsPerMinute = packetsPerMinute;
         this.verbose = verbose;
         this.log = log;
+        this.registry = registry;
+        this.sessionFactory = sessionFactory;
+        this.defaultServerSupplier = defaultServerSupplier;
+        this.mcIds = mcIds;
+        this.virtualHost = virtualHost;
+        this.bridgeConnectTimeoutMs = bridgeConnectTimeoutMs;
         setConnectionLostTimeout(30);
+        // Let the listener re-bind while old connections from a previous run
+        // are still draining through TIME_WAIT (proxy restarts, test reruns).
+        setReuseAddr(true);
     }
 
     @Override
@@ -83,7 +144,9 @@ public class EaglerWSListener extends WebSocketServer {
         conns.add(conn);
         rateWindows.remove(conn);
         rateCursors.remove(conn);
-        scheduleHandshakeTimeout(conn);
+        ConnState st = new ConnState();
+        conn.setAttachment(st);
+        scheduleHandshakeTimeout(conn, st);
         if (verbose) {
             log.info("open " + conn.getRemoteSocketAddress()
                     + " resource=" + handshake.getResourceDescriptor());
@@ -93,10 +156,17 @@ public class EaglerWSListener extends WebSocketServer {
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         conns.remove(conn);
-        handshaken.remove(conn);
         rateWindows.remove(conn);
         rateCursors.remove(conn);
-        cancelHandshakeTimeout(conn);
+        ConnState st = stateOf(conn);
+        if (st != null) {
+            cancelHandshakeTimeout(conn, st);
+            EaglerPlayerSession session = st.session;
+            if (session != null) {
+                st.session = null;
+                session.teardown("ws closed (code=" + code + ")");
+            }
+        }
         if (verbose) {
             log.info("close " + conn.getRemoteSocketAddress() + " code=" + code
                     + " remote=" + remote + " reason=" + reason);
@@ -129,59 +199,192 @@ public class EaglerWSListener extends WebSocketServer {
             return;
         }
 
+        ConnState st = stateOf(conn);
+        if (st == null) {
+            kick(conn, "protocol violation: frame before listener state ready");
+            return;
+        }
+
         byte id = message.get();
         switch (id) {
-            case PKT_HANDSHAKE: {
-                if (!handshaken.add(conn)) {
-                    kick(conn, "protocol violation: duplicate handshake");
-                    return;
-                }
-                String clientBrand = readU16String(message);
-                String username = readU16String(message);
-                if (clientBrand == null || username == null) {
-                    kick(conn, "malformed handshake");
-                    return;
-                }
-                if (username.trim().isEmpty() || username.length() > 16) {
-                    kick(conn, "invalid username");
-                    return;
-                }
-                totalAccepted.incrementAndGet();
-                cancelHandshakeTimeout(conn);
-                log.info("handshake from " + conn.getRemoteSocketAddress()
-                        + " brand=\"" + clientBrand + "\" username=\"" + username + "\"");
-                // Size from UTF-8 byte lengths, not String.length(), which
-                // counts chars and undercounts multibyte!
-                byte[] brandBytes = serverBrand.getBytes(StandardCharsets.UTF_8);
-                byte[] motdBytes = motd.getBytes(StandardCharsets.UTF_8);
-                ByteBuffer out = ByteBuffer.allocate(1 + 2 + brandBytes.length + 2 + motdBytes.length);
-                out.put(PKT_HANDSHAKE);
-                putU16Bytes(out, brandBytes);
-                putU16Bytes(out, motdBytes);
-                out.flip();
-                conn.send(out);
+            case PKT_HANDSHAKE:
+                handleHandshake(conn, st, message);
                 break;
-            }
-            case PKT_PING: {
-                if (!handshaken.contains(conn)) {
-                    kick(conn, "ping before handshake");
-                    return;
-                }
-                ByteBuffer out = ByteBuffer.allocate(len);
-                out.put(PKT_PING);
-                out.put(message);
-                out.flip();
-                conn.send(out);
-                if (verbose) {
-                    log.info("ping " + (len - 1) + " B from " + conn.getRemoteSocketAddress());
-                }
+            case PKT_PING:
+                handlePing(conn, st, message);
                 break;
-            }
+            case PKT_LOGIN:
+                handleLogin(conn, st, message);
+                break;
+            case PKT_CHAT:
+                handleChat(conn, st, message);
+                break;
             default:
                 kick(conn, "protocol violation: unknown packet id 0x" + String.format("%02x", id));
                 break;
         }
     }
+
+    // ==================== packet handlers ====================
+
+    private void handleHandshake(WebSocket conn, ConnState st, ByteBuffer message) {
+        if (st.handshaken || st.session != null) {
+            kick(conn, "protocol violation: duplicate handshake");
+            return;
+        }
+        String clientBrand = readU16String(message);
+        String username = readU16String(message);
+        if (clientBrand == null || username == null) {
+            kick(conn, "malformed handshake");
+            return;
+        }
+        st.handshaken = true;
+        cancelHandshakeTimeout(conn, st);
+        totalAccepted.incrementAndGet();
+        log.info("handshake from " + conn.getRemoteSocketAddress()
+                + " brand=\"" + clientBrand + "\" username=\"" + username + "\"");
+        // Size from UTF-8 byte lengths, not String.length(), which
+        // counts chars and undercounts multibyte!
+        byte[] brandBytes = serverBrand.getBytes(StandardCharsets.UTF_8);
+        byte[] motdBytes = motd.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer out = ByteBuffer.allocate(1 + 2 + brandBytes.length + 2 + motdBytes.length);
+        out.put(PKT_HANDSHAKE);
+        putU16Bytes(out, brandBytes);
+        putU16Bytes(out, motdBytes);
+        out.flip();
+        conn.send(out);
+    }
+
+    private void handlePing(WebSocket conn, ConnState st, ByteBuffer message) {
+        if (!st.handshaken) {
+            kick(conn, "ping before handshake");
+            return;
+        }
+        ByteBuffer out = ByteBuffer.allocate(message.remaining() + 1);
+        out.put(PKT_PING);
+        out.put(message);
+        out.flip();
+        conn.send(out);
+        EaglerPlayerSession session = st.session;
+        if (session != null && st.pingStart > 0) {
+            session.setLastPing((int) Math.max(0, System.currentTimeMillis() - st.pingStart));
+            st.pingStart = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Milestone 2: creates the player session and starts the MC bridge into
+     * the proxy's server registry.
+     */
+    private void handleLogin(WebSocket conn, ConnState st, ByteBuffer message) {
+        if (!st.handshaken) {
+            kick(conn, "login before handshake");
+            return;
+        }
+        if (st.session != null) {
+            kick(conn, "protocol violation: duplicate login");
+            return;
+        }
+        String username = readU16String(message);
+        String token = readU16String(message); // reserved for auth plugins; may be empty
+        if (username == null || token == null) {
+            loginResult(conn, ST_INVALID_USERNAME, "malformed login");
+            return;
+        }
+        username = username.trim();
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            loginResult(conn, ST_INVALID_USERNAME,
+                    "invalid username (allowed: A-Z a-z 0-9 _, max 16 chars)");
+            return;
+        }
+        ServerInfo target = defaultServerSupplier != null ? defaultServerSupplier.get() : null;
+        if (target == null) {
+            loginResult(conn, ST_FORWARDING_DISABLED,
+                    "player forwarding is disabled or the default server is not registered");
+            return;
+        }
+        if (registry.count() >= maxConnections) {
+            loginResult(conn, ST_REJECTED, "too many Eagler players online");
+            return;
+        }
+
+        EaglerPlayerSession session;
+        try {
+            session = sessionFactory.create(username, new WsSink(conn), conn.getRemoteSocketAddress());
+        } catch (Exception e) {
+            log.warning("session creation failed for " + username + ": " + e);
+            loginResult(conn, ST_REJECTED, "session creation failed");
+            return;
+        }
+
+        String conflict = registry.register(session);
+        if (conflict != null) {
+            loginResult(conn, ST_NAME_TAKEN, conflict);
+            return;
+        }
+        st.session = session;
+
+        log.info("eagler login: " + username + " from " + conn.getRemoteSocketAddress()
+                + " -> server " + target.getName());
+        // The MC bridge runs asynchronously: the 0x04 ST_OK is only sent once
+        // the backend accepts the login, so "status 0" means "session + MC
+        // bridge established" (see PROTOCOL.md). ServerConnectedEvent and
+        // ServerSwitchEvent fire from EaglerPlayerSession right before.
+        session.connectTo(target, net.md_5.bungee.api.event.ServerConnectEvent.Reason.JOIN_PROXY,
+                new Callback<Boolean>() {
+                    @Override
+                    public void done(Boolean result, Throwable error) {
+                        if (Boolean.TRUE.equals(result)) {
+                            byte[] msg = ("joined server " + target.getName())
+                                    .getBytes(StandardCharsets.UTF_8);
+                            ByteBuffer out = ByteBuffer.allocate(1 + 1 + 2 + msg.length);
+                            out.put(PKT_LOGIN_RESULT);
+                            out.put((byte) ST_OK);
+                            putU16Bytes(out, msg);
+                            out.flip();
+                            conn.send(out);
+                        } else {
+                            loginResult(conn, ST_FORWARDING_DISABLED, "could not reach server "
+                                    + target.getName());
+                            session.teardown("backend connect failed");
+                        }
+                    }
+                });
+    }
+
+    private void handleChat(WebSocket conn, ConnState st, ByteBuffer message) {
+        EaglerPlayerSession session = st.session;
+        if (session == null) {
+            kick(conn, "chat before login");
+            return;
+        }
+        String text = readU16String(message);
+        if (text == null || text.isEmpty()) {
+            kick(conn, "malformed chat");
+            return;
+        }
+        if (text.length() > 256) {
+            text = text.substring(0, 256);
+        }
+        session.chat(text);
+    }
+
+    // ==================== login result ====================
+
+    private void loginResult(WebSocket conn, int status, String message) {
+        byte[] msg = message.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer out = ByteBuffer.allocate(1 + 1 + 2 + msg.length);
+        out.put(PKT_LOGIN_RESULT);
+        out.put((byte) status);
+        putU16Bytes(out, msg);
+        out.flip();
+        conn.send(out);
+        if (status != ST_OK) {
+            conn.close(1000, "login rejected");
+        }
+    }
+
+    // ==================== errors ====================
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
@@ -197,7 +400,21 @@ public class EaglerWSListener extends WebSocketServer {
         return totalAccepted.get();
     }
 
+    /** Registry of logged-in sessions, for the status command. */
+    public EaglerSessionRegistry getRegistry() {
+        return registry;
+    }
+
     // ==================== helpers ====================
+
+    private static ConnState stateOf(WebSocket conn) {
+        try {
+            Object att = conn.getAttachment();
+            return att instanceof ConnState ? (ConnState) att : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     private void kick(WebSocket conn, String reason) {
         if (verbose) {
@@ -216,26 +433,27 @@ public class EaglerWSListener extends WebSocketServer {
         conn.close(1000, "kicked");
     }
 
-    private void scheduleHandshakeTimeout(WebSocket conn) {
+    private void scheduleHandshakeTimeout(WebSocket conn, ConnState st) {
         Thread t = new Thread(() -> {
             try {
                 Thread.sleep(handshakeTimeoutMs);
             } catch (InterruptedException ignored) {
                 return;
             }
-            if (conn.isOpen() && !handshaken.contains(conn)) {
+            if (conn.isOpen() && !st.handshaken) {
                 kick(conn, "handshake timeout (" + handshakeTimeoutMs + "ms)");
             }
         }, "eagler-hs-timeout");
         t.setDaemon(true);
-        conn.setAttachment(t);
+        st.handshakeTimeout = t;
         t.start();
     }
 
-    private void cancelHandshakeTimeout(WebSocket conn) {
-        Object att = conn.getAttachment();
-        if (att instanceof Thread) {
-            ((Thread) att).interrupt();
+    private void cancelHandshakeTimeout(WebSocket conn, ConnState st) {
+        Thread t = st.handshakeTimeout;
+        if (t != null) {
+            t.interrupt();
+            st.handshakeTimeout = null;
         }
     }
 
@@ -278,5 +496,29 @@ public class EaglerWSListener extends WebSocketServer {
         byte[] b = new byte[len];
         in.get(b);
         return new String(b, StandardCharsets.UTF_8);
+    }
+
+    /** FrameSink adapter over a live WebSocket. */
+    private static final class WsSink implements EaglerPlayerSession.FrameSink {
+        private final WebSocket conn;
+
+        WsSink(WebSocket conn) {
+            this.conn = conn;
+        }
+
+        @Override
+        public void send(ByteBuffer frame) {
+            conn.send(frame);
+        }
+
+        @Override
+        public boolean isOpen() {
+            return conn.isOpen();
+        }
+
+        @Override
+        public void close(String reason) {
+            conn.close(1000, "kicked");
+        }
     }
 }

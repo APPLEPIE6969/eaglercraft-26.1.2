@@ -1,11 +1,13 @@
 package net.lax1dude.eaglercraft.v2_6.plugin.gateway_velocity;
 
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.Yaml;
@@ -19,19 +21,23 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 
+import net.lax1dude.eaglercraft.v2_6.placeholder_server.mc.McPacketIds;
+
 /**
  * EaglercraftXVelocity 26.1.2 - Velocity plugin for EaglerCraft WebSocket clients.
  *
  * <p>On proxy initialization it reads {@code config.yml} from the plugin data
  * directory and starts an embedded WebSocket listener ({@link EaglerWSListener})
  * that speaks the Eagler binary protocol: 0x01 handshake/accept, 0x02
- * ping/pong, 0xFF kick. Java-WebSocket is relocated at build time, so the
- * plugin jar is self-contained.</p>
+ * ping/pong, 0x03 login, 0x04 login result, 0x05 chat, 0xFF kick.
+ * Java-WebSocket is relocated at build time, so the plugin jar is
+ * self-contained.</p>
  *
- * <p>This is the first functional milestone of the gateway: it makes the
- * proxy reachable by EaglerCraft browsers for MOTD/ping/handshake traffic.
- * Full MC-protocol player forwarding into Velocity's server registry is the
- * next milestone and intentionally out of scope here.</p>
+ * <p>Gateway milestone #2 (wire-protocol parity): a completed 0x03 login
+ * creates a {@link VelocityEaglerSession} backed by a real MC-protocol bridge
+ * into the backend resolved from Velocity's server registry
+ * ({@code forwarding_default_server}). See the session class for the
+ * Player-injection scope note.</p>
  */
 @Plugin(
         id = "eaglercraftx",
@@ -67,8 +73,36 @@ public class EaglercraftXVelocity {
         int packetsPerMinute = intOf(cfg.get("packet_rate_per_minute"), 500);
         boolean verbose = boolOf(cfg.get("verbose"), false);
 
+        // milestone 2: forwarding configuration
+        String defaultServerName = strOf(cfg.get("forwarding_default_server"), "");
+        String virtualHost = strOf(cfg.get("forwarding_virtual_host"), "eagler.26.1.2");
+        int bridgeConnectTimeoutMs = intOf(cfg.get("forwarding_connect_timeout_ms"), 8_000);
+        McPacketIds mcIds = mcIdsOf(cfg);
+
+        VelocitySessionRegistry registry = new VelocitySessionRegistry();
+
+        Optional<com.velocitypowered.api.proxy.server.RegisteredServer> defaultServer;
+        if (defaultServerName.isEmpty()) {
+            defaultServer = Optional.empty();
+        } else {
+            defaultServer = server.getServer(defaultServerName);
+        }
+        if (!defaultServerName.isEmpty() && !defaultServer.isPresent()) {
+            logger.warn("forwarding_default_server '{}' is not registered in the proxy -"
+                    + " Eagler logins will be rejected", defaultServerName);
+        }
+        final InetSocketAddress target = defaultServer
+                .map(rs -> rs.getServerInfo().getAddress())
+                .orElse(null);
+
+        EaglerWSListener.SessionFactory factory = (username, sink, remote) ->
+                new VelocityEaglerSession(username, sink, remote, registry, mcIds,
+                        virtualHost, bridgeConnectTimeoutMs,
+                        m -> logger.info(m), m -> logger.warn(m));
+
         EaglerWSListener listener = new EaglerWSListener(port, motd, SERVER_BRAND,
-                maxConnections, handshakeTimeoutMs, packetsPerMinute, verbose, logger);
+                maxConnections, handshakeTimeoutMs, packetsPerMinute, verbose, logger,
+                registry, factory, () -> target, mcIds, virtualHost, bridgeConnectTimeoutMs);
         if (listenerRef.compareAndSet(null, listener)) {
             listener.start();
         }
@@ -77,8 +111,9 @@ public class EaglercraftXVelocity {
         commands.register(commands.metaBuilder("eagler").plugin(this).build(),
                 new EaglerCommand(listenerRef));
 
-        logger.info("EaglercraftXVelocity enabled: ws listener on ws://0.0.0.0:" + port
-                + " (motd=\"" + motd + "\", maxConn=" + maxConnections + ")");
+        logger.info("EaglercraftXVelocity enabled: ws listener on ws://0.0.0.0:{}"
+                + " (motd=\"{}\", maxConn={}, forwarding={})", port, motd, maxConnections,
+                target != null ? target.getHostString() + ":" + target.getPort() : "disabled");
     }
 
     @Subscribe
@@ -141,12 +176,40 @@ public class EaglercraftXVelocity {
                 + "# Sliding-window per-connection packet limit.\n"
                 + "packet_rate_per_minute: 500\n"
                 + "# Verbose connection logging.\n"
-                + "verbose: false\n";
+                + "verbose: false\n"
+                + "\n"
+                + "# ---- Gateway milestone 2: player forwarding ----\n"
+                + "# Name of the backend server (in Velocity's registry) that Eagler\n"
+                + "# players join after login. Empty = forwarding disabled.\n"
+                + "forwarding_default_server: \"lobby\"\n"
+                + "# Virtual hostname advertised in the MC handshake to the backend.\n"
+                + "forwarding_virtual_host: \"eagler.26.1.2\"\n"
+                + "# TCP connect + login timeout for the MC bridge.\n"
+                + "forwarding_connect_timeout_ms: 8000\n"
+                + "#\n"
+                + "# MC-protocol packet ids used by the bridge (defaults match protocol\n"
+                + "# 775 of the 26.1.2 fork; override when the backend differs).\n"
+                + "mc_keepalive_id: 30\n"
+                + "mc_system_chat_id: 114\n"
+                + "mc_disconnect_id: 77\n"
+                + "mc_keepalive_response_id: 18\n"
+                + "mc_chat_id: 6\n";
         try {
             Files.write(file, yaml.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             logger.warn("could not write default config.yml: {}", e.toString());
         }
+    }
+
+    /** Builds the bridge packet-id config from config.yml overrides. */
+    private static McPacketIds mcIdsOf(Map<String, Object> cfg) {
+        McPacketIds ids = new McPacketIds();
+        ids.playKeepAlive = intOf(cfg.get("mc_keepalive_id"), ids.playKeepAlive);
+        ids.playSystemChat = intOf(cfg.get("mc_system_chat_id"), ids.playSystemChat);
+        ids.playDisconnect = intOf(cfg.get("mc_disconnect_id"), ids.playDisconnect);
+        ids.playKeepAliveResponse = intOf(cfg.get("mc_keepalive_response_id"), ids.playKeepAliveResponse);
+        ids.playChat = intOf(cfg.get("mc_chat_id"), ids.playChat);
+        return ids;
     }
 
     private static int intOf(Object o, int def) {

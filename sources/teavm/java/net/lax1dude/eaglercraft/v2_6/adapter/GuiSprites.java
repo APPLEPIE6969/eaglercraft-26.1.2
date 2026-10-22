@@ -10,6 +10,7 @@ import java.util.Set;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.JSProperty;
+import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Uint8Array;
 
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
@@ -173,11 +174,12 @@ public final class GuiSprites {
                 if (whiteTexture != null) return whiteTexture;
                 WebGL2RenderingContext gl = ClientMain.getWebGL2();
                 if (gl == null) return null;
-                Uint8Array px = Uint8Array.create(4);
-                px.set(0, (byte) 0xFF);
-                px.set(1, (byte) 0xFF);
-                px.set(2, (byte) 0xFF);
-                px.set(3, (byte) 0xFF);
+                ArrayBuffer buffer = ArrayBuffer.create(4);
+                Uint8Array px = Uint8Array.create(buffer);
+                px.set(0, (short) 255);
+                px.set(1, (short) 255);
+                px.set(2, (short) 255);
+                px.set(3, (short) 255);
                 whiteTexture = uploadBytes(gl, 1, 1, px);
                 return whiteTexture;
         }

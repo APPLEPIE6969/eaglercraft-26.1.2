@@ -55,6 +55,7 @@ public final class EaglerGuiImpl {
         private static JSObject guiVAO = null;
         private static JSObject guiVBO = null;
         private static JSObject uResolution = null;
+        private static JSObject uSampler = null;
         private static int aPos = -1;
         private static int aColor = -1;
         private static int aUv = -1;
@@ -117,7 +118,7 @@ public final class EaglerGuiImpl {
                 }
 
                 uResolution = EaglerShaderImpl.getUniformLocation(guiProgram, "u_resolution");
-                int uSampler = EaglerShaderImpl.getUniformLocation(guiProgram, "u_tex");
+                uSampler = EaglerShaderImpl.getUniformLocation(guiProgram, "u_tex");
                 aPos = EaglerShaderImpl.getAttribLocation(guiProgram, "a_pos");
                 aColor = EaglerShaderImpl.getAttribLocation(guiProgram, "a_color");
                 aUv = EaglerShaderImpl.getAttribLocation(guiProgram, "a_uv");

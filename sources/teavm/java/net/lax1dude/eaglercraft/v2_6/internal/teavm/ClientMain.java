@@ -555,6 +555,13 @@ public class ClientMain {
         public static native void warn(String msg);
 
         /**
+         * Reloads the browser page. The browser-honest equivalent of vanilla's
+         * {@code Minecraft.stop()} used by the title screen Quit button.
+         */
+        @JSBody(params = {}, script = "window.location.reload();")
+        public static native void reloadPage();
+
+        /**
          * Logs an error to the browser console.
          */
         @JSBody(params = { "msg" }, script = "console.error(msg);")

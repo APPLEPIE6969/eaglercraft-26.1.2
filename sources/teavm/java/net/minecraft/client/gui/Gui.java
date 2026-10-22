@@ -29,6 +29,9 @@ public class Gui {
         private static final int HOTBAR_HEIGHT = 22;
         private static final int SLOT_SIZE = 20;
 
+        /** Vanilla crosshair sprite size (GUI pixels). */
+        private static final int CROSSHAIR_SIZE = 15;
+
         private static final int COLOR_HOTBAR_BG = 0xB4141414;
         private static final int COLOR_HOTBAR_BORDER = 0xFF545454;
         private static final int COLOR_SLOT_LINE = 0xFF8B8B8B;
@@ -65,18 +68,20 @@ public class Gui {
         }
 
         /**
-         * The center crosshair: two 15px bars (1px thick) with a subtle
-         * drop shadow so they stay visible against the sky.
+         * The center crosshair: a 15x15 plus, 1px arms. Vanilla blits the
+         * hud/crosshair sprite at ((guiWidth - 15) / 2, (guiHeight - 15) / 2),
+         * so the box origin - not the screen midpoint - defines the center.
          */
         private void renderCrosshair(int guiWidth, int guiHeight) {
-                int cx = guiWidth / 2;
-                int cy = guiHeight / 2;
-                int half = 7; // 15px bar centered on the middle pixel
+                int x0 = (guiWidth - CROSSHAIR_SIZE) / 2;
+                int y0 = (guiHeight - CROSSHAIR_SIZE) / 2;
+                int cx = x0 + CROSSHAIR_SIZE / 2;
+                int cy = y0 + CROSSHAIR_SIZE / 2;
 
-                EaglerGuiImpl.fillRect(cx - half + 1, cy + 1, half * 2 + 1, 1, COLOR_CROSSHAIR_SHADOW);
-                EaglerGuiImpl.fillRect(cx + 1, cy - half + 1, 1, half * 2 + 1, COLOR_CROSSHAIR_SHADOW);
-                EaglerGuiImpl.fillRect(cx - half, cy, half * 2 + 1, 1, COLOR_CROSSHAIR);
-                EaglerGuiImpl.fillRect(cx, cy - half, 1, half * 2 + 1, COLOR_CROSSHAIR);
+                EaglerGuiImpl.fillRect(x0 + 1, cy + 1, CROSSHAIR_SIZE, 1, COLOR_CROSSHAIR_SHADOW);
+                EaglerGuiImpl.fillRect(cx + 1, y0 + 1, 1, CROSSHAIR_SIZE, COLOR_CROSSHAIR_SHADOW);
+                EaglerGuiImpl.fillRect(x0, cy, CROSSHAIR_SIZE, 1, COLOR_CROSSHAIR);
+                EaglerGuiImpl.fillRect(cx, y0, 1, CROSSHAIR_SIZE, COLOR_CROSSHAIR);
         }
 
         /**
@@ -98,14 +103,16 @@ public class Gui {
                 EaglerGuiImpl.fillRect(x0, y0, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
                 EaglerGuiImpl.fillRect(x0, y0 + HOTBAR_HEIGHT - 1, HOTBAR_WIDTH, 1, COLOR_SLOT_LINE);
 
-                // Selection frame: 24x24 vanilla selector, 2px inset overlap
-                int selX = x0 + selectedHotbarSlot * SLOT_SIZE - 2;
-                int selY = y0 - 2;
+                // Selection frame: vanilla blits the 24x23 hud/hotbar_selection
+                // sprite one pixel up/left of the hotbar origin, stepping 20px
+                // per slot.
+                int selX = x0 + selectedHotbarSlot * SLOT_SIZE - 1;
+                int selY = y0 - 1;
                 for (int i = 0; i < 24; i++) {
                         EaglerGuiImpl.fillRect(selX + i, selY, 1, 1, COLOR_SELECTOR);
-                        EaglerGuiImpl.fillRect(selX + i, selY + 23, 1, 1, COLOR_SELECTOR);
+                        EaglerGuiImpl.fillRect(selX + i, selY + 22, 1, 1, COLOR_SELECTOR);
                 }
-                for (int i = 1; i < 23; i++) {
+                for (int i = 1; i < 22; i++) {
                         EaglerGuiImpl.fillRect(selX, selY + i, 1, 1, COLOR_SELECTOR);
                         EaglerGuiImpl.fillRect(selX + 23, selY + i, 1, 1, COLOR_SELECTOR);
                 }

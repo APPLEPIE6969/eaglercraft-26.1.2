@@ -157,10 +157,16 @@ public final class EaglerGuiImpl {
         public static void flush(WebGL2RenderingContext gl) {
                 if (gl == null || !initialized || !batchOpen) return;
                 if (queuedVertices > 0) {
+                        // bufferSubData writes into whatever is bound to
+                        // ARRAY_BUFFER - that binding is global state, NOT
+                        // part of the VAO, so it must be (re)bound here even
+                        // though the VAO already references this buffer.
+                        PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, guiVBO);
                         PlatformOpenGL._wglBindVertexArray(guiVAO);
                         PlatformOpenGL._wglBufferSubData(WebGL2RenderingContext.ARRAY_BUFFER, 0, vertexBuffer);
                         PlatformOpenGL._wglDrawArrays(WebGL2RenderingContext.TRIANGLES, 0, queuedVertices);
                         PlatformOpenGL._wglBindVertexArray(null);
+                        PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, null);
                 }
                 queuedVertices = 0;
                 batchOpen = false;

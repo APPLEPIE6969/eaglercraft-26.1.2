@@ -55,6 +55,18 @@ public class PlatformInput {
         private static final int MAX_MOUSEBUTTON = 8;
         private static final boolean[] mouseDown = new boolean[MAX_MOUSEBUTTON];
 
+        /**
+         * Press/release events latched by the DOM listeners. The game polls
+         * input once per frame, and a fast click can complete (down + up)
+         * between two frames - a pure state poll would never see it. The
+         * listeners latch every transition here; EaglerCraft consumes the
+         * latches once per frame via {@link #consumeMousePress} /
+         * {@link #consumeMouseRelease}, preserving press-before-release
+         * order for clicks that happen within a single frame.
+         */
+        private static final boolean[] mousePressedLatch = new boolean[MAX_MOUSEBUTTON];
+        private static final boolean[] mouseReleasedLatch = new boolean[MAX_MOUSEBUTTON];
+
         /** Current mouse position in canvas coordinates. */
         private static int mouseX = 0;
         private static int mouseY = 0;
@@ -222,6 +234,7 @@ public class PlatformInput {
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {
                                 mouseDown[button] = true;
+                                mousePressedLatch[button] = true;
                         }
                 });
 
@@ -232,6 +245,7 @@ public class PlatformInput {
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {
                                 mouseDown[button] = false;
+                                mouseReleasedLatch[button] = true;
                         }
                 });
 
@@ -487,6 +501,35 @@ public class PlatformInput {
         public static boolean isMouseDown(int button) {
                 if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
                 return mouseDown[button];
+        }
+
+        /**
+         * Consumes a latched button press: returns (and clears) whether a
+         * mousedown transition for this button happened since the last
+         * consumption. This survives clicks that complete entirely between
+         * two game frames, which a plain isMouseDown poll would miss.
+         */
+        public static boolean consumeMousePress(int button) {
+                if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
+                if (mousePressedLatch[button]) {
+                        mousePressedLatch[button] = false;
+                        return true;
+                }
+                return false;
+        }
+
+        /**
+         * Consumes a latched button release: returns (and clears) whether a
+         * mouseup transition for this button happened since the last
+         * consumption.
+         */
+        public static boolean consumeMouseRelease(int button) {
+                if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
+                if (mouseReleasedLatch[button]) {
+                        mouseReleasedLatch[button] = false;
+                        return true;
+                }
+                return false;
         }
 
         /**

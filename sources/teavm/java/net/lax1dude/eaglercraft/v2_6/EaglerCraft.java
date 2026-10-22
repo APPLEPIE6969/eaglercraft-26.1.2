@@ -148,11 +148,8 @@ public class EaglerCraft {
 
         // ========== Input edge tracking (see processInput) ==========
 
-        /** Number of mouse buttons polled for press/release edges. */
+        /** Number of mouse buttons polled for latched press/release events. */
         private static final int MOUSE_BUTTONS_POLLED = 3;
-
-        /** Last frame's button states, for edge detection. */
-        private static final boolean[] lastMouseButtons = new boolean[MOUSE_BUTTONS_POLLED];
 
         /** Last frame's mouse position in canvas CSS pixels (-1 = never moved). */
         private static int lastMouseX = -1;
@@ -556,20 +553,29 @@ public class EaglerCraft {
                         mh.handleMouseMove(0L, mouseX, mouseY);
                 }
 
-                // Button press/release edges -> MC's MouseHandler. A press
-                // while ALREADY in world (no screen open before this edge)
-                // grabs the pointer, like vanilla's click-to-capture. The
-                // click that opens the world must not capture the pointer in
-                // the same breath: the press lands on the menu, not the game.
+                // Latched press/release events -> MC's MouseHandler. The
+                // latches (not a state poll) are what make fast clicks work:
+                // down+up can both happen between two frames, and a state
+                // poll would never observe the press. A press while ALREADY
+                // in world (no screen open before this batch) grabs the
+                // pointer, like vanilla's click-to-capture; the click that
+                // opens the world must not capture the pointer in the same
+                // breath.
                 for (int button = 0; button < MOUSE_BUTTONS_POLLED; button++) {
-                        boolean down = PlatformInput.isMouseDown(button);
-                        if (down != lastMouseButtons[button]) {
-                                lastMouseButtons[button] = down;
-                                boolean wasInGame = mc.screen == null && mc.isLevelLoaded();
-                                mh.cursorPressed(0L, button, down ? 1 : 0, 0);
-                                if (down && wasInGame && !PlatformInput.isPointerLocked()) {
+                        boolean press = PlatformInput.consumeMousePress(button);
+                        boolean release = PlatformInput.consumeMouseRelease(button);
+                        if (!press && !release) {
+                                continue;
+                        }
+                        boolean wasInGame = mc.screen == null && mc.isLevelLoaded();
+                        if (press) {
+                                mh.cursorPressed(0L, button, 1, 0);
+                                if (wasInGame && !PlatformInput.isPointerLocked()) {
                                         mh.grabMouse();
                                 }
+                        }
+                        if (release) {
+                                mh.cursorPressed(0L, button, 0, 0);
                         }
                 }
         }

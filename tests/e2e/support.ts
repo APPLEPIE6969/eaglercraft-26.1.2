@@ -308,6 +308,16 @@ export interface GameTelemetry {
   guiScale: number;
   /** Buttons on the current screen with bounds in GUI pixels. */
   buttons: GameTelemetryButton[];
+  /** Whether the six panorama face PNGs have built the cubemap (may be undefined on old bundles). */
+  panoramaReady?: boolean;
+  /** Current panorama spin angle in degrees (may be undefined on old bundles). */
+  panoramaSpin?: number;
+  /**
+   * Effective menu-background blur radius: the menuBackgroundBlurriness
+   * option on blurred menus, 0 on the title screen / in world (undefined
+   * on bundles that predate the blur feature).
+   */
+  panoramaBlur?: number;
 }
 
 /**
@@ -351,6 +361,9 @@ export async function readGameTelemetry(page: Page): Promise<GameTelemetry | nul
             h: typeof rec.h === 'number' ? rec.h : 0,
           };
         }),
+      panoramaReady: typeof bridge.panoramaReady === 'boolean' ? bridge.panoramaReady : undefined,
+      panoramaSpin: typeof bridge.panoramaSpin === 'number' ? bridge.panoramaSpin : undefined,
+      panoramaBlur: typeof bridge.panoramaBlur === 'number' ? bridge.panoramaBlur : undefined,
     };
   });
 }

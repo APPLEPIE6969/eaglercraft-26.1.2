@@ -103,10 +103,9 @@ public class OptionsScreen extends Screen {
                 int rowY = headerY + Button.HEIGHT + 17;
                 for (int i = 0; i < GRID_LEFT.length; i++) {
                         int y = rowY + i * (Button.HEIGHT + 4);
-                        boolean live = "Accessibility...".equals(GRID_LEFT[i]);
-                        this.addGridButton(gridX, y, GRID_LEFT[i], live);
+                        this.addGridButton(gridX, y, GRID_LEFT[i]);
                         this.addGridButton(gridX + HEADER_WIDGET_WIDTH + 8, y,
-                                        GRID_RIGHT[i], false);
+                                        GRID_RIGHT[i]);
                 }
 
                 // ===== Footer: Done (200px, centered) =====
@@ -115,7 +114,14 @@ public class OptionsScreen extends Screen {
                                 "Done", button -> this.onClose()));
         }
 
-        private void addGridButton(int x, int y, String label, boolean live) {
+        /**
+         * One grid cell. The Accessibility sub-screen is live (it owns the
+         * menuBackgroundBlurriness slider); every other option system is
+         * not backed by the browser port yet and renders disabled, exactly
+         * like vanilla's inactive style.
+         */
+        private void addGridButton(int x, int y, String label) {
+                boolean live = "Accessibility...".equals(label);
                 Button button = new Button(x, y, HEADER_WIDGET_WIDTH, Button.HEIGHT, label,
                                 b -> {
                                         if ("Accessibility...".equals(label) && this.minecraft != null) {

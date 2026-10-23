@@ -16413,13 +16413,23 @@ nlev_WorldStorage_saveWorld = $summary => {
             var$5 = (__safe($existing).data||[]);
             if ($i >= var$5.length)
                 break;
-            if (!jl_String_equals($summary.$name, var$5[$i].$name))
-                ($sb.$append3(nlev_WorldStorage_serialize(var$5[$i]))).$append3($rt_s(80));
+            if (!jl_String_equals($summary.$name, var$5[$i].$name)) {
+                $sb.$append3(nlev_WorldStorage_serialize(var$5[$i]));
+                $sb.$append3($rt_s(80));
+            }
             $i = $i + 1 | 0;
         }
         $sb.$append3(nlev_WorldStorage_serialize($summary));
         nlevi_PlatformRuntime_localStorageSet($rt_s(456), $sb.$toString());
         return;
+    }
+},
+nlev_WorldStorage_touchWorld = $name => {
+    let $s;
+    $s = nlev_WorldStorage_findWorld($name);
+    if ($s !== null) {
+        $s.$lastPlayed = jl_System_currentTimeMillis();
+        nlev_WorldStorage_saveWorld($s);
     }
 },
 nlev_WorldStorage_deleteWorld = $name => {
@@ -16445,6 +16455,20 @@ nlev_WorldStorage_deleteWorld = $name => {
         nlevi_PlatformRuntime_localStorageSet($rt_s(456), $sb.$toString());
     return $found;
 },
+nlev_WorldStorage_findWorld = $name => {
+    let $all, $i, var$4;
+    $all = nlev_WorldStorage_listWorlds();
+    $i = 0;
+    while (true) {
+        var$4 = (__safe($all).data||[]);
+        if ($i >= var$4.length)
+            break;
+        if (jl_String_equals(var$4[$i].$name, $name))
+            return var$4[$i];
+        $i = $i + 1 | 0;
+    }
+    return null;
+},
 nlev_WorldStorage_ensureSeeded = () => {
     let $milestone;
     if (nlevi_PlatformRuntime_localStorageGet($rt_s(457)) !== null)
@@ -16457,7 +16481,7 @@ nlev_WorldStorage_ensureSeeded = () => {
         $milestone.$allowCommands0 = 0;
         $milestone.$generateStructures = 1;
         $milestone.$bonusChest = 0;
-        $milestone.$lastPlayed = nlevi_PlatformRuntime_getCurrentTimeMillis();
+        $milestone.$lastPlayed = jl_System_currentTimeMillis();
         nlev_WorldStorage_saveWorld($milestone);
         console.log("[WorldStorage] seeded milestone world");
     }
@@ -26471,7 +26495,7 @@ nmcgs_CreateWorldScreen_onCreate = $this => {
     $summary.$allowCommands0 = $this.$allowCommands;
     $summary.$generateStructures = $this.$generateStructures0;
     $summary.$bonusChest = $this.$bonusChest0;
-    $summary.$lastPlayed = nlevi_PlatformRuntime_getCurrentTimeMillis();
+    $summary.$lastPlayed = jl_System_currentTimeMillis();
     nlev_WorldStorage_saveWorld($summary);
     $this.$minecraft.$doWorldLoad($name);
 },
@@ -27334,6 +27358,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
             $clientLevel = nmcm_ClientLevel__init_0($levelName, $rt_s(380));
             $this.$setLevel($clientLevel);
             $this.$setScreen(null);
+            nlev_WorldStorage_touchWorld($levelName);
             $this.$missTime = 0;
             var$2 = jl_String_valueOf0($clientLevel);
             var$4 = jl_StringBuilder__init_();

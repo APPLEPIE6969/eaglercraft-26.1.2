@@ -440,10 +440,13 @@ public final class EaglerGuiImpl {
         }
 
         /**
-         * Draws one line of text with the 5x7 bitmap font. When
-         * {@code shadow} is on, a 1px dark copy is drawn at {@code +1,+1}
-         * first, exactly like MC's {@code drawShadow}. Returns the width
-         * of the drawn text in GUI pixels.
+         * Draws one line of text with the vanilla 8x8 bitmap font
+         * (extracted from the client jar's ascii.png; variable-width
+         * advances, ascent 7). When {@code shadow} is on, a 1px dark copy
+         * is drawn at {@code +1,+1} first, exactly like MC's
+         * {@code drawShadow}. Returns the width of the drawn text in GUI
+         * pixels (sum of advances, incl. the trailing one - vanilla
+         * semantics).
          */
         public static int drawText(String text, float x, float y, int argb, boolean shadow) {
                 if (text == null || text.isEmpty()) return 0;
@@ -459,12 +462,11 @@ public final class EaglerGuiImpl {
                 float cursorX = x;
                 for (int i = 0; i < text.length(); i++) {
                         char c = text.charAt(i);
-                        if (EaglerFont.hasGlyph(c)) {
-                                long glyph = EaglerFont.glyph(c);
+                        long glyph = EaglerFont.glyph(c);
                                 for (int row = 0; row < EaglerFont.GLYPH_HEIGHT; row++) {
                                         int runStart = -1;
-                                        for (int col = 0; col <= EaglerFont.GLYPH_WIDTH; col++) {
-                                                boolean set = col < EaglerFont.GLYPH_WIDTH
+                                        for (int col = 0; col <= EaglerFont.CELL_WIDTH; col++) {
+                                                boolean set = col < EaglerFont.CELL_WIDTH
                                                         && EaglerFont.isPixelSet(glyph, col, row);
                                                 if (set && runStart < 0) {
                                                         runStart = col;
@@ -475,18 +477,23 @@ public final class EaglerGuiImpl {
                                                 }
                                         }
                                 }
-                        }
-                        cursorX += EaglerFont.CHAR_ADVANCE;
+                        cursorX += EaglerFont.advance(c);
                 }
         }
 
         /**
-         * Returns the width of the text as drawn (5px glyphs, 6px
-         * advance, no trailing advance).
+         * Returns the width of the text as drawn: the sum of the vanilla
+         * per-glyph advances, including the trailing one (so a single 'A'
+         * is 6 wide, two spaces are 8 - exactly vanilla's
+         * {@code Font.width}).
          */
         public static int widthOf(String text) {
                 if (text == null || text.isEmpty()) return 0;
-                return text.length() * EaglerFont.CHAR_ADVANCE - 1;
+                int w = 0;
+                for (int i = 0; i < text.length(); i++) {
+                        w += EaglerFont.advance(text.charAt(i));
+                }
+                return w;
         }
 
         // ========== Internals ==========

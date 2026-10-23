@@ -201,6 +201,20 @@ public class Screen {
         }
 
         /**
+         * Whether the panorama behind this screen should be blurred by the
+         * menu-background blur post effect (vanilla
+         * {@code Screen.extractBlurredBackground} runs when the
+         * menuBackgroundBlurriness option is {@code >= 1}). The
+         * {@link TitleScreen} overrides this to {@code false}: vanilla
+         * TitleScreen has an EMPTY {@code extractBackground}, so it shows
+         * the sharp, untiled panorama, while every other out-of-world
+         * screen blurs it and tiles {@code menu_background} on top.
+         */
+        public boolean shouldBlurBackground() {
+                return true;
+        }
+
+        /**
          * Returns whether pressing ESC should close this screen.
          */
         public boolean shouldCloseOnEsc() {

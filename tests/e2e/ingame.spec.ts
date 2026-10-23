@@ -462,4 +462,162 @@ test.describe('go in game', () => {
     });
     await context.close();
   });
+
+  /**
+   * The Create New World form: Singleplayer -> Select World -> Create New
+   * World -> the vanilla 26.1.2 tabbed screen (Game / World / More), then
+   * typing a world name into the EditBox and pressing Create joins the
+   * world through the same doWorldLoad path as Play.
+   *
+   * Also asserts the menu-background blur contract: the title screen
+   * (empty vanilla extractBackground) reports panoramaBlur=0 while the
+   * Select World screen blurs with the default option value 5.
+   */
+  test('opens the Create World form, types a name, and creates the world (capability-gated)', async ({ browser }, testInfo) => {
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 90_000);
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(String(error?.message ?? error)));
+
+    // Boot to the title screen
+    await page.goto('/index.html', { waitUntil: 'commit' });
+    expect(
+      await waitForClientBootstrap(page, BOOT_TIMEOUT),
+      'the TeaVM bundle must export self.main',
+    ).toBe(true);
+    expect(
+      await waitForReadyState(page, READY_TIMEOUT),
+      'the client must reach the title screen',
+    ).toBe(true);
+    await waitForFpsReading(page, 15_000);
+
+    const telemetry = await readGameTelemetry(page);
+    if (!telemetry?.canEnterWorld) {
+      await attachMilestoneScreenshot(page, testInfo, '05-create-world-gate');
+      test.skip(
+        true,
+        `the client cannot enter a world yet (telemetry: ${JSON.stringify(telemetry)})`,
+      );
+      return;
+    }
+
+    // ── Blur contract at the title screen: sharp panorama (radius 0) ──
+    const titleBlur = await page.evaluate(() => {
+      const game = (
+        self as unknown as { __eaglercraftGame?: { panoramaBlur?: number } }
+      ).__eaglercraftGame;
+      return game?.panoramaBlur ?? null;
+    });
+    expect(
+      titleBlur,
+      'the title screen must report panoramaBlur=0 (vanilla TitleScreen has an empty extractBackground - no menu blur)',
+    ).toBe(0);
+
+    // ── Singleplayer -> Select World: now the menu blur must be on ──
+    const singleplayer = await getButtonCssCoords(page, 'singleplayer');
+    expect(singleplayer, 'the title screen must expose the singleplayer button').not.toBeNull();
+    await page.mouse.move(singleplayer!.cssX, singleplayer!.cssY);
+    await page.waitForTimeout(100);
+    await page.mouse.click(singleplayer!.cssX, singleplayer!.cssY);
+    const selectDeadline = Date.now() + 15_000;
+    let selectState = await readGameTelemetry(page);
+    while (
+      Date.now() < selectDeadline &&
+      !(selectState?.screen ?? '').includes('SelectWorldScreen')
+    ) {
+      await page.waitForTimeout(250);
+      selectState = await readGameTelemetry(page);
+    }
+    expect(
+      (selectState?.screen ?? '').includes('SelectWorldScreen'),
+      `clicking Singleplayer must open the Select World screen (last telemetry: ${JSON.stringify(selectState)})`,
+    ).toBe(true);
+    expect(
+      selectState?.panoramaBlur,
+      'the Select World screen must blur its panorama with the vanilla default menuBackgroundBlurriness=5',
+    ).toBe(5);
+    await attachMilestoneScreenshot(page, testInfo, '06-select-world-blurred');
+
+    // ── Create New World -> the tabbed CreateWorldScreen ──
+    const create = await getButtonCssCoords(page, 'createnewworld');
+    expect(
+      create,
+      `the Select World screen must expose the "createnewworld" button (got: ${JSON.stringify(selectState?.buttons)})`,
+    ).not.toBeNull();
+    expect(create!.button.active, 'the Create New World button must be active').toBe(true);
+    await page.mouse.move(create!.cssX, create!.cssY);
+    await page.waitForTimeout(100);
+    await page.mouse.click(create!.cssX, create!.cssY);
+
+    const formDeadline = Date.now() + 15_000;
+    let formState = await readGameTelemetry(page);
+    while (
+      Date.now() < formDeadline &&
+      !(formState?.screen ?? '').includes('CreateWorldScreen')
+    ) {
+      await page.waitForTimeout(250);
+      formState = await readGameTelemetry(page);
+    }
+    expect(
+      (formState?.screen ?? '').includes('CreateWorldScreen'),
+      `clicking Create New World must open the CreateWorldScreen (last telemetry: ${JSON.stringify(formState)})`,
+    ).toBe(true);
+    expect(
+      formState?.panoramaBlur,
+      'the Create World screen must also blur its panorama (radius 5)',
+    ).toBe(5);
+
+    // ── The three vanilla tabs must be present ──
+    for (const tabId of ['tab_game', 'tab_world', 'tab_more']) {
+      const tab = (formState?.buttons ?? []).find((button) => button.id === tabId);
+      expect(
+        tab,
+        `the Create World screen must carry the "${tabId}" tab button (buttons: ${JSON.stringify(formState?.buttons)})`,
+      ).toBeTruthy();
+    }
+    await attachMilestoneScreenshot(page, testInfo, '07-create-world-form');
+
+    // ── Type a world name into the focused name EditBox ──
+    await page.keyboard.type('E2E World', { delay: 40 });
+
+    // ── Create (the Game tab is open, its Create button is in the footer) ──
+    const createConfirm = await getButtonCssCoords(page, 'createnewworld');
+    expect(
+      createConfirm,
+      'the Create World screen must expose the footer "createnewworld" button',
+    ).not.toBeNull();
+    await page.mouse.move(createConfirm!.cssX, createConfirm!.cssY);
+    await page.waitForTimeout(100);
+    await page.mouse.click(createConfirm!.cssX, createConfirm!.cssY);
+
+    // ── The world must load and the HUD must take over ──
+    const deadline = Date.now() + 30_000;
+    let worldState = await readGameTelemetry(page);
+    while (!worldState?.inWorld && Date.now() < deadline) {
+      await page.waitForTimeout(250);
+      worldState = await readGameTelemetry(page);
+    }
+    expect(
+      worldState?.inWorld,
+      `the client must flip inWorld=true after Create (last telemetry: ${JSON.stringify(worldState)})`,
+    ).toBe(true);
+    expect(
+      pageErrors,
+      `creating a world must not throw uncaught page errors:\n${pageErrors.join('\n')}`,
+    ).toEqual([]);
+
+    await attachMilestoneScreenshot(page, testInfo, '08-created-world-hud');
+    await attachSessionSummary(testInfo, {
+      gated: false,
+      path: 'create-world-form',
+      titleBlur,
+      selectBlur: selectState?.panoramaBlur,
+      formBlur: formState?.panoramaBlur,
+      typedName: 'E2E World',
+      telemetry: worldState,
+      uncaughtPageErrors: pageErrors,
+    });
+    await context.close();
+  });
 });

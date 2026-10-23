@@ -171,6 +171,29 @@ public class PlatformInput {
 
         // ========== Event Listener Registration ==========
 
+        /**
+         * Observer for raw keyboard events, invoked synchronously from the
+         * DOM keydown/keyup handlers. {@code keyCode} is the internal
+         * scan-code-style code ({@code mapKeyCode}, -1 for unmapped keys)
+         * and {@code keyStr} is the DOM {@code event.key} string - for
+         * printable keys that is the actual character ("a", "A", "7"), for
+         * control keys its name ("Backspace", "ArrowLeft", ...).
+         */
+        public interface KeyEventObserver {
+                void onKeyEvent(int keyCode, String keyStr, boolean down);
+        }
+
+        private static KeyEventObserver keyEventObserver = null;
+
+        /**
+         * Installs the keyboard observer (the Minecraft instance routes
+         * events into its KeyboardHandler / current screen). Safe to call
+         * again; the latest observer wins.
+         */
+        public static void setKeyEventObserver(KeyEventObserver observer) {
+                keyEventObserver = observer;
+        }
+
         private static void registerKeyListeners() {
                 canvas.addEventListener("keydown", (EventListener<KeyboardEvent>) event -> {
                         if (imeComposing) return;
@@ -190,6 +213,13 @@ public class PlatformInput {
                         currentKeyCode = code;
 
                         enqueueKeyEvent(keyCode, event.getKey(), code);
+                        if (keyEventObserver != null) {
+                                try {
+                                        keyEventObserver.onKeyEvent(keyCode, event.getKey(), true);
+                                } catch (Throwable t) {
+                                        // input must never break the event loop
+                                }
+                        }
                 });
 
                 canvas.addEventListener("keyup", (EventListener<KeyboardEvent>) event -> {
@@ -205,6 +235,13 @@ public class PlatformInput {
 
                         currentKeyStr = event.getKey();
                         currentKeyCode = code;
+                        if (keyEventObserver != null) {
+                                try {
+                                        keyEventObserver.onKeyEvent(keyCode, event.getKey(), false);
+                                } catch (Throwable t) {
+                                        // input must never break the event loop
+                                }
+                        }
                 });
 
                 // IME composition events
@@ -656,7 +693,7 @@ public class PlatformInput {
                         + "  'KeyY':21,'KeyZ':44,"
                         + "  'Digit0':11,'Digit1':2,'Digit2':3,'Digit3':4,'Digit4':5,'Digit5':6,"
                         + "  'Digit6':7,'Digit7':8,'Digit8':9,'Digit9':10,"
-                        + "  'F1':59,'F2':60,'F3':61,'F4':62,'F5':63,'F6':64,'F7':65,'F8':66,"
+                        + "  'Escape':1,'F1':59,'F2':60,'F3':61,'F4':62,'F5':63,'F6':64,'F7':65,'F8':66,"
                         + "  'F9':67,'F10':68,'F11':87,'F12':88,"
                         + "  'Backquote':41,'Minus':12,'Equal':13,'Backspace':14,'Tab':15,"
                         + "  'BracketLeft':26,'BracketRight':27,'Backslash':43,'Semicolon':39,'Quote':40,"

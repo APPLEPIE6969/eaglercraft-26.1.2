@@ -280,22 +280,41 @@ public final class EaglerGuiImpl {
          * @return false when the sprite is not loaded yet.
          */
         public static boolean drawSprite9(String name, float x, float y, float w, float h, int border) {
+                return drawSprite9Slices(name, x, y, w, h, border, border, border, border);
+        }
+
+        /**
+         * Nine-slice blit with independent per-side borders, for sprites
+         * whose .png.mcmeta declares an uneven border object - the vanilla
+         * {@code widget/tab*} sprites declare {@code left:2, top:2, right:2,
+         * bottom:0} (the tab sits flush on the header separator, so its
+         * bottom rows belong to the stretchable middle).
+         *
+         * @return false when the sprite is not loaded yet.
+         */
+        public static boolean drawSprite9Slices(String name, float x, float y, float w, float h,
+                        int borderLeft, int borderTop, int borderRight, int borderBottom) {
                 if (!GuiSprites.isReady(name)) return false;
                 JSObject tex = GuiSprites.texture(name);
                 if (w <= 0 || h <= 0) return true;
 
                 // Never let the borders overlap the dest middle
-                float b = Math.min(border, Math.min(w / 2.0f, h / 2.0f));
+                float bl = Math.min(borderLeft, w / 2.0f);
+                float bt = Math.min(borderTop, h / 2.0f);
+                float br = Math.min(borderRight, w / 2.0f);
+                float bb = Math.min(borderBottom, h / 2.0f);
 
                 // Destination spans: [edge, middle, edge]
-                float[] dx = { x, x + b, x + w - b, x + w };
-                float[] dy = { y, y + b, y + h - b, y + h };
+                float[] dx = { x, x + bl, x + w - br, x + w };
+                float[] dy = { y, y + bt, y + h - bb, y + h };
                 // Source UV spans: edges are 1:1 (border px of the sprite),
                 // the middle spans whatever the sprite has between them.
-                float bU = b / (float) GuiSprites.widthOf(name);
-                float bV = b / (float) GuiSprites.heightOf(name);
-                float[] su = { 0.0f, bU, 1.0f - bU, 1.0f };
-                float[] sv = { 0.0f, bV, 1.0f - bV, 1.0f };
+                float blU = bl / (float) GuiSprites.widthOf(name);
+                float btV = bt / (float) GuiSprites.heightOf(name);
+                float brU = br / (float) GuiSprites.widthOf(name);
+                float bbV = bb / (float) GuiSprites.heightOf(name);
+                float[] su = { 0.0f, blU, 1.0f - brU, 1.0f };
+                float[] sv = { 0.0f, btV, 1.0f - bbV, 1.0f };
 
                 for (int row = 0; row < 3; row++) {
                         for (int col = 0; col < 3; col++) {
@@ -320,41 +339,59 @@ public final class EaglerGuiImpl {
          */
         public static boolean drawSpriteTiled(String name, float x, float y, float w, float h,
                         float uOffPx, float vOffPx) {
+                return drawSpriteTiled(name, x, y, w, h, uOffPx, vOffPx, 0);
+        }
+
+        /**
+         * Tiled blit with an explicit destination tile span. Vanilla draws
+         * the menu backgrounds with {@code blit(..., 32, 32)} texture
+         * dimensions, so the 16x16 {@code menu_background} PNG repeats
+         * every 32 GUI pixels (2x zoom) - pass {@code destTileSize = 32}
+         * for exactly that look. {@code destTileSize <= 0} restores the
+         * native 1:1 tile size.
+         *
+         * @return false when the sprite is not loaded yet.
+         */
+        public static boolean drawSpriteTiled(String name, float x, float y, float w, float h,
+                        float uOffPx, float vOffPx, int destTileSize) {
                 if (!GuiSprites.isReady(name)) return false;
                 JSObject tex = GuiSprites.texture(name);
                 int tw = GuiSprites.widthOf(name);
                 int th = GuiSprites.heightOf(name);
                 if (tw <= 0 || th <= 0 || w <= 0 || h <= 0) return true;
 
-                int offX = ((int) uOffPx) % tw;
-                if (offX < 0) offX += tw;
-                int offY = ((int) vOffPx) % th;
-                if (offY < 0) offY += th;
+                // Destination span of one texture tile (vanilla 32 for the
+                // menu backgrounds), source always one full texture repeat
+                float tileW = destTileSize > 0 ? (float) destTileSize : (float) tw;
+                float tileH = destTileSize > 0 ? (float) destTileSize : (float) th;
 
-                float twF = (float) tw;
-                float thF = (float) th;
-                for (float ty = y; ty < y + h; ty += thF) {
-                        for (float tx = x; tx < x + w; tx += twF) {
+                int offX = ((int) uOffPx) % (int) tileW;
+                if (offX < 0) offX += tileW;
+                int offY = ((int) vOffPx) % (int) tileH;
+                if (offY < 0) offY += tileH;
+
+                for (float ty = y; ty < y + h; ty += tileH) {
+                        for (float tx = x; tx < x + w; tx += tileW) {
                                 // Dest: exactly this tile's clipped rect (vanilla
                                 // GuiSpriteScaling.Tiled blits one sprite-sized
                                 // chunk per step and clips the last row/column).
-                                float dw = Math.min(twF, x + w - tx);
-                                float dh = Math.min(thF, y + h - ty);
+                                float dw = Math.min(tileW, x + w - tx);
+                                float dh = Math.min(tileH, y + h - ty);
                                 // Source phase: scroll offset + tile index within
-                                // the repeat, wrapped back into [0, tw). The raw
+                                // the repeat, wrapped back into [0, tileW). The raw
                                 // destination offset must NEVER feed the UVs - it
                                 // grows across the loop and would stretch every
                                 // later tile across the rest of the screen.
-                                float su0 = ((offX + (tx - x)) % twF) / twF;
-                                float sv0 = ((offY + (ty - y)) % thF) / thF;
-                                float su1 = su0 + dw / twF;
-                                float sv1 = sv0 + dh / thF;
+                                float su0 = ((offX + (tx - x)) % tileW) / tileW;
+                                float sv0 = ((offY + (ty - y)) % tileH) / tileH;
+                                float su1 = su0 + dw / tileW;
+                                float sv1 = sv0 + dh / tileH;
                                 // Split the source window at the texture seam (u
                                 // and v independently, so up to 2x2 sub-quads).
                                 // Part A keeps [phase..1], part B repeats [0..rest];
                                 // the dest split point is the same seam in pixels.
-                                float seamX = tx + (1.0f - su0) * twF;
-                                float seamY = ty + (1.0f - sv0) * thF;
+                                float seamX = tx + (1.0f - su0) * tileW;
+                                float seamY = ty + (1.0f - sv0) * tileH;
                                 boolean uWrap = su1 > 1.0f;
                                 boolean vWrap = sv1 > 1.0f;
                                 // u pieces: {su0, su1End, dx0, dx1} per part

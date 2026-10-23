@@ -112,6 +112,17 @@ public class TitleScreen extends Screen {
                 return true;
         }
 
+        /**
+         * Vanilla TitleScreen.extractBackground is EMPTY: unlike the other
+         * out-of-world screens it neither blurs the panorama nor tiles
+         * menu_background over it - the sharp cubemap is the whole
+         * background. GameRenderer checks this to skip the blur passes.
+         */
+        @Override
+        public boolean shouldBlurBackground() {
+                return false;
+        }
+
         @Override
         public void tick() {
                 // Update fade-in animation

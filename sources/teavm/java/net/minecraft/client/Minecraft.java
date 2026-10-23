@@ -129,6 +129,25 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         this.levelRenderer = new LevelRenderer(this);
                         this.gui = new Gui(this);
 
+                        // Route raw DOM keyboard events into the key handler:
+                        // printable keys become charTyped on the current screen
+                        // (EditBox text input), everything else goes through
+                        // keyPress -> screen.keyPressed (ESC, arrows, ...).
+                        net.lax1dude.eaglercraft.v2_6.internal.PlatformInput.setKeyEventObserver(
+                                (keyCode, keyStr, down) -> {
+                                        if (!down) {
+                                                this.keyboardHandler.keyPress(0L, keyCode, 0, 0, 0);
+                                                return;
+                                        }
+                                        if (keyStr != null && keyStr.length() == 1 && keyCode >= 30) {
+                                                // Printable character (codes < 30 are
+                                                // control keys even when keyStr is 1 char)
+                                                this.keyboardHandler.charTyped(0L,
+                                                                keyStr.charAt(0), 0);
+                                        }
+                                        this.keyboardHandler.keyPress(0L, keyCode, 0, 1, 0);
+                                });
+
                         // Step 5: Create main render target
                         this.mainRenderTarget = new RenderTarget(
                                 this.window.getWidth(), this.window.getHeight(), true, false);

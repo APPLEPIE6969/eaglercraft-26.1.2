@@ -24,6 +24,14 @@ public class Options {
         public boolean entityShadows = true;
         public int graphicsMode = 0; // 0=fast, 1=fancy, 2=fabulous
 
+        /**
+         * Vanilla accessibility option "Menu Background Blurriness"
+         * (menuBackgroundBlurriness): 0..10, default 5. Screens out of a
+         * world blur their panorama background with this radius when
+         * {@code >= 1} (vanilla Screen.extractBlurredBackground).
+         */
+        public int menuBackgroundBlurriness = 5;
+
         // ========== Sound Options ==========
         public float masterVolume = EaglerProfile.getMasterVolume();
         public float musicVolume = EaglerProfile.getMusicVolume();

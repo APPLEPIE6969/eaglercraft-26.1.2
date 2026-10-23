@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
+import net.lax1dude.eaglercraft.v2_6.adapter.MenuBlurRenderer;
 import net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
@@ -73,10 +74,12 @@ public class GameRenderer {
 
                         // Vanilla Screen.extractBackground: when no level is
                         // loaded, every menu screen draws the rotating panorama
-                        // cubemap behind the GUI (TitleScreen shows it raw,
-                        // other screens add the menu_background tiles on top;
-                        // the blurred-background post pass is a no-op with the
-                        // default flat-color panorama and is not emulated).
+                        // cubemap behind the GUI. The cube renders into an
+                        // offscreen target that the vanilla menu-background
+                        // blur (post_effect/blur.json, radius =
+                        // options.menuBackgroundBlurriness, default 5) then
+                        // processes and blits to the screen; menu tiles are
+                        // drawn on top of the blurred image by the screens.
                         if (minecraft.screen != null && !minecraft.isLevelLoaded()) {
                                 // Real-time frame delta in ticks, like vanilla's
                                 // getRealtimeDeltaTicks()
@@ -88,9 +91,33 @@ public class GameRenderer {
                                 // unconditionally (gating on isReady() first
                                 // would deadlock the build-once cubemap).
                                 EaglerGuiImpl.flush(gl);
-                                if (!PanoramaRenderer.render(gl, pxWidth, pxHeight)) {
+                                boolean haveTargets =
+                                        MenuBlurRenderer.bindPanoramaTarget(gl, pxWidth, pxHeight);
+                                boolean panoramaDrawn =
+                                        PanoramaRenderer.render(gl, pxWidth, pxHeight);
+                                if (haveTargets) {
+                                        // Back to the default framebuffer before
+                                        // anything else draws to the screen
+                                        PlatformOpenGL._wglBindFramebuffer(
+                                                WebGL2RenderingContext.FRAMEBUFFER, null);
+                                        if (panoramaDrawn) {
+                                                // Vanilla: TitleScreen has an empty
+                                                // extractBackground -> no blur marker,
+                                                // the panorama stays sharp there
+                                                int blurRadius =
+                                                        minecraft.screen.shouldBlurBackground()
+                                                                        ? minecraft.getOptions()
+                                                                                .menuBackgroundBlurriness
+                                                                        : 0;
+                                                MenuBlurRenderer.present(gl, pxWidth, pxHeight,
+                                                                blurRadius);
+                                        }
+                                }
+                                if (!panoramaDrawn) {
                                         // Faces still decoding (or failed): flat quad in
-                                        // the vanilla default-jar panorama stub color
+                                        // the vanilla default-jar panorama stub color.
+                                        // A flat color is its own blur, so skipping
+                                        // the post passes here is bit-identical.
                                         EaglerGuiImpl.fillRect(0, 0, guiWidth, guiHeight,
                                                         PanoramaRenderer.STUB_R, PanoramaRenderer.STUB_G,
                                                         PanoramaRenderer.STUB_B, 1.0f);

@@ -97,9 +97,90 @@ stub color - bit-identical to vanilla-without-a-pack.
 The `options.accessibility.panorama_speed` slider (default 1.0) is honored
 as a constant; the options UI does not exist yet.
 
-Vanilla's `extractBlurredBackground` (menu blur post pass) is not emulated:
-with the default flat-color panorama it is a visual no-op, and the real blur
-chain is scheduled behind the world-rendering work.
+## Menu background blur (`post_effect/blur.json` + `box_blur.fsh`)
+
+Vanilla 26.1.2 blurs whatever a screen drew behind its GUI
+(`GameRenderer.processBlurEffect` runs the post effect once per frame,
+from `GuiRenderer` at the blur stratum marker):
+
+```java
+// Screen.extractBackground (out of world):
+//   extractPanorama (level == null)
+//   extractBlurredBackground: if (menuBackgroundBlurriness >= 1) blurBeforeThisStratum()
+//   extractMenuBackground: blit menu_background (alpha 64) over the blur
+// post_effect/blur.json: SIX box_blur passes (H,V,H,V,H,V), each rendered
+//   with core/screenquad, input sampled bilinear ("bilinear": true)
+// box_blur.fsh (verbatim math):
+//   actualRadius = Radius >= 0.5 ? round(Radius) : float(MenuBlurRadius)
+//   for (a = -actualRadius + 0.5; a <= actualRadius; a += 2.0)
+//       blurred += texture(In, texCoord + step * a);      // step = oneTexel * BlurDir
+//   blurred += texture(In, texCoord + step * actualRadius) / 2.0;
+//   fragColor = blurred / (actualRadius + 0.5)
+```
+
+- Option: `options.accessibility.menu_background_blurriness`, range 0..10,
+  **default 5** (`Options.BLURRINESS_DEFAULT_VALUE = 5`).
+- Vanilla `TitleScreen.extractBackground` is **empty** - the title screen
+  shows the SHARP panorama with no tiles; every other out-of-world screen
+  blurs and then tiles `menu_background` over it. Our port mirrors this
+  with `Screen.shouldBlurBackground()` (TitleScreen overrides false).
+- Our `MenuBlurRenderer` mirrors the pipeline 1:1: the panorama cube draws
+  into an offscreen RGBA8 target, six ping-pong blur passes, then a blit
+  to the screen before the GUI draws.
+
+## Menu background tiling (`extractMenuBackgroundTexture`)
+
+Vanilla draws the menu tiles with `graphics.blit(GUI_TEXTURED,
+menu_background, x, y, 0, 0, width, height, 32, 32)` - the last two
+arguments are the declared texture dimensions, so the 16x16
+`menu_background` / `menu_list_background` PNGs repeat every **32 GUI
+pixels** (2x zoom), anchored at the screen origin (u=v=0). Our
+`drawSpriteTiled(..., destTileSize=32)` reproduces exactly this.
+
+## CreateWorldScreen (`...screens.worldselection.CreateWorldScreen`)
+
+Ported from the decompile of `CreateWorldScreen`, its three tabs
+(`GameTab` / `WorldTab` / `MoreTab`), `TabNavigationBar`, `TabButton`,
+`HeaderAndFooterLayout`, `CommonLayouts` and `SwitchGrid`:
+
+```java
+// TabNavigationBar: HEIGHT=24, tabsWidth = min(400, w) - 28,
+//   tabWidth = roundToward(tabsWidth / 3, 2), bar x = roundToward((w - tabsWidth)/2, 2)
+//   header_separator 2px at y=22 left of the first tab and right of the last
+//   tab sprites widget/tab(_selected)(_highlighted), nine-slice borders 2/2/2/0
+// content y = 24 + (h - 57 - contentH) / 6  (tab area + FrameLayout alignY 1/6)
+// GameTab (rows 8 apart): "World Name" label + EditBox 208x20 (value "New World",
+//   hint "World Name"), then 210x20 CycleButtons:
+//   "Game Mode: Survival|Hardcore|Creative" (Hardcore locks Difficulty to Hard
+//    and disables Allow Cheats), "Difficulty: Peaceful|Easy|Normal|Hard",
+//   "Allow Cheats: OFF|ON"
+// WorldTab (2 cols, col spacing 10): "World Type: Default|Superflat|Large
+//   Biomes|AMPLIFIED" 150x20 + "Customize" 150x20, "Seed for the world
+//   generator" label + EditBox 308x20 (hint "Leave blank for a random seed"),
+//   SwitchGrid 310 wide: "Generate Structures" / "Bonus Chest", 44x20 ON/OFF
+//   buttons (row spacing 4)
+// MoreTab: "Game Rules" / "Experiments" / "Data Packs" 210x20
+// Footer (33px, children centered): "Create New World" + "Cancel", 150x20,
+//   8px apart, centered -> y = h - 33 + 6
+```
+
+EditBox rendering: `widget/text_field` / `_highlighted` sprite (nine-slice
+border 1), text `0xFFE0E0E0` (no shadow) 4px inside the left edge,
+vertically centered; hint `0xFF7F7F7F` while empty and unfocused; cursor
+`0xFFD0D0D0` blinking on a 500ms half period; vanilla `displayPos`
+scrolling when the text overflows.
+
+Keyboard input is wired through a new `PlatformInput.KeyEventObserver`:
+DOM keydown -> printable `event.key` chars become `Screen.charTyped`
+(control codes < 30 excluded), everything else routes
+`keyPress -> Screen.keyPressed`; ESC pops back to Select World.
+
+Known deviations: Create joins the milestone world via the same
+`Minecraft.doWorldLoad` path as Play (persistence arrives with the
+world-storage milestone), so seed / game mode / difficulty / world type
+are honest UI state that does not feed the generator yet; "Customize",
+"Game Rules", "Experiments" and "Data Packs" are disabled (their
+sub-screens are later milestones); no tooltips yet.
 
 ## Button (`net.minecraft.client.gui.components.Button`)
 
@@ -143,12 +224,13 @@ Ported from the decompile of `SelectWorldScreen`, `WorldSelectionList`,
 ```
 
 Known deviations: the search box is visual-only (text input not ported);
-Create/Edit/Re-Create/Delete are disabled until world persistence exists;
-one world ("New World", the milestone world) instead of a save-file scan;
+Edit/Re-Create/Delete are disabled until world persistence exists; one
+world ("New World", the milestone world) instead of a save-file scan;
 the second line shows the world id and a fixed date, the third the version
 string. The single player journey is vanilla-exact: click a row to select
 (second click on the selected row joins, like vanilla double-click), or
-click the row then **Play Selected World**.
+click the row then **Play Selected World**. **Create New World** now opens
+the tabbed CreateWorldScreen (see its section).
 
 ## HUD (`net.minecraft.client.gui.Gui`, extract pipeline)
 
@@ -176,6 +258,9 @@ before the PNGs finish downloading (and as documentation of the colors).
 |---|---|---|
 | TitleScreen button grid | exact (topPos, pitch, sizes, x-offsets) | Singleplayer -> SelectWorldScreen; Quit = reload; Multiplayer/Realms/Options disabled until their screens exist |
 | Button widget | exact constants + real sprites (nine-slice border 3) | press-to-activate on left click (vanilla fires on press); keyboard activation (Enter/Space) not yet ported |
-| SelectWorldScreen | exact (header 49 / footer 60, 270px rows, 36px entries, footer grid) | select-then-play flow live; search/create/edit/delete/re-create disabled until their features exist |
+| Menu blur | exact (6x box_blur, bilinear half-step taps, radius = option, default 5) | title screen sharp (vanilla empty extractBackground), other menus blurred under the tiles |
+| Menu background tiles | exact (16px PNG repeating every 32 GUI px, anchored at screen origin) | alpha-64 tiles over the blurred panorama |
+| CreateWorldScreen | exact (tab bar 24px, content alignY 1/6, footer h-33+6, widget sizes from the decompile) | tabs switch, CycleButtons cycle, EditBoxes accept text (keyboard), Create joins a world; Customize/Game Rules/Experiments/Data Packs disabled; no tooltips |
+| SelectWorldScreen | exact (header 49 / footer 60, 270px rows, 36px entries, footer grid) | select-then-play flow live; search/edit/delete/re-create disabled until their features exist |
 | Hotbar | exact + real sprite | selection follows `selectedHotbarSlot` |
 | Crosshair | exact + real sprite | sprite blit (vanilla XOR-blends when hostile indicators exist; ours is the plain sprite) |

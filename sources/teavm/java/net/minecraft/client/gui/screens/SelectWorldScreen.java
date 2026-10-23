@@ -87,11 +87,16 @@ public class SelectWorldScreen extends Screen {
                 this.playWorldButton.setActive(false);
                 this.addRenderableWidget(this.playWorldButton);
 
-                // Create New World spans columns 3-4 (150px). Disabled until
-                // world creation/persistence exists.
+                // Create New World spans columns 3-4 (150px). Opens the
+                // vanilla CreateWorldScreen (tabbed world creation form).
                 Button create = new Button(gridX + 158, row1Y,
-                                Button.DEFAULT_WIDTH, Button.HEIGHT, "Create New World", button -> { });
-                create.setActive(false);
+                                Button.DEFAULT_WIDTH, Button.HEIGHT, "Create New World",
+                                button -> {
+                                        ClientMain.log("[SelectWorldScreen] Create New World pressed");
+                                        if (this.minecraft != null) {
+                                                this.minecraft.setScreen(new CreateWorldScreen(this));
+                                        }
+                                });
                 this.addRenderableWidget(create);
 
                 // Row 2: Edit / Delete / Re-Create / Back, 71px each
@@ -149,12 +154,14 @@ public class SelectWorldScreen extends Screen {
 
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-                // Vanilla Screen.extractBackground (level == null): the rotating
-                // panorama cubemap is already drawn behind the GUI by
-                // GameRenderer; this screen tiles the alpha-64 menu_background
-                // over it, exactly like vanilla extractMenuBackground.
+                // Vanilla Screen.extractBackground (level == null): the blurred
+                // panorama cubemap is already presented to the screen by
+                // GameRenderer (blur radius = menuBackgroundBlurriness); this
+                // screen tiles the alpha-64 menu_background over it, exactly
+                // like vanilla extractMenuBackground - whose blit declares
+                // textureWidth 32, so the 16px PNG repeats every 32 GUI px.
                 boolean bgDrawn = EaglerGuiImpl.drawSpriteTiled("gui/menu_background",
-                        0, 0, this.width, this.height, 0, 0);
+                        0, 0, this.width, this.height, 0, 0, 32);
 
                 int listTop = HEADER_HEIGHT;
                 int listBottom = this.height - FOOTER_HEIGHT;
@@ -162,9 +169,9 @@ public class SelectWorldScreen extends Screen {
                 if (bgDrawn) {
                         // Vanilla extractListBackground: menu_list_background
                         // tiles the list area, pattern anchored to the screen
+                        // (uv offsets 0,0 like vanilla), same 32px repeat
                         EaglerGuiImpl.drawSpriteTiled("gui/menu_list_background",
-                                0, listTop, this.width, listBottom - listTop,
-                                this.width, this.height - listBottom);
+                                0, listTop, this.width, listBottom - listTop, 0, 0, 32);
                         // Vanilla extractListSeparators: 2px lines above and below
                         EaglerGuiImpl.drawSprite("gui/header_separator", 0, listTop - 2, this.width, 2);
                         EaglerGuiImpl.drawSprite("gui/footer_separator", 0, listBottom, this.width, 2);

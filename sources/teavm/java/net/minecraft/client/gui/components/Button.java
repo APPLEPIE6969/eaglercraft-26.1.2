@@ -54,7 +54,8 @@ public class Button extends AbstractWidget {
                 void onPress(Button button);
         }
 
-        private final String message;
+        /** Mutable so CycleButton can rewrite the label when cycling. */
+        protected String message;
         private final OnPress onPress;
 
         /**

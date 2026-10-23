@@ -21,8 +21,13 @@ public final class WorldStorage {
 
         private static final String KEY = "eaglercraft.worlds";
         private static final String SEED_FLAG = "eaglercraft.worlds.seeded";
-        private static final char FIELD_SEP = '\u0001';
-        private static final char RECORD_SEP = '\n';
+        /** Record/field separators. String form for concatenation, char
+         * form for the manual scans (TeaVM mis-emits String + char concat,
+         * so the two forms are kept apart deliberately). */
+        private static final String FIELD_SEP = "\u0001";
+        private static final String RECORD_SEP = "\n";
+        private static final char FIELD_SEP_CHAR = '\u0001';
+        private static final char RECORD_SEP_CHAR = '\n';
 
         /** One entry of the Select World list (vanilla LevelSummary). */
         public static class WorldSummary {
@@ -141,9 +146,9 @@ public final class WorldStorage {
         private static String serialize(WorldSummary s) {
                 return s.name + FIELD_SEP + (s.seed == null ? "" : s.seed)
                                 + FIELD_SEP + s.gameMode
-                                + FIELD_SEP + (s.allowCommands ? '1' : '0')
-                                + FIELD_SEP + (s.generateStructures ? '1' : '0')
-                                + FIELD_SEP + (s.bonusChest ? '1' : '0')
+                                + FIELD_SEP + (s.allowCommands ? "1" : "0")
+                                + FIELD_SEP + (s.generateStructures ? "1" : "0")
+                                + FIELD_SEP + (s.bonusChest ? "1" : "0")
                                 + FIELD_SEP + s.lastPlayed
                                 + FIELD_SEP + s.version;
         }
@@ -173,12 +178,12 @@ public final class WorldStorage {
         private static String[] splitRecords(String raw) {
                 int count = 1;
                 for (int i = 0; i < raw.length(); i++) {
-                        if (raw.charAt(i) == RECORD_SEP) count++;
+                        if (raw.charAt(i) == RECORD_SEP_CHAR) count++;
                 }
                 String[] out = new String[count];
                 int idx = 0, start = 0;
                 for (int i = 0; i < raw.length(); i++) {
-                        if (raw.charAt(i) == RECORD_SEP) {
+                        if (raw.charAt(i) == RECORD_SEP_CHAR) {
                                 out[idx++] = raw.substring(start, i);
                                 start = i + 1;
                         }
@@ -190,12 +195,12 @@ public final class WorldStorage {
         private static String[] splitFields(String record) {
                 int count = 1;
                 for (int i = 0; i < record.length(); i++) {
-                        if (record.charAt(i) == FIELD_SEP) count++;
+                        if (record.charAt(i) == FIELD_SEP_CHAR) count++;
                 }
                 String[] out = new String[count];
                 int idx = 0, start = 0;
                 for (int i = 0; i < record.length(); i++) {
-                        if (record.charAt(i) == FIELD_SEP) {
+                        if (record.charAt(i) == FIELD_SEP_CHAR) {
                                 out[idx++] = record.substring(start, i);
                                 start = i + 1;
                         }

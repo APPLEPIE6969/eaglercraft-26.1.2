@@ -1,5 +1,6 @@
 package net.lax1dude.eaglercraft.v2_6.adapter;
 
+import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.Float32Array;
 import org.teavm.jso.typedarrays.Int32Array;
@@ -153,10 +154,21 @@ public final class PanoramaRenderer {
                 PlatformOpenGL._wglUniformMatrix4fv(uProjMat, false, projMatBuf);
                 PlatformOpenGL._wglUniformMatrix4fv(uModelViewMat, false, modelViewBuf);
                 PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_CUBE_MAP, cubeTexture);
+
+                // The camera sits INSIDE the cube, so the geometric back faces
+                // are the visible ones - back-face culling must be off for
+                // this draw (the boot pipeline enables it for block faces).
+                boolean cullWasEnabled = PlatformOpenGL._wglIsEnabled(WebGL2RenderingContext.CULL_FACE);
+                if (cullWasEnabled) {
+                        PlatformOpenGL._wglDisable(WebGL2RenderingContext.CULL_FACE);
+                }
                 PlatformOpenGL._wglBindVertexArray(cubeVAO);
                 PlatformOpenGL._wglDrawElements(WebGL2RenderingContext.TRIANGLES, 36,
                                 WebGL2RenderingContext.UNSIGNED_INT, 0);
                 PlatformOpenGL._wglBindVertexArray(null);
+                if (cullWasEnabled) {
+                        PlatformOpenGL._wglEnable(WebGL2RenderingContext.CULL_FACE);
+                }
                 PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_CUBE_MAP, null);
                 PlatformOpenGL._wglUseProgram(null);
                 return true;
@@ -225,12 +237,17 @@ public final class PanoramaRenderer {
                 int[] quadIndices = new int[36];
                 for (int q = 0; q < 6; q++) {
                         int v = q * 4;
+                        // Vanilla's sequential quad index buffer: two triangles
+                        // per ring-ordered quad, split along the v0-v2 diagonal
+                        // (0,1,2, 2,3,0). Splitting along v1 instead (0,1,2,
+                        // 2,1,3) fans around one corner and leaves a wedge of
+                        // the quad uncovered.
                         quadIndices[q * 6 + 0] = v + 0;
                         quadIndices[q * 6 + 1] = v + 1;
                         quadIndices[q * 6 + 2] = v + 2;
                         quadIndices[q * 6 + 3] = v + 2;
-                        quadIndices[q * 6 + 4] = v + 1;
-                        quadIndices[q * 6 + 5] = v + 3;
+                        quadIndices[q * 6 + 4] = v + 3;
+                        quadIndices[q * 6 + 5] = v + 0;
                 }
 
                 cubeVAO = PlatformOpenGL._wglCreateVertexArray();
@@ -332,10 +349,14 @@ public final class PanoramaRenderer {
                                         flipped.set(dstRow + x, src.get(srcRow + x));
                                 }
                         }
-                        // GL cube face targets are sequential from
-                        // TEXTURE_CUBE_MAP (0x8513): +X, -X, +Y, -Y, +Z, -Z
-                        PlatformOpenGL._wglTexImage2D(
-                                        WebGL2RenderingContext.TEXTURE_CUBE_MAP + f, 0,
+                        // GL cube-face targets are NOT universally
+                        // TEXTURE_CUBE_MAP + 0..5: some WebGL implementations
+                        // use a different numeric layout, and hardcoding the
+                        // desktop-GL numbers fails with INVALID_ENUM on two of
+                        // the six faces (leaving the cubemap permanently
+                        // incomplete - sampled as opaque black). Always derive
+                        // the base from the browser's own constant.
+                        PlatformOpenGL._wglTexImage2D(cubeFaceTarget(gl, f), 0,
                                         WebGL2RenderingContext.RGBA, w, h, 0,
                                         WebGL2RenderingContext.RGBA, WebGL2RenderingContext.UNSIGNED_BYTE,
                                         flipped);
@@ -363,6 +384,14 @@ public final class PanoramaRenderer {
         }
 
         // ===== Math =====
+
+        /**
+         * GL face target for cube face 0..5 (+X, -X, +Y, -Y, +Z, -Z),
+         * derived from the browser's own TEXTURE_CUBE_MAP_POSITIVE_X.
+         */
+        @JSBody(params = { "gl", "face" }, script =
+                "return (gl.TEXTURE_CUBE_MAP_POSITIVE_X || (gl.TEXTURE_CUBE_MAP + 2)) + face;")
+        private static native int cubeFaceTarget(WebGL2RenderingContext gl, int face);
 
         private static boolean isPowerOfTwo(int v) {
                 return v > 0 && (v & (v - 1)) == 0;

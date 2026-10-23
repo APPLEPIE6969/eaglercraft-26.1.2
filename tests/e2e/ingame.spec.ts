@@ -479,6 +479,7 @@ test.describe('go in game', () => {
     const page = await context.newPage();
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(String(error?.message ?? error)));
+    const consoleRecorder = installConsoleRecorder(page);
 
     // Boot to the title screen
     await page.goto('/index.html', { waitUntil: 'commit' });
@@ -601,6 +602,15 @@ test.describe('go in game', () => {
     expect(
       worldState?.inWorld,
       `the client must flip inWorld=true after Create (last telemetry: ${JSON.stringify(worldState)})`,
+    ).toBe(true);
+
+    // ── The typed name must have reached the EditBox ──
+    // The field starts with the vanilla default "New World" and the typed
+    // characters append at the cursor; the Create log proves the whole
+    // DOM-keyboard -> KeyboardHandler -> charTyped -> EditBox chain.
+    expect(
+      consoleRecorder.text().includes("Create pressed -> world 'New WorldE2E World'"),
+      `typing must append the typed name to the world-name EditBox (console tail:\n${consoleRecorder.text().slice(-2_000)})`,
     ).toBe(true);
     expect(
       pageErrors,

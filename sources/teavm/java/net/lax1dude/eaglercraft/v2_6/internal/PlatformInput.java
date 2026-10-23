@@ -10,6 +10,7 @@ import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.dom.events.TouchEvent;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
+import org.teavm.jso.dom.html.HTMLDocument;
 
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 
@@ -195,7 +196,14 @@ public class PlatformInput {
         }
 
         private static void registerKeyListeners() {
-                canvas.addEventListener("keydown", (EventListener<KeyboardEvent>) event -> {
+                // Keyboard is bound at DOCUMENT level, not the canvas: a
+                // canvas element is never focusable, so with canvas-level
+                // listeners the keydown target would be <body> and the game
+                // would never see any key. Document-level listeners receive
+                // every key regardless of focus (Eaglercraft 1.8 does the
+                // same). Mouse listeners stay on the canvas.
+                HTMLDocument document = window.getDocument();
+                document.addEventListener("keydown", (EventListener<KeyboardEvent>) event -> {
                         if (imeComposing) return;
                         event.preventDefault();
 
@@ -222,7 +230,7 @@ public class PlatformInput {
                         }
                 });
 
-                canvas.addEventListener("keyup", (EventListener<KeyboardEvent>) event -> {
+                document.addEventListener("keyup", (EventListener<KeyboardEvent>) event -> {
                         if (imeComposing) return;
                         event.preventDefault();
 

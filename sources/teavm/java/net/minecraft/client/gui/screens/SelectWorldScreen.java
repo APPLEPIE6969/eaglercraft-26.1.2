@@ -149,6 +149,12 @@ public class SelectWorldScreen extends Screen {
 
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+                // Vanilla draws this screen over the blurred rotating panorama;
+                // we have no panorama renderer yet, so an opaque dark blue-gray
+                // base stands in for its blurred average color. Without it the
+                // alpha-64 menu_background tiles would blend against the sky
+                // clear color and the whole screen would read light blue.
+                EaglerGuiImpl.fillRect(0, 0, this.width, this.height, 0.16f, 0.18f, 0.22f, 1.0f);
                 // Vanilla menu backdrop: fullscreen tiled menu_background
                 boolean bgDrawn = EaglerGuiImpl.drawSpriteTiled("gui/menu_background",
                         0, 0, this.width, this.height, 0, 0);

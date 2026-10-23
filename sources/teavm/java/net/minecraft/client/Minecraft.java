@@ -139,9 +139,15 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                                                 this.keyboardHandler.keyPress(0L, keyCode, 0, 0, 0);
                                                 return;
                                         }
-                                        if (keyStr != null && keyStr.length() == 1 && keyCode >= 30) {
-                                                // Printable character (codes < 30 are
-                                                // control keys even when keyStr is 1 char)
+                                        // Printable characters: the DOM event.key is
+                                        // exactly one char for every printable key
+                                        // (letters, digits, space, punctuation) and a
+                                        // name ("Backspace", "ArrowLeft", ...) for all
+                                        // control keys, so the length is a complete
+                                        // discriminator. Gating on the scan code is
+                                        // WRONG: the legacy table puts Q..P at 16..25
+                                        // and digits at 2..11, all "control range".
+                                        if (keyStr != null && keyStr.length() == 1) {
                                                 this.keyboardHandler.charTyped(0L,
                                                                 keyStr.charAt(0), 0);
                                         }

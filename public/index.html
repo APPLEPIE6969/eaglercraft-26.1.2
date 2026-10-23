@@ -191,13 +191,21 @@
                             frameCount = 0;
                             lastTime = now;
                         }
-                        // Once the client enters a world the shell overlay gets
-                        // out of the way - vanilla has no DOM chrome over the HUD
-                        // (the telemetry bridge reports inWorld).
+                        // The DOM banner is the boot-frame stand-in for the
+                        // vanilla logo: it belongs on the title screen only.
+                        // Any sub-screen (Select World, Options, ...) and the
+                        // in-world HUD must render without DOM chrome, so the
+                        // overlay visibility tracks the bridge's screen state.
                         var game = window.__eaglercraftGame;
-                        if (game && game.inWorld) {
-                            document.getElementById("title-overlay").style.display = "none";
-                            return; // stop the FPS loop
+                        if (game) {
+                            var screenId = String(game.screen || "none");
+                            var onTitle = !game.inWorld
+                                && (screenId === "none" || screenId.indexOf("TitleScreen") !== -1);
+                            document.getElementById("title-overlay").style.display
+                                = onTitle ? "block" : "none";
+                            if (game.inWorld) {
+                                return; // stop the FPS loop
+                            }
                         }
                         requestAnimationFrame(updateFPS);
                     }

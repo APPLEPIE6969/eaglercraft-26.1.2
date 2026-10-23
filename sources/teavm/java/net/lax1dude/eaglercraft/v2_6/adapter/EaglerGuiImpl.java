@@ -335,22 +335,42 @@ public final class EaglerGuiImpl {
                 float thF = (float) th;
                 for (float ty = y; ty < y + h; ty += thF) {
                         for (float tx = x; tx < x + w; tx += twF) {
-                                // Source window inside the tile (offset + clip)
-                                float su0 = (offX + (tx - x)) / twF;
-                                float sv0 = (offY + (ty - y)) / thF;
-                                float su1 = su0 + Math.min(twF, x + w - tx) / twF;
-                                float sv1 = sv0 + Math.min(thF, y + h - ty) / thF;
-                                if (su1 > 1.0f) {
-                                        // tile wraps: draw up to the seam then repeat
-                                        float seam = (1.0f - su0) * twF;
-                                        drawTexture(tex, su0, sv0, 1.0f, sv1, tx, ty, tx + seam, ty + Math.min(thF, y + h - ty));
-                                        drawTexture(tex, 0.0f, sv0, su1 - 1.0f, sv1, tx + seam, ty, tx + (su1 - 1.0f) * twF, ty + Math.min(thF, y + h - ty));
-                                } else if (sv1 > 1.0f) {
-                                        float seam = (1.0f - sv0) * thF;
-                                        drawTexture(tex, su0, sv0, su1, 1.0f, tx, ty, tx + Math.min(twF, x + w - tx), ty + seam);
-                                        drawTexture(tex, su0, 0.0f, su1, sv1 - 1.0f, tx, ty + seam, tx + Math.min(twF, x + w - tx), ty + (sv1 - 1.0f) * thF);
-                                } else {
-                                        drawTexture(tex, su0, sv0, su1, sv1, tx, ty, tx + (su1 - su0) * twF, ty + (sv1 - sv0) * thF);
+                                // Dest: exactly this tile's clipped rect (vanilla
+                                // GuiSpriteScaling.Tiled blits one sprite-sized
+                                // chunk per step and clips the last row/column).
+                                float dw = Math.min(twF, x + w - tx);
+                                float dh = Math.min(thF, y + h - ty);
+                                // Source phase: scroll offset + tile index within
+                                // the repeat, wrapped back into [0, tw). The raw
+                                // destination offset must NEVER feed the UVs - it
+                                // grows across the loop and would stretch every
+                                // later tile across the rest of the screen.
+                                float su0 = ((offX + (tx - x)) % twF) / twF;
+                                float sv0 = ((offY + (ty - y)) % thF) / thF;
+                                float su1 = su0 + dw / twF;
+                                float sv1 = sv0 + dh / thF;
+                                // Split the source window at the texture seam (u
+                                // and v independently, so up to 2x2 sub-quads).
+                                // Part A keeps [phase..1], part B repeats [0..rest];
+                                // the dest split point is the same seam in pixels.
+                                float seamX = tx + (1.0f - su0) * twF;
+                                float seamY = ty + (1.0f - sv0) * thF;
+                                boolean uWrap = su1 > 1.0f;
+                                boolean vWrap = sv1 > 1.0f;
+                                // u pieces: {su0, su1End, dx0, dx1} per part
+                                float[] us = uWrap
+                                                ? new float[] { su0, 1.0f, tx, seamX,
+                                                        0.0f, su1 - 1.0f, seamX, tx + dw }
+                                                : new float[] { su0, su1, tx, tx + dw };
+                                float[] vs = vWrap
+                                                ? new float[] { sv0, 1.0f, ty, seamY,
+                                                        0.0f, sv1 - 1.0f, seamY, ty + dh }
+                                                : new float[] { sv0, sv1, ty, ty + dh };
+                                for (int vi = 0; vi < vs.length; vi += 4) {
+                                        for (int ui = 0; ui < us.length; ui += 4) {
+                                                drawTexture(tex, us[ui], vs[vi], us[ui + 1], vs[vi + 1],
+                                                                us[ui + 2], vs[vi + 2], us[ui + 3], vs[vi + 3]);
+                                        }
                                 }
                         }
                 }

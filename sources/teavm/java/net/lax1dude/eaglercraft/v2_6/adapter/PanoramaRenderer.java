@@ -112,22 +112,27 @@ public final class PanoramaRenderer {
         }
 
         /**
-         * Draws the panorama cube over the whole framebuffer. Call after
-         * the frame clear and before any GUI work that should appear on
-         * top of it. Nothing happens until all six face PNGs have decoded
-         * (the caller covers the screen with the flat stub color in the
-         * meantime, which is what the default 26.1.2 assets look like
-         * anyway).
+         * Polls the pending face downloads and draws the panorama cube over
+         * the whole framebuffer. Call after the frame clear and before any
+         * GUI work that should appear on top of it.
+         *
+         * @return true when the cubemap was drawn; false while the six face
+         *         PNGs are still decoding or failed (the caller covers the
+         *         screen with the flat stub color, which is what the default
+         *         26.1.2 assets look like anyway). The poll happens inside
+         *         this call, so callers must invoke it unconditionally -
+         *         gating on {@link #isReady()} first would deadlock the
+         *         build-once cubemap.
          */
-        public static void render(WebGL2RenderingContext gl, int fbWidth, int fbHeight) {
-                if (gl == null || fbWidth <= 0 || fbHeight <= 0) return;
+        public static boolean render(WebGL2RenderingContext gl, int fbWidth, int fbHeight) {
+                if (gl == null || fbWidth <= 0 || fbHeight <= 0) return false;
                 if (!initialized) {
                         init(gl);
-                        if (!initialized) return;
+                        if (!initialized) return false;
                 }
                 if (cubeTexture == null) {
                         pollFaces(gl);
-                        if (cubeTexture == null) return;
+                        if (cubeTexture == null) return false;
                 }
 
                 // Perspective: fov 85, near 0.05, far 10, aspect = framebuffer
@@ -154,6 +159,7 @@ public final class PanoramaRenderer {
                 PlatformOpenGL._wglBindVertexArray(null);
                 PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_CUBE_MAP, null);
                 PlatformOpenGL._wglUseProgram(null);
+                return true;
         }
 
         // ===== Setup =====

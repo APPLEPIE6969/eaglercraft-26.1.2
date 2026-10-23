@@ -81,12 +81,14 @@ public class GameRenderer {
                                 // Real-time frame delta in ticks, like vanilla's
                                 // getRealtimeDeltaTicks()
                                 PanoramaRenderer.tick(partialTick * 20.0f);
-                                if (PanoramaRenderer.isReady()) {
-                                        // Close the (empty) GUI batch so the cube can
-                                        // switch programs; the next GUI draw re-opens it
-                                        EaglerGuiImpl.flush(gl);
-                                        PanoramaRenderer.render(gl, pxWidth, pxHeight);
-                                } else {
+                                // Close the (still empty) GUI batch - the cube
+                                // switches programs, and the next GUI draw
+                                // re-opens the batch. render() also polls the
+                                // pending face downloads, so it must run
+                                // unconditionally (gating on isReady() first
+                                // would deadlock the build-once cubemap).
+                                EaglerGuiImpl.flush(gl);
+                                if (!PanoramaRenderer.render(gl, pxWidth, pxHeight)) {
                                         // Faces still decoding (or failed): flat quad in
                                         // the vanilla default-jar panorama stub color
                                         EaglerGuiImpl.fillRect(0, 0, guiWidth, guiHeight,

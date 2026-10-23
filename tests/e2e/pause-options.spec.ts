@@ -159,7 +159,14 @@ test.describe('pause menu, options and world persistence', () => {
       'the menu behind the Accessibility screen must now blur with radius 8',
     ).toBe(8);
     expect(
-      await page.evaluate(() => window.localStorage.getItem('options.menuBackgroundBlurriness')),
+      await page.evaluate(() => {
+        // PlatformRuntime namespaces every localStorage key (config-driven
+        // prefix, default "eaglercraft"), so match on the key suffix.
+        const hit = Object.keys(window.localStorage).find((key) =>
+          key.endsWith('.options.menuBackgroundBlurriness'),
+        );
+        return hit !== undefined ? window.localStorage.getItem(hit) : null;
+      }),
       'the new blur value must persist to localStorage',
     ).toBe('8');
     await attachMilestoneScreenshot(page, testInfo, '04-blur-slider-8');

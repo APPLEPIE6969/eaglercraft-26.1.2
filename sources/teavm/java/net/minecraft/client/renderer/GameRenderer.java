@@ -131,6 +131,18 @@ public class GameRenderer {
                         }
                         EaglerGuiImpl.flush(gl);
 
+                        // Vanilla in-world menu blur (GameRenderer.processBlurEffect):
+                        // when a screen is open over a loaded world and it declares a
+                        // blurred background (Screen.shouldBlurBackground), the world +
+                        // HUD content below the menu stratum runs through
+                        // post_effect/blur.json (radius = menuBackgroundBlurriness) and
+                        // is blitted back before the menu draws sharp on top.
+                        if (minecraft.isLevelLoaded() && minecraft.screen != null
+                                        && minecraft.screen.shouldBlurBackground()) {
+                                MenuBlurRenderer.blurScreenContent(gl, pxWidth, pxHeight,
+                                                minecraft.getOptions().menuBackgroundBlurriness);
+                        }
+
                         // Current screen (menus + widgets), with the real mouse pos
                         Screen screen = minecraft.screen;
                         if (screen != null) {

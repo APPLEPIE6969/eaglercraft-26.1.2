@@ -686,6 +686,11 @@ public class PlatformOpenGL {
                 gl.texStorage3D(target, levels, internalformat, width, height, depth);
         }
 
+        public static void _wglCopyTexSubImage2D(int target, int level, int xoffset, int yoffset,
+                                                                                  int x, int y, int width, int height) {
+                gl.copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+        }
+
         public static void _wglCopyTexSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset,
                                                                                           int x, int y, int width, int height) {
                 gl.copyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height);

@@ -20,6 +20,13 @@ public class ClientLevel {
         private long gameTime;
         private long dayTime;
 
+        /**
+         * The vanilla world difficulty: 0=peaceful, 1=easy, 2=normal
+         * (the fresh-world default), 3=hard. Edited from the in-world
+         * Options header difficulty CycleButton.
+         */
+        private int difficulty = 2;
+
         private final double spawnX;
         private final double spawnY;
         private final double spawnZ;
@@ -62,6 +69,15 @@ public class ClientLevel {
 
         public long getDayTime() {
                 return dayTime;
+        }
+
+        /** Vanilla world difficulty: 0=peaceful, 1=easy, 2=normal, 3=hard. */
+        public int getDifficulty() {
+                return difficulty;
+        }
+
+        public void setDifficulty(int difficulty) {
+                this.difficulty = difficulty & 3;
         }
 
         public double getSpawnX() {

@@ -52,6 +52,12 @@ public class KeyboardHandler {
                         }
                 }
 
+                // Vanilla Minecraft.pauseGame: ESC while in a world with no
+                // screen open opens the pause menu (the in-world game menu).
+                if (key == 1 && minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+                }
+
                 // Then handle game key bindings
                 // TODO: Check key bindings and dispatch to MC's input system
         }

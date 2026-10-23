@@ -154,6 +154,11 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                                         this.keyboardHandler.keyPress(0L, keyCode, 0, 1, 0);
                                 });
 
+                        // Seed the localStorage world list on first boot (the
+                        // milestone "New World" entry the Select World screen
+                        // always shipped)
+                        net.lax1dude.eaglercraft.v2_6.WorldStorage.ensureSeeded();
+
                         // Step 5: Create main render target
                         this.mainRenderTarget = new RenderTarget(
                                 this.window.getWidth(), this.window.getHeight(), true, false);
@@ -491,9 +496,27 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         this.screen.removed();
                 }
                 this.screen = screen;
+                // Vanilla: pause only when the active screen says so
+                // (PauseScreen and the options screens in-world)
+                this.pause = screen != null && screen.isPauseScreen();
                 if (screen != null) {
+                        // Screens show the cursor (vanilla releaseMouse)
+                        this.mouseHandler.releaseMouse();
                         screen.init(this, this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
                 }
+        }
+
+        /**
+         * Vanilla disconnect: leave the current world back to the title
+         * screen (the "Save and Quit to Title" button). The level is
+         * dropped - the localStorage world list keeps its metadata so the
+         * Select World screen can rejoin it.
+         */
+        public void disconnect() {
+                ClientMain.log("[Minecraft] disconnect -> title screen");
+                this.level = null;
+                this.missTime = 0;
+                this.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
         }
 
         public Screen getScreen() {

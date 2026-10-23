@@ -960,6 +960,9 @@ public abstract class WebGL2RenderingContext implements JSObject {
         public abstract void texStorage3D(int target, int levels, int internalformat, int width, int height, int depth);
 
         @JSMethod
+        public abstract void copyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
+
+        @JSMethod
         public abstract void copyTexSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset, int x, int y, int width, int height);
 
         @JSMethod

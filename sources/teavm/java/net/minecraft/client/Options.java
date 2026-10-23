@@ -137,6 +137,9 @@ public class Options {
                         if (val != null) this.mainHand = Integer.parseInt(val);
 
                         ClientMain.log("[Options] Loaded from localStorage");
+                        val = PlatformRuntime.localStorageGet("options.menuBackgroundBlurriness");
+                        if (val != null) this.menuBackgroundBlurriness =
+                                        Math.max(0, Math.min(10, Integer.parseInt(val)));
                 } catch (Exception e) {
                         ClientMain.warn("[Options] Failed to load: " + e.getMessage());
                 }
@@ -168,6 +171,8 @@ public class Options {
                         PlatformRuntime.localStorageSet("options.chatScale", String.valueOf(this.chatScale));
                         PlatformRuntime.localStorageSet("options.chatWidth", String.valueOf(this.chatWidth));
                         PlatformRuntime.localStorageSet("options.mainHand", String.valueOf(this.mainHand));
+                        PlatformRuntime.localStorageSet("options.menuBackgroundBlurriness",
+                                        String.valueOf(this.menuBackgroundBlurriness));
 
                         EaglerProfile.save();
                         dirty = false;

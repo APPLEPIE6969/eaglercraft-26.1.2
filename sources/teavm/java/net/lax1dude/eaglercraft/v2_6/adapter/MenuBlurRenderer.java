@@ -168,6 +168,41 @@ public final class MenuBlurRenderer {
                 PlatformOpenGL._wglBindVertexArray(null);
         }
 
+        /**
+         * The in-world flavor of the vanilla blur (pause screen, options
+         * opened from a world): captures the CURRENT default-framebuffer
+         * content - the world render plus the HUD, exactly the strata
+         * vanilla blurs below the menu stratum - into the offscreen target
+         * with {@code copyTexSubImage2D}, runs the same six box_blur
+         * passes, and blits the blurred image back to the screen. Call
+         * right after the world/HUD draw with the default framebuffer
+         * bound and the GUI batch closed; the menu widgets draw sharp on
+         * top afterwards.
+         *
+         * <p>Like vanilla, a radius below 1 runs nothing: the world stays
+         * sharp under the menu. Returns false in that case (and when the
+         * offscreen targets are unavailable) so the caller knows nothing
+         * was processed.</p>
+         */
+        public static boolean blurScreenContent(WebGL2RenderingContext gl, int fbWidth, int fbHeight,
+                        int blurRadius) {
+                if (gl == null || blurRadius < 1 || fbWidth <= 0 || fbHeight <= 0) return false;
+                if (!ensureTargets(gl, fbWidth, fbHeight)) return false;
+
+                // GL framebuffers and textures share the bottom-up origin,
+                // so the capture needs no flip: the blit afterwards maps
+                // texture v=0 to NDC y=-1, the same row the framebuffer
+                // read came from.
+                PlatformOpenGL._wglActiveTexture(WebGL2RenderingContext.TEXTURE0);
+                PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_2D, textureA);
+                PlatformOpenGL._wglCopyTexSubImage2D(WebGL2RenderingContext.TEXTURE_2D, 0, 0, 0,
+                                0, 0, fbWidth, fbHeight);
+                PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_2D, null);
+
+                present(gl, fbWidth, fbHeight, blurRadius);
+                return true;
+        }
+
         // ===== Setup =====
 
         private static boolean ensureTargets(WebGL2RenderingContext gl, int width, int height) {

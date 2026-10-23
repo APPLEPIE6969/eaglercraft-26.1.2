@@ -733,6 +733,18 @@ public class PlatformInput {
         private static native int[] getCanvasRelativeCoords(MouseEvent event);
 
         /**
+         * Opens a URL in a new browser tab (vanilla {@code Util.getPlatform()
+         * .openUri} / {@code Screen.openScreen} semantics for the pause
+         * menu's "Send Feedback" and "Report Bugs" buttons).
+         */
+        public static void openURL(String url, String target) {
+                openURLJS(url, target != null ? target : "_blank");
+        }
+
+        @JSBody(params = { "url", "target" }, script = "window.open(url, target);")
+        private static native void openURLJS(String url, String target);
+
+        /**
          * Gets movementX from a mouse event (pointer lock delta).
          */
         @JSBody(params = { "event" }, script = "return event.movementX || 0;")

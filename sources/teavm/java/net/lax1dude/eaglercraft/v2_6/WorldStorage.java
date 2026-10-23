@@ -81,10 +81,24 @@ public final class WorldStorage {
                         if (summary.name.equals(existing[i].name)) {
                                 continue; // replaced below
                         }
-                        sb.append(serialize(existing[i])).append(RECORD_SEP);
+                        sb.append(serialize(existing[i]));
+                        sb.append(RECORD_SEP);
                 }
                 sb.append(serialize(summary));
                 PlatformRuntime.localStorageSet(KEY, sb.toString());
+        }
+
+        /**
+         * Refreshes a world's last-played timestamp (vanilla updates
+         * lastPlayed on every world load, which drives the Select World
+         * date line). No-op when the world is unknown.
+         */
+        public static void touchWorld(String name) {
+                WorldSummary s = findWorld(name);
+                if (s != null) {
+                        s.lastPlayed = System.currentTimeMillis();
+                        saveWorld(s);
+                }
         }
 
         /** Removes the record with the given name; returns whether it existed. */
@@ -136,7 +150,10 @@ public final class WorldStorage {
                         milestone.allowCommands = false;
                         milestone.generateStructures = true;
                         milestone.bonusChest = false;
-                        milestone.lastPlayed = PlatformRuntime.getCurrentTimeMillis();
+                        // Real epoch (System.currentTimeMillis):
+                        // PlatformRuntime.getCurrentTimeMillis is a monotonic
+                        // page-uptime clock, not a wall clock
+                        milestone.lastPlayed = System.currentTimeMillis();
                         saveWorld(milestone);
                         ClientMain.log("[WorldStorage] seeded milestone world");
                 }

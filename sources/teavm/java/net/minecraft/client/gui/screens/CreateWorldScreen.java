@@ -312,8 +312,9 @@ public class CreateWorldScreen extends Screen {
                 summary.allowCommands = allowCommands;
                 summary.generateStructures = generateStructures;
                 summary.bonusChest = bonusChest;
-                summary.lastPlayed = net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime
-                                .getCurrentTimeMillis();
+                // Real epoch - PlatformRuntime.getCurrentTimeMillis is the
+                // monotonic page-uptime clock, not a wall clock
+                summary.lastPlayed = System.currentTimeMillis();
                 net.lax1dude.eaglercraft.v2_6.WorldStorage.saveWorld(summary);
 
                 this.minecraft.doWorldLoad(name);

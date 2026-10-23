@@ -686,6 +686,8 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         ClientLevel clientLevel = new ClientLevel(levelName, "minecraft:overworld");
                         this.setLevel(clientLevel);
                         this.setScreen(null); // no menu = in-game; the HUD renders
+                        // Vanilla refreshes lastPlayed on every world load
+                        net.lax1dude.eaglercraft.v2_6.WorldStorage.touchWorld(levelName);
                         this.missTime = 0;
                         ClientMain.log("[Minecraft] World loaded: " + clientLevel
                                 + " (HUD active)");

@@ -288,17 +288,34 @@ public class CreateWorldScreen extends Screen {
                 }
         }
 
-        /** Vanilla onCreate: join a world with the configured name. */
+        /** Vanilla onCreate: persist the world, then join it. */
         private void onCreate() {
                 if (this.minecraft == null) return;
                 String name = nameEdit != null && !nameEdit.getValue().trim().isEmpty()
                                 ? nameEdit.getValue().trim()
                                 : "New World";
+                String seed = seedEdit != null ? seedEdit.getValue() : "";
                 ClientMain.log("[CreateWorldScreen] Create pressed -> world '" + name
                                 + "' (mode=" + GAME_MODES[gameModeIndex]
                                 + ", difficulty=" + DIFFICULTIES[difficultyIndex]
                                 + ", cheats=" + allowCommands + ", type=" + WORLD_TYPES[worldTypeButton.getIndex()]
-                                + ", seed=" + (seedEdit != null ? seedEdit.getValue() : "") + ")");
+                                + ", seed=" + seed + ")");
+
+                // Vanilla createFreshLevel writes the level to disk first:
+                // persist the settings to localStorage so the Select World
+                // list shows (and can rejoin) this world afterwards
+                net.lax1dude.eaglercraft.v2_6.WorldStorage.WorldSummary summary =
+                                new net.lax1dude.eaglercraft.v2_6.WorldStorage.WorldSummary();
+                summary.name = name;
+                summary.seed = seed;
+                summary.gameMode = GAME_MODES[gameModeIndex];
+                summary.allowCommands = allowCommands;
+                summary.generateStructures = generateStructures;
+                summary.bonusChest = bonusChest;
+                summary.lastPlayed = net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime
+                                .getCurrentTimeMillis();
+                net.lax1dude.eaglercraft.v2_6.WorldStorage.saveWorld(summary);
+
                 this.minecraft.doWorldLoad(name);
         }
 

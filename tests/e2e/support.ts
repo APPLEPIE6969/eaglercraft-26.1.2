@@ -293,6 +293,7 @@ export interface GameTelemetryButton {
   h: number;
 }
 
+
 export interface GameTelemetry {
   /** The client reports a working Singleplayer → world → HUD path. */
   canEnterWorld: boolean;
@@ -318,6 +319,12 @@ export interface GameTelemetry {
    * on bundles that predate the blur feature).
    */
   panoramaBlur?: number;
+  /**
+   * The raw menuBackgroundBlurriness accessibility option (0..10, default
+   * 5) that the Accessibility screen's slider edits (undefined on bundles
+   * that predate the options screens).
+   */
+  menuBackgroundBlurriness?: number;
 }
 
 /**
@@ -355,6 +362,7 @@ export async function readGameTelemetry(page: Page): Promise<GameTelemetry | nul
           return {
             id: String(rec.id),
             label: typeof rec.label === 'string' ? rec.label : String(rec.id),
+            active: typeof rec.active === 'boolean' ? rec.active : undefined,
             x: typeof rec.x === 'number' ? rec.x : 0,
             y: typeof rec.y === 'number' ? rec.y : 0,
             w: typeof rec.w === 'number' ? rec.w : 0,
@@ -364,6 +372,10 @@ export async function readGameTelemetry(page: Page): Promise<GameTelemetry | nul
       panoramaReady: typeof bridge.panoramaReady === 'boolean' ? bridge.panoramaReady : undefined,
       panoramaSpin: typeof bridge.panoramaSpin === 'number' ? bridge.panoramaSpin : undefined,
       panoramaBlur: typeof bridge.panoramaBlur === 'number' ? bridge.panoramaBlur : undefined,
+      menuBackgroundBlurriness:
+        typeof bridge.menuBackgroundBlurriness === 'number'
+          ? bridge.menuBackgroundBlurriness
+          : undefined,
     };
   });
 }

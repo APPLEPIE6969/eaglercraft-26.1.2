@@ -2,6 +2,10 @@ package net.minecraft.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.lax1dude.eaglercraft.v2_6.WorldStorage;
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -33,11 +37,11 @@ import net.minecraft.client.gui.components.Button;
  *       disabled sprite)</li>
  * </ul>
  *
- * <p>The list itself is minimal but honest: one world ("New World",
- * the milestone world) rendered as a real widget with the vanilla
- * geometry, vanilla unknown-world icon, click to select and a second
- * click (or the Play button) to join. Create/Edit/Re-Create/Delete are
- * disabled until world persistence exists.</p>
+ * <p>The list is the real localStorage world list (vanilla
+ * LevelStorageSource stand-in, see {@link WorldStorage}): created worlds
+ * are persisted with their settings, the milestone "New World" seeds a
+ * fresh profile, and Play/Delete operate on the selected entry.
+ * Edit/Re-Create stay disabled until world editing exists.</p>
  */
 public class SelectWorldScreen extends Screen {
 
@@ -60,7 +64,9 @@ public class SelectWorldScreen extends Screen {
         static final String WORLD_NAME = TitleScreen.DEFAULT_WORLD_NAME;
 
         private Button playWorldButton;
-        private WorldEntryWidget worldEntry;
+        private Button deleteButton;
+        private final List<WorldEntryWidget> worldEntries = new ArrayList<WorldEntryWidget>();
+        private WorldEntryWidget selectedEntry;
 
         public SelectWorldScreen(Screen lastScreen) {
                 super();
@@ -104,8 +110,10 @@ public class SelectWorldScreen extends Screen {
                 edit.setActive(false);
                 this.addRenderableWidget(edit);
 
-                Button delete = new Button(gridX + 79, row2Y, 71, Button.HEIGHT, "Delete", button -> { });
+                Button delete = new Button(gridX + 79, row2Y, 71, Button.HEIGHT, "Delete",
+                                button -> this.deleteSelectedWorld());
                 delete.setActive(false);
+                this.deleteButton = delete;
                 this.addRenderableWidget(delete);
 
                 Button recreate = new Button(gridX + 158, row2Y, 71, Button.HEIGHT, "Re-Create", button -> { });
@@ -120,25 +128,47 @@ public class SelectWorldScreen extends Screen {
                                         }
                                 }));
 
-                // ===== The world entry (vanilla WorldSelectionList row) =====
-                // Rows are 270px wide, centered in the list; first row at the
-                // top of the list area.
+                // ===== The world entries (vanilla WorldSelectionList rows) =====
+                // Rows are 270px wide, centered in the list, 36px tall,
+                // stacked from the top of the list area. The list content is
+                // the localStorage world list (WorldStorage.listWorlds).
                 int rowLeft = centerX - ROW_WIDTH / 2;
-                this.worldEntry = new WorldEntryWidget(rowLeft, HEADER_HEIGHT,
-                                ROW_WIDTH, ENTRY_HEIGHT);
-                this.addRenderableWidget(this.worldEntry);
+                this.worldEntries.clear();
+                this.selectedEntry = null;
+                WorldStorage.WorldSummary[] summaries = WorldStorage.listWorlds();
+                for (int i = 0; i < summaries.length; i++) {
+                        WorldEntryWidget entry = new WorldEntryWidget(rowLeft,
+                                        HEADER_HEIGHT + i * (ENTRY_HEIGHT + 2),
+                                        ROW_WIDTH, ENTRY_HEIGHT, summaries[i]);
+                        this.worldEntries.add(entry);
+                        this.addRenderableWidget(entry);
+                }
 
                 this.updateButtonStatus();
         }
 
         /**
          * Vanilla updateButtonStatus: the Play button enables exactly when
-         * a world is selected.
+         * a world is selected; Delete follows the same rule.
          */
         private void updateButtonStatus() {
+                boolean hasSelection = this.selectedEntry != null;
                 if (this.playWorldButton != null) {
-                        this.playWorldButton.setActive(this.worldEntry != null && this.worldEntry.isSelected());
+                        this.playWorldButton.setActive(hasSelection);
                 }
+                if (this.deleteButton != null) {
+                        this.deleteButton.setActive(hasSelection);
+                }
+        }
+
+        /** Vanilla deleteButton flow: remove the selected world's record. */
+        private void deleteSelectedWorld() {
+                if (this.minecraft == null || this.selectedEntry == null) return;
+                String name = this.selectedEntry.summary.name;
+                ClientMain.log("[SelectWorldScreen] Delete pressed -> world '" + name + "'");
+                WorldStorage.deleteWorld(name);
+                // Rebuild the whole screen (vanilla refreshes the list)
+                this.init(this.minecraft, this.width, this.height);
         }
 
         /**
@@ -148,8 +178,11 @@ public class SelectWorldScreen extends Screen {
          */
         private void joinSelectedWorld() {
                 if (this.minecraft == null) return;
-                ClientMain.log("[SelectWorldScreen] Play pressed -> loading world '" + WORLD_NAME + "'");
-                this.minecraft.doWorldLoad(WORLD_NAME);
+                String name = this.selectedEntry != null
+                                ? this.selectedEntry.summary.name
+                                : WORLD_NAME;
+                ClientMain.log("[SelectWorldScreen] Play pressed -> loading world '" + name + "'");
+                this.minecraft.doWorldLoad(name);
         }
 
         @Override
@@ -210,16 +243,20 @@ public class SelectWorldScreen extends Screen {
 
         /**
          * One row of the world list, a real widget so it takes part in
-         * click routing and the telemetry bridge (id "newworld").
-         * Render order matches vanilla WorldListEntry.extractContent:
-         * selection outline, icon, then the three text lines.
+         * click routing and the telemetry bridge. Render order matches
+         * vanilla WorldListEntry.extractContent: selection outline, icon,
+         * then the three text lines (name, name + last-played date,
+         * version line - the date formatted like vanilla's MM/DD/YY).
          */
         public class WorldEntryWidget extends AbstractWidget {
 
+                final WorldStorage.WorldSummary summary;
                 private boolean selected = false;
 
-                public WorldEntryWidget(int x, int y, int width, int height) {
+                WorldEntryWidget(int x, int y, int width, int height,
+                                WorldStorage.WorldSummary summary) {
                         super(x, y, width, height);
+                        this.summary = summary;
                 }
 
                 public boolean isSelected() {
@@ -246,33 +283,49 @@ public class SelectWorldScreen extends Screen {
                         // Text stack at contentX + 32 + 3, rows at +1/+12/+21
                         // relative to the content box (contentY = y + 2)
                         int textX = x + 2 + 32 + 3;
-                        EaglerGuiImpl.drawText(WORLD_NAME, textX, y + 2 + 1, 0xFFFFFFFF, true);
-                        EaglerGuiImpl.drawText(WORLD_NAME + " (10/23/26)", textX, y + 2 + 12,
-                                COLOR_SECONDARY_TEXT, true);
-                        EaglerGuiImpl.drawText("Version: 26.1.2", textX, y + 2 + 21,
+                        EaglerGuiImpl.drawText(summary.name, textX, y + 2 + 1, 0xFFFFFFFF, true);
+                        EaglerGuiImpl.drawText(summary.name + " (" + formatDate(summary.lastPlayed) + ")",
+                                textX, y + 2 + 12, COLOR_SECONDARY_TEXT, true);
+                        EaglerGuiImpl.drawText("Version: " + summary.version, textX, y + 2 + 21,
                                 COLOR_SECONDARY_TEXT, true);
                 }
 
                 @Override
                 protected void onClick() {
-                        if (this.selected) {
-                                // Second click on the selected row: vanilla
-                                // double-click joins the world
-                                joinSelectedWorld();
-                        } else {
+                        // Vanilla: clicking a row selects it exclusively; a
+                        // second click on the selected row joins the world
+                        if (!this.selected) {
+                                for (int i = 0; i < worldEntries.size(); i++) {
+                                        worldEntries.get(i).selected = false;
+                                }
                                 this.selected = true;
-                                ClientMain.log("[SelectWorldScreen] world entry selected");
+                                selectedEntry = this;
+                                ClientMain.log("[SelectWorldScreen] world entry selected: "
+                                                + this.summary.name);
+                        } else {
+                                joinSelectedWorld();
                         }
                         updateButtonStatus();
                 }
 
                 /**
                  * Stable id for the e2e telemetry bridge, so automation can
-                 * click the world row exactly like a button.
+                 * click the world row exactly like a button (the milestone
+                 * "New World" keeps the historical "newworld" id).
                  */
                 @Override
                 public String getTelemetryId() {
-                        return "newworld";
+                        return summary.name.toLowerCase().replaceAll("[^a-z0-9]+", "");
                 }
+        }
+
+        /** Vanilla's MM/DD/YY world-list date format. */
+        private static String formatDate(long millis) {
+                if (millis <= 0L) return "";
+                java.util.Date d = new java.util.Date(millis);
+                int month = d.getMonth() + 1;
+                int day = d.getDate();
+                int year = (d.getYear() + 1900) % 100;
+                return month + "/" + day + "/" + (year < 10 ? "0" : "") + year;
         }
 }

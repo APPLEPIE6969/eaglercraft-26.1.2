@@ -813,10 +813,23 @@ public class EaglerCraft {
                                         (int) Math.min(totalTicks, Integer.MAX_VALUE), guiScale, buttonsJson,
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.isReady(),
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.spinDegrees(),
-                                        menuBackgroundBlurRadius());
+                                        menuBackgroundBlurRadius(), menuBackgroundBlurrinessOption());
                 } catch (Throwable t) {
                         // Telemetry must never break the game loop
                 }
+        }
+
+        /**
+         * The raw menuBackgroundBlurriness option (0..10, default 5) - the
+         * value the Accessibility screen's slider edits and localStorage
+         * persists, independent of whether the current screen applies it.
+         */
+        private static int menuBackgroundBlurrinessOption() {
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                        return ((net.minecraft.client.Minecraft) minecraftInstance)
+                                        .getOptions().menuBackgroundBlurriness;
+                }
+                return 5;
         }
 
         /**
@@ -872,7 +885,7 @@ public class EaglerCraft {
                 return sb.toString();
         }
 
-        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur" }, script =
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur", "menuBackgroundBlurriness" }, script =
                 "if (typeof window !== 'undefined') {"
                 + " window.__eaglercraftGame = {"
                 + " canEnterWorld: canEnterWorld,"
@@ -885,12 +898,14 @@ public class EaglerCraft {
                 + " panoramaReady: panoramaReady,"
                 + " panoramaSpin: panoramaSpin,"
                 + " panoramaBlur: panoramaBlur,"
+                + " menuBackgroundBlurriness: menuBackgroundBlurriness,"
                 + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
                         boolean inWorld, int ticks, int guiScale, String buttonsJson,
-                        boolean panoramaReady, float panoramaSpin, int panoramaBlur);
+                        boolean panoramaReady, float panoramaSpin, int panoramaBlur,
+                        int menuBackgroundBlurriness);
 
         /**
          * Consumes a pending {@code enterWorld()} request from the bridge:

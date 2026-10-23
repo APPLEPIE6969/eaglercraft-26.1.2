@@ -267,7 +267,7 @@ public final class EaglerGuiImpl {
         public static boolean drawSprite(String name, float x, float y, float w, float h) {
                 if (!GuiSprites.isReady(name)) return false;
                 return drawTexture(GuiSprites.texture(name),
-                        0.0f, 0.0f, 1.0f, 1.0f, x, y, w, h);
+                        0.0f, 0.0f, 1.0f, 1.0f, x, y, x + w, y + h);
         }
 
         /**

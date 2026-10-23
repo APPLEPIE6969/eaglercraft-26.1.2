@@ -319,13 +319,23 @@ public class SelectWorldScreen extends Screen {
                 }
         }
 
-        /** Vanilla's MM/DD/YY world-list date format. */
+        /** Vanilla's MM/DD/YY world-list date format. Explicit appends:
+         * TeaVM 0.15 mis-emits mixed-operand concat chains. */
         private static String formatDate(long millis) {
                 if (millis <= 0L) return "";
                 java.util.Date d = new java.util.Date(millis);
                 int month = d.getMonth() + 1;
                 int day = d.getDate();
                 int year = (d.getYear() + 1900) % 100;
-                return month + "/" + day + "/" + (year < 10 ? "0" : "") + year;
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.valueOf(month));
+                sb.append("/");
+                sb.append(String.valueOf(day));
+                sb.append("/");
+                if (year < 10) {
+                        sb.append("0");
+                }
+                sb.append(String.valueOf(year));
+                return sb.toString();
         }
 }

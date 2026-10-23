@@ -144,13 +144,28 @@ public final class WorldStorage {
         }
 
         private static String serialize(WorldSummary s) {
-                return s.name + FIELD_SEP + (s.seed == null ? "" : s.seed)
-                                + FIELD_SEP + s.gameMode
-                                + FIELD_SEP + (s.allowCommands ? "1" : "0")
-                                + FIELD_SEP + (s.generateStructures ? "1" : "0")
-                                + FIELD_SEP + (s.bonusChest ? "1" : "0")
-                                + FIELD_SEP + s.lastPlayed
-                                + FIELD_SEP + s.version;
+                // Explicit appends, all String args: TeaVM 0.15 mis-emits
+                // incremental string-concat chains that mix operand types or
+                // carry ternaries (EmitException: append(C)/append(J) fed a
+                // String), so both the separators and the flags are plain
+                // String values pushed one append at a time.
+                StringBuilder sb = new StringBuilder();
+                sb.append(s.name);
+                sb.append(FIELD_SEP);
+                sb.append(s.seed == null ? "" : s.seed);
+                sb.append(FIELD_SEP);
+                sb.append(s.gameMode);
+                sb.append(FIELD_SEP);
+                sb.append(s.allowCommands ? "1" : "0");
+                sb.append(FIELD_SEP);
+                sb.append(s.generateStructures ? "1" : "0");
+                sb.append(FIELD_SEP);
+                sb.append(s.bonusChest ? "1" : "0");
+                sb.append(FIELD_SEP);
+                sb.append(String.valueOf(s.lastPlayed));
+                sb.append(FIELD_SEP);
+                sb.append(s.version);
+                return sb.toString();
         }
 
         private static WorldSummary parse(String record) {

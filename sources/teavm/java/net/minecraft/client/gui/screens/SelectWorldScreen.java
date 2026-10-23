@@ -149,13 +149,10 @@ public class SelectWorldScreen extends Screen {
 
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-                // Vanilla draws this screen over the blurred rotating panorama;
-                // we have no panorama renderer yet, so an opaque dark blue-gray
-                // base stands in for its blurred average color. Without it the
-                // alpha-64 menu_background tiles would blend against the sky
-                // clear color and the whole screen would read light blue.
-                EaglerGuiImpl.fillRect(0, 0, this.width, this.height, 0.16f, 0.18f, 0.22f, 1.0f);
-                // Vanilla menu backdrop: fullscreen tiled menu_background
+                // Vanilla Screen.extractBackground (level == null): the rotating
+                // panorama cubemap is already drawn behind the GUI by
+                // GameRenderer; this screen tiles the alpha-64 menu_background
+                // over it, exactly like vanilla extractMenuBackground.
                 boolean bgDrawn = EaglerGuiImpl.drawSpriteTiled("gui/menu_background",
                         0, 0, this.width, this.height, 0, 0);
 
@@ -172,9 +169,9 @@ public class SelectWorldScreen extends Screen {
                         EaglerGuiImpl.drawSprite("gui/header_separator", 0, listTop - 2, this.width, 2);
                         EaglerGuiImpl.drawSprite("gui/footer_separator", 0, listBottom, this.width, 2);
                 } else {
-                        // Pre-sprite fallback: flat panel
-                        EaglerGuiImpl.fillRect(0, 0, this.width, this.height, 0xFFC6C6C6);
-                        EaglerGuiImpl.fillRect(0, listTop, this.width, listBottom - listTop, 0xFF000000);
+                        // Pre-sprite fallback: keep the panorama visible and
+                        // just darken the list band for text readability
+                        EaglerGuiImpl.fillRect(0, listTop, this.width, listBottom - listTop, 0x90000000);
                 }
 
                 // Title (vanilla: StringWidget centered in the header)

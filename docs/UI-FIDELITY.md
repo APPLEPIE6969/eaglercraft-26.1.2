@@ -56,8 +56,50 @@ Known intentional deviations in our port:
 | Vanilla | Ours | Why |
 |---|---|---|
 | `minecraft.stop()` quits the process | page reload (`window.location.reload()`) | browser-honest equivalent |
-| Panorama + Mojang logo + splash | Eagler gradient background | Eaglercraft branding is deliberate |
+| Mojang logo + splash text | DOM overlay branding (Eaglercraft / Minecraft 26.1.2) | Eaglercraft branding is deliberate; the panorama behind it is real |
 | `title.credits` copyright line | omitted | Eaglercraft should not carry Mojang's copyright line |
+
+## Panorama (CubeMap, `net.minecraft.client.renderer.CubeMap` + `Panorama`)
+
+Vanilla 26.1.2 renders the title/menu background as a perspective-projected
+unit cube textured with a `GL_TEXTURE_CUBE_MAP` (decompiled, 26.1.2):
+
+```java
+// CubeMap.render(10.0F, spin)   (called from GuiRenderer while the
+// PanoramaRenderState is set - i.e. every screen while level == null)
+projection.setupPerspective(0.05F, 10.0F, 85.0F, window.width, window.height);
+modelViewStack.rotationX(PI);            // vanilla's Y-flip
+modelViewStack.rotateX(10 deg);
+modelViewStack.rotateY(-spin);
+// 24-vertex unit cube (positions ARE the sample directions), 36 quad indices,
+// core/panorama shader: texCoord0 = Position; fragColor = texture(Sampler0, texCoord0)
+// no depth test: the camera sits inside a convex cube, every ray exits one face
+
+// Panorama.extractRenderState:
+spin = Mth.wrapDegrees(spin + realtimeDeltaTicks * panoramaSpeed * 0.1F);   // speed default 1.0
+renderState = new PanoramaRenderState(-spin);
+
+// CubeMapTexture: GL faces [+X,-X,+Y,-Y,+Z,-Z] <- panorama_[1,3,5,4,0,2].png,
+// stacked with copyRect(swapX=false, swapY=true) -> rows flip before upload
+```
+
+Asset note: the 26.1.2 jar ships **1x1 stub PNGs** in a uniform slate color
+RGB(98,111,113) and a fully transparent `panorama_overlay.png` - with the
+default assets the vanilla 26.1.2 title background is exactly that flat color
+(any texture pack can drop real panorama faces in). Our port serves the
+**official 1.8.9 panorama faces** (256x256, extracted verbatim from the
+piston-meta client jar) at
+`public/assets/gui/sprites/title/background/panorama_{0..5}.png`, so the
+title screen shows the classic slowly rotating scene through the faithful
+cubemap pipeline. Until the faces decode, `PanoramaRenderer` shows the flat
+stub color - bit-identical to vanilla-without-a-pack.
+
+The `options.accessibility.panorama_speed` slider (default 1.0) is honored
+as a constant; the options UI does not exist yet.
+
+Vanilla's `extractBlurredBackground` (menu blur post pass) is not emulated:
+with the default flat-color panorama it is a visual no-op, and the real blur
+chain is scheduled behind the world-rendering work.
 
 ## Button (`net.minecraft.client.gui.components.Button`)
 

@@ -810,7 +810,9 @@ public class EaglerCraft {
                 }
                 try {
                         pushGameTelemetry0(canEnterWorld(), gameState, screen, inWorld,
-                                        (int) Math.min(totalTicks, Integer.MAX_VALUE), guiScale, buttonsJson);
+                                        (int) Math.min(totalTicks, Integer.MAX_VALUE), guiScale, buttonsJson,
+                                        net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.isReady(),
+                                        net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.spinDegrees());
                 } catch (Throwable t) {
                         // Telemetry must never break the game loop
                 }
@@ -852,7 +854,7 @@ public class EaglerCraft {
                 return sb.toString();
         }
 
-        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson" }, script =
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin" }, script =
                 "if (typeof window !== 'undefined') {"
                 + " window.__eaglercraftGame = {"
                 + " canEnterWorld: canEnterWorld,"
@@ -862,11 +864,14 @@ public class EaglerCraft {
                 + " ticks: ticks,"
                 + " guiScale: guiScale,"
                 + " buttons: JSON.parse(buttonsJson),"
+                + " panoramaReady: panoramaReady,"
+                + " panoramaSpin: panoramaSpin,"
                 + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
-                        boolean inWorld, int ticks, int guiScale, String buttonsJson);
+                        boolean inWorld, int ticks, int guiScale, String buttonsJson,
+                        boolean panoramaReady, float panoramaSpin);
 
         /**
          * Consumes a pending {@code enterWorld()} request from the bridge:

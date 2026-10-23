@@ -54,6 +54,18 @@ public final class GuiSprites {
         private static final List<String> pending = new ArrayList<String>();
         private static final Set<String> failed = new HashSet<String>();
 
+        /**
+         * Raw decoded RGBA bytes for the six title-screen panorama faces.
+         * Kept alongside the uploaded 2D textures because the panorama
+         * renderer needs the pixel rows to build its CUBE_MAP texture
+         * (vanilla CubeMapTexture stacks the faces into a column and
+         * uploads one band per GL cube face).
+         */
+        private static final Map<String, SpriteData> panoramaRaw = new HashMap<String, SpriteData>();
+
+        /** Name prefix of the six panorama face sprites. */
+        public static final String PANORAMA_PREFIX = "title/background/panorama_";
+
         /** 1x1 opaque white texture used for every solid (non-sprite) quad. */
         private static JSObject whiteTexture = null;
 
@@ -89,7 +101,13 @@ public final class GuiSprites {
                         "gui/menu_background",
                         "gui/menu_list_background",
                         "gui/header_separator",
-                        "gui/footer_separator"
+                        "gui/footer_separator",
+                        "title/background/panorama_0",
+                        "title/background/panorama_1",
+                        "title/background/panorama_2",
+                        "title/background/panorama_3",
+                        "title/background/panorama_4",
+                        "title/background/panorama_5"
                 };
                 for (int i = 0; i < names.length; i++) {
                         pending.add(names[i]);
@@ -121,6 +139,9 @@ public final class GuiSprites {
                         try {
                                 textures.put(name, upload(gl, data));
                                 sizes.put(name, new int[] { data.getW(), data.getH() });
+                                if (name.startsWith(PANORAMA_PREFIX)) {
+                                        panoramaRaw.put(name, data);
+                                }
                         } catch (Throwable t) {
                                 failed.add(name);
                                 ClientMain.warn("[GuiSprites] texture upload failed for '" + name + "': " + t.getMessage());
@@ -164,6 +185,15 @@ public final class GuiSprites {
          */
         public static boolean isFailed(String name) {
                 return failed.contains(name);
+        }
+
+        /**
+         * Returns the raw decoded RGBA download of a panorama face
+         * (only populated for names under {@link #PANORAMA_PREFIX}),
+         * or null while the download is still in flight or failed.
+         */
+        public static SpriteData rawPanoramaData(String name) {
+                return panoramaRaw.get(name);
         }
 
         /**

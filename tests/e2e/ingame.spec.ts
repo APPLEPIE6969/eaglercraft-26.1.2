@@ -94,6 +94,49 @@ test.describe('go in game', () => {
     ).toBe(false);
     await attachMilestoneScreenshot(page, testInfo, '03-title-screen');
 
+    // ── Milestone 3b: the vanilla panorama cubemap is live and spinning ──
+    // GameRenderer draws the 26.1.2 CubeMap panorama behind every menu
+    // screen; the telemetry bridge exposes its build state and spin angle.
+    // The title overlay can become visible a beat before the first MC frame
+    // uploads the face textures, so poll instead of asserting instantly.
+    const PANORAMA_TIMEOUT = 15_000;
+    const panoramaDeadline = Date.now() + PANORAMA_TIMEOUT;
+    let panorama: { ready: boolean | null; spin: number | null } = {
+      ready: null,
+      spin: null,
+    };
+    while (Date.now() < panoramaDeadline) {
+      panorama = await page.evaluate(() => {
+        const game = (
+          self as unknown as {
+            __eaglercraftGame?: { panoramaReady?: boolean; panoramaSpin?: number };
+          }
+        ).__eaglercraftGame;
+        return { ready: game?.panoramaReady ?? null, spin: game?.panoramaSpin ?? null };
+      });
+      if (panorama.ready === true) break;
+      await page.waitForTimeout(250);
+    }
+    expect(
+      panorama.ready,
+      `the panorama cubemap must be built from the six face PNGs at the title screen (last state: ${JSON.stringify(panorama)})`,
+    ).toBe(true);
+    expect(
+      typeof panorama.spin,
+      'the panorama spin angle must be a number once the cubemap is live',
+    ).toBe('number');
+    await page.waitForTimeout(1_500);
+    const panoramaLater = await page.evaluate(() => {
+      const game = (
+        self as unknown as { __eaglercraftGame?: { panoramaSpin?: number } }
+      ).__eaglercraftGame;
+      return game?.panoramaSpin ?? null;
+    });
+    expect(
+      panoramaLater,
+      'the panorama spin must advance over time (vanilla Panorama tick)',
+    ).not.toBe(panorama.spin);
+
     // ── Milestone 4: the engine milestones must all be in the console ──
     const entries = consoleRecorder.entries();
     const text = consoleRecorder.text();

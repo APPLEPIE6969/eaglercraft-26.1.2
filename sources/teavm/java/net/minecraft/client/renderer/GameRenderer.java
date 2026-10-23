@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
+import net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
@@ -69,6 +70,30 @@ public class GameRenderer {
                         RenderSystem.disableDepthTest();
 
                         EaglerGuiImpl.begin(gl, guiWidth, guiHeight);
+
+                        // Vanilla Screen.extractBackground: when no level is
+                        // loaded, every menu screen draws the rotating panorama
+                        // cubemap behind the GUI (TitleScreen shows it raw,
+                        // other screens add the menu_background tiles on top;
+                        // the blurred-background post pass is a no-op with the
+                        // default flat-color panorama and is not emulated).
+                        if (minecraft.screen != null && !minecraft.isLevelLoaded()) {
+                                // Real-time frame delta in ticks, like vanilla's
+                                // getRealtimeDeltaTicks()
+                                PanoramaRenderer.tick(partialTick * 20.0f);
+                                if (PanoramaRenderer.isReady()) {
+                                        // Close the (empty) GUI batch so the cube can
+                                        // switch programs; the next GUI draw re-opens it
+                                        EaglerGuiImpl.flush(gl);
+                                        PanoramaRenderer.render(gl, pxWidth, pxHeight);
+                                } else {
+                                        // Faces still decoding (or failed): flat quad in
+                                        // the vanilla default-jar panorama stub color
+                                        EaglerGuiImpl.fillRect(0, 0, guiWidth, guiHeight,
+                                                        PanoramaRenderer.STUB_R, PanoramaRenderer.STUB_G,
+                                                        PanoramaRenderer.STUB_B, 1.0f);
+                                }
+                        }
 
                         // HUD overlay (crosshair + hotbar) when inside a world;
                         // flushed now so any screen below draws over it

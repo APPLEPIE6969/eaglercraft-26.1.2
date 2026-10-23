@@ -2,9 +2,6 @@ package net.minecraft.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
-import net.lax1dude.eaglercraft.v2_6.EaglerProfile;
-import net.lax1dude.eaglercraft.v2_6.adapter.EaglerShaderImpl;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -12,14 +9,13 @@ import net.minecraft.client.gui.components.Button;
 /**
  * EaglerCraft 26.1.2 browser override for net.minecraft.client.gui.screens.TitleScreen.
  * The title screen is the first screen shown when MC starts.
- * In EaglerCraft, it renders a gradient background via EaglerShaderImpl and
- * the vanilla 26.1.2 menu grid (see docs/UI-FIDELITY.md for the decompiled
- * layout this mirrors).
+ * Its background is the vanilla 26.1.2 rotating panorama cubemap, which
+ * GameRenderer draws behind every menu screen while no level is loaded
+ * (vanilla TitleScreen.extractBackground is empty; the panorama comes from
+ * the extractRenderState call). Menu layout mirrors the decompiled
+ * TitleScreen.init() - see docs/UI-FIDELITY.md.
  */
 public class TitleScreen extends Screen {
-
-        private static final String TITLE = "EaglerCraft " + EaglerCraftConfig.VERSION;
-        private static final String SUBTITLE = EaglerCraftConfig.BRAND + " | Protocol " + EaglerCraftConfig.PROTOCOL_VERSION;
 
         /** The name of the world the Singleplayer button creates/loads. */
         public static final String DEFAULT_WORLD_NAME = "New World";
@@ -101,24 +97,13 @@ public class TitleScreen extends Screen {
 
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-                // Render gradient background
-                if (this.minecraft != null) {
-                        int width = minecraft.getWindow().getWidth();
-                        int height = minecraft.getWindow().getHeight();
+                // Background: GameRenderer draws the vanilla panorama cubemap
+                // behind every menu screen while no level is loaded (vanilla
+                // Screen.extractBackground -> Panorama/CubeMap). This screen
+                // adds nothing on top of it - exactly like vanilla's empty
+                // TitleScreen.extractBackground.
 
-                        // Use EaglerShaderImpl for the title screen rendering
-                        EaglerShaderImpl.renderTitleScreen(
-                                ClientMain.getWebGL2(),
-                                width, height,
-                                TITLE,
-                                SUBTITLE,
-                                EaglerProfile.getUsername(),
-                                0,
-                                0
-                        );
-                }
-
-                // Buttons render on top of the background via the base class
+                // Buttons render on top of the panorama via the base class
                 super.render(poseStack, mouseX, mouseY, partialTick);
         }
 

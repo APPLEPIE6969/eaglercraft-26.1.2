@@ -44,12 +44,16 @@ public class TitleScreen extends Screen {
                         }
                 })).setPosition(centerX - Button.BIG_WIDTH / 2, topPos);
 
-                // Row 2: Multiplayer - vanilla disables it when multiplayer is
-                // unavailable; ours stays disabled until the gateway screens exist.
-                Button multiplayer = new Button(centerX - Button.BIG_WIDTH / 2, topPos + 24,
-                                Button.BIG_WIDTH, Button.HEIGHT, "Multiplayer", button -> { });
-                multiplayer.setActive(false);
-                this.addRenderableWidget(multiplayer);
+                // Row 2: Multiplayer (live - opens the vanilla server
+                // browser; joins run the real WebSocket connect attempt)
+                this.addRenderableWidget(Button.builder("Multiplayer", button -> {
+                        if (this.minecraft != null) {
+                                ClientMain.log("[TitleScreen] Multiplayer pressed -> JoinMultiplayerScreen");
+                                this.minecraft.setScreen(
+                                                new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(
+                                                                this));
+                        }
+                })).setPosition(centerX - Button.BIG_WIDTH / 2, topPos + 24);
 
                 // Row 3: Realms (vanilla label menu.online) - disabled.
                 Button realms = new Button(centerX - Button.BIG_WIDTH / 2, topPos + 48,
@@ -68,10 +72,17 @@ public class TitleScreen extends Screen {
                 language.setActive(false);
                 this.addRenderableWidget(language);
 
-                // Options - disabled until an options screen exists.
-                Button options = new Button(centerX - 100, topPos, 98, 20, "Options...", button -> { });
-                options.setActive(false);
-                this.addRenderableWidget(options);
+                // Options - live: opens the vanilla options grid exactly
+                // like vanilla's title-screen Options button (inWorld=false)
+                this.addRenderableWidget(new Button(centerX - 100, topPos, 98, 20,
+                                "Options...", button -> {
+                                        if (this.minecraft != null) {
+                                                ClientMain.log("[TitleScreen] Options pressed -> OptionsScreen");
+                                                this.minecraft.setScreen(
+                                                                new net.minecraft.client.gui.screens.options.OptionsScreen(
+                                                                                this, this.minecraft.getOptions(), false));
+                                        }
+                                }));
 
                 // Quit Game - vanilla calls minecraft.stop(); the browser-honest
                 // equivalent is reloading the page.

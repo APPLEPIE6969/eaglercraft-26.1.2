@@ -24,6 +24,10 @@ public class MouseHandler {
         private double ypos;
         private boolean mouseGrabbed;
 
+        /** Pointer-lock deltas accumulated since the last frame (GUI px). */
+        private double accumulatedDX;
+        private double accumulatedDY;
+
         public MouseHandler(Minecraft minecraft) {
                 this.minecraft = minecraft;
         }
@@ -45,10 +49,42 @@ public class MouseHandler {
         /**
          * Called when a mouse button is pressed or released.
          * GLFW conventions: action 1 = press, 0 = release.
+         *
+         * <p>With the pointer grabbed (in-world gameplay) the press routes
+         * to the vanilla gameplay actions instead of the GUI: button 0 =
+         * attack (start destroying), button 1 = use/place, button 2 =
+         * pick block - exactly vanilla MouseHandler.onPress's grabbed
+         * branch.</p>
          */
         public void cursorPressed(long window, int button, int action, int modifiers) {
                 double mx = this.xpos;
                 double my = this.ypos;
+
+                // Vanilla MouseHandler.onPress: clicking the canvas while
+                // in-world with the cursor free re-grabs the pointer (the
+                // first click is the grab, gameplay clicks come after)
+                if (action == 1 && !this.mouseGrabbed
+                                && minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        this.grabMouse();
+                        return;
+                }
+
+                if (this.mouseGrabbed && minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        if (action == 1) {
+                                if (button == 0) {
+                                        minecraft.startAttack();
+                                } else if (button == 1) {
+                                        minecraft.startUseItem();
+                                } else if (button == 2) {
+                                        minecraft.pickBlock();
+                                }
+                        } else if (action == 0) {
+                                if (button == 0) {
+                                        minecraft.stopAttack();
+                                }
+                        }
+                        return;
+                }
 
                 if (action == 1) {
                         // Button pressed
@@ -65,10 +101,72 @@ public class MouseHandler {
 
         /**
          * Called when the mouse is scrolled.
+         *
+         * <p>Grabbed (in-world): vanilla's Inventory.swapPaint - the hotbar
+         * selection wraps through the nine slots. Unlocked: the current
+         * screen gets the event.</p>
          */
         public void onScroll(long window, double xOffset, double yOffset) {
+                if (this.mouseGrabbed && minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        int direction = yOffset < 0.0D ? -1 : 1;
+                        int current = minecraft.getGui().getSelectedHotbarSlot();
+                        int next = ((current + direction) % 9 + 9) % 9;
+                        minecraft.getGui().setSelectedHotbarSlot(next);
+                        minecraft.playerSelectedSlotChanged();
+                        return;
+                }
                 if (minecraft.screen != null) {
                         minecraft.screen.mouseScrolled(this.xpos, this.ypos, yOffset);
+                }
+        }
+
+        /**
+         * Per-frame mouse update - vanilla {@code xhandleMouseMove}. When
+         * the pointer is grabbed, the accumulated pointer-lock deltas are
+         * converted to look rotation with vanilla's exact sensitivity
+         * curve: {@code sens = (sensitivity * 0.6 + 0.2)^3 * 8.0} applied
+
+         * to GUI-scaled pixel deltas, then {@code player.turn(xo, yo)}.
+         */
+        public void xhandleMouseMove() {
+                if (this.isMouseGrabbed() && minecraft.isLevelLoaded()) {
+                        double rawDX = PlatformInput.getMouseDX();
+                        double rawDY = PlatformInput.getMouseDY();
+                        if (rawDX != 0.0D || rawDY != 0.0D) {
+                                this.accumulatedDX += toGuiX(rawDX);
+                                this.accumulatedDY += toGuiY(rawDY);
+                        }
+                        this.turnPlayer();
+                } else {
+                        // Deltas are meaningless unlocked; keep the buffers clear
+                        PlatformInput.getMouseDX();
+                        PlatformInput.getMouseDY();
+                        this.accumulatedDX = 0.0D;
+                        this.accumulatedDY = 0.0D;
+                }
+        }
+
+        /**
+         * Vanilla turnPlayer: applies the accumulated deltas as camera
+         * rotation. The default sensitivity option (0.5) gives the
+         * familiar default turn rate; FOV-scale is NOT applied (vanilla
+         * only scales by the GUI pixel ratio, done above).
+         */
+        private void turnPlayer() {
+                double ss = minecraft.getOptions().sensitivity * 0.6F + 0.2F;
+                double sensitivityMod = ss * ss * ss;
+                double sens = sensitivityMod * 8.0;
+                double xo = this.accumulatedDX * sens;
+                double yo = this.accumulatedDY * sens;
+                this.accumulatedDX = 0.0D;
+                this.accumulatedDY = 0.0D;
+                // Vanilla invertY option (MouseSettingsScreen): flips the
+                // vertical look axis
+                if (minecraft.getOptions().invertMouseY) {
+                        yo = -yo;
+                }
+                if (minecraft.getPlayer() != null) {
+                        minecraft.getPlayer().turn(xo, yo);
                 }
         }
 
@@ -96,6 +194,12 @@ public class MouseHandler {
          */
         public boolean isMouseGrabbed() {
                 return this.mouseGrabbed;
+        }
+
+        /** Vanilla isLeftPressed: the attack button's held state (drives
+         * the destroy continuation while grabbed). */
+        public boolean isLeftPressed() {
+                return this.mouseGrabbed && PlatformInput.isMouseDown(0);
         }
 
         /**

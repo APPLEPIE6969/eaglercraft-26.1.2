@@ -115,17 +115,29 @@ public class OptionsScreen extends Screen {
         }
 
         /**
-         * One grid cell. The Accessibility sub-screen is live (it owns the
-         * menuBackgroundBlurriness slider); every other option system is
-         * not backed by the browser port yet and renders disabled, exactly
-         * like vanilla's inactive style.
+         * One grid cell. The live sub-screens (Accessibility owns the
+         * blur slider, Controls the key binds + toggles, Sound Settings
+         * the volume sliders) open their screens; the remaining option
+         * systems are not backed by the browser port yet and render
+         * disabled, exactly like vanilla's inactive style.
          */
         private void addGridButton(int x, int y, String label) {
-                boolean live = "Accessibility...".equals(label);
+                boolean live = "Accessibility...".equals(label)
+                                || "Controls...".equals(label)
+                                || "Sound Settings...".equals(label);
                 Button button = new Button(x, y, HEADER_WIDGET_WIDTH, Button.HEIGHT, label,
                                 b -> {
-                                        if ("Accessibility...".equals(label) && this.minecraft != null) {
+                                        if (this.minecraft == null) {
+                                                return;
+                                        }
+                                        if ("Accessibility...".equals(label)) {
                                                 this.minecraft.setScreen(new AccessibilityOptionsScreen(
+                                                                this, this.options));
+                                        } else if ("Controls...".equals(label)) {
+                                                this.minecraft.setScreen(new ControlsScreen(
+                                                                this, this.options));
+                                        } else if ("Sound Settings...".equals(label)) {
+                                                this.minecraft.setScreen(new SoundOptionsScreen(
                                                                 this, this.options));
                                         }
                                 });

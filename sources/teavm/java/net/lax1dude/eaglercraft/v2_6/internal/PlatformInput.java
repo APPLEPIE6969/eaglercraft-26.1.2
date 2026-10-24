@@ -272,9 +272,13 @@ public class PlatformInput {
         }
 
         private static void registerMouseListeners() {
+                // Button events are recorded in BOTH modes: unlocked clicks
+                // drive the GUI screens, pointer-locked clicks drive gameplay
+                // (attack/use - vanilla MouseHandler.onPress while grabbed).
+                // The latches funnel through EaglerCraft's poll loop into
+                // MouseHandler.cursorPressed either way.
                 canvas.addEventListener("mousedown", (EventListener<MouseEvent>) event -> {
                         event.preventDefault();
-                        if (pointerLocked) return;
 
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {
@@ -285,7 +289,6 @@ public class PlatformInput {
 
                 canvas.addEventListener("mouseup", (EventListener<MouseEvent>) event -> {
                         event.preventDefault();
-                        if (pointerLocked) return;
 
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {

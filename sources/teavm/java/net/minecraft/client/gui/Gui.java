@@ -24,6 +24,9 @@ public class Gui {
         /** Currently selected hotbar slot (0-8). */
         private int selectedHotbarSlot = 0;
 
+        /** Vanilla Gui's held-item name popup timer (40 ticks). */
+        private int missTime = 0;
+
         /** Hotbar geometry, vanilla units in GUI pixels. */
         private static final int HOTBAR_WIDTH = 182;
         private static final int HOTBAR_HEIGHT = 22;
@@ -95,6 +98,13 @@ public class Gui {
          * hud/hotbar_selection sprite one pixel up/left of the selected
          * slot, stepping 20px per slot. Falls back to the procedural
          * panel while the sprite PNGs are still downloading.
+         *
+         * <p>Slot contents: the inventory's block stacks render as 16x16
+         * icons (the vanilla block texture, drawn flat) centered in each
+         * slot + the stack count bottom-right (vanilla's count text at
+         * y+9 of the slot top-left corner... slot-relative 16x16 icon at
+         * +3,+3 and count at +17). The held item's name pops above the
+         * hotbar on change (vanilla Gui's item name display).</p>
          */
         private void renderHotbar(int guiWidth, int guiHeight) {
                 int x0 = (guiWidth - HOTBAR_WIDTH) / 2;
@@ -130,6 +140,44 @@ public class Gui {
                         }
                 }
 
+                // Slot contents: icons + counts (vanilla inventory rendering)
+                net.minecraft.world.entity.player.Inventory inventory = minecraft.getInventory();
+                if (inventory != null) {
+                        for (int slot = 0; slot < 9; slot++) {
+                                int blockId = inventory.getBlockId(slot);
+                                int count = inventory.getCount(slot);
+                                if (blockId == net.minecraft.world.level.block.Blocks.AIR || count <= 0) {
+                                        continue;
+                                }
+                                String tex = iconTexture(blockId);
+                                int sx = x0 + slot * SLOT_SIZE + 3;
+                                int sy = y0 + 3;
+                                if (tex != null) {
+                                        EaglerGuiImpl.drawSprite(tex, sx, sy, 16, 16);
+                                }
+                                if (count > 1) {
+                                        String label = String.valueOf(count);
+                                        float width = EaglerGuiImpl.widthOf(label);
+                                        EaglerGuiImpl.drawText(label, sx + 16 - width, sy + 8,
+                                                        0xFFFFFFFF, true);
+                                }
+                        }
+
+                        // Vanilla Gui's held-item name popup: shows the name
+                        // above the hotbar for 40 ticks after a slot change
+                        if (missTime > 0) {
+                                int heldId = inventory.getSelectedBlock();
+                                if (heldId != 0) {
+                                        String name = blockName(heldId);
+                                        if (name != null) {
+                                                float width = EaglerGuiImpl.widthOf(name);
+                                                EaglerGuiImpl.drawText(name, (guiWidth - width) / 2.0f,
+                                                                y0 - 14, 0xFFFFFFFF, true);
+                                        }
+                                }
+                        }
+                }
+
                 // Debug line: world identity + clock, bottom-left above the hotbar
                 if (minecraft.getLevel() instanceof ClientLevel level) {
                         String label = level.getLevelName() + " | " + level.getDimensionId()
@@ -138,11 +186,38 @@ public class Gui {
                 }
         }
 
+        /** Gui sprite path for a block's flat inventory icon. */
+        private static String iconTexture(int blockId) {
+                net.minecraft.world.level.block.Blocks.Block block =
+                        net.minecraft.world.level.block.Blocks.byId(blockId);
+                if (block.topTexture == null) {
+                        return null;
+                }
+                // the side texture is the icon for grass (vanilla uses the
+                // item model; the side face is the recognizable one)
+                return "block/" + block.sideTexture;
+        }
+
+        /** The display name of a block (vanilla Component.translatable
+         * "block.minecraft.<name>", rendered from the registry key). */
+        private static String blockName(int blockId) {
+                net.minecraft.world.level.block.Blocks.Block block =
+                        net.minecraft.world.level.block.Blocks.byId(blockId);
+                return block.name == null ? null : block.name;
+        }
+
         /**
          * Called every tick.
          */
         public void tick() {
-                // no-op (animation state lands here later)
+                if (missTime > 0) {
+                        missTime--;
+                }
+        }
+
+        /** The held-item name popup (vanilla Gui.missTime trigger). */
+        public void setMissTime(int ticks) {
+                this.missTime = ticks;
         }
 
         /**

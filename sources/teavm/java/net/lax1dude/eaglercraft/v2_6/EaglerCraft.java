@@ -543,6 +543,11 @@ public class EaglerCraft {
                 net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
                 net.minecraft.client.MouseHandler mh = mc.getMouseHandler();
 
+                // Per-frame mouse look (vanilla xhandleMouseMove): consumes
+                // the pointer-lock deltas and turns the player every render
+                // frame, not at tick rate.
+                mh.xhandleMouseMove();
+
                 // Absolute position: PlatformInput reports canvas CSS pixels;
                 // MouseHandler converts them to GUI-scaled pixels.
                 int mouseX = PlatformInput.getMouseX();
@@ -786,15 +791,22 @@ public class EaglerCraft {
          * (the current screen's class name, or "in-game" when no screen is
          * set, or "none" when no Minecraft instance exists), {@code inWorld}
          * (true once a level is loaded), {@code ticks} (game ticks
-         * processed), {@code guiScale} (the active GUI scale factor) and
+         * processed), {@code guiScale} (the active GUI scale factor),
          * {@code buttons} (the current screen's buttons with their bounds
-         * in GUI pixels, so automation can click the real menu). The object
-         * also carries an {@code enterWorld()} function that queues a
-         * world-entry request consumed on the next game tick — the same
-         * path the Singleplayer button drives. Called at the end of
-         * initialization, once per game logic tick (20 TPS) and immediately
-         * on crash, so consumers always see a fresh snapshot without having
-         * to poll Java.</p>
+         * in GUI pixels, so automation can click the real menu) and
+         * {@code gameplay} (the in-world snapshot: player transform,
+         * hotbar, crosshair hit, destroy stage — null outside a world).
+         * The object also carries functions: {@code enterWorld()} queues a
+         * world-entry request consumed on the next game tick (the same
+         * path the Singleplayer button drives), {@code queryBlock(x,y,z)}
+         * synchronously returns a world block id (-1 outside a world),
+         * {@code setHotbarSlot(slot,id,count)} and {@code selectSlot(slot)}
+         * queue hotbar requests consumed on the next game tick, and
+         * {@code setLook(yaw,pitch)} snaps the camera to an absolute
+         * orientation (the automation stand-in for a mouse look). Called at
+         * the end of initialization, once per game logic tick (20 TPS) and
+         * immediately on crash, so consumers always see a fresh snapshot
+         * without having to poll Java.</p>
          */
         private static void pushGameTelemetry() {
                 String screen = "none";
@@ -808,16 +820,195 @@ public class EaglerCraft {
                         guiScale = mc.getWindow() != null ? mc.getWindow().getGuiScale() : 1;
                         buttonsJson = buildButtonsJson(mc);
                 }
+                String gameplayJson = "null";
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                        net.minecraft.client.Minecraft mc =
+                                        (net.minecraft.client.Minecraft) minecraftInstance;
+                        consumeHotbarTelemetryRequests(mc);
+                        consumeLookRequest(mc);
+                        gameplayJson = buildGameplayJson(mc);
+                }
                 try {
                         pushGameTelemetry0(canEnterWorld(), gameState, screen, inWorld,
                                         (int) Math.min(totalTicks, Integer.MAX_VALUE), guiScale, buttonsJson,
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.isReady(),
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.spinDegrees(),
-                                        menuBackgroundBlurRadius(), menuBackgroundBlurrinessOption());
+                                        menuBackgroundBlurRadius(), menuBackgroundBlurrinessOption(),
+                                        gameplayJson, (x, y, z) -> telemetryQueryBlock(x, y, z));
                 } catch (Throwable t) {
                         // Telemetry must never break the game loop
                 }
         }
+
+        /**
+         * Builds the {@code gameplay} telemetry snapshot: the in-world state
+         * e2e asserts on. Structure (all coordinates in world units):
+         * <pre>{ "creative":bool, "edits":n,
+         *   "spawn":[x,y,z],
+         *   "player":{"x":..,"y":..,"z":..,"yaw":..,"pitch":..,
+         *             "onGround":bool,"flying":bool,"crouching":bool},
+         *   "hotbar":{"selected":n,"slots":[[id,count]|null,...]},
+         *   "hit":{"x":..,"y":..,"z":..,"face":"north"}|null,
+         *   "destroy":{"stage":0..9,"x":..,"y":..,"z":..}|null }</pre>
+         * Returns the JSON literal {@code null} outside a world.
+         */
+        private static String buildGameplayJson(net.minecraft.client.Minecraft mc) {
+                if (!(mc.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level)
+                                || !mc.isLevelLoaded()) {
+                        return "null";
+                }
+                StringBuilder sb = new StringBuilder(512);
+                sb.append("{\"creative\":").append(level.isCreative());
+                sb.append(",\"edits\":").append(level.editCount());
+                sb.append(",\"spawn\":[").append(fmt(level.getSpawnX()))
+                        .append(',').append(fmt(level.getSpawnY()))
+                        .append(',').append(fmt(level.getSpawnZ())).append(']');
+                net.minecraft.client.player.LocalPlayer p = mc.getPlayer();
+                if (p != null) {
+                        sb.append(",\"player\":{\"x\":").append(fmt(p.x))
+                                .append(",\"y\":").append(fmt(p.y))
+                                .append(",\"z\":").append(fmt(p.z))
+                                .append(",\"yaw\":").append(fmt(p.yRot))
+                                .append(",\"pitch\":").append(fmt(p.xRot))
+                                .append(",\"onGround\":").append(p.onGround)
+                                .append(",\"flying\":").append(p.flying)
+                                .append(",\"crouching\":").append(p.crouching)
+                                .append('}');
+                }
+                net.minecraft.world.entity.player.Inventory inv = mc.getInventory();
+                sb.append(",\"hotbar\":{\"selected\":").append(inv.getSelected())
+                        .append(",\"slots\":[");
+                for (int i = 0; i < net.minecraft.world.entity.player.Inventory.HOTBAR_SIZE; i++) {
+                        if (i > 0) sb.append(',');
+                        int id = inv.getBlockId(i);
+                        int count = inv.getCount(i);
+                        if (count > 0 && id != net.minecraft.world.level.block.Blocks.AIR) {
+                                sb.append('[').append(id).append(',').append(count).append(']');
+                        } else {
+                                sb.append("null");
+                        }
+                }
+                sb.append(']');
+                sb.append('}');
+                net.minecraft.world.phys.BlockHitResult hit = mc.getHitResult();
+                if (hit != null && hit.type == net.minecraft.world.phys.BlockHitResult.Type.BLOCK) {
+                        sb.append(",\"hit\":{\"x\":").append(hit.blockX)
+                                .append(",\"y\":").append(hit.blockY)
+                                .append(",\"z\":").append(hit.blockZ);
+                        if (hit.direction != null) {
+                                sb.append(",\"face\":\"").append(hit.direction.getName()).append('\"');
+                        }
+                        sb.append('}');
+                } else {
+                        sb.append(",\"hit\":null");
+                }
+                net.minecraft.client.multiplayer.MultiPlayerGameMode gm = mc.getGameMode();
+                if (gm.isDestroying()) {
+                        sb.append(",\"destroy\":{\"stage\":").append(gm.getDestroyStage())
+                                .append(",\"x\":").append(gm.getDestroyX())
+                                .append(",\"y\":").append(gm.getDestroyY())
+                                .append(",\"z\":").append(gm.getDestroyZ())
+                                .append('}');
+                } else {
+                        sb.append(",\"destroy\":null");
+                }
+                sb.append('}');
+                return sb.toString();
+        }
+
+        /** Formats a coordinate as a plain JSON number (4 decimal places,
+         * trailing zeros stripped by the Double.toString round-trip). */
+        private static double fmt(double v) {
+                return Math.round(v * 10000.0) / 10000.0;
+        }
+
+        /** Synchronous block query behind the bridge's {@code queryBlock}
+         * function; -1 outside a world, block id otherwise. */
+        private static int telemetryQueryBlock(int x, int y, int z) {
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft
+                                && ((net.minecraft.client.Minecraft) minecraftInstance).getLevel()
+                                        instanceof net.minecraft.client.multiplayer.ClientLevel level) {
+                        return level.getBlockState(x, y, z);
+                }
+                return -1;
+        }
+
+        /** Java function surfaced to JS as {@code queryBlock(x,y,z)} - the
+         * JSFunctor lambda in pushGameTelemetry is compiled to a JS
+         * function by TeaVM. */
+        @JSFunctor
+        private interface BlockQueryFn extends JSObject {
+                int query(int x, int y, int z);
+        }
+
+        /**
+         * Consumes queued {@code setHotbarSlot}/{@code selectSlot} bridge
+         * requests (latest wins, vanilla key-state semantics): fills the
+         * hotbar for placement tests and moves the selection like scroll
+         * / digit keys do. Run once per telemetry push (20 TPS).
+         */
+        private static void consumeHotbarTelemetryRequests(net.minecraft.client.Minecraft mc) {
+                int slot = peekHotbarReqSlot();
+                if (slot < 0) {
+                        return;
+                }
+                int id = peekHotbarReqId();
+                int count = peekHotbarReqCount();
+                clearHotbarReq();
+                net.minecraft.world.entity.player.Inventory inv = mc.getInventory();
+                if (slot >= 0 && slot < net.minecraft.world.entity.player.Inventory.HOTBAR_SIZE) {
+                        inv.setSelected(slot);
+                        if (id >= 0) {
+                                inv.telemetrySetSlot(slot, id, Math.max(0, Math.min(64, count)));
+                        }
+                        mc.playerSelectedSlotChanged();
+                }
+        }
+
+        @JSBody(script = "var r = window.__eaglercraftHotbarReq;"
+                        + " return r ? (r.s | 0) : -1;")
+        private static native int peekHotbarReqSlot();
+
+        @JSBody(script = "var r = window.__eaglercraftHotbarReq;"
+                        + " return r ? (r.i | 0) : -1;")
+        private static native int peekHotbarReqId();
+
+        @JSBody(script = "var r = window.__eaglercraftHotbarReq;"
+                        + " return r ? (r.c | 0) : 0;")
+        private static native int peekHotbarReqCount();
+
+        @JSBody(script = "window.__eaglercraftHotbarReq = null;")
+        private static native void clearHotbarReq();
+
+        /**
+         * Consumes a queued {@code setLook(yaw,pitch)} bridge request -
+         * the aim hook that lets automation point the camera like a
+         * mouse look would (same snapTo path the camera uses).
+         */
+        private static void consumeLookRequest(net.minecraft.client.Minecraft mc) {
+                if (mc.getPlayer() == null || !hasLookRequest()) {
+                        return;
+                }
+                float yaw = readLookYaw();
+                float pitch = readLookPitch();
+                clearLookRequest();
+                net.minecraft.client.player.LocalPlayer p = mc.getPlayer();
+                p.snapTo(p.x, p.y, p.z, yaw, pitch);
+        }
+
+        @JSBody(script = "return window.__eaglercraftLookReq != null;")
+        private static native boolean hasLookRequest();
+
+        @JSBody(script = "var r = window.__eaglercraftLookReq;"
+                        + " return r ? r.yaw : 0;")
+        private static native float readLookYaw();
+
+        @JSBody(script = "var r = window.__eaglercraftLookReq;"
+                        + " return r ? r.pitch : 0;")
+        private static native float readLookPitch();
+
+        @JSBody(script = "window.__eaglercraftLookReq = null;")
+        private static native void clearLookRequest();
 
         /**
          * The raw menuBackgroundBlurriness option (0..10, default 5) - the
@@ -885,7 +1076,7 @@ public class EaglerCraft {
                 return sb.toString();
         }
 
-        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur", "menuBackgroundBlurriness" }, script =
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur", "menuBackgroundBlurriness", "gameplayJson", "queryBlockFn" }, script =
                 "if (typeof window !== 'undefined') {"
                 + " window.__eaglercraftGame = {"
                 + " canEnterWorld: canEnterWorld,"
@@ -899,13 +1090,18 @@ public class EaglerCraft {
                 + " panoramaSpin: panoramaSpin,"
                 + " panoramaBlur: panoramaBlur,"
                 + " menuBackgroundBlurriness: menuBackgroundBlurriness,"
-                + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; }"
+                + " gameplay: JSON.parse(gameplayJson),"
+                + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; },"
+                + " queryBlock: function(x,y,z) { return queryBlockFn.query(x,y,z); },"
+                + " setHotbarSlot: function(s,i,c) { window.__eaglercraftHotbarReq = {s:s,i:i,c:c}; },"
+                + " selectSlot: function(s) { window.__eaglercraftHotbarReq = {s:s,i:-1,c:0}; },"
+                + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
                         boolean inWorld, int ticks, int guiScale, String buttonsJson,
                         boolean panoramaReady, float panoramaSpin, int panoramaBlur,
-                        int menuBackgroundBlurriness);
+                        int menuBackgroundBlurriness, String gameplayJson, BlockQueryFn queryBlockFn);
 
         /**
          * Consumes a pending {@code enterWorld()} request from the bridge:

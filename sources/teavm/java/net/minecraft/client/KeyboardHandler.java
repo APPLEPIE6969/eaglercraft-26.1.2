@@ -56,10 +56,34 @@ public class KeyboardHandler {
                 // screen open opens the pause menu (the in-world game menu).
                 if (key == 1 && minecraft.screen == null && minecraft.isLevelLoaded()) {
                         minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+                        return;
                 }
 
-                // Then handle game key bindings
-                // TODO: Check key bindings and dispatch to MC's input system
+                // Vanilla Minecraft.handleKeybinds (in-world, no screen):
+                // digits 1-9 select the hotbar slot (vanilla key.hotbar.N),
+                // inventory reserved, drop consumes a click. The binds are
+                // resolved through the KeyMapping table (defaults = the
+                // scan codes 2..10 / 18 / 16).
+                if (minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        int[] hotbarKeys = {
+                                        KeyMapping.HOTBAR_1.getKey(), KeyMapping.HOTBAR_2.getKey(),
+                                        KeyMapping.HOTBAR_3.getKey(), KeyMapping.HOTBAR_4.getKey(),
+                                        KeyMapping.HOTBAR_5.getKey(), KeyMapping.HOTBAR_6.getKey(),
+                                        KeyMapping.HOTBAR_7.getKey(), KeyMapping.HOTBAR_8.getKey(),
+                                        KeyMapping.HOTBAR_9.getKey() };
+                        for (int slot = 0; slot < hotbarKeys.length; slot++) {
+                                if (hotbarKeys[slot] != 0 && key == hotbarKeys[slot]) {
+                                        minecraft.getInventory().setSelected(slot);
+                                        minecraft.playerSelectedSlotChanged();
+                                        return;
+                                }
+                        }
+                        if (key == KeyMapping.INVENTORY.getKey()) {
+                                // vanilla key.inventory opens the inventory screen
+                                // (no inventory UI yet - reserved)
+                                return;
+                        }
+                }
         }
 
         /**

@@ -7,12 +7,14 @@ import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
 import net.lax1dude.eaglercraft.v2_6.adapter.MenuBlurRenderer;
 import net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer;
+import net.lax1dude.eaglercraft.v2_6.adapter.WorldGlRenderer;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * EaglerCraft 26.1.2 browser override for net.minecraft.client.renderer.GameRenderer.
@@ -121,6 +123,49 @@ public class GameRenderer {
                                         EaglerGuiImpl.fillRect(0, 0, guiWidth, guiHeight,
                                                         PanoramaRenderer.STUB_R, PanoramaRenderer.STUB_G,
                                                         PanoramaRenderer.STUB_B, 1.0f);
+                                }
+                        }
+
+                        // The 3D world (vanilla renderLevel): block meshes with
+                        // the camera view, then the crosshair pick, then the
+                        // hit outline + destroy overlay
+                        if (minecraft.isLevelLoaded()) {
+                                net.minecraft.client.player.LocalPlayer player = minecraft.getPlayer();
+                                net.minecraft.client.multiplayer.ClientLevel level = minecraft.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel l ? l : null;
+                                if (player != null && level != null) {
+                                        // Vanilla pick: from the eye along the view
+                                        // vector, BLOCK_INTERACTION_RANGE long
+                                        double eyeX = player.getEyeX();
+                                        double eyeY = player.getEyeY();
+                                        double eyeZ = player.getEyeZ();
+                                        double yawRad = player.yRot * (Math.PI / 180.0D);
+                                        double pitchRad = player.xRot * (Math.PI / 180.0D);
+                                        double cosPitch = Math.cos(pitchRad);
+                                        double dirX = -Math.sin(yawRad) * cosPitch;
+                                        double dirY = -Math.sin(pitchRad);
+                                        double dirZ = Math.cos(yawRad) * cosPitch;
+                                        minecraft.pickFromEye(eyeX, eyeY, eyeZ,
+                                                dirX, dirY, dirZ,
+                                                net.minecraft.client.player.LocalPlayer.BLOCK_INTERACTION_RANGE);
+
+                                        minecraft.getLevelRenderer().renderLevel(gl,
+                                                pxWidth, pxHeight,
+                                                eyeX, eyeY, eyeZ,
+                                                player.yRot, player.xRot,
+                                                minecraft.getOptions().fov);
+
+                                        // Vanilla renderHitOutline + destroy stage
+                                        BlockHitResult hit = minecraft.getHitResult();
+                                        if (hit != null && hit.type == BlockHitResult.Type.BLOCK) {
+                                                minecraft.getLevelRenderer().renderHitOutline(gl,
+                                                        hit.blockX, hit.blockY, hit.blockZ);
+                                                int stage = minecraft.getGameMode().getDestroyStage();
+                                                if (stage >= 0) {
+                                                        minecraft.getLevelRenderer().renderDestroyProgress(gl,
+                                                                hit.blockX, hit.blockY, hit.blockZ, stage);
+                                                }
+                                        }
+                                        WorldGlRenderer.endFrame(gl);
                                 }
                         }
 

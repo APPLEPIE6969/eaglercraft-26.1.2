@@ -496,6 +496,61 @@ public final class EaglerGuiImpl {
                 return w;
         }
 
+        /**
+         * Word-wraps a string to fit a pixel width (vanilla
+         * {@code Font.split} / {@code Component splitter} behavior):
+         * breaks on spaces, keeps words intact where possible, hard-splits
+         * any word longer than a full line, and preserves explicit
+         * newlines. Empty input yields a single empty line.
+         */
+        public static java.util.List<String> wrapText(String text, int maxWidth) {
+                java.util.List<String> lines = new java.util.ArrayList<String>();
+                if (text == null) {
+                        lines.add("");
+                        return lines;
+                }
+                for (String paragraph : text.split("\n", -1)) {
+                        StringBuilder line = new StringBuilder();
+                        for (String word : paragraph.split(" ", -1)) {
+                                while (widthOf(word) > maxWidth && word.length() > 1) {
+                                        // Hard-split an over-long word
+                                        int fit = 0;
+                                        int w = 0;
+                                        for (int i = 0; i < word.length(); i++) {
+                                                int adv = EaglerFont.advance(word.charAt(i));
+                                                if (w + adv > maxWidth && i > 0) {
+                                                        break;
+                                                }
+                                                w += adv;
+                                                fit = i + 1;
+                                        }
+                                        if (fit == 0) {
+                                                fit = 1;
+                                        }
+                                        if (line.length() > 0) {
+                                                lines.add(line.toString());
+                                                line = new StringBuilder();
+                                        }
+                                        lines.add(word.substring(0, fit));
+                                        word = word.substring(fit);
+                                }
+                                String candidate = line.length() == 0
+                                                ? word : line + " " + word;
+                                if (widthOf(candidate) <= maxWidth || line.length() == 0) {
+                                        line = new StringBuilder(candidate);
+                                } else {
+                                        lines.add(line.toString());
+                                        line = new StringBuilder(word);
+                                }
+                        }
+                        lines.add(line.toString());
+                }
+                if (lines.isEmpty()) {
+                        lines.add("");
+                }
+                return lines;
+        }
+
         // ========== Internals ==========
 
         private static void openBatch(WebGL2RenderingContext gl) {

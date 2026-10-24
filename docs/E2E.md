@@ -108,6 +108,55 @@ bundle predates the bridge): a `05-world-entry-gate` /
 the `test-results/` artifact. The client-side flag lives in
 `EaglerCraft.canEnterWorld()`.
 
+## Gameplay, options and multiplayer (`features.spec.ts`)
+
+The gameplay milestone adds an in-world snapshot to every telemetry push —
+`gameplay` (null outside a world):
+
+```json
+{
+  "creative": false,
+  "edits": 2,
+  "spawn": [0.5, -60, 0.5],
+  "player": { "x": 0.5, "y": -60, "z": 0.5, "yaw": 0, "pitch": 0,
+               "onGround": true, "flying": false, "crouching": false },
+  "hotbar": { "selected": 0, "slots": [[9, 1], null, null, null, null, null, null, null, null] },
+  "hit": { "x": 0, "y": -61, "z": 0, "face": "up" },
+  "destroy": { "stage": 3, "x": 0, "y": -61, "z": 0 }
+}
+```
+
+The bridge also gains functions: `queryBlock(x, y, z)` (synchronous block
+id, `-1` outside a world), `setHotbarSlot(slot, id, count)` /
+`selectSlot(slot)` (hotbar requests consumed on the next tick) and
+`setLook(yaw, pitch)` (absolute camera orientation — the automation
+stand-in for a mouse look). The three `features.spec.ts` tests gate on the
+presence of `queryBlock` + `setLook` and skip with a screenshot on older
+bundles:
+
+1. **Movement physics, jump and hotbar keys**: `enterWorld()` → assert the
+   vanilla flat-preset spawn (player feet at `y=-60` on grass, bedrock /
+   dirt / dirt / grass layers via `queryBlock`) → hold `W` (real keyboard
+   events) and require the walk distance from vanilla ground physics →
+   `Space` jump apex + gravity landing → `Digit5` / scroll wheel hotbar
+   selection.
+2. **Survival block breaking and placing**: aim straight down with
+   `setLook(0, 90)` → click the canvas (vanilla click-to-grab pointer
+   lock) → hold the left button and require both the destroy overlay
+   stages (`destroy.stage`) and the block actually breaking → the mined
+   grass must appear in the hotbar → `setLook(0, 30)` + right-click must
+   place it back on the ground within reach.
+3. **Options sub-screens and the multiplayer gateway**: the title Options
+   button opens the grid with **Controls** and **Sound Settings** live →
+   Controls carries the toggle rows + sprint-window slider and opens **Key
+   Binds** → the rebind journey clicks the "Walk Forwards" row's key
+   button, presses `K` and verifies `options.keybinds` persisted the scan
+   code → Sound Settings carries the Master + category sliders and the
+   master volume persists → the **Multiplayer** browser carries the
+   vanilla footer buttons, the Add Server dialog types name + address
+   into the EditBoxes and persists `serverlist`, and joining
+   `localhost:1` walks ConnectScreen → the honest DisconnectedScreen.
+
 ## Screenshots
 
 `ingame.spec.ts` captures the journey as milestone screenshots

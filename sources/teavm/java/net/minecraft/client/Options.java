@@ -32,11 +32,42 @@ public class Options {
          */
         public int menuBackgroundBlurriness = 5;
 
+        /** Vanilla MouseHandler turnPlayer sensitivity option: 0..1, default
+         * 0.5 - drives sens = (0.6*s + 0.2)^3 * 8 per GUI pixel. */
+        public float sensitivity = 0.5f;
+
+        // ========== Controls toggle options (ControlsScreen rows) ==========
+        /** Vanilla toggleCrouch / toggleSprint / toggleAttack / toggleUse.
+         * false = hold mode (the default). */
+        public boolean toggleCrouch = false;
+        public boolean toggleSprint = false;
+        public boolean toggleAttack = false;
+        public boolean toggleUse = false;
+        /** Vanilla autoJump option (default ON in vanilla). */
+        public boolean autoJump = true;
+        /** Vanilla sprintWindow option: double-tap window in ticks, 0..10,
+         * default 7. */
+        public int sprintWindow = 7;
+        /** Vanilla operatorItemsTab option (creative inventory rows). */
+        public boolean operatorItemsTab = false;
+
         // ========== Sound Options ==========
         public float masterVolume = EaglerProfile.getMasterVolume();
         public float musicVolume = EaglerProfile.getMusicVolume();
         public float soundVolume = EaglerProfile.getSFXVolume();
         public float ambientVolume = EaglerProfile.getAmbientVolume();
+        /** Vanilla SoundSource categories (SoundOptionsScreen rows); the
+         * browser audio stack only plays UI/world samples through master
+         * + sfx today, the rest persist for parity. */
+        public float recordVolume = 1.0f;
+        public float weatherVolume = 1.0f;
+        public float blockVolume = 1.0f;
+        public float hostileVolume = 1.0f;
+        public float neutralVolume = 1.0f;
+        public float playerVolume = 1.0f;
+        public float voiceVolume = 1.0f;
+        /** Vanilla showSubtitles / directionalAudio toggles. */
+        public boolean directionalAudio = false;
 
         // ========== Chat Options ==========
         public float chatScale = 1.0f;
@@ -56,6 +87,9 @@ public class Options {
 
         // ========== Language ==========
         public String languageCode = EaglerProfile.getLang();
+
+        /** Vanilla invertY (MouseSettingsScreen row): flips vertical look. */
+        public boolean invertMouseY = false;
 
         // ========== Browser-irrelevant Options ==========
         public boolean fullscreen = false;
@@ -140,6 +174,32 @@ public class Options {
                         val = PlatformRuntime.localStorageGet("options.menuBackgroundBlurriness");
                         if (val != null) this.menuBackgroundBlurriness =
                                         Math.max(0, Math.min(10, Integer.parseInt(val)));
+
+                        val = PlatformRuntime.localStorageGet("options.sensitivity");
+                        if (val != null) this.sensitivity =
+                                        Math.max(0.0f, Math.min(1.0f, Float.parseFloat(val)));
+                        val = PlatformRuntime.localStorageGet("options.invertMouseY");
+                        if (val != null) this.invertMouseY = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.toggleCrouch");
+                        if (val != null) this.toggleCrouch = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.toggleSprint");
+                        if (val != null) this.toggleSprint = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.toggleAttack");
+                        if (val != null) this.toggleAttack = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.toggleUse");
+                        if (val != null) this.toggleUse = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.autoJump");
+                        if (val != null) this.autoJump = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.sprintWindow");
+                        if (val != null) this.sprintWindow =
+                                        Math.max(0, Math.min(10, Integer.parseInt(val)));
+                        val = PlatformRuntime.localStorageGet("options.showSubtitles");
+                        if (val != null) this.showSubtitles = Boolean.parseBoolean(val);
+                        val = PlatformRuntime.localStorageGet("options.directionalAudio");
+                        if (val != null) this.directionalAudio = Boolean.parseBoolean(val);
+
+                        // The KeyMapping bind table (scan codes)
+                        KeyMapping.loadBinds();
                 } catch (Exception e) {
                         ClientMain.warn("[Options] Failed to load: " + e.getMessage());
                 }
@@ -173,6 +233,43 @@ public class Options {
                         PlatformRuntime.localStorageSet("options.mainHand", String.valueOf(this.mainHand));
                         PlatformRuntime.localStorageSet("options.menuBackgroundBlurriness",
                                         String.valueOf(this.menuBackgroundBlurriness));
+                        PlatformRuntime.localStorageSet("options.sensitivity",
+                                        String.valueOf(this.sensitivity));
+                        PlatformRuntime.localStorageSet("options.invertMouseY",
+                                        String.valueOf(this.invertMouseY));
+                        PlatformRuntime.localStorageSet("options.toggleCrouch",
+                                        String.valueOf(this.toggleCrouch));
+                        PlatformRuntime.localStorageSet("options.toggleSprint",
+                                        String.valueOf(this.toggleSprint));
+                        PlatformRuntime.localStorageSet("options.toggleAttack",
+                                        String.valueOf(this.toggleAttack));
+                        PlatformRuntime.localStorageSet("options.toggleUse",
+                                        String.valueOf(this.toggleUse));
+                        PlatformRuntime.localStorageSet("options.autoJump",
+                                        String.valueOf(this.autoJump));
+                        PlatformRuntime.localStorageSet("options.sprintWindow",
+                                        String.valueOf(this.sprintWindow));
+                        PlatformRuntime.localStorageSet("options.showSubtitles",
+                                        String.valueOf(this.showSubtitles));
+                        PlatformRuntime.localStorageSet("options.directionalAudio",
+                                        String.valueOf(this.directionalAudio));
+                        PlatformRuntime.localStorageSet("options.recordVolume",
+                                        String.valueOf(this.recordVolume));
+                        PlatformRuntime.localStorageSet("options.weatherVolume",
+                                        String.valueOf(this.weatherVolume));
+                        PlatformRuntime.localStorageSet("options.blockVolume",
+                                        String.valueOf(this.blockVolume));
+                        PlatformRuntime.localStorageSet("options.hostileVolume",
+                                        String.valueOf(this.hostileVolume));
+                        PlatformRuntime.localStorageSet("options.neutralVolume",
+                                        String.valueOf(this.neutralVolume));
+                        PlatformRuntime.localStorageSet("options.playerVolume",
+                                        String.valueOf(this.playerVolume));
+                        PlatformRuntime.localStorageSet("options.voiceVolume",
+                                        String.valueOf(this.voiceVolume));
+
+                        // The KeyMapping bind table (scan codes)
+                        KeyMapping.saveBinds();
 
                         EaglerProfile.save();
                         dirty = false;

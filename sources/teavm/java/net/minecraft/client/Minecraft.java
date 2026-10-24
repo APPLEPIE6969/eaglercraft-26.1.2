@@ -22,6 +22,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.sounds.SoundManager;
@@ -85,6 +89,16 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
         private Object connection; // ClientPacketListener
         private Object singleplayerServer; // IntegratedServer stub
 
+        /** The local player (movement physics + camera anchor). */
+        private LocalPlayer player;
+        /** Singleplayer game mode: destroy/use state machines. */
+        private final MultiPlayerGameMode gameMode;
+        /** Hotbar inventory (block pickups / placement stock). */
+        private final Inventory inventory;
+
+        /** The current block the crosshair targets (vanilla hitResult). */
+        private BlockHitResult hitResultBlock;
+
         // ========== Render Target ==========
         private RenderTarget mainRenderTarget;
 
@@ -125,6 +139,8 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         this.font = new Font();
                         this.keyboardHandler = new KeyboardHandler(this);
                         this.mouseHandler = new MouseHandler(this);
+                        this.inventory = new Inventory();
+                        this.gameMode = new MultiPlayerGameMode(this);
                         this.gameRenderer = new GameRenderer(this);
                         this.levelRenderer = new LevelRenderer(this);
                         this.gui = new Gui(this);
@@ -257,6 +273,23 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         // Tick the loaded world (advances the game clock)
                         if (this.level instanceof ClientLevel clientLevel) {
                                 clientLevel.tick();
+                                // Vanilla LocalPlayer tick order: the player's
+                                // aiStep runs after the level's, then the game
+                                // mode's destroy state machine advances
+                                if (this.player != null) {
+                                        this.player.tick(clientLevel);
+                                }
+                                this.gameMode.tick();
+                                // Held attack: vanilla continues the destroy on
+                                // the currently targeted block each tick
+                                if (this.player != null && this.mouseHandler.isMouseGrabbed()
+                                                && this.mouseHandler.isLeftPressed()
+                                                && this.hitResultBlock != null) {
+                                        this.gameMode.continueDestroyBlock(
+                                                this.hitResultBlock.blockX,
+                                                this.hitResultBlock.blockY,
+                                                this.hitResultBlock.blockZ);
+                                }
                         }
 
                         // Tick the HUD
@@ -503,6 +536,12 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                         // Screens show the cursor (vanilla releaseMouse)
                         this.mouseHandler.releaseMouse();
                         screen.init(this, this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
+                } else if (this.isLevelLoaded()) {
+                        // Vanilla Minecraft.setScreen(null) in a world:
+                        // re-grab the mouse for gameplay (this is what makes
+                        // clicking "Back to Game" hand the pointer back - and
+                        // covers closing any screen while in-world)
+                        this.mouseHandler.grabMouse();
                 }
         }
 
@@ -514,7 +553,13 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
          */
         public void disconnect() {
                 ClientMain.log("[Minecraft] disconnect -> title screen");
+                // Persist block edits (vanilla saves the level on unload)
+                if (this.level instanceof ClientLevel clientLevel) {
+                        clientLevel.saveEdits();
+                }
                 this.level = null;
+                this.player = null;
+                this.hitResultBlock = null;
                 this.missTime = 0;
                 this.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
         }
@@ -665,6 +710,14 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 return null;
         }
 
+        /** The stored world's game mode ("Survival"/"Creative"), survival
+         * when unknown - vanilla's LevelSummary.gameType resolution. */
+        private static String worldGameModeName(String levelName) {
+                net.lax1dude.eaglercraft.v2_6.WorldStorage.WorldSummary summary =
+                        net.lax1dude.eaglercraft.v2_6.WorldStorage.findWorld(levelName);
+                return summary != null ? summary.gameMode : "Survival";
+        }
+
         /**
          * Enters a world the Singleplayer way: constructs the client-side
          * {@link ClientLevel}, swaps it in, closes the menu, and leaves
@@ -685,12 +738,24 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 try {
                         ClientLevel clientLevel = new ClientLevel(levelName, "minecraft:overworld");
                         this.setLevel(clientLevel);
+                        // The local player: vanilla LocalPlayer placement - feet
+                        // on the flat preset's grass surface, looking at yaw 180
+                        // (vanilla spawn faces +Z... yaw 0 faces +Z in MC; the
+                        // title panorama view direction is preserved by 0)
+                        boolean creative = "Creative".equals(
+                                worldGameModeName(levelName));
+                        this.player = new LocalPlayer(this, creative);
+                        this.player.snapTo(clientLevel.getSpawnX(), clientLevel.getSpawnY(),
+                                clientLevel.getSpawnZ(), 0.0F, 0.0F);
+                        clientLevel.setGameMode(creative ? 1 : 0);
+                        this.hitResultBlock = null;
                         this.setScreen(null); // no menu = in-game; the HUD renders
                         // Vanilla refreshes lastPlayed on every world load
                         net.lax1dude.eaglercraft.v2_6.WorldStorage.touchWorld(levelName);
                         this.missTime = 0;
                         ClientMain.log("[Minecraft] World loaded: " + clientLevel
-                                + " (HUD active)");
+                                + " (HUD active, player at " + this.player.x + " "
+                                + this.player.y + " " + this.player.z + ")");
                 } catch (Throwable t) {
                         ClientMain.error("[Minecraft] World load failed: " + t.getMessage());
                         StackTraceElement[] stack = t.getStackTrace();
@@ -736,16 +801,95 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
         // ========== Input Stubs ==========
 
+        /** Vanilla startUseItem (MouseHandler button 1 while grabbed). */
         public void startUseItem() {
-                // stub
+                if (this.hitResultBlock != null && this.level instanceof ClientLevel) {
+                        int blockId = this.inventory.getSelectedBlock();
+                        this.gameMode.useItemOn(this.hitResultBlock, blockId);
+                }
         }
 
+        /** Vanilla startAttack (MouseHandler button 0 while grabbed). */
         public void startAttack() {
-                // stub
+                if (this.hitResultBlock != null) {
+                        this.gameMode.startDestroyBlock(
+                                this.hitResultBlock.blockX,
+                                this.hitResultBlock.blockY,
+                                this.hitResultBlock.blockZ);
+                }
         }
 
-        public void handleKeybindings() {
-                // stub - handled by KeyboardHandler/MouseHandler
+        /** Vanilla stopAttack (MouseHandler button 0 release). */
+        public void stopAttack() {
+                if (this.hitResultBlock != null) {
+                        this.gameMode.stopDestroyBlock(
+                                this.hitResultBlock.blockX,
+                                this.hitResultBlock.blockY,
+                                this.hitResultBlock.blockZ);
+                }
+        }
+
+        /** Vanilla pickBlock (middle click) - selects the targeted block's
+         * slot when it is already held (full creative pick needs the
+         * inventory UI). */
+        public void pickBlock() {
+                if (this.hitResultBlock != null && this.level instanceof ClientLevel level) {
+                        int id = level.getBlockState(this.hitResultBlock.blockX,
+                                this.hitResultBlock.blockY, this.hitResultBlock.blockZ);
+                        for (int i = 0; i < Inventory.HOTBAR_SIZE; i++) {
+                                if (this.inventory.getBlockId(i) == id && this.inventory.getCount(i) > 0) {
+                                        this.inventory.setSelected(i);
+                                        this.playerSelectedSlotChanged();
+                                        return;
+                                }
+                        }
+                }
+        }
+
+        /** The local player (null outside a world). */
+        public LocalPlayer getPlayer() {
+                return this.player;
+        }
+
+        /** The hotbar inventory. */
+        public Inventory getInventory() {
+                return this.inventory;
+        }
+
+        /** The singleplayer game mode. */
+        public MultiPlayerGameMode getGameMode() {
+                return this.gameMode;
+        }
+
+        /** The current crosshair target (vanilla hitResult, block scope). */
+        public BlockHitResult getHitResult() {
+                return this.hitResultBlock;
+        }
+
+        /** Gui/telemetry hook: the selected hotbar slot changed. */
+        public void playerSelectedSlotChanged() {
+                if (this.gui != null) {
+                        this.gui.setSelectedHotbarSlot(this.inventory.getSelected());
+                        // vanilla Gui: the item name popup triggers on change
+                        this.gui.setMissTime(40);
+                }
+        }
+
+        /**
+         * Vanilla GameRenderer.pick for blocks: one raycast per frame from
+         * the eye along the view vector; the result feeds attack/use and
+         * the outline. Misses clear the outline.
+         */
+        public void pickFromEye(double fromX, double fromY, double fromZ,
+                double dirX, double dirY, double dirZ, double range) {
+                if (!(this.level instanceof ClientLevel level)) {
+                        this.hitResultBlock = null;
+                        return;
+                }
+                double toX = fromX + dirX * range;
+                double toY = fromY + dirY * range;
+                double toZ = fromZ + dirZ * range;
+                this.hitResultBlock = level.clip(fromX, fromY, fromZ, toX, toY, toZ);
         }
 
         // ========== Narrator / Toast / Tutorial ==========

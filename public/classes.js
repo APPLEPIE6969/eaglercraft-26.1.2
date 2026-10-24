@@ -14495,10 +14495,38 @@ nmcm_ClientLevel_indexInSection = ($x, $y, $z) => {
     return ($y & 15) << 8 | ($z & 15) << 4 | $x & 15;
 },
 nmcm_ClientLevel_sectionFor = ($this, $key) => {
-    let $section;
+    let $section, $baseX, $baseY, $baseZ, $y, $worldY, $preset, $layerBase, $z, $rowBase, $x;
     $section = $this.$sections.$get0(jl_Long_valueOf($key));
     if ($section === null) {
         $section = $rt_createByteArray(4096);
+        $baseX = nmc_BlockPos_getX($key) << 4;
+        $baseY = nmc_BlockPos_getY($key) << 4;
+        $baseZ = nmc_BlockPos_getZ($key) << 4;
+        $y = 0;
+        while ($y < 16) {
+            a: {
+                $worldY = $baseY + $y | 0;
+                if ($worldY >= (-64) && $worldY <= 319) {
+                    $preset = $this.$generatedBlock($baseX, $worldY, $baseZ) << 24 >> 24;
+                    if ($preset) {
+                        $layerBase = $y << 8;
+                        $z = 0;
+                        while (true) {
+                            if ($z >= 16)
+                                break a;
+                            $rowBase = $layerBase | $z << 4;
+                            $x = 0;
+                            while ($x < 16) {
+                                (__safe($section).data||[])[$rowBase | $x] = $preset;
+                                $x = $x + 1 | 0;
+                            }
+                            $z = $z + 1 | 0;
+                        }
+                    }
+                }
+            }
+            $y = $y + 1 | 0;
+        }
         $this.$sections.$put(jl_Long_valueOf($key), $section);
     }
     return $section;
@@ -25021,6 +25049,10 @@ nmc_MouseHandler_cursorPressed = ($this, $window, $button, $action, $modifiers) 
     let $mx, $my, var$7, var$8;
     $mx = $this.$xpos0;
     $my = $this.$ypos0;
+    if ($button == 2)
+        $button = 1;
+    else if ($button == 1)
+        $button = 2;
     var$7 = $rt_compare($action, 1);
     if (!var$7 && !$this.$mouseGrabbed && $this.$minecraft0.$screen === null) {
         var$8 = $this.$minecraft0;

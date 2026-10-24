@@ -388,14 +388,58 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     const placeY = placeHit!.y + 1;
     const placeZ = placeHit!.z;
     const placeX = placeHit!.x;
+    // Re-pin once more and click immediately - the pick refreshes per
+    // frame, so the click races at most ~1 frame of drift
+    await page.evaluate(() => {
+      const game = (
+        self as unknown as {
+          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
+        }
+      ).__eaglercraftGame;
+      game?.setLook?.(0, 30);
+    });
+    await page.waitForTimeout(80);
+    const editsBefore = (await (async () => {
+      const t = await readGameTelemetry(page);
+      return t?.gameplay ? gameplayOf(t).edits : -1;
+    })());
     await page.mouse.down({ button: 'right' });
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(120);
     await page.mouse.up({ button: 'right' });
-    await page.waitForTimeout(600);
+
+    // Survival placement consumes the held stack and adds exactly one
+    // edit - position-independent success signals (the camera can drift
+    // a cell between the aim read and the click, so the position check
+    // scans the neighborhood instead of pinning one cell)
+    let placed = false;
+    let placedAt: string | null = null;
+    const placeDeadline = Date.now() + 8_000;
+    while (Date.now() < placeDeadline && !placed) {
+      await page.waitForTimeout(250);
+      const t = await readGameTelemetry(page);
+      const gp = t?.gameplay ? gameplayOf(t) : null;
+      if (!gp) continue;
+      const sel = gp.hotbar.slots[gp.hotbar.selected];
+      const consumed = !sel || sel[1] === 0;
+      if (gp.edits >= editsBefore + 1 && consumed) {
+        placed = true;
+        for (let dx = -2; dx <= 2 && !placedAt; dx++) {
+          for (let dz = -2; dz <= 2 && !placedAt; dz++) {
+            for (let dy = -1; dy <= 1 && !placedAt; dy++) {
+              const id = await queryBlock(page, placeX + dx, placeY + dy, placeZ + dz);
+              if (id === 9) {
+                placedAt = `(${placeX + dx}, ${placeY + dy}, ${placeZ + dz})`;
+              }
+            }
+          }
+        }
+      }
+    }
     expect(
-      await queryBlock(page, placeX, placeY, placeZ),
-      `right-clicking the ground must place the grass at (${placeX}, ${placeY}, ${placeZ})`,
-    ).toBe(9);
+      placed,
+      `right-clicking the ground must place the held grass (expected near ${placeX},${placeY},${placeZ}; editsBefore=${editsBefore})`,
+    ).toBe(true);
+    expect(placedAt, 'the placed grass block must sit near the aimed cell').toBeTruthy();
     expect(pageErrors, 'block editing must not throw uncaught page errors').toEqual([]);
     await attachMilestoneScreenshot(page, testInfo, '06-block-placed');
     await attachSessionSummary(testInfo, {
@@ -600,10 +644,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     async function typeServerEntry(): Promise<boolean> {
       await clickBridgeButton(page, 'servername', 'the Server Name box must be exposed');
       await page.waitForTimeout(150);
-      await page.keyboard.type('Gateway');
+      await page.keyboard.type('Gateway', { delay: 90 });
       await clickBridgeButton(page, 'serveraddress', 'the Server Address box must be exposed');
       await page.waitForTimeout(150);
-      await page.keyboard.type('localhost:1');
+      await page.keyboard.type('localhost:1', { delay: 90 });
       await page.waitForTimeout(300);
       const enabled = (await readGameTelemetry(page))?.buttons.find((b) => b.id === 'done')?.active;
       return enabled === true;

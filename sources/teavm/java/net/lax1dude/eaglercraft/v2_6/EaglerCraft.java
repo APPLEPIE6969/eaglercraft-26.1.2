@@ -1102,7 +1102,7 @@ public class EaglerCraft {
                 + " menuBackgroundBlurriness: menuBackgroundBlurriness,"
                 + " gameplay: JSON.parse(gameplayJson),"
                 + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; },"
-                + " queryBlock: function(x,y,z) { return queryBlockFn.query(x,y,z); },"
+                + " queryBlock: function(x,y,z) { return queryBlockFn(x,y,z); },"
                 + " setHotbarSlot: function(s,i,c) { window.__eaglercraftHotbarReq = {s:s,i:i,c:c}; },"
                 + " selectSlot: function(s) { window.__eaglercraftHotbarReq = {s:s,i:-1,c:0}; },"
                 + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; }"

@@ -47,13 +47,21 @@ async function getGuiCssCoords(
   guiY: number,
 ): Promise<{ cssX: number; cssY: number }> {
   return page.evaluate(({ guiX: gx, guiY: gy }) => {
+    // The shell hosts a decoy first canvas - pick the game canvas by
+    // id, or the largest visible one
+    const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas');
+    const canvas =
+      (byId as HTMLCanvasElement | null) ??
+      (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[])
+        .filter((c) => c.clientWidth > 0)
+        .sort((a, b) => b.clientWidth - a.clientWidth)[0] ??
+      null;
+    if (!canvas || canvas.width === 0 || canvas.clientWidth === 0) {
+      throw new Error('no game canvas for coordinate conversion');
+    }
     const bridge = (
       window as unknown as { __eaglercraftGame?: { guiScale?: number } }
     ).__eaglercraftGame;
-    const canvas = document.querySelector('canvas');
-    if (!canvas || canvas.width === 0) {
-      throw new Error('no game canvas for coordinate conversion');
-    }
     const guiScale =
       typeof bridge?.guiScale === 'number' && bridge.guiScale > 0 ? bridge.guiScale : 1;
     const backingToCss = canvas.clientWidth / canvas.width;
@@ -285,8 +293,11 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
 
     // ── Click the canvas to grab the pointer (vanilla click-to-grab) ──
     const canvas = await page.evaluate(() => {
-      const c = document.querySelector('canvas');
-      return c ? { x: c.getBoundingClientRect().left + c.clientWidth / 2, y: c.getBoundingClientRect().top + c.clientHeight / 2 } : null;
+      const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null;
+      const c = byId ?? (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[]).find((k) => k.clientWidth > 0);
+      if (!c) return null;
+      const rect = c.getBoundingClientRect();
+      return { x: rect.left + c.clientWidth / 2, y: rect.top + c.clientHeight / 2 };
     });
     expect(canvas, 'the game canvas must exist').toBeTruthy();
     await page.mouse.click(canvas!.x, canvas!.y);
@@ -443,8 +454,9 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       const bridge = (
         window as unknown as { __eaglercraftGame?: { guiScale?: number } }
       ).__eaglercraftGame;
-      const canvas = document.querySelector('canvas');
-      if (!canvas || canvas.width === 0) return null;
+      const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null;
+      const canvas = byId ?? (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[]).find((k) => k.clientWidth > 0);
+      if (!canvas || canvas.width === 0 || canvas.clientWidth === 0) return null;
       const guiScale =
         typeof bridge?.guiScale === 'number' && bridge.guiScale > 0 ? bridge.guiScale : 1;
       const backingToCss = canvas.clientWidth / canvas.width;
@@ -454,10 +466,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       const rowW = Math.min(480, guiWidth - 20);
       const keyButtonX = rowX + rowW - 52 + 25; // +25 = button center
       const row1Y = 32 + 20 + 10; // header row + half the bind row
-      return {
-        cssX: rect.left + keyButtonX * guiScale * backingToCss,
-        cssY: rect.top + row1Y * guiScale * backingToCss,
-      };
+      const cssX = rect.left + keyButtonX * guiScale * backingToCss;
+      const cssY = rect.top + row1Y * guiScale * backingToCss;
+      if (!Number.isFinite(cssX) || !Number.isFinite(cssY)) return null;
+      return { cssX, cssY };
     });
     expect(keyButtonCenter, 'the key-binds list geometry must be computable').toBeTruthy();
     await page.mouse.click(keyButtonCenter!.cssX, keyButtonCenter!.cssY);

@@ -47,6 +47,12 @@ public class PlatformRuntime {
         /** The current canvas height in CSS pixels. */
         private static int canvasHeight = 0;
 
+        /** The current drawing-buffer width in physical pixels (CSS × DPR). */
+        private static int bufferWidth = 0;
+
+        /** The current drawing-buffer height in physical pixels (CSS × DPR). */
+        private static int bufferHeight = 0;
+
         /** The device pixel ratio for HiDPI support. */
         private static float devicePixelRatio = 1.0f;
 
@@ -87,11 +93,9 @@ public class PlatformRuntime {
                 timeOrigin = getTimeOrigin();
                 totalTimeMs = getCurrentTimeMillis();
 
-                // Initialize canvas size
+                // Initialize canvas size (also reads the device pixel ratio:
+                // the buffer must always be sized with the CURRENT ratio)
                 updateCanvasSize();
-
-                // Initialize device pixel ratio
-                devicePixelRatio = getDevicePixelRatio0();
 
                 // Initialize screen info
                 updateScreenInfo();
@@ -120,9 +124,9 @@ public class PlatformRuntime {
                 deltaTimeMs = deltaMs;
                 totalTimeMs += deltaMs;
 
-                // Update canvas size (check for resize)
+                // Update canvas size (picks up client-size AND device-pixel-ratio
+                // changes; the ratio is refreshed inside, before it is used)
                 updateCanvasSize();
-                devicePixelRatio = getDevicePixelRatio0();
 
                 // Poll gamepad
                 PlatformInput.pollGamepad();
@@ -169,22 +173,44 @@ public class PlatformRuntime {
         // ========== Canvas / Screen ==========
 
         /**
-         * Updates the cached canvas dimensions.
+         * Updates the cached canvas dimensions and the drawing-buffer size.
+         *
+         * <p>This is the single authority for the canvas backing-store size:
+         * buffer = CSS size × devicePixelRatio, refreshed whenever EITHER
+         * factor changes. The old implementation sized the buffer with the
+         * PREVIOUS ratio and only refreshed the ratio afterwards, and it only
+         * re-sized when clientWidth changed — so on HiDPI displays and zoomed
+         * browsers (devicePixelRatio ≠ 1) the buffer stayed at CSS×1 forever,
+         * rendering blurry/pixelated while the rest of the pipeline (Window
+         * cache, GUI scale, mouse mapping) used the true ratio. A manual
+         * window resize was the only thing that re-aligned them.</p>
          */
         public static void updateCanvasSize() {
                 HTMLCanvasElement canvas = ClientMain.getCanvas();
-                if (canvas != null) {
-                        int w = canvas.getClientWidth();
-                        int h = canvas.getClientHeight();
-                        if (w != canvasWidth || h != canvasHeight) {
-                                canvasWidth = w;
-                                canvasHeight = h;
-                                // Update the actual drawing buffer size
-                                int dw = (int) (w * devicePixelRatio);
-                                int dh = (int) (h * devicePixelRatio);
-                                canvas.setWidth(dw);
-                                canvas.setHeight(dh);
-                        }
+                if (canvas == null) {
+                        return;
+                }
+                int w = canvas.getClientWidth();
+                int h = canvas.getClientHeight();
+                // Read the ratio FIRST and size the buffer with it in the same
+                // pass, so a ratio change alone (browser zoom, moving the window
+                // to another monitor) re-sizes the buffer without needing a
+                // client-size change to trigger it.
+                float dpr = getDevicePixelRatio0();
+                devicePixelRatio = dpr;
+                int dw = Math.max(1, Math.round(w * dpr));
+                int dh = Math.max(1, Math.round(h * dpr));
+                boolean bufferChanged = dw != bufferWidth || dh != bufferHeight
+                                || canvas.getWidth() != dw || canvas.getHeight() != dh;
+                canvasWidth = w;
+                canvasHeight = h;
+                bufferWidth = dw;
+                bufferHeight = dh;
+                if (bufferChanged) {
+                        // setWidth/setHeight clear the canvas, so they are only
+                        // touched when the buffer really has to change.
+                        canvas.setWidth(dw);
+                        canvas.setHeight(dh);
                 }
         }
 
@@ -203,17 +229,20 @@ public class PlatformRuntime {
         }
 
         /**
-         * Gets the canvas width in physical pixels (for drawing buffer).
+         * Gets the canvas width in physical pixels. Returns the exact
+         * drawing-buffer size that was last applied to the canvas element,
+         * not a re-derived product, so every consumer (Window cache, GUI
+         * scale, viewport, mouse mapping) agrees on the same integers.
          */
         public static int getCanvasDrawableWidth() {
-                return (int) (canvasWidth * devicePixelRatio);
+                return bufferWidth;
         }
 
         /**
-         * Gets the canvas height in physical pixels (for drawing buffer).
+         * Gets the canvas height in physical pixels (exact drawing-buffer size).
          */
         public static int getCanvasDrawableHeight() {
-                return (int) (canvasHeight * devicePixelRatio);
+                return bufferHeight;
         }
 
         /**
@@ -597,9 +626,11 @@ public class PlatformRuntime {
         }
 
         private static void __onResize() {
+                // updateCanvasSize re-reads the device pixel ratio before using
+                // it, so a zoom-driven resize (ratio change, same client size)
+                // is picked up here too.
                 updateCanvasSize();
                 updateScreenInfo();
-                devicePixelRatio = getDevicePixelRatio0();
         }
 
         // Orientation change listener

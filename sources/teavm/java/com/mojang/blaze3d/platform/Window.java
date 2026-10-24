@@ -344,6 +344,15 @@ public class Window {
         this.eventHandler = eventHandler;
         this.displayData = displayData;
         this.title = title;
+        // Pull the real canvas dimensions in at construction. The browser
+        // canvas is laid out before main() runs, so this is the settled
+        // size in virtually every boot; without it the cached size stays
+        // 0x0, the first GUI-scale calculation degenerates to 1 and the
+        // first screens initialize against a 0x0 viewport. Minecraft
+        // syncCanvasSize() still re-syncs every tick as a safety net.
+        updateCanvasSize();
+        this.windowedWidth = this.width;
+        this.windowedHeight = this.height;
     }
 
     public void close() {

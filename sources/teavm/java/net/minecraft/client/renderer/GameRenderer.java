@@ -60,6 +60,14 @@ public class GameRenderer {
                 int guiHeight = minecraft.getWindow().getGuiScaledHeight();
                 if (guiWidth <= 0 || guiHeight <= 0) return;
 
+                // Keep the GL viewport glued to the actual drawing buffer on
+                // every frame. The viewport used to be sized once at boot; a
+                // buffer that settles later (or at a different device pixel
+                // ratio) then rendered into a stale, overscanned viewport,
+                // clipping the right/bottom of the GUI until the user manually
+                // resized the window.
+                PlatformOpenGL._wglViewport(0, 0, pxWidth, pxHeight);
+
                 try {
                         // Clear to the vanilla overworld sky color
                         PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);

@@ -337,3 +337,76 @@ before the PNGs finish downloading (and as documentation of the colors).
 | Hotbar | exact + real sprite | selection follows `selectedHotbarSlot` |
 | Crosshair | exact + real sprite | sprite blit (vanilla XOR-blends when hostile indicators exist; ours is the plain sprite) |
 | Font | exact glyphs + widths from the jar's ascii.png (ascent 7, space advance 4) | vanilla variable-width rendering; shadow = +1px copy at 25% color |
+
+## Feature 4: block palette, 36-slot inventory and the container screens
+
+### Registry id policy (no decompile available)
+
+The original `mc-client-26.1.2.jar` (the local decompile reference) was
+lost with a sandbox reset and its only provenance was Mojang's piston
+manifest, so new-block numeric ids could no longer be read from the
+decompile. Policy:
+
+- `1/4/9/10/15/33` (stone, cobblestone, grass_block, dirt, oak_planks,
+  bedrock) are verified from the decompile and never change.
+- `5-8` (stone-brick family), `11-14` (dirt family incl. mud), `16-23`
+  (planks family) and `34-49` (the ore ladder) follow the registry runs
+  those anchors imply - high confidence from modern-vanilla ordering.
+- Every other entry uses a port-assigned id `>= 256`
+  (scripts/gen_block_palette.py assigns them deterministically in
+  definition order). Save format stores ids verbatim; they are stable
+  for the life of the port.
+
+### Blocks (158 entries)
+
+- Textures are the real jar PNGs (static frame 0; `.png.mcmeta`
+  animation metadata is not ported) copied to
+  `assets/world/textures/` (3D array layers) and
+  `assets/gui/sprites/block/` (GUI icons) by
+  scripts/gen_block_palette.py.
+- destroySpeed / requiresCorrectTool follow the vanilla
+  Properties.strength table (stone 1.5, obsidian 50, ancient debris 30,
+  leaves 0.2, ...); all full cubes use friction 0.6.
+- Biome tint bake at texture upload: grass top 0x91BD59 (plains grass),
+  leaves 0x77AB2F (plains foliage), birch 0x80A755, spruce 0x619961 -
+  the same bake vanilla's biome colormaps perform. The world shader's
+  alpha-0.5 discard gives leaves/glass cutout for free.
+
+### Inventory (vanilla 36-slot model)
+
+- `Inventory.items`: 0-8 hotbar, 9-35 main. `addItem` = vanilla
+  getSlotWithRemainingSpace-then-getFreeSlot (hotbar-first).
+- Slot clicks implement vanilla AbstractContainerMenu.doClick: left
+  pickup/place/merge/swap, right pickup-ceil-half / place-one, shift
+  quick-move between the main inventory and the hotbar. The carried
+  (cursor) stack is `AbstractContainerMenu.carried`.
+
+### Survival InventoryScreen
+
+- Panel geometry measured from the real container texture's own inset
+  borders (176x166): armor x=7 y=7+18r, craft 2x2 (97,17)+(115,35),
+  result (153,27), main (7,83) 9x3, hotbar (7,141).
+- Working: the 27 main + 9 hotbar slots (click/shift-click), carried
+  stack, tooltips, E/ESC close.
+- Simplifications (no backing systems yet): armor and the 2x2
+  crafting grid render as inert vanilla slots; clicking outside the
+  panel does not drop the carried stack (no item entities).
+
+### CreativeModeInventoryScreen
+
+- Panel 195x136 from tab_items.png (grid (8,17) 9x5, hotbar row y=111,
+  destroy slot (174,111), 12x15 scroller on a 90px track at x=174),
+  all measured from the texture.
+- Behavior is vanilla's item-picker tab: left = full stack, right =
+  one, click-with-carried on the grid = void, destroy slot = void,
+  wheel pages the grid, E/ESC close.
+- Simplifications vs vanilla: a single tab row with the three
+  populated categories (Building / Colored / Natural) - the search
+  tab (no localized search index) and the player-inventory tab are
+  not ported yet. Tabs nine-slice-stretch the 26x32
+  tab_top_selected/unselected sprites to the label width.
+
+### Telemetry bridge additions
+
+`gameplay.main` (27 slots), `gameplay.carried` and CycleButton ids of
+the form `gamemode:survival` (prefix + current value) for automation.

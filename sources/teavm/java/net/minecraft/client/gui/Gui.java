@@ -199,11 +199,63 @@ public class Gui {
         }
 
         /** The display name of a block (vanilla Component.translatable
-         * "block.minecraft.<name>", rendered from the registry key). */
-        private static String blockName(int blockId) {
+         * "block.minecraft.<name>", rendered from the registry's
+         * vanilla en_us.json display name). */
+        public static String blockName(int blockId) {
                 net.minecraft.world.level.block.Blocks.Block block =
                         net.minecraft.world.level.block.Blocks.byId(blockId);
-                return block.name == null ? null : block.name;
+                return block.displayName == null ? null : block.displayName;
+        }
+
+        /**
+         * Vanilla slot-item rendering shared by the hotbar and the
+         * inventory screens: a 16x16 flat block icon at the slot's
+         * +3,+3 inner corner (hotbar) or +1,+1 (container slots).
+         */
+        public static void drawItemIcon(int blockId, float x, float y) {
+                String tex = iconTexture(blockId);
+                if (tex != null) {
+                        EaglerGuiImpl.drawSprite(tex, x, y, 16, 16);
+                }
+        }
+
+        /** The stack-count text, bottom-right of a 16x16 icon slot. */
+        public static void drawItemCount(int count, float x, float y) {
+                if (count > 1) {
+                        String label = String.valueOf(count);
+                        float width = EaglerGuiImpl.widthOf(label);
+                        EaglerGuiImpl.drawText(label, x + 17 - width, y + 9,
+                                        0xFFFFFFFF, true);
+                }
+        }
+
+        /** A full item rendering pass (icon + count). */
+        public static void drawItem(int blockId, int count, float x, float y) {
+                if (blockId == net.minecraft.world.level.block.Blocks.AIR || count <= 0) {
+                        return;
+                }
+                drawItemIcon(blockId, x, y);
+                drawItemCount(count, x, y);
+        }
+
+        /** Vanilla tooltip background (GuiGraphics.renderTooltip). */
+        public static void drawTooltip(String text, float mouseX, float mouseY,
+                        float screenW, float screenH) {
+                float width = EaglerGuiImpl.widthOf(text);
+                float x = mouseX + 12;
+                float y = mouseY - 12;
+                if (x + width + 6 > screenW) {
+                        x = mouseX - width - 18;
+                }
+                if (y < 4) {
+                        y = 4;
+                }
+                EaglerGuiImpl.fillRect(x - 3, y - 3, width + 6, 12, 0xF0100010);
+                EaglerGuiImpl.fillRect(x - 4, y - 4, width + 8, 1, 0xFF50509E);
+                EaglerGuiImpl.fillRect(x - 4, y + 9, width + 8, 1, 0xFF50509E);
+                EaglerGuiImpl.fillRect(x - 4, y - 3, 1, 12, 0xFF50509E);
+                EaglerGuiImpl.fillRect(x + width + 3, y - 3, 1, 12, 0xFF50509E);
+                EaglerGuiImpl.drawText(text, x, y, 0xFFFFFFFF, false);
         }
 
         /**

@@ -85,51 +85,59 @@ public final class GuiSprites {
         public static void requestAll() {
                 if (requested) return;
                 requested = true;
-                String[] names = {
-                        "widget/button",
-                        "widget/button_highlighted",
-                        "widget/button_disabled",
-                        "widget/text_field",
-                        "widget/text_field_highlighted",
-                        "widget/tab",
-                        "widget/tab_highlighted",
-                        "widget/tab_selected",
-                        "widget/tab_selected_highlighted",
-                        "widget/scroller",
-                        "widget/scroller_background",
-                        "widget/slider",
-                        "widget/slider_highlighted",
-                        "widget/slider_handle",
-                        "widget/slider_handle_highlighted",
-                        "hud/crosshair",
-                        "hud/hotbar",
-                        "hud/hotbar_selection",
-                        "misc/unknown_server",
-                        "icon/language",
-                        "icon/accessibility",
-                        "block/grass_block_top",
-                        "block/grass_block_side",
-                        "block/dirt",
-                        "block/bedrock",
-                        "block/stone",
-                        "block/cobblestone",
-                        "block/oak_planks",
-                        "gui/menu_background",
-                        "gui/menu_list_background",
-                        "gui/header_separator",
-                        "gui/footer_separator",
-                        "title/background/panorama_0",
-                        "title/background/panorama_1",
-                        "title/background/panorama_2",
-                        "title/background/panorama_3",
-                        "title/background/panorama_4",
-                        "title/background/panorama_5"
-                };
-                for (int i = 0; i < names.length; i++) {
-                        pending.add(names[i]);
-                        beginLoad(names[i], BASE_PATH + names[i] + ".png");
+                java.util.List<String> names = new java.util.ArrayList<String>();
+                names.add("widget/button");
+                names.add("widget/button_highlighted");
+                names.add("widget/button_disabled");
+                names.add("widget/text_field");
+                names.add("widget/text_field_highlighted");
+                names.add("widget/tab");
+                names.add("widget/tab_highlighted");
+                names.add("widget/tab_selected");
+                names.add("widget/tab_selected_highlighted");
+                names.add("widget/scroller");
+                names.add("widget/scroller_background");
+                names.add("widget/slider");
+                names.add("widget/slider_highlighted");
+                names.add("widget/slider_handle");
+                names.add("widget/slider_handle_highlighted");
+                names.add("hud/crosshair");
+                names.add("hud/hotbar");
+                names.add("hud/hotbar_selection");
+                names.add("misc/unknown_server");
+                names.add("icon/language");
+                names.add("icon/accessibility");
+                // container chrome for the inventory screens (vanilla
+                // textures/gui/container/*)
+                names.add("container/inventory");
+                names.add("container/creative_inventory/tab_items");
+                names.add("container/creative_inventory/tab_inventory");
+                names.add("container/creative_inventory/tab_item_search");
+                for (int w = 1; w <= 7; w++) {
+                        names.add("container/creative_inventory/tab_top_selected_" + w);
+                        names.add("container/creative_inventory/tab_top_unselected_" + w);
                 }
-                ClientMain.log("[GuiSprites] requested " + names.length + " vanilla sprite PNGs");
+                names.add("container/creative_inventory/scroller");
+                // every texture the block registry references (GUI item
+                // icons live under sprites/block/<texture>.png)
+                for (String texture : net.minecraft.world.level.block.Blocks.allTextureNames()) {
+                        names.add("block/" + texture);
+                }
+                names.add("gui/menu_background");
+                names.add("gui/menu_list_background");
+                names.add("gui/header_separator");
+                names.add("gui/footer_separator");
+                names.add("title/background/panorama_0");
+                names.add("title/background/panorama_1");
+                names.add("title/background/panorama_2");
+                names.add("title/background/panorama_3");
+                names.add("title/background/panorama_4");
+                names.add("title/background/panorama_5");
+                for (int i = 0; i < names.size(); i++) {
+                        pending.add(names.get(i));
+                        beginLoad(names.get(i), BASE_PATH + names.get(i) + ".png");
+                }
+                ClientMain.log("[GuiSprites] requested " + names.size() + " vanilla sprite PNGs");
         }
 
         /**

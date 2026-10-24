@@ -900,6 +900,26 @@ public class EaglerCraft {
                 }
                 sb.append(']');
                 sb.append('}');
+                // full inventory + carried stack (inventory-screen asserts)
+                sb.append(",\"main\":[");
+                for (int i = 0; i < net.minecraft.world.entity.player.Inventory.MAIN_SIZE; i++) {
+                        if (i > 0) sb.append(',');
+                        int id = inv.getBlockId(net.minecraft.world.entity.player.Inventory.HOTBAR_SIZE + i);
+                        int count = inv.getCount(net.minecraft.world.entity.player.Inventory.HOTBAR_SIZE + i);
+                        if (count > 0 && id != net.minecraft.world.level.block.Blocks.AIR) {
+                                sb.append('[').append(id).append(',').append(count).append(']');
+                        } else {
+                                sb.append("null");
+                        }
+                }
+                sb.append(']');
+                if (inv.getCarriedCount() > 0
+                                && inv.getCarriedBlock() != net.minecraft.world.level.block.Blocks.AIR) {
+                        sb.append(",\"carried\":[").append(inv.getCarriedBlock())
+                                .append(',').append(inv.getCarriedCount()).append(']');
+                } else {
+                        sb.append(",\"carried\":null");
+                }
                 net.minecraft.world.phys.BlockHitResult hit = mc.getHitResult();
                 if (hit != null && hit.type == net.minecraft.world.phys.BlockHitResult.Type.BLOCK) {
                         sb.append(",\"hit\":{\"x\":").append(hit.blockX)

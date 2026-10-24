@@ -76,4 +76,18 @@ public class CycleButton extends Button {
                         onValueChange.onChange(this, index);
                 }
         }
+
+        /**
+         * Bridge id: the prefix plus the CURRENT value, so automation can
+         * find a cycle button in a specific state ("gamemode:survival" ->
+         * click -> "gamemode:hardcore" -> click -> "gamemode:creative").
+         */
+        @Override
+        public String getTelemetryId() {
+                String base = (prefix == null ? "" : prefix)
+                        .toLowerCase().replaceAll("[^a-z0-9]+", "");
+                String value = getValue() == null ? "" : getValue();
+                String vs = value.toLowerCase().replaceAll("[^a-z0-9]+", "");
+                return base + (vs.isEmpty() ? "" : ":" + vs);
+        }
 }

@@ -3,12 +3,18 @@ import { expect, test } from './fixtures';
 import {
   attachMilestoneScreenshot,
   attachSessionSummary,
+  enterWorld,
+  gameplayOf,
   getButtonCssCoords,
+  getGuiCssCoords,
+  hasGameplayBridge,
   installConsoleRecorder,
   readGameTelemetry,
   waitForClientBootstrap,
   waitForFpsReading,
   waitForReadyState,
+  waitForTelemetry,
+  type Gameplay,
 } from './support';
 
 const BOOT_TIMEOUT = 150_000;
@@ -16,20 +22,6 @@ const READY_TIMEOUT = 90_000;
 
 type Telemetry = NonNullable<Awaited<ReturnType<typeof readGameTelemetry>>>;
 
-/** Polls the telemetry until the predicate holds or the deadline expires. */
-async function waitForTelemetry(
-  page: Page,
-  deadlineMs: number,
-  predicate: (telemetry: Telemetry) => boolean,
-): Promise<Telemetry> {
-  const deadline = Date.now() + deadlineMs;
-  let state = await readGameTelemetry(page);
-  while (Date.now() < deadline && !(state && predicate(state))) {
-    await page.waitForTimeout(200);
-    state = await readGameTelemetry(page);
-  }
-  return state;
-}
 
 /** Clicks a bridge button by its telemetry id (move + settle + click). */
 async function clickBridgeButton(page: Page, id: string, failMessage: string): Promise<void> {
@@ -40,80 +32,9 @@ async function clickBridgeButton(page: Page, id: string, failMessage: string): P
   await page.mouse.click(coords!.cssX, coords!.cssY);
 }
 
-/** Converts arbitrary GUI-pixel coordinates to canvas CSS coordinates. */
-async function getGuiCssCoords(
-  page: Page,
-  guiX: number,
-  guiY: number,
-): Promise<{ cssX: number; cssY: number }> {
-  return page.evaluate(({ guiX: gx, guiY: gy }) => {
-    // The shell hosts a decoy first canvas - pick the game canvas by
-    // id, or the largest visible one
-    const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas');
-    const canvas =
-      (byId as HTMLCanvasElement | null) ??
-      (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[])
-        .filter((c) => c.clientWidth > 0)
-        .sort((a, b) => b.clientWidth - a.clientWidth)[0] ??
-      null;
-    if (!canvas || canvas.width === 0 || canvas.clientWidth === 0) {
-      throw new Error('no game canvas for coordinate conversion');
-    }
-    const bridge = (
-      window as unknown as { __eaglercraftGame?: { guiScale?: number } }
-    ).__eaglercraftGame;
-    const guiScale =
-      typeof bridge?.guiScale === 'number' && bridge.guiScale > 0 ? bridge.guiScale : 1;
-    const backingToCss = canvas.clientWidth / canvas.width;
-    const rect = canvas.getBoundingClientRect();
-    return {
-      cssX: rect.left + gx * guiScale * backingToCss,
-      cssY: rect.top + gy * guiScale * backingToCss,
-    };
-  }, { guiX, guiY });
-}
 
-/** Enters the default world through the bridge and waits for the HUD and
- * the first landed physics tick (onGround) so the snapshot is settled. */
-async function enterWorld(page: Page): Promise<Telemetry> {
-  await page.evaluate(() => {
-    const game = (
-      self as unknown as { __eaglercraftGame?: { enterWorld?: () => void } }
-    ).__eaglercraftGame;
-    game?.enterWorld?.();
-  });
-  const state = await waitForTelemetry(page, 30_000, (t) => {
-    const gp = t.gameplay as Gameplay | null | undefined;
-    return t.inWorld && !!gp?.player?.onGround;
-  });
-  expect(state?.inWorld, 'the client must enter the world').toBe(true);
-  expect(state?.gameplay, 'the gameplay snapshot must exist in world').toBeTruthy();
-  return state!;
-}
 
-/** The gameplay snapshot type (mirrors buildGameplayJson in EaglerCraft.java). */
-interface Gameplay {
-  creative: boolean;
-  edits: number;
-  spawn: [number, number, number];
-  player: {
-    x: number;
-    y: number;
-    z: number;
-    yaw: number;
-    pitch: number;
-    onGround: boolean;
-    flying: boolean;
-    crouching: boolean;
-  };
-  hotbar: { selected: number; slots: ([number, number] | null)[] };
-  hit: { x: number; y: number; z: number; face?: string } | null;
-  destroy: { stage: number; x: number; y: number; z: number } | null;
-}
 
-function gameplayOf(state: Telemetry): Gameplay {
-  return state.gameplay as unknown as Gameplay;
-}
 
 /** Reads a world block through the bridge's synchronous queryBlock. */
 async function queryBlock(page: Page, x: number, y: number, z: number): Promise<number> {
@@ -130,17 +51,8 @@ async function queryBlock(page: Page, x: number, y: number, z: number): Promise<
   );
 }
 
-/** Whether the deployed bundle carries the gameplay bridge (capability gate). */
-async function hasGameplayBridge(page: Page): Promise<boolean> {
-  return page.evaluate(() => {
-    const game = (
-      self as unknown as {
-        __eaglercraftGame?: { queryBlock?: unknown; setLook?: unknown; gameplay?: unknown };
-      }
-    ).__eaglercraftGame;
-    return typeof game?.queryBlock === 'function' && typeof game?.setLook === 'function';
-  });
-}
+
+
 
 test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
   test('movement physics, jump and hotbar keys work in-world (capability-gated)', async ({

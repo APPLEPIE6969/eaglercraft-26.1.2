@@ -79,8 +79,17 @@ public class KeyboardHandler {
                                 }
                         }
                         if (key == KeyMapping.INVENTORY.getKey()) {
-                                // vanilla key.inventory opens the inventory screen
-                                // (no inventory UI yet - reserved)
+                                // vanilla key.inventory opens the inventory
+                                // screen; in creative the screen swaps to the
+                                // creative item picker (vanilla
+                                // Minecraft.handleKeybinds -> hasInfiniteItems)
+                                if (minecraft.getPlayer() != null && minecraft.getScreen() == null) {
+                                        if (minecraft.getPlayer().mayfly) {
+                                                minecraft.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen());
+                                        } else {
+                                                minecraft.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen());
+                                        }
+                                }
                                 return;
                         }
                 }

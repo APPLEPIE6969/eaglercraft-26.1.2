@@ -13,6 +13,7 @@ import org.teavm.jso.typedarrays.Uint8Array;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Loads the real Minecraft 26.1.2 block textures for the 3D world
@@ -25,7 +26,10 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
  * Every texture is a 16x16 layer of a single {@code TEXTURE_2D_ARRAY};
  * the mesh builder indexes layers per-vertex, so a mixed section (grass
  * top + dirt sides + bedrock) draws in one call with one bind - the
- * same shape as vanilla's atlas binding.</p>
+ * same shape as vanilla's atlas binding. The layer list is derived from
+ * the {@link Blocks} registry (destroy stages first, then every
+ * texture the registry references in registry order), so adding blocks
+ * never touches this class.</p>
  *
  * <p>Sampling state mirrors vanilla block atlases:</p>
  * <ul>
@@ -35,9 +39,10 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
  *       mip chain (vanilla's block mipmap, kills distant shimmer)</li>
  * </ul>
  *
- * <p>The grass_block_top texture is grayscale in the vanilla assets and
- * is tinted at upload time with the plains-biome grass color (0x91BD59)
- * - the same bake vanilla's biome colormap performs.</p>
+ * <p>Biome tint bake: the grayscale grass_block_top and leaf textures
+ * are multiplied at upload time with their registry tint (plains grass
+ * 0x91BD59, foliage 0x77AB2F, birch 0x80A755, spruce 0x619961) - the
+ * same bake vanilla's biome colormaps perform.</p>
  *
  * <p>Load protocol mirrors {@link GuiSprites}: async {@code <img>}
  * downloads parked in {@code window.__eaglerWorldTextures}, drained
@@ -48,38 +53,50 @@ public final class WorldTextures {
         /** Base path the block texture PNGs are served from (same origin). */
         public static final String BASE_PATH = "assets/world/textures/";
 
-        /** Layer order = the array's depth index (stable, referenced by name). */
-        public static final String[] NAMES = {
-                "grass_block_top",      // 0
-                "grass_block_side",     // 1
-                "dirt",                 // 2
-                "bedrock",              // 3
-                "stone",                // 4
-                "cobblestone",          // 5
-                "oak_planks",           // 6
-                "destroy_stage_0",      // 7
-                "destroy_stage_1",      // 8
-                "destroy_stage_2",      // 9
-                "destroy_stage_3",      // 10
-                "destroy_stage_4",      // 11
-                "destroy_stage_5",      // 12
-                "destroy_stage_6",      // 13
-                "destroy_stage_7",      // 14
-                "destroy_stage_8",      // 15
-                "destroy_stage_9"       // 16
-        };
+        /** Destroy-stage overlays occupy the first 10 array layers. */
+        public static final int DESTROY_STAGE_COUNT = 10;
 
-        public static final int LAYER_GRASS_TOP = 0;
-        public static final int LAYER_GRASS_SIDE = 1;
-        public static final int LAYER_DIRT = 2;
-        public static final int LAYER_BEDROCK = 3;
-        public static final int LAYER_STONE = 4;
-        public static final int LAYER_COBBLESTONE = 5;
-        public static final int LAYER_OAK_PLANKS = 6;
-        public static final int LAYER_DESTROY_0 = 7;
+        /** Layer of destroy_stage_0 (destroy_stage_N = this + N). */
+        public static final int LAYER_DESTROY_0 = 0;
 
-        /** Vanilla plains grass tint (RGB) for the grayscale grass top. */
-        public static final int GRASS_TINT = 0x91BD59;
+        /** Layer order = the array's depth index (destroy stages, then block textures). */
+        public static final String[] NAMES = buildNames();
+
+        /** Per-layer tint (0 = none), aligned with NAMES. */
+        private static final int[] TINTS = buildTints();
+
+        private static String[] buildNames() {
+                List<String> names = new ArrayList<String>();
+                for (int i = 0; i < DESTROY_STAGE_COUNT; i++) {
+                        names.add("destroy_stage_" + i);
+                }
+                names.addAll(Blocks.allTextureNames());
+                return names.toArray(new String[0]);
+        }
+
+        private static int[] buildTints() {
+                int[] tints = new int[NAMES.length];
+                for (int i = DESTROY_STAGE_COUNT; i < NAMES.length; i++) {
+                        String tex = NAMES[i];
+                        for (Blocks.Block b : Blocks.creativeBuilding()) {
+                                tints[i] = b.tintFor(tex);
+                                if (tints[i] != 0) break;
+                        }
+                        if (tints[i] == 0) {
+                                for (Blocks.Block b : Blocks.creativeColored()) {
+                                        tints[i] = b.tintFor(tex);
+                                        if (tints[i] != 0) break;
+                                }
+                        }
+                        if (tints[i] == 0) {
+                                for (Blocks.Block b : Blocks.creativeNatural()) {
+                                        tints[i] = b.tintFor(tex);
+                                        if (tints[i] != 0) break;
+                                }
+                        }
+                }
+                return tints;
+        }
 
         private static final Map<String, Uint8Array> decoded = new HashMap<String, Uint8Array>();
         private static final List<String> pending = new ArrayList<String>();
@@ -132,8 +149,9 @@ public final class WorldTextures {
                                 continue;
                         }
                         Uint8Array pixels = data.getData();
-                        if (LAYER_GRASS_TOP == layerOf(name)) {
-                                pixels = bakeTint(pixels, GRASS_TINT);
+                        int tint = layerTint(name);
+                        if (tint != 0) {
+                                pixels = bakeTint(pixels, tint);
                         }
                         decoded.put(name, pixels);
                 }
@@ -165,6 +183,12 @@ public final class WorldTextures {
                         }
                 }
                 return -1;
+        }
+
+        /** Registry tint for a texture layer (0 = render raw). */
+        public static int layerTint(String name) {
+                int idx = layerOf(name);
+                return idx >= 0 ? TINTS[idx] : 0;
         }
 
         /** Array layer for a block's top face (real Blocks registry type). */
@@ -201,7 +225,7 @@ public final class WorldTextures {
                 return out;
         }
 
-        /** Uploads every decoded layer as one TEXTURE_2D_ARRAY (17 layers). */
+        /** Uploads every decoded layer as one TEXTURE_2D_ARRAY. */
         private static JSObject buildArray(WebGL2RenderingContext gl) {
                 JSObject tex = PlatformOpenGL._wglCreateTexture();
                 PlatformOpenGL._wglBindTexture(WebGL2RenderingContext.TEXTURE_2D_ARRAY, tex);

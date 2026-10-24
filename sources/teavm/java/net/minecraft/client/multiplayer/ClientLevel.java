@@ -129,6 +129,32 @@ public class ClientLevel {
                 byte[] section = sections.get(key);
                 if (section == null) {
                         section = new byte[SECTION_SIZE * SECTION_SIZE * SECTION_SIZE];
+                        // Materialize the generated preset - vanilla fills a
+                        // fresh section from the ChunkSource generator. A
+                        // zero array would read as air and drop the whole
+                        // 16^3 region out of collision/raycast/mesh reads
+                        // the moment the first edit materializes it.
+                        int baseX = BlockPos.getX(key) << SECTION_SHIFT;
+                        int baseY = BlockPos.getY(key) << SECTION_SHIFT;
+                        int baseZ = BlockPos.getZ(key) << SECTION_SHIFT;
+                        for (int y = 0; y < SECTION_SIZE; y++) {
+                                int worldY = baseY + y;
+                                if (worldY < MIN_Y || worldY > MAX_Y) {
+                                        continue;
+                                }
+                                // The flat preset is x/z-uniform: one layer value
+                                byte preset = (byte) generatedBlock(baseX, worldY, baseZ);
+                                if (preset == Blocks.AIR) {
+                                        continue;
+                                }
+                                int layerBase = y << 8;
+                                for (int z = 0; z < SECTION_SIZE; z++) {
+                                        int rowBase = layerBase | (z << 4);
+                                        for (int x = 0; x < SECTION_SIZE; x++) {
+                                                section[rowBase | x] = preset;
+                                        }
+                                }
+                        }
                         sections.put(key, section);
                 }
                 return section;

@@ -18668,6 +18668,26 @@ jt_DecimalFormatParser_parseExponent = ($this, $apply) => {
     jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(512)), var$4), $rt_s(443)), var$5);
     jl_IllegalArgumentException__init_(var$3, jl_StringBuilder_toString(var$6));
     $rt_throw(var$3);
+},
+nlevi_PlatformInput$updateTouchState$lambda$_60_0 = $rt_classWithoutFields(),
+nlevi_PlatformInput$updateTouchState$lambda$_60_0__init_ = var$0 => {
+    jl_Object__init_(var$0);
+},
+nlevi_PlatformInput$updateTouchState$lambda$_60_0__init_0 = () => {
+    let var_0 = new nlevi_PlatformInput$updateTouchState$lambda$_60_0();
+    nlevi_PlatformInput$updateTouchState$lambda$_60_0__init_(var_0);
+    return var_0;
+},
+nlevi_PlatformInput$updateTouchState$lambda$_60_0_call = (var$0, var$1, var$2, var$3, var$4) => {
+    nlevi_PlatformInput_lambda$updateTouchState$0(var$1, var$2, var$3, var$4);
+},
+nlevi_PlatformInput$updateTouchState$lambda$_60_0_call$exported$0 = (var$1, var$2, var$3, var$4, var$5) => {
+    let var$6, var$7, var$8, var$9;
+    var$6 = var$2;
+    var$7 = var$3;
+    var$8 = var$4;
+    var$9 = var$5;
+    var$1.$call(var$6, var$7, var$8, var$9);
 };
 function jur_Pattern() {
     let a = this; jl_Object.call(a);
@@ -23078,7 +23098,7 @@ nlevit_EPKLoader$loadEPK$lambda$_1_0_call = (var$0, var$1) => {
     nlevit_EPKLoader_lambda$loadEPK$0(var$1);
 },
 nlevit_EPKLoader$loadEPK$lambda$_1_0_call$exported$0 = (var$1, var$2) => {
-    var$1.$call(var$2);
+    var$1.$call0(var$2);
 },
 nleva_EaglerGuiImpl = $rt_classWithoutFields(),
 nleva_EaglerGuiImpl_guiProgram = null,
@@ -23604,26 +23624,6 @@ jt_DecimalFormat$CurrencyField_render = ($this, $format, $buffer) => {
         $buffer.$append15(164);
     else
         $buffer.$append14(ju_Currency_getSymbol($format.$getCurrency(), $format.$symbols.$getLocale()));
-},
-nlevi_PlatformInput$updateTouchState$lambda$_59_0 = $rt_classWithoutFields(),
-nlevi_PlatformInput$updateTouchState$lambda$_59_0__init_ = var$0 => {
-    jl_Object__init_(var$0);
-},
-nlevi_PlatformInput$updateTouchState$lambda$_59_0__init_0 = () => {
-    let var_0 = new nlevi_PlatformInput$updateTouchState$lambda$_59_0();
-    nlevi_PlatformInput$updateTouchState$lambda$_59_0__init_(var_0);
-    return var_0;
-},
-nlevi_PlatformInput$updateTouchState$lambda$_59_0_call = (var$0, var$1, var$2, var$3, var$4) => {
-    nlevi_PlatformInput_lambda$updateTouchState$0(var$1, var$2, var$3, var$4);
-},
-nlevi_PlatformInput$updateTouchState$lambda$_59_0_call$exported$0 = (var$1, var$2, var$3, var$4, var$5) => {
-    let var$6, var$7, var$8, var$9;
-    var$6 = var$2;
-    var$7 = var$3;
-    var$8 = var$4;
-    var$9 = var$5;
-    var$1.$call0(var$6, var$7, var$8, var$9);
 };
 function jur_AbstractCharClass$LazyJavaLetterOrDigit$1() {
     jur_AbstractCharClass.call(this);
@@ -26337,6 +26337,7 @@ nlev_EaglerCraft_consumeLookRequest = $mc => {
         $yaw = nlev_EaglerCraft_readLookYaw$js_body$_31();
         $pitch = nlev_EaglerCraft_readLookPitch$js_body$_32();
         window.__eaglercraftLookReq = null;
+        nlevi_PlatformInput_clearMouseDeltas();
         $p = $mc.$getPlayer();
         $p.$snapTo($p.$x0, $p.$y0, $p.$z, $yaw, $pitch);
         return;
@@ -26931,7 +26932,7 @@ nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call = (var$0, var$1) => {
     nlevit_ClientMain_lambda$beginAssetBundleLoad$0(var$1);
 },
 nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call$exported$0 = (var$1, var$2) => {
-    var$1.$call(var$2);
+    var$1.$call0(var$2);
 },
 nlevit_EPKLoader$ProgressCallback = $rt_classWithoutFields(0),
 nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1 = $rt_classWithoutFields(),
@@ -30146,7 +30147,7 @@ nlevi_PlatformInput___onWheel = $normalizedDelta => {
 },
 nlevi_PlatformInput_registerPointerLockListener = () => {
     nlevi_PlatformInput_$callClinit();
-    nlevi_PlatformInput_documentAddPointerLockChangeListener$js_body$_53(otji_JS_function(otji_JSWrapper_unwrap(nlevi_PlatformInput$registerPointerLockListener$lambda$_9_0__init_0()), "handleEvent"));
+    nlevi_PlatformInput_documentAddPointerLockChangeListener$js_body$_54(otji_JS_function(otji_JSWrapper_unwrap(nlevi_PlatformInput$registerPointerLockListener$lambda$_9_0__init_0()), "handleEvent"));
 },
 nlevi_PlatformInput_registerGamepadListeners = () => {
     nlevi_PlatformInput_$callClinit();
@@ -30180,7 +30181,7 @@ nlevi_PlatformInput_pollGamepad = () => {
         var$1 = nlevi_PlatformInput_activeGamepadIndex;
         var$2 = nlevi_PlatformInput$pollGamepad$lambda$_13_0__init_0();
         var$3 = nlevi_PlatformInput$pollGamepad$lambda$_13_1__init_0();
-        nlevi_PlatformInput_pollGamepad0$js_body$_63(var$1, otji_JS_function(otji_JSWrapper_unwrap(var$2), "call"), otji_JS_function(otji_JSWrapper_unwrap(var$3), "call"));
+        nlevi_PlatformInput_pollGamepad0$js_body$_64(var$1, otji_JS_function(otji_JSWrapper_unwrap(var$2), "call"), otji_JS_function(otji_JSWrapper_unwrap(var$3), "call"));
         return;
     }
 },
@@ -30188,11 +30189,11 @@ nlevi_PlatformInput_requestPointerLock = () => {
     nlevi_PlatformInput_$callClinit();
     nlevit_ClientMain_$callClinit();
     if (nlevit_ClientMain_pointerLockSupported)
-        nlevi_PlatformInput_requestPointerLock0$js_body$_50();
+        nlevi_PlatformInput_requestPointerLock0$js_body$_51();
 },
 nlevi_PlatformInput_exitPointerLock = () => {
     nlevi_PlatformInput_$callClinit();
-    nlevi_PlatformInput_exitPointerLock0$js_body$_51();
+    nlevi_PlatformInput_exitPointerLock0$js_body$_52();
 },
 nlevi_PlatformInput_isPointerLocked = () => {
     nlevi_PlatformInput_$callClinit();
@@ -30225,6 +30226,11 @@ nlevi_PlatformInput_getMouseDY = () => {
     $result = nlevi_PlatformInput_dy;
     nlevi_PlatformInput_dy = 0;
     return $result;
+},
+nlevi_PlatformInput_clearMouseDeltas = () => {
+    nlevi_PlatformInput_$callClinit();
+    nlevi_PlatformInput_dx = 0;
+    nlevi_PlatformInput_dy = 0;
 },
 nlevi_PlatformInput_getMouseDWheel = () => {
     let $result;
@@ -30283,7 +30289,7 @@ nlevi_PlatformInput_updateTouchState = $event => {
         $i = $i + 1 | 0;
     }
     nlevi_PlatformInput_touchCount = 0;
-    nlevi_PlatformInput_updateTouchState0$js_body$_60($event, otji_JS_function(otji_JSWrapper_unwrap(nlevi_PlatformInput$updateTouchState$lambda$_59_0__init_0()), "call"));
+    nlevi_PlatformInput_updateTouchState0$js_body$_61($event, otji_JS_function(otji_JSWrapper_unwrap(nlevi_PlatformInput$updateTouchState$lambda$_60_0__init_0()), "call"));
 },
 nlevi_PlatformInput___updateTouchPoint = ($index, $x, $y, $pressure) => {
     nlevi_PlatformInput_$callClinit();
@@ -30417,7 +30423,7 @@ nlevi_PlatformInput_lambda$registerMouseListeners$2 = $event => {
     let $coords, var$3;
     nlevi_PlatformInput_$callClinit();
     if (!nlevi_PlatformInput_pointerLocked) {
-        $coords = otji_JS_unwrapIntArray(nlevi_PlatformInput_getCanvasRelativeCoords$js_body$_44($event));
+        $coords = otji_JS_unwrapIntArray(nlevi_PlatformInput_getCanvasRelativeCoords$js_body$_45($event));
         var$3 = (__safe($coords).data||[]);
         nlevi_PlatformInput_mouseX = var$3[0];
         nlevi_PlatformInput_mouseY = var$3[1];
@@ -30469,7 +30475,7 @@ nlevi_PlatformInput_lambda$registerKeyListeners$1 = $event => {
         return;
     $event.preventDefault();
     $code = $rt_str($event.code);
-    $keyCode = nlevi_PlatformInput_mapKeyCode$js_body$_43($rt_ustr($code));
+    $keyCode = nlevi_PlatformInput_mapKeyCode$js_body$_44($rt_ustr($code));
     if ($keyCode >= 0 && $keyCode < 256)
         (__safe(nlevi_PlatformInput_keyDown).data||[])[$keyCode] = 0;
     a: {
@@ -30496,7 +30502,7 @@ nlevi_PlatformInput_lambda$registerKeyListeners$0 = $event => {
         return;
     $event.preventDefault();
     $code = $rt_str($event.code);
-    $keyCode = nlevi_PlatformInput_mapKeyCode$js_body$_43($rt_ustr($code));
+    $keyCode = nlevi_PlatformInput_mapKeyCode$js_body$_44($rt_ustr($code));
     if ($keyCode >= 0 && $keyCode < 256) {
         if (!(__safe(nlevi_PlatformInput_keyDown).data||[])[$keyCode])
             (__safe(nlevi_PlatformInput_keyDownOnce).data||[])[$keyCode] = 1;
@@ -30572,13 +30578,13 @@ nlevi_PlatformInput_registerWheelListener0$js_body$_7 = var$1 => {
         }, { passive : false });
     }
 },
-nlevi_PlatformInput_mapKeyCode$js_body$_43 = var$1 => {
+nlevi_PlatformInput_mapKeyCode$js_body$_44 = var$1 => {
     var map = { 'KeyA' : 30, 'KeyB' : 48, 'KeyC' : 46, 'KeyD' : 32, 'KeyE' : 18, 'KeyF' : 33, 'KeyG' : 34, 'KeyH' : 35, 'KeyI' : 23, 'KeyJ' : 36, 'KeyK' : 37, 'KeyL' : 38, 'KeyM' : 50, 'KeyN' : 49, 'KeyO' : 24, 'KeyP' : 25, 'KeyQ' : 16, 'KeyR' : 19, 'KeyS' : 31, 'KeyT' : 20, 'KeyU' : 22, 'KeyV' : 47, 'KeyW' : 17, 'KeyX' : 45, 'KeyY' : 21, 'KeyZ' : 44, 'Digit0' : 11, 'Digit1' : 2, 'Digit2' : 3, 'Digit3' : 4, 'Digit4' : 5, 'Digit5' : 6, 'Digit6' : 7, 'Digit7' : 8, 'Digit8' : 9, 'Digit9' : 10, 'Escape' : 1, 'F1'
     : 59, 'F2' : 60, 'F3' : 61, 'F4' : 62, 'F5' : 63, 'F6' : 64, 'F7' : 65, 'F8' : 66, 'F9' : 67, 'F10' : 68, 'F11' : 87, 'F12' : 88, 'Backquote' : 41, 'Minus' : 12, 'Equal' : 13, 'Backspace' : 14, 'Tab' : 15, 'BracketLeft' : 26, 'BracketRight' : 27, 'Backslash' : 43, 'Semicolon' : 39, 'Quote' : 40, 'Enter' : 28, 'CapsLock' : 58, 'ShiftLeft' : 42, 'ShiftRight' : 54, 'ControlLeft' : 29, 'ControlRight' : 157, 'AltLeft' : 56, 'AltRight' : 184, 'MetaLeft' : 221, 'MetaRight' : 220, 'Space' : 57, 'ContextMenu' : 58,
     'ArrowLeft' : 203, 'ArrowUp' : 200, 'ArrowRight' : 205, 'ArrowDown' : 208, 'Insert' : 210, 'Home' : 199, 'PageUp' : 201, 'Delete' : 211, 'End' : 207, 'PageDown' : 209, 'NumLock' : 69, 'ScrollLock' : 70, 'Pause' : 197, 'NumpadDivide' : 181, 'NumpadMultiply' : 55, 'NumpadSubtract' : 74, 'NumpadAdd' : 78, 'NumpadEnter' : 156, 'NumpadDecimal' : 83, 'Numpad0' : 82, 'Numpad1' : 79, 'Numpad2' : 80, 'Numpad3' : 81, 'Numpad4' : 75, 'Numpad5' : 76, 'Numpad6' : 77, 'Numpad7' : 71, 'Numpad8' : 72, 'Numpad9' : 73 };
     return map[var$1] ||  -1;
 },
-nlevi_PlatformInput_getCanvasRelativeCoords$js_body$_44 = var$1 => {
+nlevi_PlatformInput_getCanvasRelativeCoords$js_body$_45 = var$1 => {
     var rect = var$1.target.getBoundingClientRect();
     var x = var$1.clientX - rect.left;
     var y = var$1.clientY - rect.top;
@@ -30586,7 +30592,7 @@ nlevi_PlatformInput_getCanvasRelativeCoords$js_body$_44 = var$1 => {
     var scaleY = var$1.target.clientHeight / rect.height;
     return [Math.round(x * scaleX), Math.round(y * scaleY)];
 },
-nlevi_PlatformInput_requestPointerLock0$js_body$_50 = () => {
+nlevi_PlatformInput_requestPointerLock0$js_body$_51 = () => {
     var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');
     if (c && c.requestPointerLock) {
         var r;
@@ -30599,14 +30605,14 @@ nlevi_PlatformInput_requestPointerLock0$js_body$_50 = () => {
         });
     }
 },
-nlevi_PlatformInput_exitPointerLock0$js_body$_51 = () => {
+nlevi_PlatformInput_exitPointerLock0$js_body$_52 = () => {
     if (document.exitPointerLock) document.exitPointerLock(); else if (document.mozExitPointerLock) document.mozExitPointerLock();
-},
-nlevi_PlatformInput_documentAddPointerLockChangeListener$js_body$_53 = var$1 => {
+};
+let nlevi_PlatformInput_documentAddPointerLockChangeListener$js_body$_54 = var$1 => {
     document.addEventListener('pointerlockchange', var$1);
     document.addEventListener('mozpointerlockchange', var$1);
-};
-let nlevi_PlatformInput_updateTouchState0$js_body$_60 = (var$1, var$2) => {
+},
+nlevi_PlatformInput_updateTouchState0$js_body$_61 = (var$1, var$2) => {
     var touches = var$1.touches;
     for (var i = 0;i < Math.min(touches.length, 8);i++) {
         var t = touches[i];
@@ -30616,7 +30622,7 @@ let nlevi_PlatformInput_updateTouchState0$js_body$_60 = (var$1, var$2) => {
         var$2(i, (t.clientX - rect.left) * scaleX, (t.clientY - rect.top) * scaleY, t.force || 1.0);
     }
 },
-nlevi_PlatformInput_pollGamepad0$js_body$_63 = (var$1, var$2, var$3) => {
+nlevi_PlatformInput_pollGamepad0$js_body$_64 = (var$1, var$2, var$3) => {
     var gamepads = navigator.getGamepads();
     if (!gamepads || !gamepads[var$1]) return;
     var gp = gamepads[var$1];
@@ -33259,7 +33265,7 @@ nlevi_PlatformNetworking$connect$lambda$_1_1_call = (var$0, var$1) => {
     nlevi_PlatformNetworking_lambda$connect$1(var$1);
 },
 nlevi_PlatformNetworking$connect$lambda$_1_1_call$exported$0 = (var$1, var$2) => {
-    var$1.$call(var$2);
+    var$1.$call0(var$2);
 },
 nlevi_PlatformNetworking$connect$lambda$_1_2 = $rt_classWithoutFields(),
 nlevi_PlatformNetworking$connect$lambda$_1_2__init_ = var$0 => {
@@ -36141,6 +36147,7 @@ nmwp_BlockHitResult, 0, jl_Object, [], 1, 0, 0, 0,
 jur_AbstractCharClass$LazyJavaDefined, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDefined__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDefined_computeValue)],
 nmwlb_Blocks, 0, jl_Object, [], 17, 0, () => nmwlb_Blocks_$callClinit(), 0,
 jt_DecimalFormatParser, 0, jl_Object, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormatParser__init_), "$parse", $rt_wrapFunction1(jt_DecimalFormatParser_parse), "$apply", $rt_wrapFunction1(jt_DecimalFormatParser_apply), "$parseText", $rt_wrapFunction2(jt_DecimalFormatParser_parseText)],
+nlevi_PlatformInput$updateTouchState$lambda$_60_0, 0, jl_Object, [nlevi_PlatformInput$TouchUpdateCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$updateTouchState$lambda$_60_0__init_), "$call", $rt_wrapFunction4(nlevi_PlatformInput$updateTouchState$lambda$_60_0_call)],
 jur_Pattern, 0, jl_Object, [ji_Serializable], 17, 0, 0, ["$matcher", $rt_wrapFunction1(jur_Pattern_matcher), "$split1", $rt_wrapFunction2(jur_Pattern_split), "$split0", $rt_wrapFunction1(jur_Pattern_split0), "$pattern", $rt_wrapFunction0(jur_Pattern_pattern), "$namedGroups", $rt_wrapFunction0(jur_Pattern_namedGroups), "$groupCount", $rt_wrapFunction0(jur_Pattern_groupCount), "$compCount", $rt_wrapFunction0(jur_Pattern_compCount), "$consCount", $rt_wrapFunction0(jur_Pattern_consCount)],
 nleva_MenuBlurRenderer, 0, jl_Object, [], 17, 0, () => nleva_MenuBlurRenderer_$callClinit(), 0,
 otjde_EventTarget, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
@@ -36154,9 +36161,9 @@ ju_Collections$13, 0, ju_AbstractMap, [], 0, 0, 0, ["$_init_3", $rt_wrapFunction
 cmbv_PoseStack, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(cmbv_PoseStack__init_)],
 nmcgso_SoundOptionsScreen$VolumeSlider, "SoundOptionsScreen$VolumeSlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_100", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgso_SoundOptionsScreen$VolumeSlider__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$displayString", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_getTelemetryId)],
 jur_AbstractCharClass$LazyJavaLetterOrDigit, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit_computeValue)],
-nmcgc_CycleButton$OnValueChange, 0, jl_Object, [], 1537, 0, 0, 0,
-otciu_UnicodeHelper$Range, "UnicodeHelper$Range", 9, jl_Object, [], 1, 0, 0, ["$_init_35", $rt_wrapFunction3(otciu_UnicodeHelper$Range__init_)]]);
-$rt_metadata([jur_AbstractLineTerminator$2, 0, jur_AbstractLineTerminator, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator$2__init_), "$isLineTerminator", $rt_wrapFunction1(jur_AbstractLineTerminator$2_isLineTerminator), "$isAfterLineTerminator", $rt_wrapFunction2(jur_AbstractLineTerminator$2_isAfterLineTerminator)],
+nmcgc_CycleButton$OnValueChange, 0, jl_Object, [], 1537, 0, 0, 0]);
+$rt_metadata([otciu_UnicodeHelper$Range, "UnicodeHelper$Range", 9, jl_Object, [], 1, 0, 0, ["$_init_35", $rt_wrapFunction3(otciu_UnicodeHelper$Range__init_)],
+jur_AbstractLineTerminator$2, 0, jur_AbstractLineTerminator, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator$2__init_), "$isLineTerminator", $rt_wrapFunction1(jur_AbstractLineTerminator$2_isLineTerminator), "$isAfterLineTerminator", $rt_wrapFunction2(jur_AbstractLineTerminator$2_isAfterLineTerminator)],
 otciu_CharMapping, 0, jl_Object, [], 1, 0, 0, ["$_init_34", $rt_wrapFunction2(otciu_CharMapping__init_)],
 jur_AbstractLineTerminator$1, 0, jur_AbstractLineTerminator, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator$1__init_), "$isLineTerminator", $rt_wrapFunction1(jur_AbstractLineTerminator$1_isLineTerminator), "$isAfterLineTerminator", $rt_wrapFunction2(jur_AbstractLineTerminator$1_isAfterLineTerminator)],
 jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart_computeValue)],
@@ -36211,16 +36218,15 @@ jm_BigInteger, 0, jl_Number, [jl_Comparable, ji_Serializable], 1, 0, () => jm_Bi
 "$getFirstNonzeroDigit", $rt_wrapFunction0(jm_BigInteger_getFirstNonzeroDigit)],
 jl_ArithmeticException, "ArithmeticException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(jl_ArithmeticException__init_0)],
 jur_AbstractCharClass$LazyNonDigit, 0, jur_AbstractCharClass$LazyDigit, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit_computeValue)],
-nlevit_EPKLoader, 0, jl_Object, [], 1, 0, () => nlevit_EPKLoader_$callClinit(), 0,
-jur_AbstractCharClass$1, "AbstractCharClass$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_19", $rt_wrapFunction2(jur_AbstractCharClass$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$1_contains)]]);
-$rt_metadata([jur_AbstractCharClass$2, "AbstractCharClass$2", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_20", $rt_wrapFunction3(jur_AbstractCharClass$2__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$2_contains)],
+nlevit_EPKLoader, 0, jl_Object, [], 1, 0, () => nlevit_EPKLoader_$callClinit(), 0]);
+$rt_metadata([jur_AbstractCharClass$1, "AbstractCharClass$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_19", $rt_wrapFunction2(jur_AbstractCharClass$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$1_contains)],
+jur_AbstractCharClass$2, "AbstractCharClass$2", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_20", $rt_wrapFunction3(jur_AbstractCharClass$2__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$2_contains)],
 jur_AbstractCharClass$LazyJavaLowerCase, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLowerCase__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLowerCase_computeValue)],
 nlevit_EPKLoader$LoadCompleteNativeCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-nlevit_EPKLoader$loadEPK$lambda$_1_0, 0, jl_Object, [nlevit_EPKLoader$LoadCompleteNativeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_EPKLoader$loadEPK$lambda$_1_0__init_), "$call", $rt_wrapFunction1(nlevit_EPKLoader$loadEPK$lambda$_1_0_call)],
+nlevit_EPKLoader$loadEPK$lambda$_1_0, 0, jl_Object, [nlevit_EPKLoader$LoadCompleteNativeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_EPKLoader$loadEPK$lambda$_1_0__init_), "$call0", $rt_wrapFunction1(nlevit_EPKLoader$loadEPK$lambda$_1_0_call)],
 nleva_EaglerGuiImpl, 0, jl_Object, [], 17, 0, () => nleva_EaglerGuiImpl_$callClinit(), 0,
 jur_PossessiveCompositeQuantifierSet, "PossessiveCompositeQuantifierSet", 2, jur_CompositeQuantifierSet, [], 0, 0, 0, ["$_init_77", $rt_wrapFunction4(jur_PossessiveCompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveCompositeQuantifierSet_matches)],
 jt_DecimalFormat$CurrencyField, "DecimalFormat$CurrencyField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$CurrencyField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$CurrencyField_render)],
-nlevi_PlatformInput$updateTouchState$lambda$_59_0, 0, jl_Object, [nlevi_PlatformInput$TouchUpdateCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$updateTouchState$lambda$_59_0__init_), "$call0", $rt_wrapFunction4(nlevi_PlatformInput$updateTouchState$lambda$_59_0_call)],
 jur_AbstractCharClass$LazyJavaLetterOrDigit$1, "AbstractCharClass$LazyJavaLetterOrDigit$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_82", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1_contains)],
 jur_CharClass$18, "CharClass$18", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction2(jur_CharClass$18__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$18_contains), "$toString", $rt_wrapFunction0(jur_CharClass$18_toString)],
 jur_PossessiveGroupQuantifierSet, "PossessiveGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_PossessiveGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveGroupQuantifierSet_matches)],
@@ -36310,7 +36316,7 @@ jt_DecimalFormat$1, 0, jl_Object, [], 32768, 0, () => jt_DecimalFormat$1_$callCl
 nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0, 0, jl_Object, [nlevi_PlatformRuntime$SimpleCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0__init_), "$call5", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call)],
 jur_AbstractCharClass$LazyJavaLetter$1, "AbstractCharClass$LazyJavaLetter$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_25", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1_contains)],
 jur_ReluctantQuantifierSet, "ReluctantQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_31", $rt_wrapFunction3(jur_ReluctantQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantQuantifierSet_matches)],
-nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0, 0, jl_Object, [nlevit_EPKLoader$LoadCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_), "$call", $rt_wrapFunction1(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call)],
+nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0, 0, jl_Object, [nlevit_EPKLoader$LoadCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_), "$call0", $rt_wrapFunction1(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call)],
 nlevit_EPKLoader$ProgressCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1, 0, jl_Object, [nlevit_EPKLoader$ProgressCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1__init_), "$call2", $rt_wrapFunction2(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1_call)],
 ju_UUID, 0, jl_Object, [], 1, 0, 0, 0,
@@ -36436,7 +36442,7 @@ nmcr_LevelRenderer$Mesh, 0, jl_Object, [], 16, 0, 0, 0,
 nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0_onPress)],
 nlevi_PlatformNetworking$WebSocketOpenCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nlevi_PlatformNetworking$connect$lambda$_1_0, 0, jl_Object, [nlevi_PlatformNetworking$WebSocketOpenCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_0__init_), "$call5", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_0_call)],
-nlevi_PlatformNetworking$connect$lambda$_1_1, 0, jl_Object, [nlevi_PlatformNetworking$WebSocketMessageCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_1__init_), "$call", $rt_wrapFunction1(nlevi_PlatformNetworking$connect$lambda$_1_1_call)],
+nlevi_PlatformNetworking$connect$lambda$_1_1, 0, jl_Object, [nlevi_PlatformNetworking$WebSocketMessageCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_1__init_), "$call0", $rt_wrapFunction1(nlevi_PlatformNetworking$connect$lambda$_1_1_call)],
 nlevi_PlatformNetworking$connect$lambda$_1_2, 0, jl_Object, [nlevi_PlatformNetworking$WebSocketCloseCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_2__init_), "$call8", $rt_wrapFunction2(nlevi_PlatformNetworking$connect$lambda$_1_2_call)],
 nlevi_PlatformNetworking$connect$lambda$_1_3, 0, jl_Object, [nlevi_PlatformNetworking$WebSocketErrorCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$connect$lambda$_1_3__init_), "$call1", $rt_wrapFunction1(nlevi_PlatformNetworking$connect$lambda$_1_3_call)],
 jur_AbstractCharClass$LazyJavaIdentifierIgnorable, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaIdentifierIgnorable__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaIdentifierIgnorable_computeValue)],
@@ -36555,14 +36561,14 @@ let $rt_jso_marker = Symbol('jsoClass');
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformInput$registerTouchListeners$lambda$_5_2_handleEvent$exported$0);
     c = nlevi_PlatformInput$registerPointerLockListener$lambda$_9_0.prototype;
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformInput$registerPointerLockListener$lambda$_9_0_handleEvent$exported$0);
+    c = nlevi_PlatformInput$updateTouchState$lambda$_60_0.prototype;
+    c.call = $rt_callWithReceiver(nlevi_PlatformInput$updateTouchState$lambda$_60_0_call$exported$0);
     c = nlevi_PlatformInput$suppressDragDrop$lambda$_12_1.prototype;
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformInput$suppressDragDrop$lambda$_12_1_handleEvent$exported$0);
     c = nlevi_PlatformInput$suppressDragDrop$lambda$_12_0.prototype;
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformInput$suppressDragDrop$lambda$_12_0_handleEvent$exported$0);
     c = nlevit_EPKLoader$loadEPK$lambda$_1_0.prototype;
     c.call = $rt_callWithReceiver(nlevit_EPKLoader$loadEPK$lambda$_1_0_call$exported$0);
-    c = nlevi_PlatformInput$updateTouchState$lambda$_59_0.prototype;
-    c.call = $rt_callWithReceiver(nlevi_PlatformInput$updateTouchState$lambda$_59_0_call$exported$0);
     c = nlevit_EPKLoader$loadEPK$lambda$_1_2.prototype;
     c.call = $rt_callWithReceiver(nlevit_EPKLoader$loadEPK$lambda$_1_2_call$exported$0);
     c = nlevit_EPKLoader$loadEPK$lambda$_1_1.prototype;

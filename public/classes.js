@@ -3089,8 +3089,8 @@ cmbp_Window_updateCanvasSize = $this => {
         $this.$height1 = nlevi_PlatformRuntime_getCanvasDrawableHeight();
         $this.$framebufferWidth = $this.$width2;
         $this.$framebufferHeight = $this.$height1;
-        $this.$screenWidth = nlevi_PlatformRuntime_getCanvasWidth();
-        $this.$screenHeight = nlevi_PlatformRuntime_getCanvasHeight();
+        $this.$screenWidth = $this.$width2;
+        $this.$screenHeight = $this.$height1;
     } else {
         $this.$width2 = cmbp_Window_getCanvasWidth0$js_body$_3();
         $this.$height1 = cmbp_Window_getCanvasHeight0$js_body$_4();
@@ -3108,9 +3108,6 @@ cmbp_Window_getWidth = $this => {
 },
 cmbp_Window_getHeight = $this => {
     return $this.$height1;
-},
-cmbp_Window_getScreenWidth = $this => {
-    return $this.$screenWidth;
 },
 cmbp_Window_getGuiScale = $this => {
     return $this.$guiScale;
@@ -5170,7 +5167,7 @@ jl_AbstractStringBuilder_insert7 = ($this, $target, $value) => {
     otcit_FloatAnalyzer_analyze($value, $number);
     $mantissa = $number.$mantissa0;
     $exp = $number.$exponent0;
-    $negative = $number.$sign3;
+    $negative = $number.$sign4;
     $intPart = 1;
     $sz = 1;
     if ($negative)
@@ -5357,7 +5354,7 @@ jl_AbstractStringBuilder_insert4 = ($this, $target, $value) => {
     otcit_DoubleAnalyzer_analyze($value, $number);
     $mantissa = $number.$mantissa;
     $exp = $number.$exponent;
-    $negative = $number.$sign2;
+    $negative = $number.$sign3;
     $intPart = 1;
     $sz = 1;
     if ($negative)
@@ -7470,7 +7467,7 @@ function otcit_DoubleAnalyzer$Result() {
     let a = this; jl_Object.call(a);
     a.$mantissa = Long_ZERO;
     a.$exponent = 0;
-    a.$sign2 = 0;
+    a.$sign3 = 0;
 }
 let otcit_DoubleAnalyzer$Result__init_0 = $this => {
     jl_Object__init_($this);
@@ -10216,9 +10213,9 @@ jt_DecimalFormat_format1 = ($this, $value, $buffer, $field) => {
         $analysisResult = jt_DecimalFormat$Constants_doubleAnalysisResult;
         otcit_DoubleAnalyzer_analyze($value, $analysisResult);
         if ($this.$exponentDigits <= 0)
-            jt_DecimalFormat_formatRegular($this, $analysisResult.$mantissa, $analysisResult.$exponent, $analysisResult.$sign2 ? 0 : 1, $buffer);
+            jt_DecimalFormat_formatRegular($this, $analysisResult.$mantissa, $analysisResult.$exponent, $analysisResult.$sign3 ? 0 : 1, $buffer);
         else
-            jt_DecimalFormat_formatExponent($this, $analysisResult.$mantissa, $analysisResult.$exponent, $analysisResult.$sign2 ? 0 : 1, $buffer);
+            jt_DecimalFormat_formatExponent($this, $analysisResult.$mantissa, $analysisResult.$exponent, $analysisResult.$sign3 ? 0 : 1, $buffer);
     } else {
         var$5 = $rt_compare_less($value, 0.0);
         var$6 = var$5 <= 0 ? $this.$negativePrefix : $this.$positivePrefix;
@@ -10850,7 +10847,7 @@ otcit_FloatAnalyzer_analyze = ($d, $result) => {
     let $bits, $mantissa, $exponent, var$6, $decExponent, var$8, var$9, $binExponentCorrection, $mantissaShift, $decMantissa, var$13, var$14, var$15, $decMantissaHi, $decMantissaLow, $lowerPos, $upperPos, $posCmp;
     otcit_FloatAnalyzer_$callClinit();
     $bits = jl_Float_floatToIntBits($d);
-    $result.$sign3 = !($bits & (-2147483648)) ? 0 : 1;
+    $result.$sign4 = !($bits & (-2147483648)) ? 0 : 1;
     $mantissa = $bits & 8388607;
     $exponent = $bits >> 23 & 255;
     if (!$mantissa && !$exponent) {
@@ -14012,6 +14009,8 @@ nlevi_PlatformRuntime_pageVisible = 0,
 nlevi_PlatformRuntime_initialized = 0,
 nlevi_PlatformRuntime_canvasWidth = 0,
 nlevi_PlatformRuntime_canvasHeight = 0,
+nlevi_PlatformRuntime_bufferWidth = 0,
+nlevi_PlatformRuntime_bufferHeight = 0,
 nlevi_PlatformRuntime_devicePixelRatio = 0.0,
 nlevi_PlatformRuntime_deltaTimeMs = Long_ZERO,
 nlevi_PlatformRuntime_totalTimeMs = Long_ZERO,
@@ -14036,7 +14035,6 @@ nlevi_PlatformRuntime__init = () => {
     nlevi_PlatformRuntime_timeOrigin = nlevi_PlatformRuntime_getTimeOrigin();
     nlevi_PlatformRuntime_totalTimeMs = nlevi_PlatformRuntime_getCurrentTimeMillis();
     nlevi_PlatformRuntime_updateCanvasSize();
-    nlevi_PlatformRuntime_devicePixelRatio = window.devicePixelRatio || 1.0;
     nlevi_PlatformRuntime_updateScreenInfo();
     if (nlevit_ClientMain_pageVisibilitySupported)
         nlevi_PlatformRuntime_registerVisibilityChangeListener();
@@ -14054,7 +14052,6 @@ nlevi_PlatformRuntime_update = $deltaMs => {
     nlevi_PlatformRuntime_deltaTimeMs = $deltaMs;
     nlevi_PlatformRuntime_totalTimeMs = Long_add(nlevi_PlatformRuntime_totalTimeMs, $deltaMs);
     nlevi_PlatformRuntime_updateCanvasSize();
-    nlevi_PlatformRuntime_devicePixelRatio = window.devicePixelRatio || 1.0;
     nlevi_PlatformInput_pollGamepad();
 },
 nlevi_PlatformRuntime_getCurrentTimeMillis = () => {
@@ -14070,20 +14067,25 @@ nlevi_PlatformRuntime_getDeltaTimeMs = () => {
     return nlevi_PlatformRuntime_deltaTimeMs;
 },
 nlevi_PlatformRuntime_updateCanvasSize = () => {
-    let $canvas, $w, $h, $dw, $dh;
+    let $canvas, $w, $h, $dpr, $dw, $dh, $bufferChanged;
     nlevi_PlatformRuntime_$callClinit();
     $canvas = nlevit_ClientMain_getCanvas();
-    if ($canvas !== null) {
-        $w = $canvas.clientWidth;
-        $h = $canvas.clientHeight;
-        if (!($w == nlevi_PlatformRuntime_canvasWidth && $h == nlevi_PlatformRuntime_canvasHeight)) {
-            nlevi_PlatformRuntime_canvasWidth = $w;
-            nlevi_PlatformRuntime_canvasHeight = $h;
-            $dw = $w * nlevi_PlatformRuntime_devicePixelRatio | 0;
-            $dh = $h * nlevi_PlatformRuntime_devicePixelRatio | 0;
-            $canvas.width = $dw;
-            $canvas.height = $dh;
-        }
+    if ($canvas === null)
+        return;
+    $w = $canvas.clientWidth;
+    $h = $canvas.clientHeight;
+    $dpr = window.devicePixelRatio || 1.0;
+    nlevi_PlatformRuntime_devicePixelRatio = $dpr;
+    $dw = jl_Math_max(1, jl_Math_round0($w * $dpr));
+    $dh = jl_Math_max(1, jl_Math_round0($h * $dpr));
+    $bufferChanged = $dw == nlevi_PlatformRuntime_bufferWidth && $dh == nlevi_PlatformRuntime_bufferHeight && $canvas.width == $dw && $canvas.height == $dh ? 0 : 1;
+    nlevi_PlatformRuntime_canvasWidth = $w;
+    nlevi_PlatformRuntime_canvasHeight = $h;
+    nlevi_PlatformRuntime_bufferWidth = $dw;
+    nlevi_PlatformRuntime_bufferHeight = $dh;
+    if ($bufferChanged) {
+        $canvas.width = $dw;
+        $canvas.height = $dh;
     }
 },
 nlevi_PlatformRuntime_getCanvasWidth = () => {
@@ -14096,11 +14098,11 @@ nlevi_PlatformRuntime_getCanvasHeight = () => {
 },
 nlevi_PlatformRuntime_getCanvasDrawableWidth = () => {
     nlevi_PlatformRuntime_$callClinit();
-    return nlevi_PlatformRuntime_canvasWidth * nlevi_PlatformRuntime_devicePixelRatio | 0;
+    return nlevi_PlatformRuntime_bufferWidth;
 },
 nlevi_PlatformRuntime_getCanvasDrawableHeight = () => {
     nlevi_PlatformRuntime_$callClinit();
-    return nlevi_PlatformRuntime_canvasHeight * nlevi_PlatformRuntime_devicePixelRatio | 0;
+    return nlevi_PlatformRuntime_bufferHeight;
 },
 nlevi_PlatformRuntime_updateScreenInfo = () => {
     nlevi_PlatformRuntime_$callClinit();
@@ -14154,7 +14156,6 @@ nlevi_PlatformRuntime___onResize = () => {
     nlevi_PlatformRuntime_$callClinit();
     nlevi_PlatformRuntime_updateCanvasSize();
     nlevi_PlatformRuntime_updateScreenInfo();
-    nlevi_PlatformRuntime_devicePixelRatio = window.devicePixelRatio || 1.0;
 },
 nlevi_PlatformRuntime_registerOrientationChangeListener = () => {
     nlevi_PlatformRuntime_$callClinit();
@@ -14171,8 +14172,8 @@ nlevi_PlatformRuntime_lambda$registerOrientationChangeListener$0 = () => {
 nlevi_PlatformRuntime_lambda$registerResizeListener$0 = () => {
     nlevi_PlatformRuntime_$callClinit();
     nlevi_PlatformRuntime___onResize();
-},
-nlevi_PlatformRuntime_lambda$registerVisibilityChangeListener$0 = $visible => {
+};
+let nlevi_PlatformRuntime_lambda$registerVisibilityChangeListener$0 = $visible => {
     nlevi_PlatformRuntime_$callClinit();
     nlevi_PlatformRuntime___onVisibilityChange($visible);
 },
@@ -14185,6 +14186,8 @@ try {
     nlevi_PlatformRuntime_initialized = 0;
     nlevi_PlatformRuntime_canvasWidth = 0;
     nlevi_PlatformRuntime_canvasHeight = 0;
+    nlevi_PlatformRuntime_bufferWidth = 0;
+    nlevi_PlatformRuntime_bufferHeight = 0;
     nlevi_PlatformRuntime_devicePixelRatio = 1.0;
     nlevi_PlatformRuntime_deltaTimeMs = Long_ZERO;
     nlevi_PlatformRuntime_totalTimeMs = Long_ZERO;
@@ -14195,8 +14198,8 @@ try {
     nlevi_PlatformRuntime_serverWorkerRunning = 0;
     nlevi_PlatformRuntime_serverWorker = null;
 
-} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
-let nlevi_PlatformRuntime_getCurrentTimeMillis0$js_body$_39 = () => {
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
+nlevi_PlatformRuntime_getCurrentTimeMillis0$js_body$_39 = () => {
     if (window.performance && window.performance.now) {
         return BigInt(Math.floor(window.performance.now()));
     } else {
@@ -15589,7 +15592,7 @@ jm_Division_divideAndRemainderByInteger = ($val, $divisor, $divisorSign) => {
     let $valDigits, $valLen, $valSign, $quotientSign, $quotientDigits, $remainderDigits, $result0, $result1, $a, $b, $quo, $rem, var$16, var$17;
     $valDigits = $val.$digits;
     $valLen = $val.$numberLength;
-    $valSign = $val.$sign1;
+    $valSign = $val.$sign2;
     if ($valLen != 1) {
         $quotientSign = $valSign != $divisorSign ? (-1) : 1;
         $quotientDigits = $rt_createIntArray($valLen);
@@ -15639,11 +15642,11 @@ jm_Division_multiplyAndSubtract = ($a, $start, $b, $bLen, $c) => {
 jm_BitLevel = $rt_classWithoutFields(),
 jm_BitLevel_bitLength = $val => {
     let $bLength, $highDigit, $i, var$5;
-    if (!$val.$sign1)
+    if (!$val.$sign2)
         return 0;
     $bLength = $val.$numberLength << 5;
     $highDigit = $val.$digits.data[$val.$numberLength - 1 | 0];
-    if ($val.$sign1 < 0) {
+    if ($val.$sign2 < 0) {
         $i = $val.$getFirstNonzeroDigit();
         if ($i == ($val.$numberLength - 1 | 0))
             $highDigit = $highDigit + (-1) | 0;
@@ -15673,7 +15676,7 @@ jm_BitLevel_shiftLeft0 = ($source, $count) => {
     $resLength = ($source.$numberLength + $intCount | 0) + (var$4 ? 1 : 0) | 0;
     $resDigits = $rt_createIntArray($resLength);
     jm_BitLevel_shiftLeft($resDigits, $source.$digits, $intCount, var$4);
-    $result = jm_BigInteger__init_($source.$sign1, $resLength, $resDigits);
+    $result = jm_BigInteger__init_($source.$sign2, $resLength, $resDigits);
     jm_BigInteger_cutOffLeadingZeroes($result);
     return $result;
 },
@@ -15724,7 +15727,7 @@ jm_BitLevel_shiftRight = ($source, $count) => {
     $intCount = $count >> 5;
     var$4 = $count & 31;
     if ($intCount >= $source.$numberLength) {
-        if ($source.$sign1 >= 0) {
+        if ($source.$sign2 >= 0) {
             jm_BigInteger_$callClinit();
             var$5 = jm_BigInteger_ZERO;
         } else {
@@ -15738,7 +15741,7 @@ jm_BitLevel_shiftRight = ($source, $count) => {
         var$7 = $resLength + 1 | 0;
         $resDigits = $rt_createIntArray(var$7);
         jm_BitLevel_shiftRight0($resDigits, $resLength, $source.$digits, $intCount, var$4);
-        if ($source.$sign1 >= 0)
+        if ($source.$sign2 >= 0)
             var$7 = $resLength;
         else {
             $i = 0;
@@ -15777,7 +15780,7 @@ jm_BitLevel_shiftRight = ($source, $count) => {
             var$12[var$4] = var$12[var$4] + 1 | 0;
         }
     }
-    $result = jm_BigInteger__init_($source.$sign1, var$7, $resDigits);
+    $result = jm_BigInteger__init_($source.$sign2, var$7, $resDigits);
     jm_BigInteger_cutOffLeadingZeroes($result);
     return $result;
 },
@@ -18465,8 +18468,11 @@ jl_Math_ceil = var$1 => {
 jl_Math_floor = var$1 => {
     return Math.floor(var$1);
 },
-jl_Math_round = var$1 => {
-    return Long_fromNumber(var$1 + jl_Math_signum(var$1) * 0.5);
+jl_Math_round0 = var$1 => {
+    return var$1 + jl_Math_signum(var$1) * 0.5 | 0;
+},
+jl_Math_round = $a => {
+    return Long_fromNumber($a + jl_Math_signum0($a) * 0.5);
 },
 jl_Math_random = () => {
     return jl_Math_randomImpl();
@@ -18538,8 +18544,14 @@ jl_Math_abs0 = var$1 => {
 jl_Math_sign = var$1 => {
     return Math.sign(var$1);
 },
-jl_Math_signum = var$1 => {
+jl_Math_signum0 = var$1 => {
     return jl_Math_sign(var$1);
+},
+jl_Math_sign0 = var$1 => {
+    return Math.sign(var$1);
+},
+jl_Math_signum = var$1 => {
+    return jl_Math_sign0(var$1);
 },
 otji_JSWrapper$Helper$FinalizationRegistryConsumer = $rt_classWithoutFields(0),
 nlevi_PlatformInput$WheelCallback = $rt_classWithoutFields(0);
@@ -22165,7 +22177,7 @@ function otcit_FloatAnalyzer$Result() {
     let a = this; jl_Object.call(a);
     a.$mantissa0 = 0;
     a.$exponent0 = 0;
-    a.$sign3 = 0;
+    a.$sign4 = 0;
 }
 let otcit_FloatAnalyzer$Result__init_ = $this => {
     jl_Object__init_($this);
@@ -23093,7 +23105,7 @@ function jm_BigInteger() {
     let a = this; jl_Number.call(a);
     a.$digits = null;
     a.$numberLength = 0;
-    a.$sign1 = 0;
+    a.$sign2 = 0;
     a.$firstNonzeroDigit = 0;
 }
 let jm_BigInteger_ZERO = null,
@@ -23112,7 +23124,7 @@ jm_BigInteger__init_4 = ($this, $sign, $value) => {
     jm_BigInteger_$callClinit();
     jl_Number__init_($this);
     $this.$firstNonzeroDigit = (-2);
-    $this.$sign1 = $sign;
+    $this.$sign2 = $sign;
     $this.$numberLength = 1;
     var$3 = $rt_createIntArray(1);
     var$3.data[0] = $value;
@@ -23127,7 +23139,7 @@ jm_BigInteger__init_1 = ($this, $sign, $numberLength, $digits) => {
     jm_BigInteger_$callClinit();
     jl_Number__init_($this);
     $this.$firstNonzeroDigit = (-2);
-    $this.$sign1 = $sign;
+    $this.$sign2 = $sign;
     $this.$numberLength = $numberLength;
     $this.$digits = $digits;
 },
@@ -23141,7 +23153,7 @@ jm_BigInteger__init_3 = ($this, $sign, $val) => {
     jm_BigInteger_$callClinit();
     jl_Number__init_($this);
     $this.$firstNonzeroDigit = (-2);
-    $this.$sign1 = $sign;
+    $this.$sign2 = $sign;
     if (Long_eq(Long_and($val, Long_create(0, 4294967295)), Long_ZERO)) {
         $this.$numberLength = 1;
         var$3 = $rt_createIntArray(1);
@@ -23165,12 +23177,12 @@ jm_BigInteger__init_5 = ($this, $signum, $digits) => {
     $this.$firstNonzeroDigit = (-2);
     var$4 = var$3.length;
     if (var$4) {
-        $this.$sign1 = $signum;
+        $this.$sign2 = $signum;
         $this.$numberLength = var$4;
         $this.$digits = $digits;
         jm_BigInteger_cutOffLeadingZeroes($this);
     } else {
-        $this.$sign1 = 0;
+        $this.$sign2 = 0;
         $this.$numberLength = 1;
         var$3 = $rt_createIntArray(1);
         var$3.data[0] = 0;
@@ -23194,12 +23206,12 @@ jm_BigInteger_valueOf = $val => {
     return (__safe(jm_BigInteger_SMALL_VALUES).data||[])[Long_lo($val)];
 },
 jm_BigInteger_abs = $this => {
-    if ($this.$sign1 < 0)
+    if ($this.$sign2 < 0)
         $this = jm_BigInteger__init_(1, $this.$numberLength, $this.$digits);
     return $this;
 },
 jm_BigInteger_negate = $this => {
-    return !$this.$sign1 ? $this : jm_BigInteger__init_( -$this.$sign1 | 0, $this.$numberLength, $this.$digits);
+    return !$this.$sign2 ? $this : jm_BigInteger__init_( -$this.$sign2 | 0, $this.$numberLength, $this.$digits);
 },
 jm_BigInteger_add = ($this, $val) => {
     return jm_Elementary_add0($this, $val);
@@ -23208,15 +23220,15 @@ jm_BigInteger_subtract = ($this, $val) => {
     return jm_Elementary_subtract0($this, $val);
 },
 jm_BigInteger_signum = $this => {
-    return $this.$sign1;
+    return $this.$sign2;
 },
 jm_BigInteger_shiftRight = ($this, $n) => {
-    if ($n && $this.$sign1)
+    if ($n && $this.$sign2)
         return $n > 0 ? jm_BitLevel_shiftRight($this, $n) : jm_BitLevel_shiftLeft0($this,  -$n | 0);
     return $this;
 },
 jm_BigInteger_shiftLeft = ($this, $n) => {
-    if ($n && $this.$sign1)
+    if ($n && $this.$sign2)
         return $n > 0 ? jm_BitLevel_shiftLeft0($this, $n) : jm_BitLevel_shiftRight($this,  -$n | 0);
     return $this;
 },
@@ -23231,10 +23243,10 @@ jm_BigInteger_testBit = ($this, $n) => {
         $rt_throw(jl_ArithmeticException__init_($rt_s(936)));
     $intCount = $n >> 5;
     if ($intCount >= $this.$numberLength)
-        return $this.$sign1 >= 0 ? 0 : 1;
+        return $this.$sign2 >= 0 ? 0 : 1;
     $digit = $this.$digits.data[$intCount];
     var$4 = 1 << ($n & 31);
-    if ($this.$sign1 < 0) {
+    if ($this.$sign2 < 0) {
         $firstNonZeroDigit = $this.$getFirstNonzeroDigit();
         if ($intCount < $firstNonZeroDigit)
             return 0;
@@ -23243,26 +23255,26 @@ jm_BigInteger_testBit = ($this, $n) => {
     return !($digit & var$4) ? 0 : 1;
 },
 jm_BigInteger_intValue = $this => {
-    return $rt_imul($this.$sign1, $this.$digits.data[0]);
+    return $rt_imul($this.$sign2, $this.$digits.data[0]);
 },
 jm_BigInteger_longValue = $this => {
     let $value;
     $value = $this.$numberLength <= 1 ? Long_and(Long_fromInt($this.$digits.data[0]), Long_create(4294967295, 0)) : Long_or(Long_shl(Long_fromInt($this.$digits.data[1]), 32), Long_and(Long_fromInt($this.$digits.data[0]), Long_create(4294967295, 0)));
-    return Long_mul(Long_fromInt($this.$sign1), $value);
+    return Long_mul(Long_fromInt($this.$sign2), $value);
 },
 jm_BigInteger_doubleValue = $this => {
     return jm_Conversion_bigInteger2Double($this);
 },
 jm_BigInteger_compareTo = ($this, $val) => {
-    if ($this.$sign1 > $val.$sign1)
+    if ($this.$sign2 > $val.$sign2)
         return 1;
-    if ($this.$sign1 < $val.$sign1)
+    if ($this.$sign2 < $val.$sign2)
         return (-1);
     if ($this.$numberLength > $val.$numberLength)
-        return $this.$sign1;
+        return $this.$sign2;
     if ($this.$numberLength < $val.$numberLength)
-        return  -$val.$sign1 | 0;
-    return $rt_imul($this.$sign1, jm_Elementary_compareArrays($this.$digits, $val.$digits, $this.$numberLength));
+        return  -$val.$sign2 | 0;
+    return $rt_imul($this.$sign2, jm_Elementary_compareArrays($this.$digits, $val.$digits, $this.$numberLength));
 },
 jm_BigInteger_equals = ($this, $x) => {
     let $x1;
@@ -23271,7 +23283,7 @@ jm_BigInteger_equals = ($this, $x) => {
     if (!($x instanceof jm_BigInteger))
         return 0;
     $x1 = $x;
-    return $this.$sign1 == $x1.$sign1 && $this.$numberLength == $x1.$numberLength && $this.$equalsArrays($x1.$digits) ? 1 : 0;
+    return $this.$sign2 == $x1.$sign2 && $this.$numberLength == $x1.$numberLength && $this.$equalsArrays($x1.$digits) ? 1 : 0;
 },
 jm_BigInteger_equalsArrays = ($this, $b) => {
     let $i, var$3;
@@ -23285,11 +23297,11 @@ jm_BigInteger_equalsArrays = ($this, $b) => {
     return $i >= 0 ? 0 : 1;
 },
 jm_BigInteger_multiply = ($this, $val) => {
-    if (!$val.$sign1) {
+    if (!$val.$sign2) {
         jm_BigInteger_$callClinit();
         return jm_BigInteger_ZERO;
     }
-    if ($this.$sign1)
+    if ($this.$sign2)
         return jm_Multiplication_multiply($this, $val);
     jm_BigInteger_$callClinit();
     return jm_BigInteger_ZERO;
@@ -23318,7 +23330,7 @@ jm_BigInteger_pow = ($this, $exp) => {
 },
 jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
     let $divisorSign, $divisorLen, $divisorDigits, $thisDigits, $thisLen, var$7, $cmp, var$9, var$10, $thisSign, $quotientLength, $quotientSign, $quotientDigits, $remainderDigits, $result0, $result1;
-    $divisorSign = $divisor.$sign1;
+    $divisorSign = $divisor.$sign2;
     if (!$divisorSign)
         $rt_throw(jl_ArithmeticException__init_($rt_s(938)));
     $divisorLen = $divisor.$numberLength;
@@ -23337,7 +23349,7 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
         var$10[1] = $this;
         return var$9;
     }
-    $thisSign = $this.$sign1;
+    $thisSign = $this.$sign2;
     $quotientLength = ($thisLen - $divisorLen | 0) + 1 | 0;
     $quotientSign = $thisSign != $divisorSign ? (-1) : 1;
     $quotientDigits = $rt_createIntArray($quotientLength);
@@ -23350,15 +23362,15 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
 },
 jm_BigInteger_divide = ($this, $divisor) => {
     let $divisorSign, $thisSign, $thisLen, $divisorLen, $val, var$7, $cmp, $resLength, $resDigits, $resSign, $result;
-    if (!$divisor.$sign1)
+    if (!$divisor.$sign2)
         $rt_throw(jl_ArithmeticException__init_($rt_s(938)));
-    $divisorSign = $divisor.$sign1;
+    $divisorSign = $divisor.$sign2;
     if ($divisor.$isOne()) {
-        if ($divisor.$sign1 <= 0)
+        if ($divisor.$sign2 <= 0)
             $this = $this.$negate();
         return $this;
     }
-    $thisSign = $this.$sign1;
+    $thisSign = $this.$sign2;
     $thisLen = $this.$numberLength;
     $divisorLen = $divisor.$numberLength;
     if (($thisLen + $divisorLen | 0) == 2) {
@@ -23386,7 +23398,7 @@ jm_BigInteger_divide = ($this, $divisor) => {
 },
 jm_BigInteger_remainder = ($this, $divisor) => {
     let $thisLen, $divisorLen, var$4, $resDigits, $qLen, $result;
-    if (!$divisor.$sign1)
+    if (!$divisor.$sign2)
         $rt_throw(jl_ArithmeticException__init_($rt_s(938)));
     $thisLen = $this.$numberLength;
     $divisorLen = $divisor.$numberLength;
@@ -23399,7 +23411,7 @@ jm_BigInteger_remainder = ($this, $divisor) => {
         $resDigits = jm_Division_divide(null, $qLen, $this.$digits, $thisLen, $divisor.$digits, $divisorLen);
     } else
         (__safe($resDigits).data||[])[0] = jm_Division_remainderArrayByInt($this.$digits, $thisLen, $divisor.$digits.data[0]);
-    $result = jm_BigInteger__init_($this.$sign1, $divisorLen, $resDigits);
+    $result = jm_BigInteger__init_($this.$sign2, $divisorLen, $resDigits);
     jm_BigInteger_cutOffLeadingZeroes($result);
     return $result;
 },
@@ -23416,7 +23428,7 @@ jm_BigInteger_cutOffLeadingZeroes = $this => {
     var$3 = $this.$numberLength;
     $this.$numberLength = var$3 + 1 | 0;
     if (!var$1[var$3])
-        $this.$sign1 = 0;
+        $this.$sign2 = 0;
 },
 jm_BigInteger_isOne = $this => {
     return $this.$numberLength == 1 && $this.$digits.data[0] == 1 ? 1 : 0;
@@ -23424,7 +23436,7 @@ jm_BigInteger_isOne = $this => {
 jm_BigInteger_getFirstNonzeroDigit = $this => {
     let $i;
     if ($this.$firstNonzeroDigit == (-2)) {
-        if (!$this.$sign1)
+        if (!$this.$sign2)
             $i = (-1);
         else {
             $i = 0;
@@ -25786,7 +25798,7 @@ nmc_MouseHandler_toGuiY = ($this, $cssY) => {
 },
 nmc_MouseHandler_backingPerCss = $this => {
     let $cssWidth;
-    $cssWidth = ($this.$minecraft0.$getWindow()).$getScreenWidth();
+    $cssWidth = nlevi_PlatformRuntime_getCanvasWidth();
     if ($cssWidth <= 0)
         return 1.0;
     return ($this.$minecraft0.$getWindow()).$getWidth() / $cssWidth;
@@ -25904,6 +25916,7 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
         $guiWidth = ($this.$minecraft1.$getWindow()).$getGuiScaledWidth();
         $guiHeight = ($this.$minecraft1.$getWindow()).$getGuiScaledHeight();
         if ($guiWidth > 0 && $guiHeight > 0) {
+            nlevi_PlatformOpenGL__wglViewport(0, 0, $pxWidth, $pxHeight);
             a: {
                 try {
                     nlevi_PlatformOpenGL__wglClearColor(0.6269999742507935, 0.8080000281333923, 1.0, 1.0);
@@ -28454,7 +28467,7 @@ jm_Conversion_bigInteger2Double = var$1 => {
         return Long_toNumber(var$1.$longValue());
     }
     if (var$1.$numberLength > 32)
-        return var$1.$sign1 <= 0 ? (-Infinity) : Infinity;
+        return var$1.$sign2 <= 0 ? (-Infinity) : Infinity;
     var$2 = (var$1.$abs3()).$bitLength1();
     var$3 = Long_fromInt(var$2 - 1 | 0);
     var$4 = var$2 - 54 | 0;
@@ -28462,14 +28475,14 @@ jm_Conversion_bigInteger2Double = var$1 => {
     $mantissa = Long_and(var$5, Long_create(4294967295, 2097151));
     if (Long_eq(var$3, Long_fromInt(1023))) {
         if (Long_eq($mantissa, Long_create(4294967295, 2097151)))
-            return var$1.$sign1 <= 0 ? (-Infinity) : Infinity;
+            return var$1.$sign2 <= 0 ? (-Infinity) : Infinity;
         if (Long_eq($mantissa, Long_create(4294967294, 2097151)))
-            return var$1.$sign1 <= 0 ? (-1.7976931348623157E308) : 1.7976931348623157E308;
+            return var$1.$sign2 <= 0 ? (-1.7976931348623157E308) : 1.7976931348623157E308;
     }
     if (!(!(Long_eq(Long_and($mantissa, Long_fromInt(1)), Long_fromInt(1)) && Long_eq(Long_and($mantissa, Long_fromInt(2)), Long_fromInt(2))) && !jm_BitLevel_nonZeroDroppedBits(var$4, var$1.$digits)))
         $mantissa = Long_add($mantissa, Long_fromInt(2));
     var$7 = Long_shr($mantissa, 1);
-    $resSign = var$1.$sign1 >= 0 ? Long_ZERO : Long_create(0, 2147483648);
+    $resSign = var$1.$sign2 >= 0 ? Long_ZERO : Long_create(0, 2147483648);
     var$9 = Long_and(Long_shl(Long_add(Long_fromInt(1023), var$3), 52), Long_create(0, 2146435072));
     $result = Long_or(Long_or($resSign, var$9), var$7);
     return $rt_longBitsToDouble($result);
@@ -30438,7 +30451,7 @@ jm_Multiplication_multiplyPAP = ($a, $b) => {
     $aLen = $a.$numberLength;
     $bLen = $b.$numberLength;
     $resLength = $aLen + $bLen | 0;
-    $resSign = $a.$sign1 == $b.$sign1 ? 1 : (-1);
+    $resSign = $a.$sign2 == $b.$sign2 ? 1 : (-1);
     if ($resLength != 2) {
         $aDigits = $a.$digits;
         $bDigits = $b.$digits;
@@ -31755,8 +31768,8 @@ jm_Elementary_compareArrays = ($a, $b, $size) => {
 },
 jm_Elementary_add0 = ($op1, $op2) => {
     let $op1Sign, $op2Sign, $op1Len, $op2Len, $a, $b, $res, $valueLo, $valueHi, $resDigits, var$13, $cmp, var$15, $res_0;
-    $op1Sign = $op1.$sign1;
-    $op2Sign = $op2.$sign1;
+    $op1Sign = $op1.$sign2;
+    $op2Sign = $op2.$sign2;
     if (!$op1Sign)
         return $op2;
     if (!$op2Sign)
@@ -31835,8 +31848,8 @@ jm_Elementary_add1 = ($res, $a, $aSize, $b, $bSize) => {
 },
 jm_Elementary_subtract0 = ($op1, $op2) => {
     let $op1Sign, $op2Sign, $op1Len, $op2Len, $a, $b, var$9, $cmp, $resSign, $resDigits, var$13, $res;
-    $op1Sign = $op1.$sign1;
-    $op2Sign = $op2.$sign1;
+    $op1Sign = $op1.$sign2;
+    $op2Sign = $op2.$sign2;
     if (!$op2Sign)
         return $op1;
     if (!$op1Sign)
@@ -34901,7 +34914,7 @@ otcit_DoubleAnalyzer_analyze = ($d, $result) => {
     let $bits, $mantissa, $exponent, var$6, $decExponent, var$8, var$9, $binExponentCorrection, $mantissaShift, $decMantissa, var$13, var$14, var$15, $decMantissaHi, $decMantissaLow, $lowerPos, $upperPos, $posCmp;
     otcit_DoubleAnalyzer_$callClinit();
     $bits = jl_Double_doubleToLongBits($d);
-    $result.$sign2 = Long_eq(Long_and($bits, Long_create(0, 2147483648)), Long_ZERO) ? 0 : 1;
+    $result.$sign3 = Long_eq(Long_and($bits, Long_create(0, 2147483648)), Long_ZERO) ? 0 : 1;
     $mantissa = Long_and($bits, Long_create(4294967295, 1048575));
     $exponent = Long_lo(Long_shr($bits, 52)) & 2047;
     if (Long_eq($mantissa, Long_ZERO) && !$exponent) {
@@ -36792,8 +36805,8 @@ $rt_metadata([nmcgso_SoundOptionsScreen$init$lambda$_1_9, 0, jl_Object, [nmcgso_
 jur_LeafSet, 0, jur_AbstractSet, [], 1024, 0, 0, ["$_init_9", $rt_wrapFunction1(jur_LeafSet__init_0), "$_init_0", $rt_wrapFunction0(jur_LeafSet__init_), "$matches", $rt_wrapFunction3(jur_LeafSet_matches), "$charCount", $rt_wrapFunction0(jur_LeafSet_charCount), "$hasConsumed", $rt_wrapFunction1(jur_LeafSet_hasConsumed)],
 jur_CISequenceSet, "CISequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_72", $rt_wrapFunction1(jur_CISequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_CISequenceSet_accepts), "$getName", $rt_wrapFunction0(jur_CISequenceSet_getName)],
 nmcgso_SoundOptionsScreen$init$lambda$_1_6, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6_accept)],
-cmbp_Window, 0, jl_Object, [], 1, 0, 0, ["$_init_141", $rt_wrapFunction4(cmbp_Window__init_), "$refreshCachedSize", $rt_wrapFunction0(cmbp_Window_refreshCachedSize), "$getWidth", $rt_wrapFunction0(cmbp_Window_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_Window_getHeight), "$getScreenWidth", $rt_wrapFunction0(cmbp_Window_getScreenWidth), "$getGuiScale", $rt_wrapFunction0(cmbp_Window_getGuiScale), "$setGuiScale", $rt_wrapFunction1(cmbp_Window_setGuiScale), "$calculateScale", $rt_wrapFunction2(cmbp_Window_calculateScale),
-"$getGuiScaledWidth", $rt_wrapFunction0(cmbp_Window_getGuiScaledWidth), "$getGuiScaledHeight", $rt_wrapFunction0(cmbp_Window_getGuiScaledHeight)],
+cmbp_Window, 0, jl_Object, [], 1, 0, 0, ["$_init_141", $rt_wrapFunction4(cmbp_Window__init_), "$refreshCachedSize", $rt_wrapFunction0(cmbp_Window_refreshCachedSize), "$getWidth", $rt_wrapFunction0(cmbp_Window_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_Window_getHeight), "$getGuiScale", $rt_wrapFunction0(cmbp_Window_getGuiScale), "$setGuiScale", $rt_wrapFunction1(cmbp_Window_setGuiScale), "$calculateScale", $rt_wrapFunction2(cmbp_Window_calculateScale), "$getGuiScaledWidth", $rt_wrapFunction0(cmbp_Window_getGuiScaledWidth),
+"$getGuiScaledHeight", $rt_wrapFunction0(cmbp_Window_getGuiScaledHeight)],
 otciu_CLDRHelper, 0, jl_Object, [], 17, 0, 0, 0,
 nmcgso_SoundOptionsScreen$init$lambda$_1_7, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7_accept)],
 jl_CharSequence, 0, jl_Object, [], 1537, 0, 0, 0,

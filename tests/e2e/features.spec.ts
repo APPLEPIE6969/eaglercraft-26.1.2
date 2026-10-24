@@ -461,13 +461,28 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       return { cssX, cssY };
     });
     expect(keyButtonCenter, 'the key-binds list geometry must be computable').toBeTruthy();
-    await page.mouse.click(keyButtonCenter!.cssX, keyButtonCenter!.cssY);
-    await page.waitForTimeout(200);
     // The row is listening; the vanilla contract: the next key press
-    // rebinds. K is scan code 37 (0x25).
-    await page.keyboard.press('KeyK');
-    await page.waitForTimeout(400);
-    const savedBinds = await page.evaluate(() => localStorage.getItem('_eaglercraftX26.options.keybinds'));
+    // rebinds (KeyBindsScreen.keyPressed persists immediately). K is scan
+    // code 37 (0x25). Click/press delivery can drop on a loaded runner, so
+    // arm-and-press is retried until the persisted table shows up; every
+    // attempt re-arms the same row (idempotent) and bails out if the screen
+    // navigated away for any other reason.
+    let savedBinds: string | null = null;
+    for (let attempt = 0; attempt < 4 && !savedBinds; attempt++) {
+      const screenNow = await readGameTelemetry(page);
+      if (!screenNow || !screenNow.screen.includes('KeyBindsScreen')) {
+        throw new Error(
+          `Key Binds screen closed during rebind attempt ${attempt + 1} (screen: ${screenNow?.screen})`,
+        );
+      }
+      await page.mouse.click(keyButtonCenter!.cssX, keyButtonCenter!.cssY);
+      await page.waitForTimeout(200);
+      await page.keyboard.press('KeyK');
+      await page.waitForTimeout(400);
+      savedBinds = await page.evaluate(() =>
+        localStorage.getItem('_eaglercraftX26.options.keybinds'),
+      );
+    }
     expect(savedBinds, 'a rebind must persist the keybinds table').toBeTruthy();
     expect(savedBinds!.includes('key.forward=37'), `Walk Forwards must now be bound to K (scan 37), got: ${savedBinds}`).toBe(true);
 

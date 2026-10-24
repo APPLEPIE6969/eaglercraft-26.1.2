@@ -100,7 +100,7 @@ interface Gameplay {
 }
 
 function gameplayOf(state: Telemetry): Gameplay {
-  return state.gameplay as Gameplay;
+  return state.gameplay as unknown as Gameplay;
 }
 
 /** Reads a world block through the bridge's synchronous queryBlock. */
@@ -405,6 +405,8 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     const controlsState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('ControlsScreen'));
     expect(controlsState?.screen.includes('ControlsScreen'), 'Controls must open').toBe(true);
     const controlIds = (controlsState?.buttons ?? []).map((b) => b.id);
+    // CycleButton ids include the current value ("Toggle Crouch: Hold" ->
+    // "togglecrouchhold"), so value-bearing rows match by prefix
     for (const expectedId of [
       'mousesettings',
       'keybinds',
@@ -417,7 +419,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       'operatoritemstab',
       'done',
     ]) {
-      expect(controlIds, `Controls must carry "${expectedId}" (got: ${JSON.stringify(controlIds)})`).toContain(expectedId);
+      expect(
+        controlIds.some((id) => id.startsWith(expectedId)),
+        `Controls must carry "${expectedId}" (got: ${JSON.stringify(controlIds)})`,
+      ).toBe(true);
     }
     await attachMilestoneScreenshot(page, testInfo, '08-controls');
 
@@ -487,7 +492,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       'directionalaudio',
       'done',
     ]) {
-      expect(soundIds, `Sound Settings must carry "${expectedId}" (got: ${JSON.stringify(soundIds)})`).toContain(expectedId);
+      expect(
+        soundIds.some((id) => id.startsWith(expectedId)),
+        `Sound Settings must carry "${expectedId}" (got: ${JSON.stringify(soundIds)})`,
+      ).toBe(true);
     }
     await attachMilestoneScreenshot(page, testInfo, '10-sound-settings');
 

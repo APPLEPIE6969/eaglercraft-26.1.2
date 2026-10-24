@@ -583,6 +583,16 @@ public class EaglerCraft {
                                 mh.cursorPressed(0L, button, 0, 0);
                         }
                 }
+
+                // Mouse wheel -> MC's MouseHandler (vanilla onMouseScroll):
+                // the DOM deltaY accumulates in PlatformInput and is
+                // consumed per frame. DOM convention (positive = scroll
+                // down) is kept: the in-world hotbar path and the screen
+                // lists both expect it.
+                int wheel = PlatformInput.getMouseDWheel();
+                if (wheel != 0) {
+                        mh.onScroll(0L, 0.0D, wheel);
+                }
         }
 
         /**

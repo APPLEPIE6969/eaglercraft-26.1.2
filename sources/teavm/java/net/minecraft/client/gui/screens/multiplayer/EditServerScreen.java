@@ -138,15 +138,17 @@ public class EditServerScreen extends Screen {
 
         @Override
         public boolean charTyped(char codePoint, int modifiers) {
+                boolean handled = false;
                 if (this.nameBox != null && this.nameBox.isFocused()
                                 && this.nameBox.charTyped(codePoint)) {
-                        return true;
+                        handled = true;
                 }
                 if (this.addressBox != null && this.addressBox.isFocused()
                                 && this.addressBox.charTyped(codePoint)) {
-                        return true;
+                        handled = true;
                 }
-                return super.charTyped(codePoint, modifiers);
+                this.syncDoneEnabled();
+                return handled || super.charTyped(codePoint, modifiers);
         }
 
         @Override

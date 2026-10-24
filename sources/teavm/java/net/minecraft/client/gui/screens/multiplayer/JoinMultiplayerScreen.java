@@ -259,8 +259,9 @@ public class JoinMultiplayerScreen extends Screen {
                 int contentHeight = this.serverList.size() * ROW_HEIGHT;
                 int listHeight = this.listBottom - this.listTop;
                 if (contentHeight > listHeight) {
+                        // Positive delta = DOM scroll down = show later rows
                         this.listScroll = Math.max(0, Math.min(contentHeight - listHeight,
-                                        this.listScroll - (int) (delta * ROW_HEIGHT)));
+                                        this.listScroll + (int) (delta * ROW_HEIGHT)));
                 }
                 return true;
         }

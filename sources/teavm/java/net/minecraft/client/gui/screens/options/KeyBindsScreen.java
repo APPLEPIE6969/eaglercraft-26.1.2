@@ -299,7 +299,8 @@ public class KeyBindsScreen extends Screen {
 
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-                double newScroll = this.scrollAmount - delta * ROW_HEIGHT;
+                // Positive delta = DOM scroll down = show later rows
+                double newScroll = this.scrollAmount + delta * ROW_HEIGHT;
                 this.scrollAmount = Math.max(0.0D, Math.min(this.maxScroll(), newScroll));
                 return true;
         }

@@ -101,11 +101,10 @@ public class DirectConnectScreen extends Screen {
 
         @Override
         public boolean charTyped(char codePoint, int modifiers) {
-                if (this.addressBox != null && this.addressBox.isFocused()
-                                && this.addressBox.charTyped(codePoint)) {
-                        return true;
-                }
-                return super.charTyped(codePoint, modifiers);
+                boolean handled = this.addressBox != null && this.addressBox.isFocused()
+                                && this.addressBox.charTyped(codePoint);
+                this.syncJoinEnabled();
+                return handled || super.charTyped(codePoint, modifiers);
         }
 
         @Override

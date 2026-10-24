@@ -309,6 +309,8 @@ export interface GameTelemetry {
   guiScale: number;
   /** Buttons on the current screen with bounds in GUI pixels. */
   buttons: GameTelemetryButton[];
+  /** The in-world gameplay snapshot (null outside a world; undefined on bundles without the gameplay bridge). */
+  gameplay?: Record<string, unknown> | null;
   /** Whether the six panorama face PNGs have built the cubemap (may be undefined on old bundles). */
   panoramaReady?: boolean;
   /** Current panorama spin angle in degrees (may be undefined on old bundles). */
@@ -369,6 +371,10 @@ export async function readGameTelemetry(page: Page): Promise<GameTelemetry | nul
             h: typeof rec.h === 'number' ? rec.h : 0,
           };
         }),
+      gameplay:
+        typeof bridge.gameplay === 'object' || bridge.gameplay === null
+          ? (bridge.gameplay as Record<string, unknown> | null)
+          : undefined,
       panoramaReady: typeof bridge.panoramaReady === 'boolean' ? bridge.panoramaReady : undefined,
       panoramaSpin: typeof bridge.panoramaSpin === 'number' ? bridge.panoramaSpin : undefined,
       panoramaBlur: typeof bridge.panoramaBlur === 'number' ? bridge.panoramaBlur : undefined,

@@ -271,11 +271,15 @@ public class MouseHandler {
         }
 
         /**
-         * Backing-store pixels per CSS pixel (device pixel ratio), as
-         * tracked by the Window.
+         * Backing-store pixels per CSS pixel (device pixel ratio).
+         *
+         * <p>Window.screenWidth/Height are PHYSICAL pixels since the GUI-scale
+         * convention unification (the vanilla auto-scale rule runs on device
+         * pixels, like desktop MC on a HiDPI monitor), so the CSS width comes
+         * straight from the platform canvas cache instead.</p>
          */
         private double backingPerCss() {
-                int cssWidth = minecraft.getWindow().getScreenWidth();
+                int cssWidth = net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime.getCanvasWidth();
                 if (cssWidth <= 0) {
                         return 1.0D;
                 }

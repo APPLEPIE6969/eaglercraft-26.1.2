@@ -91,8 +91,17 @@ public class Window {
                         this.height = PlatformRuntime.getCanvasDrawableHeight();
                         this.framebufferWidth = this.width;
                         this.framebufferHeight = this.height;
-                        this.screenWidth = PlatformRuntime.getCanvasWidth();
-                        this.screenHeight = PlatformRuntime.getCanvasHeight();
+                        // screenWidth/Height are PHYSICAL pixels - the same unit
+                        // as width/height. The GUI auto-scale rule runs on device
+                        // pixels (vanilla desktop parity on HiDPI displays) and
+                        // every consumer of these fields assumes that unit. They
+                        // used to be set from the CSS canvas size here while the
+                        // constructor set them from the device size, so the GUI
+                        // scale silently changed unit depending on which path ran
+                        // last - at devicePixelRatio != 1 the UI size flipped on
+                        // the first resize (the "wrong scale until I resize" bug).
+                        this.screenWidth = this.width;
+                        this.screenHeight = this.height;
                 } else {
                         this.width = getCanvasWidth0();
                         this.height = getCanvasHeight0();

@@ -67,12 +67,16 @@ async function readCanvasGeometry(page: import('@playwright/test').Page): Promis
   }, GAME_CANVAS_SELECTOR);
 }
 
-/** Vanilla auto-scale rule (Window.calculateScale with preferredScale=MAX). */
-function expectedGuiScale(cssWidth: number, cssHeight: number): number {
+/**
+ * Vanilla auto-scale rule (Window.calculateScale with preferredScale=MAX).
+ * The port runs it on PHYSICAL (device) pixels - desktop-MC parity on HiDPI
+ * displays - so the expectation takes the backing-store size, not CSS.
+ */
+function expectedGuiScale(backingWidth: number, backingHeight: number): number {
   let scale = 1;
   while (
-    cssWidth / (scale + 1) >= 320 &&
-    cssHeight / (scale + 1) >= 240
+    backingWidth / (scale + 1) >= 320 &&
+    backingHeight / (scale + 1) >= 240
   ) {
     scale++;
   }
@@ -129,16 +133,18 @@ test.describe('HiDPI (deviceScaleFactor 2)', () => {
     const { fps } = await waitForFpsReading(page, 30_000);
     expect(fps).toBeGreaterThan(0);
 
-    // 3. Telemetry GUI scale must follow the vanilla auto rule for the CSS
-    //    viewport (1280x800 -> 3), not degenerate to 1 (the boot state of
-    //    the stale-size bug) and not blow up with the 2x buffer.
+    // 3. Telemetry GUI scale must follow the vanilla auto rule for the
+    //    PHYSICAL viewport (2560x1600 -> 6), not degenerate to 1 (the boot
+    //    state of the stale-size bug) and not be computed from the CSS size
+    //    (1280x800 -> 3), which would make the UI size flip on the first
+    //    resize - the unit used to depend on which Window path ran last.
     let telemetry: GameTelemetry | null = null;
     await expect
       .poll(async () => {
         telemetry = await readGameTelemetry(page);
         return telemetry ? telemetry.guiScale : -1;
       }, { timeout: 60_000 })
-      .toBe(expectedGuiScale(1280, 800));
+      .toBe(expectedGuiScale(geo.bufferWidth, geo.bufferHeight));
     expect(telemetry!.screen).toContain('TitleScreen');
 
     // 4. Every reported button must land fully inside the visible canvas.
@@ -181,6 +187,15 @@ test.describe('HiDPI (deviceScaleFactor 2)', () => {
         ];
       }, { timeout: 30_000 })
       .toEqual([2000, 1400, 2000, 1400]);
+
+    // 5b. The GUI scale must recompute for the new physical size (rule over
+    //     2000x1400 -> 5) instead of keeping the boot value.
+    await expect
+      .poll(async () => {
+        const after = await readGameTelemetry(page);
+        return after ? after.guiScale : -1;
+      }, { timeout: 30_000 })
+      .toBe(expectedGuiScale(2000, 1400));
 
     // 6. No game runtime errors along the way.
     const errors = await readCapturedErrors(page);

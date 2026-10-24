@@ -346,44 +346,55 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(pickedSlot, 'the broken grass must be picked up into the hotbar').toBeGreaterThanOrEqual(0);
 
     // ── Place it back: aim at the ground a few blocks south ──
-    await page.evaluate(() => {
-      const game = (
-        self as unknown as {
-          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
-        }
-      ).__eaglercraftGame;
-      // yaw 0 faces +Z, pitch 30 looks down-forward: hits the ground
-      // ~2.8 blocks away (within the 4.5 reach)
-      game?.setLook?.(0, 30);
-    });
-    // Slow tick loops may need a moment to consume the look request and
-    // re-run the pick - poll until the camera is at pitch 30 with a hit
-    const placeAimState = await waitForTelemetry(page, 10_000, (t) => {
-      const gp = t.gameplay as Gameplay | null | undefined;
-      return Math.abs((gp?.player?.pitch ?? 0) - 30) < 1 && gp?.hit != null;
-    });
-    const placeHit = gameplayOf(placeAimState).hit;
-    expect(placeHit, 'the forward-down ray must hit the ground').toBeTruthy();
+    // Synthetic CDP pointer deltas drift the camera between ticks even
+    // after the snap, so the aim is re-pinned every round until the
+    // snapshot shows pitch ~30 with a valid top-face hit whose placement
+    // cell is not the player's own occupied block (vanilla canSurvive
+    // rejects that - as does this poll).
+    let placeHit: Gameplay['hit'] = null;
+    for (let i = 0; i < 25 && !placeHit; i++) {
+      await page.evaluate(() => {
+        const game = (
+          self as unknown as {
+            __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
+          }
+        ).__eaglercraftGame;
+        // yaw 0 faces +Z, pitch 30 looks down-forward: from the 1-block
+        // hole the ray clears the hole wall and lands ~1.5 blocks away
+        game?.setLook?.(0, 30);
+      });
+      await page.waitForTimeout(200);
+      const t = await readGameTelemetry(page);
+      const gp = t?.gameplay ? gameplayOf(t) : null;
+      if (!gp?.hit || gp.hit.face !== 'up') {
+        continue;
+      }
+      if (Math.abs(gp.player.pitch - 30) >= 2) {
+        continue;
+      }
+      const cellX = gp.hit.x;
+      const cellY = gp.hit.y + 1;
+      const cellZ = gp.hit.z;
+      const feetX = Math.floor(gp.player.x);
+      const feetY = Math.floor(gp.player.y);
+      const feetZ = Math.floor(gp.player.z);
+      if (cellX === feetX && cellY === feetY && cellZ === feetZ) {
+        continue; // the player's own cell - placement would be rejected
+      }
+      placeHit = gp.hit;
+    }
+    expect(placeHit, 'the forward-down ray must find a placeable ground cell').toBeTruthy();
     expect(placeHit!.face, 'the placement surface must be the top face').toBe('up');
     const placeY = placeHit!.y + 1;
     const placeZ = placeHit!.z;
-
-    await page.evaluate(() => {
-      const game = (
-        self as unknown as {
-          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
-        }
-      ).__eaglercraftGame;
-      game?.setLook?.(0, 30); // re-snap right before the click
-    });
-    await page.waitForTimeout(250);
+    const placeX = placeHit!.x;
     await page.mouse.down({ button: 'right' });
     await page.waitForTimeout(150);
     await page.mouse.up({ button: 'right' });
     await page.waitForTimeout(600);
     expect(
-      await queryBlock(page, 0, placeY, placeZ),
-      `right-clicking the ground must place the grass at (0, ${placeY}, ${placeZ})`,
+      await queryBlock(page, placeX, placeY, placeZ),
+      `right-clicking the ground must place the grass at (${placeX}, ${placeY}, ${placeZ})`,
     ).toBe(9);
     expect(pageErrors, 'block editing must not throw uncaught page errors').toEqual([]);
     await attachMilestoneScreenshot(page, testInfo, '06-block-placed');
@@ -586,11 +597,23 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await clickBridgeButton(page, 'addserver', 'the Add Server button must be clickable');
     const addState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('EditServerScreen'));
     expect(addState?.screen.includes('EditServerScreen'), 'Add Server must open the entry dialog').toBe(true);
-    await clickBridgeButton(page, 'servername', 'the Server Name box must be exposed');
-    await page.keyboard.type('Gateway');
-    await clickBridgeButton(page, 'serveraddress', 'the Server Address box must be exposed');
-    await page.keyboard.type('localhost:1');
-    const doneEnabled = (await readGameTelemetry(page))?.buttons.find((b) => b.id === 'done')?.active;
+    async function typeServerEntry(): Promise<boolean> {
+      await clickBridgeButton(page, 'servername', 'the Server Name box must be exposed');
+      await page.waitForTimeout(150);
+      await page.keyboard.type('Gateway');
+      await clickBridgeButton(page, 'serveraddress', 'the Server Address box must be exposed');
+      await page.waitForTimeout(150);
+      await page.keyboard.type('localhost:1');
+      await page.waitForTimeout(300);
+      const enabled = (await readGameTelemetry(page))?.buttons.find((b) => b.id === 'done')?.active;
+      return enabled === true;
+    }
+    let doneEnabled = await typeServerEntry();
+    if (!doneEnabled) {
+      // The box click can lose the race with a frame on slow runners -
+      // retype once before failing
+      doneEnabled = await typeServerEntry();
+    }
     expect(doneEnabled, 'Done must enable once the address is non-empty').toBe(true);
     await clickBridgeButton(page, 'done', 'Done must be clickable');
     await page.waitForTimeout(400);

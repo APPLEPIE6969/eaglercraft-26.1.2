@@ -668,10 +668,14 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(savedList!.includes('Gateway'), `the new entry must be saved (got: ${JSON.stringify(savedList)})`).toBe(true);
 
     // ── Select the row and join: ConnectScreen -> DisconnectedScreen ──
-    // First row: listTop 32, row height 36 -> click at GUI (245, 50)
+    // First row: listTop 32, row height 36 -> click at GUI (245, 50).
+    // The row highlight is computed at render time, so the pointer must
+    // rest on the row for a frame before the click lands.
     const rowClick = await getGuiCssCoords(page, 245, 50);
+    await page.mouse.move(rowClick.cssX, rowClick.cssY);
+    await page.waitForTimeout(250);
     await page.mouse.click(rowClick.cssX, rowClick.cssY);
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(300);
     await clickBridgeButton(page, 'joinserver', 'Join Server must be clickable after selecting a row');
     const connectState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('ConnectScreen'));
     expect(connectState?.screen.includes('ConnectScreen'), 'joining must show the ConnectScreen').toBe(true);

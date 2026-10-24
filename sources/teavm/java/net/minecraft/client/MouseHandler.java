@@ -60,6 +60,17 @@ public class MouseHandler {
                 double mx = this.xpos;
                 double my = this.ypos;
 
+                // DOM MouseEvent.button -> vanilla GLFW numbering: DOM
+                // 0=left, 1=middle, 2=right; GLFW 0=left, 1=right, 2=middle.
+                // The gameplay branch below uses vanilla semantics (1 =
+                // use/place, 2 = pick block); the GUI path only checks
+                // button 0, which is identical in both conventions.
+                if (button == 2) {
+                        button = 1;
+                } else if (button == 1) {
+                        button = 2;
+                }
+
                 // Vanilla MouseHandler.onPress: clicking the canvas while
                 // in-world with the cursor free re-grabs the pointer (the
                 // first click is the grab, gameplay clicks come after)

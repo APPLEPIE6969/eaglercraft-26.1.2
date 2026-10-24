@@ -24,7 +24,7 @@ type Telemetry = NonNullable<Awaited<ReturnType<typeof readGameTelemetry>>>;
 
 
 /**
- * Clicks a bridge button by its telemetry id (move + settle + click).
+ * Clicks a bridge button by its telemetry id.
  *
  * The lookup polls instead of reading once: right after a navigation the
  * telemetry bridge still reports the PREVIOUS screen for up to a tick, so a
@@ -32,31 +32,60 @@ type Telemetry = NonNullable<Awaited<ReturnType<typeof readGameTelemetry>>>;
  * several screens ("done") - resolves the stale screen's button and clicks
  * its coordinates on the new one. When `expectedScreen` is given, the poll
  * waits until the bridge reports that screen AND carries the button, which
- * makes the click unambiguous; without it the poll just waits for the id.
+ * makes the click unambiguous. Class-name suffixes must be specific enough
+ * not to substring-match ("OptionsScreen" IS a substring of
+ * "SoundOptionsScreen" - use "screens.options.OptionsScreen").
+ *
+ * When `untilScreen` is given the click is verified by its EFFECT: the
+ * helper polls for that screen and re-clicks (re-looking the button up)
+ * up to three times, because a single click can physically drop on a
+ * loaded runner and leave the screen unchanged.
  */
 async function clickBridgeButton(
   page: Page,
   id: string,
   failMessage: string,
   expectedScreen?: string,
+  untilScreen?: string,
 ): Promise<void> {
-  const deadline = Date.now() + 12_000;
-  let coords: Awaited<ReturnType<typeof getButtonCssCoords>> = null;
-  for (;;) {
-    const telemetry = await readGameTelemetry(page);
-    const screenOk = !expectedScreen || (telemetry?.screen ?? '').includes(expectedScreen);
-    if (screenOk && telemetry?.buttons.some((b) => b.id === id)) {
-      coords = await getButtonCssCoords(page, id);
-      if (coords) break;
+  const attempts = untilScreen ? 3 : 1;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const findDeadline = Date.now() + 12_000;
+    let coords: Awaited<ReturnType<typeof getButtonCssCoords>> = null;
+    for (;;) {
+      const telemetry = await readGameTelemetry(page);
+      const screenOk =
+        !expectedScreen || (telemetry?.screen ?? '').includes(expectedScreen);
+      if (screenOk && telemetry?.buttons.some((b) => b.id === id)) {
+        coords = await getButtonCssCoords(page, id);
+        if (coords) break;
+      }
+      if (Date.now() > findDeadline) {
+        expect(
+          coords,
+          `${failMessage} (screen: ${telemetry?.screen})`,
+        ).not.toBeNull();
+      }
+      await page.waitForTimeout(250);
     }
-    if (Date.now() > deadline) {
-      expect(coords, `${failMessage} (screen: ${telemetry?.screen})`).not.toBeNull();
+    await page.mouse.move(coords!.cssX, coords!.cssY);
+    await page.waitForTimeout(100);
+    await page.mouse.click(coords!.cssX, coords!.cssY);
+    if (!untilScreen) return;
+    const untilDeadline = Date.now() + 8_000;
+    for (;;) {
+      const telemetry = await readGameTelemetry(page);
+      if ((telemetry?.screen ?? '').includes(untilScreen)) return;
+      if (Date.now() > untilDeadline) {
+        break; // re-look the button up and click again
+      }
+      await page.waitForTimeout(250);
     }
-    await page.waitForTimeout(250);
   }
-  await page.mouse.move(coords!.cssX, coords!.cssY);
-  await page.waitForTimeout(100);
-  await page.mouse.click(coords!.cssX, coords!.cssY);
+  expect(
+    false,
+    `${failMessage}: clicked "${id}" ${attempts}x without reaching ${untilScreen}`,
+  ).toBe(true);
 }
 
 
@@ -514,9 +543,9 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(savedBinds!.includes('key.forward=37'), `Walk Forwards must now be bound to K (scan 37), got: ${savedBinds}`).toBe(true);
 
     // ── Sound Settings: master + category sliders ──
-    await clickBridgeButton(page, 'done', 'the Key Binds Done button must be clickable', 'KeyBindsScreen');
-    await clickBridgeButton(page, 'done', 'the Controls Done button must be clickable', 'ControlsScreen');
-    await clickBridgeButton(page, 'soundsettings', 'the Sound Settings button must be clickable', 'OptionsScreen');
+    await clickBridgeButton(page, 'done', 'the Key Binds Done button must work', 'screens.options.KeyBindsScreen', 'screens.options.ControlsScreen');
+    await clickBridgeButton(page, 'done', 'the Controls Done button must work', 'screens.options.ControlsScreen', 'screens.options.OptionsScreen');
+    await clickBridgeButton(page, 'soundsettings', 'the Sound Settings button must work', 'screens.options.OptionsScreen', 'screens.options.SoundOptionsScreen');
     const soundState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('SoundOptionsScreen'));
     expect(soundState?.screen.includes('SoundOptionsScreen'), 'Sound Settings must open').toBe(true);
     const soundIds = (soundState?.buttons ?? []).map((b) => b.id);
@@ -574,8 +603,8 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     ).toBe(true);
 
     // Done -> Options, Done -> Title
-    await clickBridgeButton(page, 'done', 'the Sound Settings Done button must be clickable', 'SoundOptionsScreen');
-    await clickBridgeButton(page, 'done', 'the Options Done button must be clickable', 'OptionsScreen');
+    await clickBridgeButton(page, 'done', 'the Sound Settings Done button must work', 'screens.options.SoundOptionsScreen', 'screens.options.OptionsScreen');
+    await clickBridgeButton(page, 'done', 'the Options Done button must work', 'screens.options.OptionsScreen', 'TitleScreen');
     const titleAgain = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('TitleScreen'));
     expect(titleAgain?.screen.includes('TitleScreen'), 'Done must return to the title screen').toBe(true);
 
@@ -676,7 +705,9 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(pageErrors, 'the options/multiplayer flows must not throw uncaught page errors').toEqual([]);
     await attachSessionSummary(testInfo, {
       gated: false,
-      serverList: savedList,
+      serverList: await page.evaluate(() =>
+        localStorage.getItem('_eaglercraftX26.serverlist'),
+      ),
       keybinds: savedBinds,
     });
     await context.close();

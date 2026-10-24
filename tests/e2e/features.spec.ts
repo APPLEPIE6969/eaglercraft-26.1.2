@@ -23,10 +23,37 @@ const READY_TIMEOUT = 90_000;
 type Telemetry = NonNullable<Awaited<ReturnType<typeof readGameTelemetry>>>;
 
 
-/** Clicks a bridge button by its telemetry id (move + settle + click). */
-async function clickBridgeButton(page: Page, id: string, failMessage: string): Promise<void> {
-  const coords = await getButtonCssCoords(page, id);
-  expect(coords, failMessage).not.toBeNull();
+/**
+ * Clicks a bridge button by its telemetry id (move + settle + click).
+ *
+ * The lookup polls instead of reading once: right after a navigation the
+ * telemetry bridge still reports the PREVIOUS screen for up to a tick, so a
+ * single-shot read either misses the button or - for ids that exist on
+ * several screens ("done") - resolves the stale screen's button and clicks
+ * its coordinates on the new one. When `expectedScreen` is given, the poll
+ * waits until the bridge reports that screen AND carries the button, which
+ * makes the click unambiguous; without it the poll just waits for the id.
+ */
+async function clickBridgeButton(
+  page: Page,
+  id: string,
+  failMessage: string,
+  expectedScreen?: string,
+): Promise<void> {
+  const deadline = Date.now() + 12_000;
+  let coords: Awaited<ReturnType<typeof getButtonCssCoords>> = null;
+  for (;;) {
+    const telemetry = await readGameTelemetry(page);
+    const screenOk = !expectedScreen || (telemetry?.screen ?? '').includes(expectedScreen);
+    if (screenOk && telemetry?.buttons.some((b) => b.id === id)) {
+      coords = await getButtonCssCoords(page, id);
+      if (coords) break;
+    }
+    if (Date.now() > deadline) {
+      expect(coords, `${failMessage} (screen: ${telemetry?.screen})`).not.toBeNull();
+    }
+    await page.waitForTimeout(250);
+  }
   await page.mouse.move(coords!.cssX, coords!.cssY);
   await page.waitForTimeout(100);
   await page.mouse.click(coords!.cssX, coords!.cssY);
@@ -487,9 +514,9 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(savedBinds!.includes('key.forward=37'), `Walk Forwards must now be bound to K (scan 37), got: ${savedBinds}`).toBe(true);
 
     // ── Sound Settings: master + category sliders ──
-    await clickBridgeButton(page, 'done', 'the Key Binds Done button must be clickable');
-    await clickBridgeButton(page, 'done', 'the Controls Done button must be clickable');
-    await clickBridgeButton(page, 'soundsettings', 'the Sound Settings button must be clickable');
+    await clickBridgeButton(page, 'done', 'the Key Binds Done button must be clickable', 'KeyBindsScreen');
+    await clickBridgeButton(page, 'done', 'the Controls Done button must be clickable', 'ControlsScreen');
+    await clickBridgeButton(page, 'soundsettings', 'the Sound Settings button must be clickable', 'OptionsScreen');
     const soundState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('SoundOptionsScreen'));
     expect(soundState?.screen.includes('SoundOptionsScreen'), 'Sound Settings must open').toBe(true);
     const soundIds = (soundState?.buttons ?? []).map((b) => b.id);
@@ -547,8 +574,8 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     ).toBe(true);
 
     // Done -> Options, Done -> Title
-    await clickBridgeButton(page, 'done', 'the Sound Settings Done button must be clickable');
-    await clickBridgeButton(page, 'done', 'the Options Done button must be clickable');
+    await clickBridgeButton(page, 'done', 'the Sound Settings Done button must be clickable', 'SoundOptionsScreen');
+    await clickBridgeButton(page, 'done', 'the Options Done button must be clickable', 'OptionsScreen');
     const titleAgain = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('TitleScreen'));
     expect(titleAgain?.screen.includes('TitleScreen'), 'Done must return to the title screen').toBe(true);
 
@@ -568,31 +595,61 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await clickBridgeButton(page, 'addserver', 'the Add Server button must be clickable');
     const addState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('EditServerScreen'));
     expect(addState?.screen.includes('EditServerScreen'), 'Add Server must open the entry dialog').toBe(true);
-    async function typeServerEntry(): Promise<boolean> {
-      await clickBridgeButton(page, 'servername', 'the Server Name box must be exposed');
+    // Keys can drop or mis-route under runner load (one CI run saved the
+    // mangled name "teway\u0001localhost:1"), and a blind retype APPENDS to
+    // whatever landed, so each field is cleared with Backspaces before
+    // typing and the whole entry is retried until the persisted list holds
+    // the exact name+address pair.
+    async function clearAndType(boxId: string, text: string): Promise<void> {
+      await clickBridgeButton(page, boxId, `the ${boxId} box must be exposed`);
       await page.waitForTimeout(150);
-      await page.keyboard.type('Gateway', { delay: 90 });
-      await clickBridgeButton(page, 'serveraddress', 'the Server Address box must be exposed');
-      await page.waitForTimeout(150);
-      await page.keyboard.type('localhost:1', { delay: 90 });
-      await page.waitForTimeout(300);
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Backspace');
+      }
+      await page.waitForTimeout(100);
+      await page.keyboard.type(text, { delay: 90 });
+      await page.waitForTimeout(200);
+    }
+    async function entrySaved(): Promise<boolean> {
+      const raw = await page.evaluate(() =>
+        localStorage.getItem('_eaglercraftX26.serverlist'),
+      );
+      if (!raw) return false;
+      try {
+        const list = JSON.parse(raw) as Array<{ name?: string; ip?: string }>;
+        return (
+          Array.isArray(list) &&
+          list.some((e) => e && e.name === 'Gateway' && e.ip === 'localhost:1')
+        );
+      } catch {
+        return raw.includes('Gateway') && raw.includes('localhost:1');
+      }
+    }
+    let entryOk = false;
+    for (let attempt = 0; attempt < 3 && !entryOk; attempt++) {
+      if (attempt > 0) {
+        // Back out of whatever state the failed attempt left and start over
+        const cancelVisible = (await readGameTelemetry(page))?.buttons.some(
+          (b) => b.id === 'cancel' && b.active !== false,
+        );
+        if (cancelVisible) {
+          await clickBridgeButton(page, 'cancel', 'Cancel must be clickable to redo the entry');
+        }
+        await clickBridgeButton(page, 'addserver', 'the Add Server button must be clickable');
+        await waitForTelemetry(page, 15_000, (t) => t.screen.includes('EditServerScreen'));
+      }
+      await clearAndType('servername', 'Gateway');
+      await clearAndType('serveraddress', 'localhost:1');
       const enabled = (await readGameTelemetry(page))?.buttons.find((b) => b.id === 'done')?.active;
-      return enabled === true;
+      if (enabled !== true) continue;
+      await clickBridgeButton(page, 'done', 'Done must be clickable');
+      await page.waitForTimeout(400);
+      entryOk = await entrySaved();
     }
-    let doneEnabled = await typeServerEntry();
-    if (!doneEnabled) {
-      // The box click can lose the race with a frame on slow runners -
-      // retype once before failing
-      doneEnabled = await typeServerEntry();
-    }
-    expect(doneEnabled, 'Done must enable once the address is non-empty').toBe(true);
-    await clickBridgeButton(page, 'done', 'Done must be clickable');
-    await page.waitForTimeout(400);
-
-    // ── The entry persisted (vanilla servers.dat equivalent) ──
-    const savedList = await page.evaluate(() => localStorage.getItem('_eaglercraftX26.serverlist'));
-    expect(savedList, 'the server list must persist to localStorage').toBeTruthy();
-    expect(savedList!.includes('Gateway'), `the new entry must be saved (got: ${JSON.stringify(savedList)})`).toBe(true);
+    expect(
+      entryOk,
+      'the new entry must be saved with the exact typed name and address',
+    ).toBe(true);
 
     // ── Select the row and join: ConnectScreen -> DisconnectedScreen ──
     // First row: listTop 32, row height 36 -> click at GUI (245, 50).

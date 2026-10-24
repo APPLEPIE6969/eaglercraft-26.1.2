@@ -1002,6 +1002,10 @@ public class EaglerCraft {
                 float yaw = readLookYaw();
                 float pitch = readLookPitch();
                 clearLookRequest();
+                // Drop any accumulated pointer deltas: they predate the snap
+                // and would immediately drag the camera off the requested
+                // orientation
+                PlatformInput.clearMouseDeltas();
                 net.minecraft.client.player.LocalPlayer p = mc.getPlayer();
                 p.snapTo(p.x, p.y, p.z, yaw, pitch);
         }

@@ -535,6 +535,17 @@ public class PlatformInput {
         }
 
         /**
+         * Discards any accumulated pointer-lock deltas without applying
+         * them (input hygiene: stale synthetic deltas must not fight an
+         * explicit camera snap - vanilla look deltas always come from
+         * real mouse motion).
+         */
+        public static void clearMouseDeltas() {
+                dx = 0;
+                dy = 0;
+        }
+
+        /**
          * Gets and clears the accumulated mouse wheel delta.
          */
         public static int getMouseDWheel() {

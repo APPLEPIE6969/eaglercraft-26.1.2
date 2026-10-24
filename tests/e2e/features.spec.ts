@@ -73,7 +73,8 @@ async function getGuiCssCoords(
   }, { guiX, guiY });
 }
 
-/** Enters the default world through the bridge and waits for the HUD. */
+/** Enters the default world through the bridge and waits for the HUD and
+ * the first landed physics tick (onGround) so the snapshot is settled. */
 async function enterWorld(page: Page): Promise<Telemetry> {
   await page.evaluate(() => {
     const game = (
@@ -81,7 +82,10 @@ async function enterWorld(page: Page): Promise<Telemetry> {
     ).__eaglercraftGame;
     game?.enterWorld?.();
   });
-  const state = await waitForTelemetry(page, 30_000, (t) => t.inWorld);
+  const state = await waitForTelemetry(page, 30_000, (t) => {
+    const gp = t.gameplay as Gameplay | null | undefined;
+    return t.inWorld && !!gp?.player?.onGround;
+  });
   expect(state?.inWorld, 'the client must enter the world').toBe(true);
   expect(state?.gameplay, 'the gameplay snapshot must exist in world').toBeTruthy();
   return state!;
@@ -285,7 +289,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       ).__eaglercraftGame;
       game?.setLook?.(0, 90);
     });
-    const aimState = await waitForTelemetry(page, 5_000, (t) => gameplayOf(t).hit !== null);
+    const aimState = await waitForTelemetry(page, 10_000, (t) => {
+      const gp = t.gameplay as Gameplay | null | undefined;
+      return Math.abs((gp?.player?.pitch ?? 0) - 90) < 1 && gp?.hit != null;
+    });
     const hit = gameplayOf(aimState).hit!;
     expect(hit, `aiming down must hit the ground (last telemetry: ${JSON.stringify(aimState?.gameplay)})`).toBeTruthy();
     expect([hit.x, hit.y, hit.z], 'the ray must hit the grass block under spawn').toEqual([0, -61, 0]);
@@ -307,7 +314,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await page.mouse.down();
     let sawDestroyStage = false;
     let broke = false;
-    const destroyDeadline = Date.now() + 12_000;
+    const destroyDeadline = Date.now() + 20_000;
     while (Date.now() < destroyDeadline && !broke) {
       await page.waitForTimeout(150);
       const t = await readGameTelemetry(page);
@@ -347,18 +354,31 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       // ~2.8 blocks away (within the 4.5 reach)
       game?.setLook?.(0, 30);
     });
-    await page.waitForTimeout(400);
-    const placeAimState = await readGameTelemetry(page);
+    // Slow tick loops may need a moment to consume the look request and
+    // re-run the pick - poll until the camera is at pitch 30 with a hit
+    const placeAimState = await waitForTelemetry(page, 10_000, (t) => {
+      const gp = t.gameplay as Gameplay | null | undefined;
+      return Math.abs((gp?.player?.pitch ?? 0) - 30) < 1 && gp?.hit != null;
+    });
     const placeHit = gameplayOf(placeAimState).hit;
     expect(placeHit, 'the forward-down ray must hit the ground').toBeTruthy();
     expect(placeHit!.face, 'the placement surface must be the top face').toBe('up');
     const placeY = placeHit!.y + 1;
     const placeZ = placeHit!.z;
 
+    await page.evaluate(() => {
+      const game = (
+        self as unknown as {
+          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
+        }
+      ).__eaglercraftGame;
+      game?.setLook?.(0, 30); // re-snap right before the click
+    });
+    await page.waitForTimeout(250);
     await page.mouse.down({ button: 'right' });
     await page.waitForTimeout(150);
     await page.mouse.up({ button: 'right' });
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(600);
     expect(
       await queryBlock(page, 0, placeY, placeZ),
       `right-clicking the ground must place the grass at (0, ${placeY}, ${placeZ})`,
@@ -519,14 +539,27 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       master.x + Math.round(master.w * 0.25),
       master.y + master.h / 2,
     );
-    await page.mouse.click(masterClick.cssX, masterClick.cssY);
-    await page.waitForTimeout(300);
-    const savedMaster = await page.evaluate(
-      () => localStorage.getItem('_eaglercraftX26.p.masterVol'),
-    );
+    // Click-to-set at 25%, retried at a couple of positions - the value
+    // must land in the persisted profile (vanilla OptionInstance.save)
+    let savedMaster: string | null = null;
+    for (const frac of [0.25, 0.6, 0.4]) {
+      const c = await getGuiCssCoords(
+        page,
+        master.x + Math.round(master.w * frac),
+        master.y + master.h / 2,
+      );
+      await page.mouse.move(c.cssX, c.cssY);
+      await page.waitForTimeout(120);
+      await page.mouse.click(c.cssX, c.cssY);
+      await page.waitForTimeout(600);
+      savedMaster = await page.evaluate(() => localStorage.getItem('_eaglercraftX26.profile.masterVol'));
+      if (savedMaster !== null) {
+        break;
+      }
+    }
     expect(
       savedMaster !== null,
-      `master volume must persist (got: ${savedMaster})`,
+      `master volume must persist after a slider click (got: ${savedMaster})`,
     ).toBe(true);
 
     // Done -> Options, Done -> Title

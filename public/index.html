@@ -181,6 +181,7 @@
                     document.getElementById("title-overlay").style.display = "block";
                     // Update FPS counter periodically
                     var fpsEl = document.getElementById("title-fps");
+                    var overlayEl = document.getElementById("title-overlay");
                     var lastTime = performance.now();
                     var frameCount = 0;
                     function updateFPS() {
@@ -196,15 +197,19 @@
                         // Any sub-screen (Select World, Options, ...) and the
                         // in-world HUD must render without DOM chrome, so the
                         // overlay visibility tracks the bridge's screen state.
+                        // The style is only written on CHANGE - a same-value
+                        // display write every frame keeps the element on the
+                        // compositor's dirty list for no reason. The loop also
+                        // stays alive in-world so the banner comes back when a
+                        // world is quit to the title screen.
                         var game = window.__eaglercraftGame;
                         if (game) {
                             var screenId = String(game.screen || "none");
                             var onTitle = !game.inWorld
                                 && (screenId === "none" || screenId.indexOf("TitleScreen") !== -1);
-                            document.getElementById("title-overlay").style.display
-                                = onTitle ? "block" : "none";
-                            if (game.inWorld) {
-                                return; // stop the FPS loop
+                            var want = onTitle ? "block" : "none";
+                            if (overlayEl.style.display !== want) {
+                                overlayEl.style.display = want;
                             }
                         }
                         requestAnimationFrame(updateFPS);

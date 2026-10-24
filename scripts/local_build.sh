@@ -78,7 +78,13 @@ EOF
 fi
 
 # ── 3. TeaVM jar patches (pristine from Maven Central, patched locally) ──
-PRISTINE_DIR=$(mktemp -d)
+# Persistent locations: the sandbox wipes /tmp and ~/.gradle between
+# sessions, so the pristine downloads and the done-marker live outside
+# both - re-running after a wipe must not re-fetch from Maven Central
+# (which rate-limits this sandbox IP after a few killed runs).
+PRISTINE_DIR=/home/z/my-project/tools/pristine
+PRISTINE_MARKER=/home/z/my-project/tools/.teavm_patched_marker
+mkdir -p "$PRISTINE_DIR"
 patch_teavm_artifact() {
   local group_path="$1" artifact="$2" version="$3" script="$4"
   local cache_jar
@@ -101,12 +107,12 @@ patch_teavm_artifact() {
   fi
   echo "[local-build] patched $artifact"
 }
-if [ ! -s /tmp/.teavm_patched_marker ]; then
+if [ ! -s "$PRISTINE_MARKER" ]; then
   ./gradlew :sources:dependencies --configuration teavmClasspath --no-daemon >/dev/null 2>&1 || true
   patch_teavm_artifact org.teavm teavm-core 0.15.0 scripts/patch_teavm_jar.py
   patch_teavm_artifact org.teavm teavm-classlib 0.15.0 scripts/patch_classlib_jar.py
   patch_teavm_artifact org.teavm teavm-relocated-libs-asm 0.15.0 scripts/patch_teavm_asm.py
-  touch /tmp/.teavm_patched_marker
+  touch "$PRISTINE_MARKER"
 fi
 
 # ── 4. DFU patches ──────────────────────────────────────────────────────

@@ -436,7 +436,10 @@ public class ClientMain {
                         + "  preserveDrawingBuffer: false,"
                         + "  powerPreference: 'high-performance',"
                         + "  failIfMajorPerformanceCaveat: false,"
-                        + "  desynchronized: true"
+                        // desynchronized stays off: the low-latency present
+                        // path is a documented flicker source on real GPU
+                        // compositors (invisible in headless/software GL).
+                        + "  desynchronized: false"
                         + "};")
         private static native JSObject createDefaultContextAttributes();
 
@@ -453,7 +456,7 @@ public class ClientMain {
                         + "  preserveDrawingBuffer: glConfig.preserveDrawingBuffer !== undefined ? glConfig.preserveDrawingBuffer : false,"
                         + "  powerPreference: glConfig.powerPreference || 'high-performance',"
                         + "  failIfMajorPerformanceCaveat: glConfig.failIfMajorPerformanceCaveat || false,"
-                        + "  desynchronized: glConfig.desynchronized !== undefined ? glConfig.desynchronized : true"
+                        + "  desynchronized: glConfig.desynchronized !== undefined ? glConfig.desynchronized : false"
                         + "};")
         private static native JSObject createContextAttributes(Object glConfig);
 

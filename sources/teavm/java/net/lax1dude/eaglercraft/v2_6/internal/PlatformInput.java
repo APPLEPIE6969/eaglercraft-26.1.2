@@ -187,6 +187,32 @@ public class PlatformInput {
         private static KeyEventObserver keyEventObserver = null;
 
         /**
+         * Browser-reserved shortcuts that must reach the browser: devtools
+         * (F12, Ctrl/Cmd+Shift+I/J/C) and page reload (Ctrl/Cmd+R,
+         * Ctrl/Cmd+Shift+R). The blanket {@code preventDefault()} used to
+         * swallow these too, which made Ctrl+R and F12 dead keys on the
+         * site - the game owns gameplay keys, but these combos belong to
+         * the browser on every desktop platform. The events are still
+         * delivered to the game below; only the browser-default
+         * suppression is skipped. F5 stays captured (in-game use).
+         */
+        private static boolean isBrowserShortcut(KeyboardEvent event) {
+                String code = event.getCode();
+                if ("F12".equals(code)) {
+                        return true;
+                }
+                boolean ctrlOrCmd = event.isCtrlKey() || event.isMetaKey();
+                if (ctrlOrCmd && "KeyR".equals(code)) {
+                        return true;
+                }
+                if (event.isCtrlKey() && event.isShiftKey()) {
+                        return "KeyI".equals(code) || "KeyJ".equals(code)
+                                        || "KeyC".equals(code);
+                }
+                return false;
+        }
+
+        /**
          * Installs the keyboard observer (the Minecraft instance routes
          * events into its KeyboardHandler / current screen). Safe to call
          * again; the latest observer wins.
@@ -205,7 +231,9 @@ public class PlatformInput {
                 HTMLDocument document = window.getDocument();
                 document.addEventListener("keydown", (EventListener<KeyboardEvent>) event -> {
                         if (imeComposing) return;
-                        event.preventDefault();
+                        if (!isBrowserShortcut(event)) {
+                                event.preventDefault();
+                        }
 
                         String code = event.getCode();
                         int keyCode = mapKeyCode(code);
@@ -232,7 +260,9 @@ public class PlatformInput {
 
                 document.addEventListener("keyup", (EventListener<KeyboardEvent>) event -> {
                         if (imeComposing) return;
-                        event.preventDefault();
+                        if (!isBrowserShortcut(event)) {
+                                event.preventDefault();
+                        }
 
                         String code = event.getCode();
                         int keyCode = mapKeyCode(code);

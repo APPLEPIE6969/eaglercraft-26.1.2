@@ -206,6 +206,21 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(slotState, 'Digit5 must select hotbar slot 4 (vanilla key.hotbar.5)').toBeTruthy();
 
     // ── Scroll changes the selection too (vanilla Inventory.swapPaint) ──
+    // swapPaint only runs while the pointer is grabbed (vanilla gameplay
+    // wheel), so the canvas must be clicked to grab first; a programmatic
+    // lock grant is async, so wait for the pointer-lock state to settle
+    // before trusting the wheel event.
+    const wheelCanvas = await page.evaluate(() => {
+      const c = document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null;
+      const hit = c ?? (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[]).find((k) => k.clientWidth > 0);
+      if (!hit) return null;
+      const rect = hit.getBoundingClientRect();
+      return { x: rect.left + hit.clientWidth / 2, y: rect.top + hit.clientHeight / 2 };
+    });
+    expect(wheelCanvas, 'the game canvas must exist for the wheel grab').toBeTruthy();
+    await page.mouse.move(wheelCanvas!.x, wheelCanvas!.y);
+    await page.mouse.click(wheelCanvas!.x, wheelCanvas!.y);
+    await page.waitForTimeout(600);
     await page.mouse.wheel(0, 120);
     const scrollState = await waitForTelemetry(page, 5_000, (t) => gameplayOf(t).hotbar.selected === 5);
     expect(scrollState, 'scroll down must move the selection to slot 5').toBeTruthy();

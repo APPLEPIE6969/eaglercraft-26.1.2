@@ -40,23 +40,38 @@ public class Inventory {
 
         /** Vanilla Inventory.add: first matching stack, then first empty (hotbar first). */
         public boolean addItem(int blockId) {
-                if (blockId == Blocks.AIR) {
+                return addItem(blockId, 1, STACK_SIZE);
+        }
+
+        /**
+         * Vanilla Inventory.add with an explicit per-item stack limit
+         * (tools cap at 1, ingredients at 64): first merge into matching
+         * stacks with room, then first empty slot, hotbar first. Returns
+         * false when nothing fit (inventory full).
+         */
+        public boolean addItem(int blockId, int count, int maxStack) {
+                if (blockId == Blocks.AIR || count <= 0) {
                         return false;
                 }
-                for (int i = 0; i < TOTAL_SIZE; i++) {
-                        if (slots[i] == blockId && counts[i] > 0 && counts[i] < STACK_SIZE) {
-                                counts[i]++;
-                                return true;
+                int cap = Math.max(1, Math.min(STACK_SIZE, maxStack));
+                int left = count;
+                for (int i = 0; i < TOTAL_SIZE && left > 0; i++) {
+                        if (slots[i] == blockId && counts[i] > 0
+                                        && counts[i] < cap) {
+                                int moved = Math.min(cap - counts[i], left);
+                                counts[i] += moved;
+                                left -= moved;
                         }
                 }
-                for (int i = 0; i < TOTAL_SIZE; i++) {
+                for (int i = 0; i < TOTAL_SIZE && left > 0; i++) {
                         if (counts[i] == 0) {
+                                int moved = Math.min(cap, left);
                                 slots[i] = blockId;
-                                counts[i] = 1;
-                                return true;
+                                counts[i] = moved;
+                                left -= moved;
                         }
                 }
-                return false; // inventory full
+                return left < count;
         }
 
         /** Whether the selected slot holds a placeable block. */
@@ -127,7 +142,10 @@ public class Inventory {
 
         public void setCarried(int blockId, int count) {
                 carriedBlock = (blockId == Blocks.AIR || count <= 0) ? Blocks.AIR : blockId;
-                carriedCount = Math.max(0, Math.min(STACK_SIZE, carriedCount));
+                // clamp the REQUESTED count (the pre-crafting code clamped
+                // the stale field here, so every pickup produced an empty
+                // cursor stack - caught by the crafting e2e)
+                carriedCount = Math.max(0, Math.min(STACK_SIZE, count));
         }
 
         // ===== vanilla AbstractContainerMenu.doClick (survival slots) =====
@@ -135,25 +153,38 @@ public class Inventory {
         /**
          * Vanilla left/right click on a slot: pickup, place, merge, swap.
          * Left = whole stack; right = pickup ceil-half, or place one.
+         *
+         * <p>Shared by the player inventory ({@link #clickSlot}) and the
+         * crafting grids ({code CraftingContainer.clickCell}) - vanilla's
+         * AbstractContainerMenu.doClick is one code path over any slot
+         * list. {@code ids} uses 0 = empty; {@code inv} carries the cursor
+         * stack. Merge space respects the id's vanilla stack limit
+         * (tools stack to 1, blocks to 64).</p>
          */
-        public void clickSlot(int slot, int button) {
-                if (slot < 0 || slot >= TOTAL_SIZE) {
+        public static void doClick(int[] ids, int[] counts, int index,
+                        int button, Inventory inv) {
+                if (index < 0 || index >= ids.length) {
                         return;
                 }
-                int slotBlock = slots[slot];
-                int slotCount = counts[slot];
-                if (carriedCount == 0) {
+                int slotBlock = ids[index];
+                int slotCount = counts[index];
+                int cap = net.minecraft.world.item.crafting.Crafting
+                        .maxStack(slotBlock == 0 && inv.carriedCount > 0
+                                ? inv.carriedBlock : slotBlock);
+                if (inv.carriedCount == 0) {
                         // pickup
                         if (slotCount > 0) {
                                 if (button == 0) {
                                         // whole stack
-                                        setCarried(slotBlock, slotCount);
-                                        setSlot(slot, Blocks.AIR, 0);
+                                        inv.setCarried(slotBlock, slotCount);
+                                        writeSlot(ids, counts, index, 0, 0);
                                 } else {
                                         // ceil half
                                         int take = (slotCount + 1) / 2;
-                                        setCarried(slotBlock, take);
-                                        setSlot(slot, slotBlock, slotCount - take);
+                                        inv.setCarried(slotBlock, take);
+                                        writeSlot(ids, counts, index,
+                                                        slotBlock,
+                                                        slotCount - take);
                                 }
                         }
                         return;
@@ -162,31 +193,50 @@ public class Inventory {
                 if (slotCount == 0) {
                         // place onto empty
                         if (button == 0) {
-                                setSlot(slot, carriedBlock, carriedCount);
-                                setCarried(Blocks.AIR, 0);
+                                writeSlot(ids, counts, index,
+                                                inv.carriedBlock,
+                                                inv.carriedCount);
+                                inv.setCarried(0, 0);
                         } else {
-                                setSlot(slot, carriedBlock, 1);
-                                setCarried(carriedBlock, carriedCount - 1);
+                                writeSlot(ids, counts, index,
+                                                inv.carriedBlock, 1);
+                                inv.setCarried(inv.carriedBlock,
+                                                inv.carriedCount - 1);
                         }
                         return;
                 }
-                if (slotBlock == carriedBlock) {
-                        // merge up to STACK_SIZE
-                        int space = STACK_SIZE - slotCount;
-                        int moved = Math.min(space, button == 0 ? carriedCount : 1);
+                if (slotBlock == inv.carriedBlock) {
+                        // merge up to the stack cap
+                        int space = cap - slotCount;
+                        int moved = Math.min(space,
+                                        button == 0 ? inv.carriedCount : 1);
                         if (moved > 0) {
-                                setSlot(slot, slotBlock, slotCount + moved);
-                                setCarried(carriedBlock, carriedCount - moved);
+                                writeSlot(ids, counts, index, slotBlock,
+                                                slotCount + moved);
+                                inv.setCarried(inv.carriedBlock,
+                                                inv.carriedCount - moved);
                         }
                         return;
                 }
                 // swap (left only; vanilla right-click-swap also swaps whole)
                 if (button == 0) {
-                        int nb = carriedBlock;
-                        int nc = carriedCount;
-                        setCarried(slotBlock, slotCount);
-                        setSlot(slot, nb, nc);
+                        int nb = inv.carriedBlock;
+                        int nc = inv.carriedCount;
+                        inv.setCarried(slotBlock, slotCount);
+                        writeSlot(ids, counts, index, nb, nc);
                 }
+        }
+
+        /** The doClick slot write: 0 count or 0 id clears to air. */
+        private static void writeSlot(int[] ids, int[] counts, int index,
+                        int blockId, int count) {
+                ids[index] = (blockId == 0 || count <= 0) ? 0 : blockId;
+                counts[index] = Math.max(0, Math.min(STACK_SIZE, count));
+        }
+
+        /** The inventory's own arrays through the shared doClick. */
+        public void clickSlot(int slot, int button) {
+                doClick(slots, counts, slot, button, this);
         }
 
         /**

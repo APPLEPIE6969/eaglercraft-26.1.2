@@ -310,6 +310,13 @@ public final class Blocks {
         register(372, "melon", "Melon", 1.0F, false, "melon_top", "melon_side", "melon_top", TAB_NATURAL, 0x000000, 0x000000);
         register(373, "cactus", "Cactus", 0.4F, false, "cactus_top", "cactus_side", "cactus_bottom", TAB_NATURAL, 0x000000, 0x000000);
         register(374, "mushroom_stem", "Mushroom Stem", 0.2F, false, "mushroom_stem", "mushroom_stem", "mushroom_stem", TAB_NATURAL, 0x000000, 0x000000);
+        // crafting_table: the vanilla numeric id is unverifiable from the
+        // decompile, so it gets a port-assigned id like the 256+ run. It is
+        // interactive (startUseItem opens the 3x3 CraftingTableScreen) and
+        // craftable from four planks in the 2x2 grid, closing the survival
+        // tool ladder. Not in a creative tab yet (the tab set is a
+        // documented simplification).
+        register(375, "crafting_table", "Crafting Table", 2.5F, false, "crafting_table_top", "crafting_table_front", "crafting_table_top", TAB_NONE, 0x000000, 0x000000);
         }
 
         private Blocks() {

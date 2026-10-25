@@ -65,8 +65,8 @@ public class PlatformInput {
          * {@link #consumeMouseRelease}, preserving press-before-release
          * order for clicks that happen within a single frame.
          */
-        private static final boolean[] mousePressedLatch = new boolean[MAX_MOUSEBUTTON];
-        private static final boolean[] mouseReleasedLatch = new boolean[MAX_MOUSEBUTTON];
+        private static final int[] mousePressedCount = new int[MAX_MOUSEBUTTON];
+        private static final int[] mouseReleasedCount = new int[MAX_MOUSEBUTTON];
 
         /** Current mouse position in canvas coordinates. */
         private static int mouseX = 0;
@@ -313,7 +313,10 @@ public class PlatformInput {
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {
                                 mouseDown[button] = true;
-                                mousePressedLatch[button] = true;
+                                // count, don't overwrite: rapid clicks must
+                                // queue for the following frames (a boolean
+                                // latch drops them on slow machines)
+                                if (mousePressedCount[button] < 8) mousePressedCount[button]++;
                         }
                 });
 
@@ -323,7 +326,7 @@ public class PlatformInput {
                         int button = event.getButton();
                         if (button >= 0 && button < MAX_MOUSEBUTTON) {
                                 mouseDown[button] = false;
-                                mouseReleasedLatch[button] = true;
+                                if (mouseReleasedCount[button] < 8) mouseReleasedCount[button]++;
                         }
                 });
 
@@ -597,25 +600,30 @@ public class PlatformInput {
          * mousedown transition for this button happened since the last
          * consumption. This survives clicks that complete entirely between
          * two game frames, which a plain isMouseDown poll would miss.
+         *
+         * <p>The latch is a per-button COUNT, not a boolean: a boolean
+         * silently drops every click that arrives while the previous press
+         * is still pending (slow machines / heavy frames coalesce rapid
+         * clicks into one - the crafting e2e caught this), a counter queues
+         * them for the following frames like GLFW's event queue.</p>
          */
         public static boolean consumeMousePress(int button) {
                 if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
-                if (mousePressedLatch[button]) {
-                        mousePressedLatch[button] = false;
+                if (mousePressedCount[button] > 0) {
+                        mousePressedCount[button]--;
                         return true;
                 }
                 return false;
         }
 
         /**
-         * Consumes a latched button release: returns (and clears) whether a
-         * mouseup transition for this button happened since the last
-         * consumption.
+         * Consumes a latched button release (the same count semantics as
+         * {@link #consumeMousePress}).
          */
         public static boolean consumeMouseRelease(int button) {
                 if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
-                if (mouseReleasedLatch[button]) {
-                        mouseReleasedLatch[button] = false;
+                if (mouseReleasedCount[button] > 0) {
+                        mouseReleasedCount[button]--;
                         return true;
                 }
                 return false;

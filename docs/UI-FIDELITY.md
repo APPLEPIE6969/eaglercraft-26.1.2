@@ -465,3 +465,55 @@ decompile. Policy:
 
 `gameplay.main` (27 slots), `gameplay.carried` and CycleButton ids of
 the form `gamemode:survival` (prefix + current value) for automation.
+
+## Crafting (Feature 8)
+
+The vanilla recipe data drives the grids, baked from the jar's
+data-driven files by `scripts/gen_crafting_recipes.py` into
+`CraftingRecipes.java` (25 recipes: planks x8, stick, crafting_table,
+wooden/stone/iron tool ladders; tags recursively expanded to port ids
+at generation time; skips logged in the generated header).
+
+- Item ids: port-assigned space at 4096+ (`Items`), blocks stay below
+  512; tools stack to 1, ingredients to 64 (vanilla limits).
+- Matched like vanilla `ShapedRecipe`/`ShapelessRecipe`: shaped = the
+  grid's non-empty bounding box compared against the pattern (both
+  horizontal mirrors), so 3-wide tool patterns are uncraftable in the
+  2x2; shapeless = ingredient multiset with backtracking.
+- Result slot: left takes one craft onto an empty/compatible cursor,
+  shift crafts repeatedly into the inventory; every take consumes one
+  item per non-empty grid cell (no container leftovers in the set).
+- 2x2 grid + result live in the survival InventoryScreen
+  ((97,17)/(115,17)/(97,35)/(115,35), result (153,27) - measured from
+  the texture insets; the modern result cell draws 26x26 centered on
+  the item origin, same math as the jar's menu code).
+- crafting_table block (port-assigned id 375, `TAB_NONE`, hardness 2.5)
+  is craftable from four planks (2x2), placeable, and right-click
+  opens the 3x3 `CraftingTableScreen` (vanilla `CraftingMenu`:
+  grid (30,17), result (124,35), inventory block at (8,84)).
+- Both screens return the grid contents AND the carried stack to the
+  inventory on close (vanilla `AbstractContainerMenu.removed`); overflow
+  is lost (the documented item-entity-free simplification).
+- Known deviations: no recipe book button on the crafting table screen;
+  iron tools ship as recipe data but iron_ingot has no in-world source
+  until the furnace milestone; items are not in the creative tabs yet.
+
+## Engine fixes surfaced by the crafting e2e
+
+- `Inventory.setCarried` clamped the stale carried count instead of the
+  requested one (every pickup produced an empty cursor stack; the old
+  soft telemetry assertions hid it).
+- The telemetry bridge's `waitForTelemetry` returned the last snapshot
+  on timeout and every caller asserted truthiness - a vacuous pass that
+  masked the above; it now returns null on timeout.
+- `Items` clinit order: the registry collections must precede the
+  register calls (a clinit-order slip silently killed ALL sprite
+  downloads - the panorama read false at the title screen).
+- `MouseHandler.grabMouse` is optimistic (the browser grant is async; a
+  synchronous check always read false and swallowed the next click),
+  `tick()` drops the phantom look delta of a late lock grant, and the
+  wheel routes through vanilla's `Inventory.swapPaint` whenever no
+  screen is open (the port's old path updated a cosmetic Gui field).
+- The bridge's `setHotbarSlot` no longer selects the slot it fills, and
+  PlatformInput's per-button input latch counts presses instead of
+  overwriting (rapid clicks queue instead of vanishing on slow frames).

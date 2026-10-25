@@ -110,6 +110,7 @@ public final class GuiSprites {
                 // container chrome for the inventory screens (vanilla
                 // textures/gui/container/*)
                 names.add("container/inventory");
+                names.add("container/crafting_table");
                 names.add("container/creative_inventory/tab_items");
                 names.add("container/creative_inventory/tab_inventory");
                 names.add("container/creative_inventory/tab_item_search");
@@ -122,6 +123,11 @@ public final class GuiSprites {
                 // icons live under sprites/block/<texture>.png)
                 for (String texture : net.minecraft.world.level.block.Blocks.allTextureNames()) {
                         names.add("block/" + texture);
+                }
+                // every texture the item registry references (the vanilla
+                // textures/item/ PNGs, under sprites/item/<name>.png)
+                for (String texture : net.minecraft.world.item.Items.allTextureNames()) {
+                        names.add("item/" + texture);
                 }
                 names.add("gui/menu_background");
                 names.add("gui/menu_list_background");

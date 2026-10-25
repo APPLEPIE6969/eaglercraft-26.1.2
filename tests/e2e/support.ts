@@ -478,19 +478,27 @@ export async function attachSessionSummary(
 
 export type Telemetry = NonNullable<Awaited<ReturnType<typeof readGameTelemetry>>>;
 
-/** Polls the telemetry until the predicate holds or the deadline expires. */
+/**
+ * Polls the telemetry until the predicate holds or the deadline expires.
+ *
+ * Returns null on timeout - callers must assert on the fields they need,
+ * never on the returned object's truthiness (a truthy check would pass on
+ * any fresh snapshot even when the predicate never matched, which is how
+ * the carried-stack pickup bug stayed green through the inventory
+ * milestone).
+ */
 export async function waitForTelemetry(
   page: Page,
   deadlineMs: number,
   predicate: (telemetry: Telemetry) => boolean,
-): Promise<Telemetry> {
+): Promise<Telemetry | null> {
   const deadline = Date.now() + deadlineMs;
   let state = await readGameTelemetry(page);
   while (Date.now() < deadline && !(state && predicate(state))) {
     await page.waitForTimeout(200);
     state = await readGameTelemetry(page);
   }
-  return state;
+  return state && predicate(state) ? state : null;
 }
 
 /** Enters the default world through the bridge and waits for the HUD and
@@ -531,6 +539,15 @@ export interface Gameplay {
   main?: ([number, number] | null)[];
   /** The carried (cursor) stack, null when empty (undefined pre-Feature-4). */
   carried?: [number, number] | null;
+  /**
+   * The open crafting grid (2x2 inventory / 3x3 crafting table), undefined
+   * when no grid screen is open (pre-Feature-8 bundles always undefined).
+   */
+  craft?: {
+    w: number;
+    grid: ([number, number] | null)[];
+    result: [number, number] | null;
+  };
   hit: { x: number; y: number; z: number; face?: string } | null;
   destroy: { stage: number; x: number; y: number; z: number } | null;
 }

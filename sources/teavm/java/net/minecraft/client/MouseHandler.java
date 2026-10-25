@@ -113,16 +113,19 @@ public class MouseHandler {
         /**
          * Called when the mouse is scrolled.
          *
-         * <p>Grabbed (in-world): vanilla's Inventory.swapPaint - the hotbar
-         * selection wraps through the nine slots. Unlocked: the current
-         * screen gets the event.</p>
+         * <p>In-world (no screen open): vanilla's Inventory.swapPaint - the
+         * hotbar selection wraps through the nine slots. Vanilla desktop has
+         * no cursor concept, so the wheel scrolls the hotbar whenever no
+         * screen is open regardless of the browser pointer-lock state; a
+         * screen being open gives the event to the screen.</p>
          */
         public void onScroll(long window, double xOffset, double yOffset) {
-                if (this.mouseGrabbed && minecraft.screen == null && minecraft.isLevelLoaded()) {
+                if (minecraft.screen == null && minecraft.isLevelLoaded()) {
+                        // vanilla MouseHandler.onScroll: Inventory.swapPaint on
+                        // the real inventory selection (the Gui mirror syncs
+                        // through playerSelectedSlotChanged)
                         int direction = yOffset < 0.0D ? -1 : 1;
-                        int current = minecraft.getGui().getSelectedHotbarSlot();
-                        int next = ((current + direction) % 9 + 9) % 9;
-                        minecraft.getGui().setSelectedHotbarSlot(next);
+                        minecraft.getInventory().swapPaint(direction);
                         minecraft.playerSelectedSlotChanged();
                         return;
                 }
@@ -186,10 +189,16 @@ public class MouseHandler {
          * The browser only grants pointer lock in response to a user
          * gesture, so EaglerCraft calls this on a real in-world canvas
          * click.
+         *
+         * <p>The grab flag is set optimistically: the browser grant is
+         * async, so a synchronous isPointerLocked() check here would
+         * always read false and swallow the next gameplay click (the
+         * relock-throttle case). {@link #tick()} reconciles the flag with
+         * the real lock state every tick.</p>
          */
         public void grabMouse() {
                 PlatformInput.requestPointerLock();
-                this.mouseGrabbed = PlatformInput.isPointerLocked();
+                this.mouseGrabbed = true;
         }
 
         /**
@@ -221,7 +230,17 @@ public class MouseHandler {
         public void tick() {
                 this.xpos = toGuiX(PlatformInput.getMouseX());
                 this.ypos = toGuiY(PlatformInput.getMouseY());
-                this.mouseGrabbed = PlatformInput.isPointerLocked();
+                boolean locked = PlatformInput.isPointerLocked();
+                if (locked && !this.mouseGrabbed) {
+                        // The browser granted the lock late (the grant is
+                        // async and the container-close re-grab is
+                        // gestureless): the position jump fires one huge
+                        // movement delta that would whip the camera - drop it
+                        PlatformInput.clearMouseDeltas();
+                        this.accumulatedDX = 0.0D;
+                        this.accumulatedDY = 0.0D;
+                }
+                this.mouseGrabbed = locked;
         }
 
         /**

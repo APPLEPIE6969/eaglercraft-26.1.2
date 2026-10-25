@@ -186,8 +186,14 @@ public class Gui {
                 }
         }
 
-        /** Gui sprite path for a block's flat inventory icon. */
+        /** Gui sprite path for a block or item's flat inventory icon. */
         private static String iconTexture(int blockId) {
+                // items (sticks, tools) live in their own id space
+                if (net.minecraft.world.item.Items.isItem(blockId)) {
+                        net.minecraft.world.item.Items.Item item =
+                                net.minecraft.world.item.Items.byId(blockId);
+                        return item == null ? null : "item/" + item.name;
+                }
                 net.minecraft.world.level.block.Blocks.Block block =
                         net.minecraft.world.level.block.Blocks.byId(blockId);
                 if (block.topTexture == null) {
@@ -198,10 +204,16 @@ public class Gui {
                 return "block/" + block.sideTexture;
         }
 
-        /** The display name of a block (vanilla Component.translatable
-         * "block.minecraft.<name>", rendered from the registry's
-         * vanilla en_us.json display name). */
+        /** The display name of a block or item (vanilla
+         * Component.translatable "block.minecraft.<name>" /
+         * "item.minecraft.<name>", rendered from the registries'
+         * vanilla en_us.json display names). */
         public static String blockName(int blockId) {
+                if (net.minecraft.world.item.Items.isItem(blockId)) {
+                        net.minecraft.world.item.Items.Item item =
+                                net.minecraft.world.item.Items.byId(blockId);
+                        return item == null ? null : item.displayName;
+                }
                 net.minecraft.world.level.block.Blocks.Block block =
                         net.minecraft.world.level.block.Blocks.byId(blockId);
                 return block.displayName == null ? null : block.displayName;

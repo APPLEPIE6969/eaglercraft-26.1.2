@@ -802,10 +802,33 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
         // ========== Input Stubs ==========
 
-        /** Vanilla startUseItem (MouseHandler button 1 while grabbed). */
+        /**
+         * Vanilla startUseItem (MouseHandler button 1 while grabbed).
+         * Vanilla order: the targeted block's use() runs first (opening
+         * its screen - the crafting_table), then the held item, then the
+         * placement; non-block held ids (the item registry) place nothing
+         * (vanilla BlockItem.place only exists for blocks).
+         */
         public void startUseItem() {
                 if (this.hitResultBlock != null && this.level instanceof ClientLevel) {
+                        // vanilla Block.use: interactive blocks open their
+                        // screen instead of receiving a placement
+                        ClientLevel level = (ClientLevel) this.level;
+                        net.minecraft.world.level.block.Blocks.Block target =
+                                net.minecraft.world.level.block.Blocks.byId(
+                                        level.getBlockState(
+                                                this.hitResultBlock.blockX,
+                                                this.hitResultBlock.blockY,
+                                                this.hitResultBlock.blockZ));
+                        if (target.name.equals("crafting_table")) {
+                                this.setScreen(new net.minecraft.client.gui
+                                        .screens.inventory.CraftingTableScreen());
+                                return;
+                        }
                         int blockId = this.inventory.getSelectedBlock();
+                        if (net.minecraft.world.item.Items.isItem(blockId)) {
+                                return;
+                        }
                         this.gameMode.useItemOn(this.hitResultBlock, blockId);
                 }
         }

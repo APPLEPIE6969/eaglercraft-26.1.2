@@ -1139,26 +1139,32 @@ nleva_GuiSprites_requestAll = () => {
     $names.$add($rt_s(24));
     $names.$add($rt_s(25));
     $names.$add($rt_s(26));
+    $names.$add($rt_s(27));
     $w = 1;
     while ($w <= 7) {
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(27)), $w);
+        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(28)), $w);
         $names.$add(jl_StringBuilder_toString(var$3));
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(28)), $w);
+        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(29)), $w);
         $names.$add(jl_StringBuilder_toString(var$3));
         $w = $w + 1 | 0;
     }
-    $names.$add($rt_s(29));
+    $names.$add($rt_s(30));
     var$3 = (nmwlb_Blocks_allTextureNames()).$iterator();
     while (var$3.$hasNext()) {
         $texture = var$3.$next();
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(30)), $texture);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(31)), $texture);
         $names.$add(jl_StringBuilder_toString(var$5));
     }
-    $names.$add($rt_s(31));
-    $names.$add($rt_s(32));
+    var$3 = (nmwi_Items_allTextureNames()).$iterator();
+    while (var$3.$hasNext()) {
+        $texture = var$3.$next();
+        var$5 = jl_StringBuilder__init_();
+        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(32)), $texture);
+        $names.$add(jl_StringBuilder_toString(var$5));
+    }
     $names.$add($rt_s(33));
     $names.$add($rt_s(34));
     $names.$add($rt_s(35));
@@ -1167,20 +1173,22 @@ nleva_GuiSprites_requestAll = () => {
     $names.$add($rt_s(38));
     $names.$add($rt_s(39));
     $names.$add($rt_s(40));
+    $names.$add($rt_s(41));
+    $names.$add($rt_s(42));
     $i = 0;
     while ($i < $names.$size()) {
         nleva_GuiSprites_pending.$add($names.$get($i));
         var$3 = $names.$get($i);
         var$5 = $names.$get($i);
         var$7 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(41)), var$5), $rt_s(42));
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(43)), var$5), $rt_s(44));
         var$5 = jl_StringBuilder_toString(var$7);
         nleva_GuiSprites_beginLoad$js_body$_12($rt_ustr(var$3), $rt_ustr(var$5));
         $i = $i + 1 | 0;
     }
     var$8 = $names.$size();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(43)), var$8), $rt_s(44));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(45)), var$8), $rt_s(46));
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nleva_GuiSprites_pollPending = () => {
@@ -1201,13 +1209,13 @@ nleva_GuiSprites_pollPending = () => {
                 if ($data.error ? 1 : 0) {
                     nleva_GuiSprites_failed.$add($name);
                     var$5 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(45)), $name), 39);
+                    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(47)), $name), 39);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$5)));
                 } else
                     try {
                         nleva_GuiSprites_textures.$put($name, otji_JSWrapper_wrap(nleva_GuiSprites_upload($gl, $data)));
                         nleva_GuiSprites_sizes.$put($name, $rt_createIntArrayFromData([$data.w, $data.h]));
-                        if (jl_String_startsWith($name, $rt_s(46)))
+                        if (jl_String_startsWith($name, $rt_s(48)))
                             nleva_GuiSprites_panoramaRaw.$put($name, otji_JSWrapper_wrap($data));
                         break a;
                     } catch ($$e) {
@@ -1217,7 +1225,7 @@ nleva_GuiSprites_pollPending = () => {
                             nleva_GuiSprites_failed.$add($name);
                             var$5 = $t.$getMessage();
                             var$7 = jl_StringBuilder__init_();
-                            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(47)), $name), $rt_s(48)), var$5);
+                            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(49)), $name), $rt_s(50)), var$5);
                             console.warn($rt_ustr(jl_StringBuilder_toString(var$7)));
                             break a;
                         } else {
@@ -1371,7 +1379,7 @@ nlev_EaglerProfile_key = $suffix => {
     let var$2;
     nlev_EaglerProfile_$callClinit();
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(49)), $suffix);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(51)), $suffix);
     return jl_StringBuilder_toString(var$2);
 },
 nlev_EaglerProfile_load = () => {
@@ -1384,58 +1392,58 @@ nlev_EaglerProfile_load = () => {
             try {
                 c: {
                     try {
-                        $val = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(50)));
+                        $val = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(52)));
                         if ($val !== null)
                             nlev_EaglerProfile_username = $val;
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(51)));
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(53)));
                         if (var$2 !== null) {
                             nlev_EaglerProfile_skinModel = jl_Integer_parseInt(var$2);
                             nlev_EaglerProfile_skinModel = jl_Math_max(0, jl_Math_min(1, nlev_EaglerProfile_skinModel));
                         }
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(52)));
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(54)));
                         if (var$2 !== null && !jl_String_isEmpty(var$2))
                             nlev_EaglerProfile_skinURL = var$2;
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(53)));
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(55)));
                         if (var$2 !== null) {
                             nlev_EaglerProfile_renderDistance = jl_Integer_parseInt(var$2);
                             nlev_EaglerProfile_renderDistance = nlev_EaglerProfile_clamp(nlev_EaglerProfile_renderDistance, 2, 16);
                         }
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(54)));
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(56)));
                         if (var$2 !== null) {
                             nlev_EaglerProfile_fov = jl_Integer_parseInt(var$2);
                             nlev_EaglerProfile_fov = jl_Math_max(30, jl_Math_min(110, nlev_EaglerProfile_fov));
                         }
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(55)));
-                        if (var$2 !== null)
-                            nlev_EaglerProfile_masterVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(56)));
-                        if (var$2 !== null)
-                            nlev_EaglerProfile_musicVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(57)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_sfxVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
+                            nlev_EaglerProfile_masterVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(58)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_ambientVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
+                            nlev_EaglerProfile_musicVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(59)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_fancyGraphics = jl_Boolean_parseBoolean(var$2);
+                            nlev_EaglerProfile_sfxVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(60)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_smoothLighting = jl_Boolean_parseBoolean(var$2);
+                            nlev_EaglerProfile_ambientVolume = nlev_EaglerProfile_clampFloat(jl_Float_parseFloat(var$2), 0.0, 1.0);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(61)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_vsync = jl_Boolean_parseBoolean(var$2);
+                            nlev_EaglerProfile_fancyGraphics = jl_Boolean_parseBoolean(var$2);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(62)));
-                        if (var$2 !== null && !jl_String_isEmpty(var$2))
-                            nlev_EaglerProfile_lang = var$2;
+                        if (var$2 !== null)
+                            nlev_EaglerProfile_smoothLighting = jl_Boolean_parseBoolean(var$2);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(63)));
                         if (var$2 !== null)
-                            nlev_EaglerProfile_showFPS = jl_Boolean_parseBoolean(var$2);
+                            nlev_EaglerProfile_vsync = jl_Boolean_parseBoolean(var$2);
                         var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(64)));
+                        if (var$2 !== null && !jl_String_isEmpty(var$2))
+                            nlev_EaglerProfile_lang = var$2;
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(65)));
+                        if (var$2 !== null)
+                            nlev_EaglerProfile_showFPS = jl_Boolean_parseBoolean(var$2);
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(66)));
                         if (var$2 !== null)
                             nlev_EaglerProfile_heldItemTooltips = jl_Boolean_parseBoolean(var$2);
-                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(65)));
+                        var$2 = nlevi_PlatformRuntime_localStorageGet(nlev_EaglerProfile_key($rt_s(67)));
                         if (var$2 !== null) {
                             nlev_EaglerProfile_mipmapLevels = jl_Integer_parseInt(var$2);
                             nlev_EaglerProfile_mipmapLevels = jl_Math_max(0, jl_Math_min(4, nlev_EaglerProfile_mipmapLevels));
@@ -1446,7 +1454,7 @@ nlev_EaglerProfile_load = () => {
                         var$4 = nlev_EaglerProfile_renderDistance;
                         var$5 = nlev_EaglerProfile_fov;
                         var$6 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(66)), var$2), $rt_s(67)), var$3), $rt_s(68)), var$4), $rt_s(69)), var$5), 41);
+                        jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(68)), var$2), $rt_s(69)), var$3), $rt_s(70)), var$4), $rt_s(71)), var$5), 41);
                         console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
                         break a;
                     } catch ($$e) {
@@ -1470,13 +1478,13 @@ nlev_EaglerProfile_load = () => {
             }
             var$2 = $e.$getMessage();
             var$6 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(70)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(72)), var$2);
             console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
             break a;
         }
         var$2 = $e.$getMessage();
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(71)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(73)), var$2);
         console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
     }
 },
@@ -1485,22 +1493,22 @@ nlev_EaglerProfile_save = () => {
     nlev_EaglerProfile_$callClinit();
     a: {
         try {
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(50)), nlev_EaglerProfile_username);
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(51)), jl_String_valueOf(nlev_EaglerProfile_skinModel));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(52)), nlev_EaglerProfile_skinURL === null ? $rt_s(72) : nlev_EaglerProfile_skinURL);
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(53)), jl_String_valueOf(nlev_EaglerProfile_renderDistance));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(54)), jl_String_valueOf(nlev_EaglerProfile_fov));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(55)), jl_String_valueOf0(nlev_EaglerProfile_masterVolume));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(56)), jl_String_valueOf0(nlev_EaglerProfile_musicVolume));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(57)), jl_String_valueOf0(nlev_EaglerProfile_sfxVolume));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(58)), jl_String_valueOf0(nlev_EaglerProfile_ambientVolume));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(59)), jl_String_valueOf1(nlev_EaglerProfile_fancyGraphics));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(60)), jl_String_valueOf1(nlev_EaglerProfile_smoothLighting));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(61)), jl_String_valueOf1(nlev_EaglerProfile_vsync));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(62)), nlev_EaglerProfile_lang);
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(63)), jl_String_valueOf1(nlev_EaglerProfile_showFPS));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(64)), jl_String_valueOf1(nlev_EaglerProfile_heldItemTooltips));
-            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(65)), jl_String_valueOf(nlev_EaglerProfile_mipmapLevels));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(52)), nlev_EaglerProfile_username);
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(53)), jl_String_valueOf(nlev_EaglerProfile_skinModel));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(54)), nlev_EaglerProfile_skinURL === null ? $rt_s(74) : nlev_EaglerProfile_skinURL);
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(55)), jl_String_valueOf(nlev_EaglerProfile_renderDistance));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(56)), jl_String_valueOf(nlev_EaglerProfile_fov));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(57)), jl_String_valueOf0(nlev_EaglerProfile_masterVolume));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(58)), jl_String_valueOf0(nlev_EaglerProfile_musicVolume));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(59)), jl_String_valueOf0(nlev_EaglerProfile_sfxVolume));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(60)), jl_String_valueOf0(nlev_EaglerProfile_ambientVolume));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(61)), jl_String_valueOf1(nlev_EaglerProfile_fancyGraphics));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(62)), jl_String_valueOf1(nlev_EaglerProfile_smoothLighting));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(63)), jl_String_valueOf1(nlev_EaglerProfile_vsync));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(64)), nlev_EaglerProfile_lang);
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(65)), jl_String_valueOf1(nlev_EaglerProfile_showFPS));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(66)), jl_String_valueOf1(nlev_EaglerProfile_heldItemTooltips));
+            nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(67)), jl_String_valueOf(nlev_EaglerProfile_mipmapLevels));
             break a;
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -1508,7 +1516,7 @@ nlev_EaglerProfile_save = () => {
                 $e = $$je;
                 var$1 = $e.$getMessage();
                 var$3 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(73)), var$1);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(75)), var$1);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$3)));
                 break a;
             } else {
@@ -1528,7 +1536,7 @@ nlev_EaglerProfile_getRenderDistance = () => {
 nlev_EaglerProfile_setRenderDistance = $distance => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_renderDistance = nlev_EaglerProfile_clamp($distance, 2, 16);
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(53)), jl_String_valueOf(nlev_EaglerProfile_renderDistance));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(55)), jl_String_valueOf(nlev_EaglerProfile_renderDistance));
 },
 nlev_EaglerProfile_getFOV = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1537,7 +1545,7 @@ nlev_EaglerProfile_getFOV = () => {
 nlev_EaglerProfile_setFOV = $fieldOfView => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_fov = jl_Math_max(30, jl_Math_min(110, $fieldOfView));
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(54)), jl_String_valueOf(nlev_EaglerProfile_fov));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(56)), jl_String_valueOf(nlev_EaglerProfile_fov));
 },
 nlev_EaglerProfile_getMasterVolume = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1546,7 +1554,7 @@ nlev_EaglerProfile_getMasterVolume = () => {
 nlev_EaglerProfile_setMasterVolume = $volume => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_masterVolume = nlev_EaglerProfile_clampFloat($volume, 0.0, 1.0);
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(55)), jl_String_valueOf0(nlev_EaglerProfile_masterVolume));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(57)), jl_String_valueOf0(nlev_EaglerProfile_masterVolume));
 },
 nlev_EaglerProfile_getMusicVolume = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1555,7 +1563,7 @@ nlev_EaglerProfile_getMusicVolume = () => {
 nlev_EaglerProfile_setMusicVolume = $volume => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_musicVolume = nlev_EaglerProfile_clampFloat($volume, 0.0, 1.0);
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(56)), jl_String_valueOf0(nlev_EaglerProfile_musicVolume));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(58)), jl_String_valueOf0(nlev_EaglerProfile_musicVolume));
 },
 nlev_EaglerProfile_getSFXVolume = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1564,7 +1572,7 @@ nlev_EaglerProfile_getSFXVolume = () => {
 nlev_EaglerProfile_setSFXVolume = $volume => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_sfxVolume = nlev_EaglerProfile_clampFloat($volume, 0.0, 1.0);
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(57)), jl_String_valueOf0(nlev_EaglerProfile_sfxVolume));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(59)), jl_String_valueOf0(nlev_EaglerProfile_sfxVolume));
 },
 nlev_EaglerProfile_getAmbientVolume = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1573,7 +1581,7 @@ nlev_EaglerProfile_getAmbientVolume = () => {
 nlev_EaglerProfile_setAmbientVolume = $volume => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_ambientVolume = nlev_EaglerProfile_clampFloat($volume, 0.0, 1.0);
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(58)), jl_String_valueOf0(nlev_EaglerProfile_ambientVolume));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(60)), jl_String_valueOf0(nlev_EaglerProfile_ambientVolume));
 },
 nlev_EaglerProfile_isFancyGraphics = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1582,7 +1590,7 @@ nlev_EaglerProfile_isFancyGraphics = () => {
 nlev_EaglerProfile_setFancyGraphics = $enabled => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_fancyGraphics = $enabled;
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(59)), jl_String_valueOf1(nlev_EaglerProfile_fancyGraphics));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(61)), jl_String_valueOf1(nlev_EaglerProfile_fancyGraphics));
 },
 nlev_EaglerProfile_isSmoothLighting = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1591,7 +1599,7 @@ nlev_EaglerProfile_isSmoothLighting = () => {
 nlev_EaglerProfile_setSmoothLighting = $enabled => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_smoothLighting = $enabled;
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(60)), jl_String_valueOf1(nlev_EaglerProfile_smoothLighting));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(62)), jl_String_valueOf1(nlev_EaglerProfile_smoothLighting));
 },
 nlev_EaglerProfile_isVsync = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1600,7 +1608,7 @@ nlev_EaglerProfile_isVsync = () => {
 nlev_EaglerProfile_setVsync = $enabled => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_vsync = $enabled;
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(61)), jl_String_valueOf1(nlev_EaglerProfile_vsync));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(63)), jl_String_valueOf1(nlev_EaglerProfile_vsync));
 },
 nlev_EaglerProfile_getLang = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1610,7 +1618,7 @@ nlev_EaglerProfile_setLang = $language => {
     nlev_EaglerProfile_$callClinit();
     if ($language !== null && !jl_String_isEmpty($language)) {
         nlev_EaglerProfile_lang = $language;
-        nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(62)), nlev_EaglerProfile_lang);
+        nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(64)), nlev_EaglerProfile_lang);
     }
 },
 nlev_EaglerProfile_isShowFPS = () => {
@@ -1620,7 +1628,7 @@ nlev_EaglerProfile_isShowFPS = () => {
 nlev_EaglerProfile_setShowFPS = $show => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_showFPS = $show;
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(63)), jl_String_valueOf1(nlev_EaglerProfile_showFPS));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(65)), jl_String_valueOf1(nlev_EaglerProfile_showFPS));
 },
 nlev_EaglerProfile_isHeldItemTooltips = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1629,7 +1637,7 @@ nlev_EaglerProfile_isHeldItemTooltips = () => {
 nlev_EaglerProfile_setHeldItemTooltips = $enabled => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_heldItemTooltips = $enabled;
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(64)), jl_String_valueOf1(nlev_EaglerProfile_heldItemTooltips));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(66)), jl_String_valueOf1(nlev_EaglerProfile_heldItemTooltips));
 },
 nlev_EaglerProfile_getMipmapLevels = () => {
     nlev_EaglerProfile_$callClinit();
@@ -1638,7 +1646,7 @@ nlev_EaglerProfile_getMipmapLevels = () => {
 nlev_EaglerProfile_setMipmapLevels = $levels => {
     nlev_EaglerProfile_$callClinit();
     nlev_EaglerProfile_mipmapLevels = jl_Math_max(0, jl_Math_min(4, $levels));
-    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(65)), jl_String_valueOf(nlev_EaglerProfile_mipmapLevels));
+    nlevi_PlatformRuntime_localStorageSet(nlev_EaglerProfile_key($rt_s(67)), jl_String_valueOf(nlev_EaglerProfile_mipmapLevels));
 },
 nlev_EaglerProfile_clamp = ($value, $min, $max) => {
     nlev_EaglerProfile_$callClinit();
@@ -1654,7 +1662,7 @@ try {
     let var$1, var$2;
     var$1 = jl_Math_random() * 1000.0 | 0;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(74)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(76)), var$1);
     nlev_EaglerProfile_username = jl_StringBuilder_toString(var$2);
     nlev_EaglerProfile_skinModel = 0;
     nlev_EaglerProfile_skinURL = null;
@@ -1668,7 +1676,7 @@ try {
     nlev_EaglerProfile_fancyGraphics = 1;
     nlev_EaglerProfile_smoothLighting = 1;
     nlev_EaglerProfile_vsync = 1;
-    nlev_EaglerProfile_lang = $rt_s(75);
+    nlev_EaglerProfile_lang = $rt_s(77);
     nlev_EaglerProfile_showFPS = 0;
     nlev_EaglerProfile_heldItemTooltips = 1;
     nlev_EaglerProfile_mipmapLevels = 4;
@@ -1747,13 +1755,13 @@ jl_Integer_parseInt0 = ($s, $radix) => {
     jl_Integer_$callClinit();
     if ($s !== null)
         return jl_Integer_parseIntImpl($s, 0, jl_String_length($s), $radix);
-    $rt_throw(jl_NumberFormatException__init_1($rt_s(76)));
+    $rt_throw(jl_NumberFormatException__init_1($rt_s(78)));
 },
 jl_Integer_parseIntImpl = ($s, $beginIndex, $endIndex, $radix) => {
     let $negative, var$6, $value, $maxValue, var$9, $digit, var$11, var$12, var$13, var$14;
     jl_Integer_$callClinit();
     if ($beginIndex == $endIndex)
-        $rt_throw(jl_NumberFormatException__init_1($rt_s(77)));
+        $rt_throw(jl_NumberFormatException__init_1($rt_s(79)));
     if ($radix >= 2 && $radix <= 36) {
         a: {
             $negative = 0;
@@ -1785,7 +1793,7 @@ jl_Integer_parseIntImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$11 = new jl_NumberFormatException;
                 var$12 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$13 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(78)), var$12);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(80)), var$12);
                 jl_NumberFormatException__init_0(var$11, jl_StringBuilder_toString(var$13));
                 $rt_throw(var$11);
             }
@@ -1793,7 +1801,7 @@ jl_Integer_parseIntImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$12 = new jl_NumberFormatException;
                 var$13 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$14 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$14, $rt_s(79)), $radix), $rt_s(80)), var$13);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$14, $rt_s(81)), $radix), $rt_s(82)), var$13);
                 jl_NumberFormatException__init_0(var$12, jl_StringBuilder_toString(var$14));
                 $rt_throw(var$12);
             }
@@ -1806,17 +1814,17 @@ jl_Integer_parseIntImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$11 = new jl_NumberFormatException;
                 var$12 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$13 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(81)), var$12);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(83)), var$12);
                 jl_NumberFormatException__init_0(var$11, jl_StringBuilder_toString(var$13));
                 $rt_throw(var$11);
             }
             var$6 = var$9;
         }
-        $rt_throw(jl_NumberFormatException__init_1($rt_s(82)));
+        $rt_throw(jl_NumberFormatException__init_1($rt_s(84)));
     }
     var$11 = new jl_NumberFormatException;
     var$12 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$12, $rt_s(83)), $radix);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$12, $rt_s(85)), $radix);
     jl_NumberFormatException__init_0(var$11, jl_StringBuilder_toString(var$12));
     $rt_throw(var$11);
 },
@@ -2118,7 +2126,7 @@ jur_JointSet_setNext = ($this, $next) => {
     $this.$fSet.$setNext($next);
 },
 jur_JointSet_getName = $this => {
-    return $rt_s(84);
+    return $rt_s(86);
 },
 jur_JointSet_first = ($this, $set) => {
     let $i;
@@ -2247,10 +2255,10 @@ jur_SingleSet_processSecondPass = $this => {
 jl_Runnable = $rt_classWithoutFields(0);
 function jl_Thread() {
     let a = this; jl_Object.call(a);
-    a.$id0 = Long_ZERO;
+    a.$id1 = Long_ZERO;
     a.$timeSliceStart = Long_ZERO;
     a.$finishedLock = null;
-    a.$name8 = null;
+    a.$name10 = null;
     a.$alive = 0;
     a.$target = null;
 }
@@ -2278,11 +2286,11 @@ jl_Thread__init_ = ($this, $target, $name) => {
     jl_Object__init_($this);
     $this.$finishedLock = jl_Object__init_0();
     $this.$alive = 1;
-    $this.$name8 = $name;
+    $this.$name10 = $name;
     $this.$target = $target;
     var$3 = jl_Thread_nextId;
     jl_Thread_nextId = var$3 + 1 | 0;
-    $this.$id0 = Long_fromInt(var$3);
+    $this.$id1 = Long_fromInt(var$3);
 },
 jl_Thread__init_2 = (var_0, var_1) => {
     let var_2 = new jl_Thread();
@@ -2302,7 +2310,7 @@ jl_Thread_currentThread = () => {
 jl_Thread__clinit_ = () => {
 try {
 
-    jl_Thread_mainThread = jl_Thread__init_1($rt_s(85));
+    jl_Thread_mainThread = jl_Thread__init_1($rt_s(87));
     jl_Thread_currentThread0 = jl_Thread_mainThread;
     jl_Thread_nextId = 1;
     jl_Thread_activeCount = 1;
@@ -2496,7 +2504,7 @@ nleva_EaglerShaderImpl_compileShader = ($type, $source, $name) => {
     $shader = nlevi_PlatformOpenGL__wglCreateShader($type);
     if ($shader === null) {
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(86)), $name);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(88)), $name);
         console.error($rt_ustr(jl_StringBuilder_toString(var$6)));
         nleva_EaglerShaderImpl_shaderCompileFailures = nleva_EaglerShaderImpl_shaderCompileFailures + 1 | 0;
         return null;
@@ -2507,37 +2515,37 @@ nleva_EaglerShaderImpl_compileShader = ($type, $source, $name) => {
     if ($compiled) {
         nleva_EaglerShaderImpl_shadersCompiled = nleva_EaglerShaderImpl_shadersCompiled + 1 | 0;
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(87)), $name);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(89)), $name);
         console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
         return $shader;
     }
     $infoLog = nlevi_PlatformOpenGL__wglGetShaderInfoLog($shader);
     var$6 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(88)), $name);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(90)), $name);
     console.error($rt_ustr(jl_StringBuilder_toString(var$6)));
     var$6 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(89)), $infoLog);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(91)), $infoLog);
     console.error($rt_ustr(jl_StringBuilder_toString(var$6)));
-    $lines = jl_String_split($processedSource, $rt_s(90));
+    $lines = jl_String_split($processedSource, $rt_s(92));
     var$10 = (__safe($lines).data||[]);
     var$11 = var$10.length;
     $maxLines = jl_Math_min(var$11, 20);
     var$6 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(91)), var$11), $rt_s(92));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(93)), var$11), $rt_s(94));
     console.error($rt_ustr(jl_StringBuilder_toString(var$6)));
     $i = 0;
     while ($i < $maxLines) {
         $i_0 = $i + 1 | 0;
         var$6 = var$10[$i];
         var$15 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$15, $rt_s(93)), $i_0), $rt_s(80)), var$6);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$15, $rt_s(95)), $i_0), $rt_s(82)), var$6);
         console.error($rt_ustr(jl_StringBuilder_toString(var$15)));
         $i = $i_0;
     }
     if (var$11 > $maxLines) {
         var$11 = var$11 - $maxLines | 0;
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(94)), var$11), $rt_s(95));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(96)), var$11), $rt_s(97));
         console.error($rt_ustr(jl_StringBuilder_toString(var$6)));
     }
     nlevi_PlatformOpenGL__wglDeleteShader($shader);
@@ -2559,7 +2567,7 @@ nleva_EaglerShaderImpl_linkProgram = ($vertexShader, $fragmentShader, $name) => 
         $program = nlevi_PlatformOpenGL__wglCreateProgram();
         if ($program === null) {
             var$5 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(96)), $name);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(98)), $name);
             console.error($rt_ustr(jl_StringBuilder_toString(var$5)));
             nleva_EaglerShaderImpl_programLinkFailures = nleva_EaglerShaderImpl_programLinkFailures + 1 | 0;
             return null;
@@ -2575,16 +2583,16 @@ nleva_EaglerShaderImpl_linkProgram = ($vertexShader, $fragmentShader, $name) => 
             nlevi_PlatformOpenGL__wglDeleteShader($fragmentShader);
             nleva_EaglerShaderImpl_programsLinked = nleva_EaglerShaderImpl_programsLinked + 1 | 0;
             var$5 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(97)), $name);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(99)), $name);
             console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
             return $program;
         }
         $infoLog = nlevi_PlatformOpenGL__wglGetProgramInfoLog($program);
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(98)), $name);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(100)), $name);
         console.error($rt_ustr(jl_StringBuilder_toString(var$5)));
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(89)), $infoLog);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(91)), $infoLog);
         console.error($rt_ustr(jl_StringBuilder_toString(var$5)));
         nlevi_PlatformOpenGL__wglDetachShader($program, $vertexShader);
         nlevi_PlatformOpenGL__wglDetachShader($program, $fragmentShader);
@@ -2593,7 +2601,7 @@ nleva_EaglerShaderImpl_linkProgram = ($vertexShader, $fragmentShader, $name) => 
         return null;
     }
     var$5 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(99)), $name);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(101)), $name);
     console.error($rt_ustr(jl_StringBuilder_toString(var$5)));
     nleva_EaglerShaderImpl_programLinkFailures = nleva_EaglerShaderImpl_programLinkFailures + 1 | 0;
     return null;
@@ -2602,12 +2610,12 @@ nleva_EaglerShaderImpl_createProgramFromSource = ($vertexSource, $fragmentSource
     let var$4, $vertexShader, $fragmentShader;
     nleva_EaglerShaderImpl_$callClinit();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $name), $rt_s(100));
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $name), $rt_s(102));
     $vertexShader = nleva_EaglerShaderImpl_compileVertexShader($vertexSource, jl_StringBuilder_toString(var$4));
     if ($vertexShader === null)
         return null;
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $name), $rt_s(101));
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $name), $rt_s(103));
     $fragmentShader = nleva_EaglerShaderImpl_compileFragmentShader($fragmentSource, jl_StringBuilder_toString(var$4));
     if ($fragmentShader !== null)
         return nleva_EaglerShaderImpl_linkProgram($vertexShader, $fragmentShader, $name);
@@ -2626,13 +2634,13 @@ nleva_EaglerShaderImpl_preprocessShaderSource = ($type, $source) => {
     let $result, var$4, $lines, var$6, $hasFragColor, var$8, var$9, $line, $trimmed, var$12, var$13, $processed, $insertPos, var$16;
     nleva_EaglerShaderImpl_$callClinit();
     $result = jl_StringBuilder__init_();
-    ($result.$append3($rt_s(102))).$append3($rt_s(90));
+    ($result.$append3($rt_s(104))).$append3($rt_s(92));
     var$4 = $rt_compare($type, 35632);
     if (var$4)
-        $result.$append3($rt_s(103));
+        $result.$append3($rt_s(105));
     else
-        $result.$append3($rt_s(104));
-    $lines = jl_String_split($source, $rt_s(90));
+        $result.$append3($rt_s(106));
+    $lines = jl_String_split($source, $rt_s(92));
     var$6 = (__safe($lines).data||[]);
     $hasFragColor = 0;
     var$8 = var$6.length;
@@ -2640,30 +2648,30 @@ nleva_EaglerShaderImpl_preprocessShaderSource = ($type, $source) => {
     while (var$9 < var$8) {
         $line = var$6[var$9];
         $trimmed = jl_String_trim($line);
-        if (!jl_String_startsWith($trimmed, $rt_s(105)) && !jl_String_startsWith($trimmed, $rt_s(106)) && !jl_String_startsWith($trimmed, $rt_s(107))) {
+        if (!jl_String_startsWith($trimmed, $rt_s(107)) && !jl_String_startsWith($trimmed, $rt_s(108)) && !jl_String_startsWith($trimmed, $rt_s(109))) {
             if ($type != 35633)
-                var$12 = nleva_EaglerShaderImpl_convertKeyword($line, $rt_s(108), $rt_s(109));
+                var$12 = nleva_EaglerShaderImpl_convertKeyword($line, $rt_s(110), $rt_s(111));
             else {
-                var$13 = nleva_EaglerShaderImpl_convertKeyword($line, $rt_s(110), $rt_s(109));
-                var$12 = nleva_EaglerShaderImpl_convertKeyword(var$13, $rt_s(108), $rt_s(111));
+                var$13 = nleva_EaglerShaderImpl_convertKeyword($line, $rt_s(112), $rt_s(111));
+                var$12 = nleva_EaglerShaderImpl_convertKeyword(var$13, $rt_s(110), $rt_s(113));
             }
-            var$13 = nleva_EaglerShaderImpl_convertTextureCall(var$12, $rt_s(112));
-            var$13 = nleva_EaglerShaderImpl_convertTextureCall(var$13, $rt_s(113));
-            if (jl_String_contains(var$13, $rt_s(114)))
+            var$13 = nleva_EaglerShaderImpl_convertTextureCall(var$12, $rt_s(114));
+            var$13 = nleva_EaglerShaderImpl_convertTextureCall(var$13, $rt_s(115));
+            if (jl_String_contains(var$13, $rt_s(116)))
                 $hasFragColor = 1;
-            ($result.$append3(var$13)).$append3($rt_s(90));
+            ($result.$append3(var$13)).$append3($rt_s(92));
         }
         var$9 = var$9 + 1 | 0;
     }
     if (!var$4 && $hasFragColor) {
         $processed = $result.$toString();
-        var$13 = jl_String_replace($processed, $rt_s(114), $rt_s(115));
+        var$13 = jl_String_replace($processed, $rt_s(116), $rt_s(117));
         $insertPos = jl_String_indexOf(var$13, 10, jl_String_indexOf0(var$13, 10) + 1 | 0) + 1 | 0;
         var$4 = jl_String_indexOf(var$13, 10, $insertPos) + 1 | 0;
         var$12 = jl_String_substring(var$13, 0, var$4);
         var$13 = jl_String_substring0(var$13, var$4);
         var$16 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$16, var$12), $rt_s(116)), var$13);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$16, var$12), $rt_s(118)), var$13);
         var$13 = jl_StringBuilder_toString(var$16);
         return var$13;
     }
@@ -2673,15 +2681,15 @@ nleva_EaglerShaderImpl_convertKeyword = ($line, $oldWord, $newWord) => {
     let var$4;
     nleva_EaglerShaderImpl_$callClinit();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(117)), $oldWord), $rt_s(117));
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(119)), $oldWord), $rt_s(119));
     return jl_String_replaceAll($line, jl_StringBuilder_toString(var$4), $newWord);
 },
 nleva_EaglerShaderImpl_convertTextureCall = ($line, $funcName) => {
     let var$3;
     nleva_EaglerShaderImpl_$callClinit();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(117)), $funcName), $rt_s(118));
-    return jl_String_replaceAll($line, jl_StringBuilder_toString(var$3), $rt_s(119));
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(119)), $funcName), $rt_s(120));
+    return jl_String_replaceAll($line, jl_StringBuilder_toString(var$3), $rt_s(121));
 },
 nleva_EaglerShaderImpl_getShaderStats = () => {
     let var$1, var$2, var$3, var$4, var$5;
@@ -2691,7 +2699,7 @@ nleva_EaglerShaderImpl_getShaderStats = () => {
     var$3 = nleva_EaglerShaderImpl_programsLinked;
     var$4 = nleva_EaglerShaderImpl_programLinkFailures;
     var$5 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(120)), var$1), $rt_s(121)), var$2), $rt_s(122)), var$3), $rt_s(121)), var$4), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(122)), var$1), $rt_s(123)), var$2), $rt_s(124)), var$3), $rt_s(123)), var$4), 41);
     return jl_StringBuilder_toString(var$5);
 },
 nleva_EaglerShaderImpl_resetStats = () => {
@@ -2720,15 +2728,15 @@ nleva_EaglerShaderImpl_renderTitleScreen = ($gl, $width, $height, $title, $subti
 nleva_EaglerShaderImpl_initTitleResources = $gl => {
     let $vsh, $fsh, $quadData, var$5, var$6, $quadBuf, $i, var$9, $posAttrib;
     nleva_EaglerShaderImpl_$callClinit();
-    $vsh = $rt_s(123);
-    $fsh = $rt_s(124);
-    nleva_EaglerShaderImpl_titleProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(125));
+    $vsh = $rt_s(125);
+    $fsh = $rt_s(126);
+    nleva_EaglerShaderImpl_titleProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(127));
     if (nleva_EaglerShaderImpl_titleProgram === null) {
         console.error("[EaglerShaderImpl] Failed to create title screen shader");
         return;
     }
-    nleva_EaglerShaderImpl_titleResolutionUniform = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(126));
-    nleva_EaglerShaderImpl_titleTimeUniform = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(127));
+    nleva_EaglerShaderImpl_titleResolutionUniform = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(128));
+    nleva_EaglerShaderImpl_titleTimeUniform = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(129));
     nleva_EaglerShaderImpl_titleVAO = nlevi_PlatformOpenGL__wglCreateVertexArray();
     nlevi_PlatformOpenGL__wglBindVertexArray(nleva_EaglerShaderImpl_titleVAO);
     nleva_EaglerShaderImpl_titleVBO = nlevi_PlatformOpenGL__wglCreateBuffer();
@@ -2752,7 +2760,7 @@ nleva_EaglerShaderImpl_initTitleResources = $gl => {
         $i = $i + 1 | 0;
     }
     nlevi_PlatformOpenGL__wglBufferData(34962, $quadBuf, 35044);
-    $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(128));
+    $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerShaderImpl_titleProgram, $rt_s(130));
     nlevi_PlatformOpenGL__wglEnableVertexAttribArray($posAttrib);
     nlevi_PlatformOpenGL__wglVertexAttribPointer($posAttrib, 2, 5126, 0, 0, 0);
     nlevi_PlatformOpenGL__wglBindVertexArray(null);
@@ -2935,7 +2943,7 @@ jur_CISequenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$string2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(129)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(131)), var$1);
     return jl_StringBuilder_toString(var$2);
 };
 function nmcgso_SoundOptionsScreen$init$lambda$_1_6() {
@@ -3085,7 +3093,7 @@ otciu_CLDRHelper_resolveCountry = ($language, $country) => {
     if (jl_String_isEmpty($country)) {
         $subtags = otciu_CLDRHelper_getLikelySubtags($language);
         $index = jl_String_lastIndexOf0($subtags, 95);
-        $country = $index <= 0 ? $rt_s(72) : jl_String_substring0($subtags, $index + 1 | 0);
+        $country = $index <= 0 ? $rt_s(74) : jl_String_substring0($subtags, $index + 1 | 0);
     }
     return $country;
 },
@@ -3471,10 +3479,10 @@ jl_Throwable_toString = $this => {
     $message = $this.$getLocalizedMessage();
     var$2 = jl_Class_getName(jl_Object_getClass($this));
     if ($message === null)
-        var$3 = $rt_s(72);
+        var$3 = $rt_s(74);
     else {
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(80)), $message);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(82)), $message);
         var$3 = jl_StringBuilder_toString(var$3);
     }
     var$4 = jl_StringBuilder__init_();
@@ -3564,12 +3572,12 @@ jl_StringIndexOutOfBoundsException__init_ = () => {
 function ju_MissingResourceException() {
     let a = this; jl_RuntimeException.call(a);
     a.$className = null;
-    a.$key2 = null;
+    a.$key3 = null;
 }
 let ju_MissingResourceException__init_ = ($this, $s, $className, $key) => {
     jl_RuntimeException__init_0($this, $s);
     $this.$className = $className;
-    $this.$key2 = $key;
+    $this.$key3 = $key;
 },
 ju_MissingResourceException__init_0 = (var_0, var_1, var_2) => {
     let var_3 = new ju_MissingResourceException();
@@ -3676,7 +3684,7 @@ jur_CIBackReferenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$groupIndex;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(130)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(132)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jur_CIBackReferenceSet_hasConsumed = ($this, $matchResult) => {
@@ -3722,7 +3730,7 @@ jur_UCIBackReferenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$groupIndex1;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(131)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(133)), var$1);
     return jl_StringBuilder_toString(var$2);
 };
 function jur_AbstractCharClass$LazyCategory() {
@@ -3825,7 +3833,7 @@ jur_DotAllQuantifierSet_find = ($this, $stringIndex, $testString, $matchResult) 
     return (-1);
 },
 jur_DotAllQuantifierSet_getName = $this => {
-    return $rt_s(132);
+    return $rt_s(134);
 },
 otji_JSWrapper$Helper = $rt_classWithoutFields(),
 otji_JSWrapper$Helper_hashCodes = null,
@@ -3917,7 +3925,7 @@ jur_FSet_getGroupIndex = $this => {
     return $this.$groupIndex0;
 },
 jur_FSet_getName = $this => {
-    return $rt_s(133);
+    return $rt_s(135);
 },
 jur_FSet_hasConsumed = ($this, $mr) => {
     return 0;
@@ -3946,7 +3954,7 @@ jur_BehindFSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $stringIndex;
 },
 jur_BehindFSet_getName = $this => {
-    return $rt_s(134);
+    return $rt_s(136);
 },
 nlevit_ClientMain$TickFunctor = $rt_classWithoutFields(0),
 nlevit_ClientMain$startGameLoop$lambda$_6_0 = $rt_classWithoutFields(),
@@ -3967,13 +3975,13 @@ nlevit_ClientMain$startGameLoop$lambda$_6_0_tick$exported$0 = var$1 => {
 jur_RandomGenerator = $rt_classWithoutFields(0);
 function otrfm_AbstractInMemoryVirtualFile() {
     let a = this; jl_Object.call(a);
-    a.$name7 = null;
+    a.$name9 = null;
     a.$lastModified = Long_ZERO;
 }
 let otrfm_AbstractInMemoryVirtualFile__init_ = ($this, $name) => {
     jl_Object__init_($this);
     $this.$lastModified = jl_System_currentTimeMillis();
-    $this.$name7 = $name;
+    $this.$name9 = $name;
 };
 function jur_LowHighSurrogateRangeSet() {
     let a = this; jur_JointSet.call(a);
@@ -4021,10 +4029,10 @@ jur_LowHighSurrogateRangeSet_matches = ($this, $stringIndex, $testString, $match
 },
 jur_LowHighSurrogateRangeSet_getName = $this => {
     let var$1, var$2, var$3;
-    var$1 = !$this.$alt1 ? $rt_s(135) : $rt_s(136);
+    var$1 = !$this.$alt1 ? $rt_s(137) : $rt_s(138);
     var$2 = $this.$surrChars.$toString();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(137)), var$1), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(139)), var$1), var$2);
     return jl_StringBuilder_toString(var$3);
 },
 jur_GroupQuantifierSet = $rt_classWithoutFields(jur_QuantifierSet),
@@ -4046,7 +4054,7 @@ jur_GroupQuantifierSet_matches = ($this, $stringIndex, $testString, $matchResult
     return $this.$next3.$matches($stringIndex, $testString, $matchResult);
 },
 jur_GroupQuantifierSet_getName = $this => {
-    return $rt_s(138);
+    return $rt_s(140);
 },
 jur_ReluctantGroupQuantifierSet = $rt_classWithoutFields(jur_GroupQuantifierSet),
 jur_ReluctantGroupQuantifierSet__init_ = ($this, $innerSet, $next, $type) => {
@@ -4149,7 +4157,7 @@ ju_Currency_getInstance = $currencyCode => {
         return $currency;
     var$3 = new jl_IllegalArgumentException;
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(139)), $currencyCode);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(141)), $currencyCode);
     jl_IllegalArgumentException__init_(var$3, jl_StringBuilder_toString(var$4));
     $rt_throw(var$3);
 },
@@ -4777,23 +4785,39 @@ nmcg_Gui_renderHotbar = ($this, $guiWidth, $guiHeight) => {
         var$25 = $level.$getDimensionId();
         var$26 = $level.$getGameTime();
         var$27 = jl_StringBuilder__init_();
-        jl_StringBuilder_append2(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$27, var$23), $rt_s(140)), var$25), $rt_s(141)), var$26);
+        jl_StringBuilder_append2(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$27, var$23), $rt_s(142)), var$25), $rt_s(143)), var$26);
         $label = jl_StringBuilder_toString(var$27);
         nleva_EaglerGuiImpl_drawText($label, 2.0, $y0 - 10 | 0, (-2039584), 1);
     }
 },
 nmcg_Gui_iconTexture = $blockId => {
-    let $block, var$3, var$4;
-    $block = nmwlb_Blocks_byId($blockId);
-    if ($block.$topTexture === null)
-        return null;
-    var$3 = $block.$sideTexture;
-    var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(30)), var$3);
-    return jl_StringBuilder_toString(var$4);
+    let $block, var$3, var$4, $item;
+    if (!nmwi_Items_isItem($blockId)) {
+        $block = nmwlb_Blocks_byId($blockId);
+        if ($block.$topTexture === null)
+            return null;
+        var$3 = $block.$sideTexture;
+        var$4 = jl_StringBuilder__init_();
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(31)), var$3);
+        return jl_StringBuilder_toString(var$4);
+    }
+    $item = nmwi_Items_byId0($blockId);
+    if ($item === null)
+        var$3 = null;
+    else {
+        var$3 = $item.$name3;
+        var$4 = jl_StringBuilder__init_();
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(32)), var$3);
+        var$3 = jl_StringBuilder_toString(var$4);
+    }
+    return var$3;
 },
 nmcg_Gui_blockName = $blockId => {
-    let $block;
+    let $item, $block;
+    if (nmwi_Items_isItem($blockId)) {
+        $item = nmwi_Items_byId0($blockId);
+        return $item !== null ? $item.$displayName0 : null;
+    }
     $block = nmwlb_Blocks_byId($blockId);
     return $block.$displayName !== null ? $block.$displayName : null;
 },
@@ -4845,9 +4869,6 @@ nmcg_Gui_tick = $this => {
 },
 nmcg_Gui_setMissTime = ($this, $ticks) => {
     $this.$missTime = $ticks;
-},
-nmcg_Gui_getSelectedHotbarSlot = $this => {
-    return $this.$selectedHotbarSlot;
 },
 nmcg_Gui_setSelectedHotbarSlot = ($this, $slot) => {
     $this.$selectedHotbarSlot = jl_Math_max(0, jl_Math_min(8, $slot));
@@ -4917,7 +4938,7 @@ jl_AbstractStringBuilder_insert1 = ($this, $index, $string) => {
     let $i, var$4, var$5;
     if ($index >= 0 && $index <= $this.$length0) {
         if ($string === null)
-            $string = $rt_s(142);
+            $string = $rt_s(144);
         else if (jl_String_isEmpty($string))
             return $this;
         $this.$ensureCapacity($this.$length0 + jl_String_length($string) | 0);
@@ -5506,13 +5527,13 @@ jl_AbstractStringBuilder_insert2 = ($this, $index, $c) => {
     return $this;
 },
 jl_AbstractStringBuilder_insert5 = ($this, $index, $obj) => {
-    return $this.$insert0($index, $obj === null ? $rt_s(142) : $obj.$toString());
+    return $this.$insert0($index, $obj === null ? $rt_s(144) : $obj.$toString());
 },
 jl_AbstractStringBuilder_append8 = ($this, $b) => {
     return $this.$insert7($this.$length0, $b);
 },
 jl_AbstractStringBuilder_insert3 = ($this, $index, $b) => {
-    return $this.$insert0($index, !$b ? $rt_s(143) : $rt_s(144));
+    return $this.$insert0($index, !$b ? $rt_s(145) : $rt_s(146));
 },
 jl_AbstractStringBuilder_ensureCapacity = ($this, $capacity) => {
     let $newLength;
@@ -5864,16 +5885,16 @@ nlevi_PlatformInput$registerMouseListeners$lambda$_5_2_handleEvent$exported$0 = 
 };
 function jl_Enum() {
     let a = this; jl_Object.call(a);
-    a.$name3 = null;
+    a.$name4 = null;
     a.$ordinal0 = 0;
 }
 let jl_Enum__init_ = ($this, $name, $ordinal) => {
     jl_Object__init_($this);
-    $this.$name3 = $name;
+    $this.$name4 = $name;
     $this.$ordinal0 = $ordinal;
 },
 jl_Enum_name = $this => {
-    return $this.$name3;
+    return $this.$name4;
 },
 jl_Enum_ordinal = $this => {
     return $this.$ordinal0;
@@ -5907,8 +5928,8 @@ nmwp_BlockHitResult$Type_$values = () => {
 nmwp_BlockHitResult$Type__clinit_ = () => {
 try {
 
-    nmwp_BlockHitResult$Type_MISS = nmwp_BlockHitResult$Type__init_($rt_s(145), 0);
-    nmwp_BlockHitResult$Type_BLOCK = nmwp_BlockHitResult$Type__init_($rt_s(146), 1);
+    nmwp_BlockHitResult$Type_MISS = nmwp_BlockHitResult$Type__init_($rt_s(147), 0);
+    nmwp_BlockHitResult$Type_BLOCK = nmwp_BlockHitResult$Type__init_($rt_s(148), 1);
     nmwp_BlockHitResult$Type_$VALUES = nmwp_BlockHitResult$Type_$values();
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
@@ -5935,7 +5956,7 @@ jur_AbstractCharClass$PredefinedCharacterClasses_getObject = ($this, $name) => {
     while (true) {
         jur_AbstractCharClass$PredefinedCharacterClasses_$callClinit();
         if ($i >= jur_AbstractCharClass$PredefinedCharacterClasses_contents.data.length)
-            $rt_throw(ju_MissingResourceException__init_0($rt_s(72), $rt_s(72), $name));
+            $rt_throw(ju_MissingResourceException__init_0($rt_s(74), $rt_s(74), $name));
         $row = jur_AbstractCharClass$PredefinedCharacterClasses_contents.data[$i];
         var$4 = (__safe($row).data||[]);
         if (jl_String_equals($name, var$4[0]))
@@ -5954,972 +5975,972 @@ try {
     var$2 = var$1.data;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(147);
+    var$4[0] = $rt_s(149);
     var$4[1] = jur_AbstractCharClass$LazyLower__init_0();
     var$2[0] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(148);
+    var$4[0] = $rt_s(150);
     var$4[1] = jur_AbstractCharClass$LazyUpper__init_0();
     var$2[1] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(149);
+    var$4[0] = $rt_s(151);
     var$4[1] = jur_AbstractCharClass$LazyASCII__init_0();
     var$2[2] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(150);
+    var$4[0] = $rt_s(152);
     var$4[1] = jur_AbstractCharClass$LazyAlpha__init_0();
     var$2[3] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(151);
+    var$4[0] = $rt_s(153);
     var$4[1] = jur_AbstractCharClass$PredefinedCharacterClasses_digit;
     var$2[4] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(152);
+    var$4[0] = $rt_s(154);
     var$4[1] = jur_AbstractCharClass$LazyAlnum__init_0();
     var$2[5] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(153);
+    var$4[0] = $rt_s(155);
     var$4[1] = jur_AbstractCharClass$LazyPunct__init_0();
     var$2[6] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(154);
+    var$4[0] = $rt_s(156);
     var$4[1] = jur_AbstractCharClass$LazyGraph__init_0();
     var$2[7] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(155);
+    var$4[0] = $rt_s(157);
     var$4[1] = jur_AbstractCharClass$LazyPrint__init_0();
     var$2[8] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(156);
+    var$4[0] = $rt_s(158);
     var$4[1] = jur_AbstractCharClass$LazyBlank__init_0();
     var$2[9] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(157);
+    var$4[0] = $rt_s(159);
     var$4[1] = jur_AbstractCharClass$LazyCntrl__init_0();
     var$2[10] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(158);
+    var$4[0] = $rt_s(160);
     var$4[1] = jur_AbstractCharClass$LazyXDigit__init_0();
     var$2[11] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(159);
+    var$4[0] = $rt_s(161);
     var$4[1] = jur_AbstractCharClass$LazyJavaLowerCase__init_0();
     var$2[12] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(160);
+    var$4[0] = $rt_s(162);
     var$4[1] = jur_AbstractCharClass$LazyJavaUpperCase__init_0();
     var$2[13] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(161);
+    var$4[0] = $rt_s(163);
     var$4[1] = jur_AbstractCharClass$LazyJavaWhitespace__init_0();
     var$2[14] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(162);
+    var$4[0] = $rt_s(164);
     var$4[1] = jur_AbstractCharClass$LazyJavaMirrored__init_0();
     var$2[15] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(163);
+    var$4[0] = $rt_s(165);
     var$4[1] = jur_AbstractCharClass$LazyJavaDefined__init_0();
     var$2[16] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(164);
+    var$4[0] = $rt_s(166);
     var$4[1] = jur_AbstractCharClass$LazyJavaDigit__init_0();
     var$2[17] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(165);
+    var$4[0] = $rt_s(167);
     var$4[1] = jur_AbstractCharClass$LazyJavaIdentifierIgnorable__init_0();
     var$2[18] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(166);
+    var$4[0] = $rt_s(168);
     var$4[1] = jur_AbstractCharClass$LazyJavaISOControl__init_0();
     var$2[19] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(167);
+    var$4[0] = $rt_s(169);
     var$4[1] = jur_AbstractCharClass$LazyJavaJavaIdentifierPart__init_0();
     var$2[20] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(168);
+    var$4[0] = $rt_s(170);
     var$4[1] = jur_AbstractCharClass$LazyJavaJavaIdentifierStart__init_0();
     var$2[21] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(169);
+    var$4[0] = $rt_s(171);
     var$4[1] = jur_AbstractCharClass$LazyJavaLetter__init_0();
     var$2[22] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(170);
+    var$4[0] = $rt_s(172);
     var$4[1] = jur_AbstractCharClass$LazyJavaLetterOrDigit__init_0();
     var$2[23] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(171);
+    var$4[0] = $rt_s(173);
     var$4[1] = jur_AbstractCharClass$LazyJavaSpaceChar__init_0();
     var$2[24] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(172);
+    var$4[0] = $rt_s(174);
     var$4[1] = jur_AbstractCharClass$LazyJavaTitleCase__init_0();
     var$2[25] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(173);
+    var$4[0] = $rt_s(175);
     var$4[1] = jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart__init_0();
     var$2[26] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(174);
+    var$4[0] = $rt_s(176);
     var$4[1] = jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart__init_0();
     var$2[27] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(175);
+    var$4[0] = $rt_s(177);
     var$4[1] = jur_AbstractCharClass$PredefinedCharacterClasses_space;
     var$2[28] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(176);
+    var$4[0] = $rt_s(178);
     var$4[1] = jur_AbstractCharClass$LazyWord__init_0();
     var$2[29] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(177);
+    var$4[0] = $rt_s(179);
     var$4[1] = jur_AbstractCharClass$LazyNonWord__init_0();
     var$2[30] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(178);
+    var$4[0] = $rt_s(180);
     var$4[1] = jur_AbstractCharClass$PredefinedCharacterClasses_space;
     var$2[31] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(179);
+    var$4[0] = $rt_s(181);
     var$4[1] = jur_AbstractCharClass$LazyNonSpace__init_0();
     var$2[32] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(180);
+    var$4[0] = $rt_s(182);
     var$4[1] = jur_AbstractCharClass$PredefinedCharacterClasses_digit;
     var$2[33] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(181);
+    var$4[0] = $rt_s(183);
     var$4[1] = jur_AbstractCharClass$LazyNonDigit__init_0();
     var$2[34] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(182);
+    var$4[0] = $rt_s(184);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(0, 127);
     var$2[35] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(183);
+    var$4[0] = $rt_s(185);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(128, 255);
     var$2[36] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(184);
+    var$4[0] = $rt_s(186);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(256, 383);
     var$2[37] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(185);
+    var$4[0] = $rt_s(187);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(384, 591);
     var$2[38] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(186);
+    var$4[0] = $rt_s(188);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(592, 687);
     var$2[39] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(187);
+    var$4[0] = $rt_s(189);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(688, 767);
     var$2[40] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(188);
+    var$4[0] = $rt_s(190);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(768, 879);
     var$2[41] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(189);
+    var$4[0] = $rt_s(191);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(880, 1023);
     var$2[42] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(190);
+    var$4[0] = $rt_s(192);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1024, 1279);
     var$2[43] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(191);
+    var$4[0] = $rt_s(193);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1280, 1327);
     var$2[44] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(192);
+    var$4[0] = $rt_s(194);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1328, 1423);
     var$2[45] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(193);
+    var$4[0] = $rt_s(195);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1424, 1535);
     var$2[46] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(194);
+    var$4[0] = $rt_s(196);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1536, 1791);
     var$2[47] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(195);
+    var$4[0] = $rt_s(197);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1792, 1871);
     var$2[48] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(196);
+    var$4[0] = $rt_s(198);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1872, 1919);
     var$2[49] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(197);
+    var$4[0] = $rt_s(199);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(1920, 1983);
     var$2[50] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(198);
+    var$4[0] = $rt_s(200);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2304, 2431);
     var$2[51] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(199);
+    var$4[0] = $rt_s(201);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2432, 2559);
     var$2[52] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(200);
+    var$4[0] = $rt_s(202);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2560, 2687);
     var$2[53] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(201);
+    var$4[0] = $rt_s(203);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2688, 2815);
     var$2[54] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(202);
+    var$4[0] = $rt_s(204);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2816, 2943);
     var$2[55] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(203);
+    var$4[0] = $rt_s(205);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(2944, 3071);
     var$2[56] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(204);
+    var$4[0] = $rt_s(206);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3072, 3199);
     var$2[57] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(205);
+    var$4[0] = $rt_s(207);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3200, 3327);
     var$2[58] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(206);
+    var$4[0] = $rt_s(208);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3328, 3455);
     var$2[59] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(207);
+    var$4[0] = $rt_s(209);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3456, 3583);
     var$2[60] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(208);
+    var$4[0] = $rt_s(210);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3584, 3711);
     var$2[61] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(209);
+    var$4[0] = $rt_s(211);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3712, 3839);
     var$2[62] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(210);
+    var$4[0] = $rt_s(212);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(3840, 4095);
     var$2[63] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(211);
+    var$4[0] = $rt_s(213);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(4096, 4255);
     var$2[64] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(212);
+    var$4[0] = $rt_s(214);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(4256, 4351);
     var$2[65] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(213);
+    var$4[0] = $rt_s(215);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(4352, 4607);
     var$2[66] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(214);
+    var$4[0] = $rt_s(216);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(4608, 4991);
     var$2[67] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(215);
+    var$4[0] = $rt_s(217);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(4992, 5023);
     var$2[68] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(216);
+    var$4[0] = $rt_s(218);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5024, 5119);
     var$2[69] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(217);
+    var$4[0] = $rt_s(219);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5120, 5759);
     var$2[70] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(218);
+    var$4[0] = $rt_s(220);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5760, 5791);
     var$2[71] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(219);
+    var$4[0] = $rt_s(221);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5792, 5887);
     var$2[72] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(220);
+    var$4[0] = $rt_s(222);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5888, 5919);
     var$2[73] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(221);
+    var$4[0] = $rt_s(223);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5920, 5951);
     var$2[74] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(222);
+    var$4[0] = $rt_s(224);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5952, 5983);
     var$2[75] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(223);
+    var$4[0] = $rt_s(225);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(5984, 6015);
     var$2[76] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(224);
+    var$4[0] = $rt_s(226);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6016, 6143);
     var$2[77] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(225);
+    var$4[0] = $rt_s(227);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6144, 6319);
     var$2[78] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(226);
+    var$4[0] = $rt_s(228);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6400, 6479);
     var$2[79] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(227);
+    var$4[0] = $rt_s(229);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6480, 6527);
     var$2[80] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(228);
+    var$4[0] = $rt_s(230);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6528, 6623);
     var$2[81] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(229);
+    var$4[0] = $rt_s(231);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6624, 6655);
     var$2[82] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(230);
+    var$4[0] = $rt_s(232);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(6656, 6687);
     var$2[83] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(231);
+    var$4[0] = $rt_s(233);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(7424, 7551);
     var$2[84] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(232);
+    var$4[0] = $rt_s(234);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(7552, 7615);
     var$2[85] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(233);
+    var$4[0] = $rt_s(235);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(7616, 7679);
     var$2[86] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(234);
+    var$4[0] = $rt_s(236);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(7680, 7935);
     var$2[87] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(235);
+    var$4[0] = $rt_s(237);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(7936, 8191);
     var$2[88] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(236);
+    var$4[0] = $rt_s(238);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8192, 8303);
     var$2[89] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(237);
+    var$4[0] = $rt_s(239);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8304, 8351);
     var$2[90] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(238);
+    var$4[0] = $rt_s(240);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8352, 8399);
     var$2[91] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(239);
+    var$4[0] = $rt_s(241);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8400, 8447);
     var$2[92] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(240);
+    var$4[0] = $rt_s(242);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8448, 8527);
     var$2[93] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(241);
+    var$4[0] = $rt_s(243);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8528, 8591);
     var$2[94] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(242);
+    var$4[0] = $rt_s(244);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8592, 8703);
     var$2[95] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(243);
+    var$4[0] = $rt_s(245);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8704, 8959);
     var$2[96] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(244);
+    var$4[0] = $rt_s(246);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(8960, 9215);
     var$2[97] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(245);
+    var$4[0] = $rt_s(247);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9216, 9279);
     var$2[98] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(246);
+    var$4[0] = $rt_s(248);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9280, 9311);
     var$2[99] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(247);
+    var$4[0] = $rt_s(249);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9312, 9471);
     var$2[100] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(248);
+    var$4[0] = $rt_s(250);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9472, 9599);
     var$2[101] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(249);
+    var$4[0] = $rt_s(251);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9600, 9631);
     var$2[102] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(250);
+    var$4[0] = $rt_s(252);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9632, 9727);
     var$2[103] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(251);
+    var$4[0] = $rt_s(253);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9728, 9983);
     var$2[104] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(252);
+    var$4[0] = $rt_s(254);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(9984, 10175);
     var$2[105] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(253);
+    var$4[0] = $rt_s(255);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10176, 10223);
     var$2[106] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(254);
+    var$4[0] = $rt_s(256);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10224, 10239);
     var$2[107] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(255);
+    var$4[0] = $rt_s(257);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10240, 10495);
     var$2[108] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(256);
+    var$4[0] = $rt_s(258);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10496, 10623);
     var$2[109] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(257);
+    var$4[0] = $rt_s(259);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10624, 10751);
     var$2[110] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(258);
+    var$4[0] = $rt_s(260);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(10752, 11007);
     var$2[111] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(259);
+    var$4[0] = $rt_s(261);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11008, 11263);
     var$2[112] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(260);
+    var$4[0] = $rt_s(262);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11264, 11359);
     var$2[113] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(261);
+    var$4[0] = $rt_s(263);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11392, 11519);
     var$2[114] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(262);
+    var$4[0] = $rt_s(264);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11520, 11567);
     var$2[115] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(263);
+    var$4[0] = $rt_s(265);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11568, 11647);
     var$2[116] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(264);
+    var$4[0] = $rt_s(266);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11648, 11743);
     var$2[117] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(265);
+    var$4[0] = $rt_s(267);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11776, 11903);
     var$2[118] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(266);
+    var$4[0] = $rt_s(268);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(11904, 12031);
     var$2[119] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(267);
+    var$4[0] = $rt_s(269);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12032, 12255);
     var$2[120] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(268);
+    var$4[0] = $rt_s(270);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12272, 12287);
     var$2[121] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(269);
+    var$4[0] = $rt_s(271);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12288, 12351);
     var$2[122] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(270);
+    var$4[0] = $rt_s(272);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12352, 12447);
     var$2[123] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(271);
+    var$4[0] = $rt_s(273);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12448, 12543);
     var$2[124] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(272);
+    var$4[0] = $rt_s(274);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12544, 12591);
     var$2[125] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(273);
+    var$4[0] = $rt_s(275);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12592, 12687);
     var$2[126] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(274);
+    var$4[0] = $rt_s(276);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12688, 12703);
     var$2[127] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(275);
+    var$4[0] = $rt_s(277);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12704, 12735);
     var$2[128] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(276);
+    var$4[0] = $rt_s(278);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12736, 12783);
     var$2[129] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(277);
+    var$4[0] = $rt_s(279);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12784, 12799);
     var$2[130] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(278);
+    var$4[0] = $rt_s(280);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(12800, 13055);
     var$2[131] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(279);
+    var$4[0] = $rt_s(281);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(13056, 13311);
     var$2[132] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(280);
+    var$4[0] = $rt_s(282);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(13312, 19893);
     var$2[133] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(281);
+    var$4[0] = $rt_s(283);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(19904, 19967);
     var$2[134] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(282);
+    var$4[0] = $rt_s(284);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(19968, 40959);
     var$2[135] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(283);
+    var$4[0] = $rt_s(285);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(40960, 42127);
     var$2[136] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(284);
+    var$4[0] = $rt_s(286);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(42128, 42191);
     var$2[137] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(285);
+    var$4[0] = $rt_s(287);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(42752, 42783);
     var$2[138] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(286);
+    var$4[0] = $rt_s(288);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(43008, 43055);
     var$2[139] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(287);
+    var$4[0] = $rt_s(289);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(44032, 55203);
     var$2[140] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(288);
+    var$4[0] = $rt_s(290);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(55296, 56191);
     var$2[141] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(289);
+    var$4[0] = $rt_s(291);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(56192, 56319);
     var$2[142] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(290);
+    var$4[0] = $rt_s(292);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(56320, 57343);
     var$2[143] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(291);
+    var$4[0] = $rt_s(293);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(57344, 63743);
     var$2[144] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(292);
+    var$4[0] = $rt_s(294);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(63744, 64255);
     var$2[145] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(293);
+    var$4[0] = $rt_s(295);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(64256, 64335);
     var$2[146] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(294);
+    var$4[0] = $rt_s(296);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(64336, 65023);
     var$2[147] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(295);
+    var$4[0] = $rt_s(297);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65024, 65039);
     var$2[148] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(296);
+    var$4[0] = $rt_s(298);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65040, 65055);
     var$2[149] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(297);
+    var$4[0] = $rt_s(299);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65056, 65071);
     var$2[150] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(298);
+    var$4[0] = $rt_s(300);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65072, 65103);
     var$2[151] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(299);
+    var$4[0] = $rt_s(301);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65104, 65135);
     var$2[152] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(300);
+    var$4[0] = $rt_s(302);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65136, 65279);
     var$2[153] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(301);
+    var$4[0] = $rt_s(303);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(65280, 65519);
     var$2[154] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(302);
+    var$4[0] = $rt_s(304);
     var$4[1] = jur_AbstractCharClass$LazyRange__init_(0, 1114111);
     var$2[155] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(303);
+    var$4[0] = $rt_s(305);
     var$4[1] = jur_AbstractCharClass$LazySpecialsBlock__init_0();
     var$2[156] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(304);
+    var$4[0] = $rt_s(306);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(0, 1);
     var$2[157] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(305);
+    var$4[0] = $rt_s(307);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(62, 1);
     var$2[158] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(306);
+    var$4[0] = $rt_s(308);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(1, 1);
     var$2[159] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(307);
+    var$4[0] = $rt_s(309);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(2, 1);
     var$2[160] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(308);
+    var$4[0] = $rt_s(310);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(3, 0);
     var$2[161] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(309);
+    var$4[0] = $rt_s(311);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(4, 0);
     var$2[162] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(310);
+    var$4[0] = $rt_s(312);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(5, 1);
     var$2[163] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(311);
+    var$4[0] = $rt_s(313);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(448, 1);
     var$2[164] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(312);
+    var$4[0] = $rt_s(314);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(6, 1);
     var$2[165] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(313);
+    var$4[0] = $rt_s(315);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(7, 0);
     var$2[166] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(314);
+    var$4[0] = $rt_s(316);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(8, 1);
     var$2[167] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(315);
+    var$4[0] = $rt_s(317);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(3584, 1);
     var$2[168] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(316);
+    var$4[0] = $rt_s(318);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(9, 1);
     var$2[169] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(317);
+    var$4[0] = $rt_s(319);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(10, 1);
     var$2[170] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(318);
+    var$4[0] = $rt_s(320);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(11, 1);
     var$2[171] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(319);
+    var$4[0] = $rt_s(321);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(28672, 0);
     var$2[172] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(320);
+    var$4[0] = $rt_s(322);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(12, 0);
     var$2[173] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(321);
+    var$4[0] = $rt_s(323);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(13, 0);
     var$2[174] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(322);
+    var$4[0] = $rt_s(324);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(14, 0);
     var$2[175] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(323);
+    var$4[0] = $rt_s(325);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_2(983040, 1, 1);
     var$2[176] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(324);
+    var$4[0] = $rt_s(326);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(15, 0);
     var$2[177] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(325);
+    var$4[0] = $rt_s(327);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(16, 1);
     var$2[178] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(326);
+    var$4[0] = $rt_s(328);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(18, 1);
     var$2[179] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(327);
+    var$4[0] = $rt_s(329);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_2(19, 0, 1);
     var$2[180] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(328);
+    var$4[0] = $rt_s(330);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(1643118592, 1);
     var$2[181] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(329);
+    var$4[0] = $rt_s(331);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(20, 0);
     var$2[182] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(330);
+    var$4[0] = $rt_s(332);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(21, 0);
     var$2[183] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(331);
+    var$4[0] = $rt_s(333);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(22, 0);
     var$2[184] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(332);
+    var$4[0] = $rt_s(334);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(23, 0);
     var$2[185] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(333);
+    var$4[0] = $rt_s(335);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(24, 1);
     var$2[186] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(334);
+    var$4[0] = $rt_s(336);
     var$4[1] = jur_AbstractCharClass$LazyCategoryScope__init_(2113929216, 1);
     var$2[187] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(335);
+    var$4[0] = $rt_s(337);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(25, 1);
     var$2[188] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(336);
+    var$4[0] = $rt_s(338);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(26, 0);
     var$2[189] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(337);
+    var$4[0] = $rt_s(339);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(27, 0);
     var$2[190] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(338);
+    var$4[0] = $rt_s(340);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(28, 1);
     var$2[191] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(339);
+    var$4[0] = $rt_s(341);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(29, 0);
     var$2[192] = var$3;
     var$3 = $rt_createArray(jl_Object, 2);
     var$4 = var$3.data;
-    var$4[0] = $rt_s(340);
+    var$4[0] = $rt_s(342);
     var$4[1] = jur_AbstractCharClass$LazyCategory__init_(30, 0);
     var$2[193] = var$3;
     jur_AbstractCharClass$PredefinedCharacterClasses_contents = var$1;
@@ -7102,7 +7123,7 @@ jur_DecomposedCharSet_getName = $this => {
     let var$1, var$2;
     var$1 = jur_DecomposedCharSet_getDecomposedChar($this);
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(341)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(343)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jur_DecomposedCharSet_codePointAt = ($this, $strIndex, $testString, $rightBound) => {
@@ -7171,7 +7192,7 @@ jur_AheadFSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $stringIndex;
 },
 jur_AheadFSet_getName = $this => {
-    return $rt_s(342);
+    return $rt_s(344);
 },
 jur_NonCapJointSet = $rt_classWithoutFields(jur_JointSet),
 jur_NonCapJointSet__init_ = ($this, $children, $fSet) => {
@@ -7202,7 +7223,7 @@ jur_NonCapJointSet_matches = ($this, $stringIndex, $testString, $matchResult) =>
     return $shift;
 },
 jur_NonCapJointSet_getName = $this => {
-    return $rt_s(343);
+    return $rt_s(345);
 },
 jur_NonCapJointSet_hasConsumed = ($this, $matchResult) => {
     let $cons;
@@ -7238,7 +7259,7 @@ jur_AtomicJointSet_setNext = ($this, $next) => {
     $this.$next3 = $next;
 },
 jur_AtomicJointSet_getName = $this => {
-    return $rt_s(343);
+    return $rt_s(345);
 },
 jur_PositiveLookAhead = $rt_classWithoutFields(jur_AtomicJointSet),
 jur_PositiveLookAhead__init_ = ($this, $children, $fSet) => {
@@ -7266,7 +7287,7 @@ jur_PositiveLookAhead_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_PositiveLookAhead_getName = $this => {
-    return $rt_s(344);
+    return $rt_s(346);
 },
 jur_NegativeLookAhead = $rt_classWithoutFields(jur_AtomicJointSet),
 jur_NegativeLookAhead__init_ = ($this, $children, $fSet) => {
@@ -7295,7 +7316,7 @@ jur_NegativeLookAhead_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_NegativeLookAhead_getName = $this => {
-    return $rt_s(345);
+    return $rt_s(347);
 };
 function nmcgc_AbstractWidget() {
     let a = this; jl_Object.call(a);
@@ -7373,7 +7394,7 @@ function nmcgs_CreateWorldScreen$TabButtonWidget() {
     let a = this; nmcgc_AbstractWidget.call(a);
     a.$label2 = null;
     a.$tabIndex0 = 0;
-    a.$selected0 = 0;
+    a.$selected1 = 0;
     a.$clickConsumed = 0;
 }
 let nmcgs_CreateWorldScreen$TabButtonWidget__init_ = ($this, $this$0, $x, $y, $width, $height, $label, $selected, $tabIndex) => {
@@ -7381,7 +7402,7 @@ let nmcgs_CreateWorldScreen$TabButtonWidget__init_ = ($this, $this$0, $x, $y, $w
     nmcgc_AbstractWidget__init_($this, $x, $y, $width, $height);
     $this.$clickConsumed = 0;
     $this.$label2 = $label;
-    $this.$selected0 = $selected;
+    $this.$selected1 = $selected;
     $this.$tabIndex0 = $tabIndex;
 },
 nmcgs_CreateWorldScreen$TabButtonWidget__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7) => {
@@ -7390,7 +7411,7 @@ nmcgs_CreateWorldScreen$TabButtonWidget__init_0 = (var_0, var_1, var_2, var_3, v
     return var_8;
 },
 nmcgs_CreateWorldScreen$TabButtonWidget_setSelected = ($this, $selected) => {
-    $this.$selected0 = $selected;
+    $this.$selected1 = $selected;
 },
 nmcgs_CreateWorldScreen$TabButtonWidget_consumedClick = $this => {
     return $this.$clickConsumed;
@@ -7403,27 +7424,27 @@ nmcgs_CreateWorldScreen$TabButtonWidget_render = ($this, $poseStack, $mouseX, $m
     if (!$this.$visible)
         return;
     $this.$hovered = $this.$active && $this.$isInside($mouseX, $mouseY) ? 1 : 0;
-    $sprite = !$this.$selected0 ? (!$this.$hovered ? $rt_s(7) : $rt_s(8)) : !$this.$hovered ? $rt_s(9) : $rt_s(10);
+    $sprite = !$this.$selected1 ? (!$this.$hovered ? $rt_s(7) : $rt_s(8)) : !$this.$hovered ? $rt_s(9) : $rt_s(10);
     if (!nleva_EaglerGuiImpl_drawSprite9Slices($sprite, $this.$x, $this.$y, $this.$width0, $this.$height0, 2, 2, 2, 0)) {
         var$6 = $this.$x;
         var$7 = $this.$y;
         var$8 = $this.$width0;
         var$9 = $this.$height0;
-        var$10 = !$this.$selected0 ? (-10987432) : (-16777216);
+        var$10 = !$this.$selected1 ? (-10987432) : (-16777216);
         nleva_EaglerGuiImpl_fillRect(var$6, var$7, var$8, var$9, var$10);
         var$6 = $this.$x + 1 | 0;
         var$7 = $this.$y + 1 | 0;
         var$8 = $this.$width0 - 2 | 0;
         var$9 = $this.$height0 - 2 | 0;
-        var$10 = !$this.$selected0 ? (-12500671) : (-12829636);
+        var$10 = !$this.$selected1 ? (-12500671) : (-12829636);
         nleva_EaglerGuiImpl_fillRect(var$6, var$7, var$8, var$9, var$10);
     }
     $textWidth = nleva_EaglerGuiImpl_widthOf($this.$label2);
     $tx = $this.$x + ($this.$width0 - $textWidth | 0) / 2.0;
     $ty = $this.$y + ($this.$height0 - 8 | 0) / 2.0;
     var$14 = $this.$label2;
-    var$10 = !$this.$selected0 ? (-6250336) : (-1);
-    var$15 = $this.$selected0;
+    var$10 = !$this.$selected1 ? (-6250336) : (-1);
+    var$15 = $this.$selected1;
     nleva_EaglerGuiImpl_drawText(var$14, $tx, $ty, var$10, var$15);
 },
 nmcgs_CreateWorldScreen$TabButtonWidget_mouseClicked = ($this, $mouseX, $mouseY, $button) => {
@@ -7439,11 +7460,38 @@ nmcgs_CreateWorldScreen$TabButtonWidget_getTelemetryId = $this => {
     let var$1, var$2;
     var$1 = jl_String_toLowerCase($this.$label2);
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(346)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(348)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 otjt_ArrayBufferView = $rt_classWithoutFields(),
-otjt_TypedArray = $rt_classWithoutFields(otjt_ArrayBufferView),
+otjt_TypedArray = $rt_classWithoutFields(otjt_ArrayBufferView);
+function nmwic_CraftingRecipes$Recipe() {
+    let a = this; jl_Object.call(a);
+    a.$key2 = null;
+    a.$shaped = 0;
+    a.$width3 = 0;
+    a.$height2 = 0;
+    a.$cells = null;
+    a.$ingredients = null;
+    a.$resultId0 = 0;
+    a.$resultCount0 = 0;
+}
+let nmwic_CraftingRecipes$Recipe__init_ = ($this, $key, $shaped, $width, $height, $cells, $ingredients, $resultId, $resultCount) => {
+    jl_Object__init_($this);
+    $this.$key2 = $key;
+    $this.$shaped = $shaped;
+    $this.$width3 = $width;
+    $this.$height2 = $height;
+    $this.$cells = $cells;
+    $this.$ingredients = $ingredients;
+    $this.$resultId0 = $resultId;
+    $this.$resultCount0 = $resultCount;
+},
+nmwic_CraftingRecipes$Recipe__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7) => {
+    let var_8 = new nmwic_CraftingRecipes$Recipe();
+    nmwic_CraftingRecipes$Recipe__init_(var_8, var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7);
+    return var_8;
+},
 jlr_Array = $rt_classWithoutFields(),
 jlr_Array_getLength = $array => {
     let $cls;
@@ -7522,13 +7570,13 @@ nmc_KeyMapping$Category_$values = () => {
 nmc_KeyMapping$Category__clinit_ = () => {
 try {
 
-    nmc_KeyMapping$Category_MOVEMENT = nmc_KeyMapping$Category__init_($rt_s(347), 0);
-    nmc_KeyMapping$Category_GAMEPLAY = nmc_KeyMapping$Category__init_($rt_s(348), 1);
-    nmc_KeyMapping$Category_INVENTORY = nmc_KeyMapping$Category__init_($rt_s(349), 2);
-    nmc_KeyMapping$Category_INTERFACE = nmc_KeyMapping$Category__init_($rt_s(350), 3);
-    nmc_KeyMapping$Category_CREATIVE = nmc_KeyMapping$Category__init_($rt_s(351), 4);
-    nmc_KeyMapping$Category_MULTIPLAYER = nmc_KeyMapping$Category__init_($rt_s(352), 5);
-    nmc_KeyMapping$Category_MISC = nmc_KeyMapping$Category__init_($rt_s(353), 6);
+    nmc_KeyMapping$Category_MOVEMENT = nmc_KeyMapping$Category__init_($rt_s(349), 0);
+    nmc_KeyMapping$Category_GAMEPLAY = nmc_KeyMapping$Category__init_($rt_s(350), 1);
+    nmc_KeyMapping$Category_INVENTORY = nmc_KeyMapping$Category__init_($rt_s(351), 2);
+    nmc_KeyMapping$Category_INTERFACE = nmc_KeyMapping$Category__init_($rt_s(352), 3);
+    nmc_KeyMapping$Category_CREATIVE = nmc_KeyMapping$Category__init_($rt_s(353), 4);
+    nmc_KeyMapping$Category_MULTIPLAYER = nmc_KeyMapping$Category__init_($rt_s(354), 5);
+    nmc_KeyMapping$Category_MISC = nmc_KeyMapping$Category__init_($rt_s(355), 6);
     nmc_KeyMapping$Category_$VALUES = nmc_KeyMapping$Category_$values();
     nmc_KeyMapping$Category_SORTED = nmc_KeyMapping$Category_values();
 
@@ -7646,7 +7694,7 @@ otci_IntegerUtil = $rt_classWithoutFields(),
 otci_IntegerUtil_toUnsignedLogRadixString = ($value, $radixLog2) => {
     let $radix, $mask, $sz, $chars, $pos, $target, var$9, $target_0;
     if (!$value)
-        return $rt_s(354);
+        return $rt_s(356);
     $radix = 1 << $radixLog2;
     $mask = $radix - 1 | 0;
     $sz = (((32 - jl_Integer_numberOfLeadingZeros($value) | 0) + $radixLog2 | 0) - 1 | 0) / $radixLog2 | 0;
@@ -7665,7 +7713,7 @@ otci_IntegerUtil_toUnsignedLogRadixString = ($value, $radixLog2) => {
 otci_IntegerUtil_toUnsignedLogRadixString0 = ($value, $radixLog2) => {
     let $radix, $mask, $sz, $chars, $pos, $target, var$9, $target_0;
     if (Long_eq($value, Long_ZERO))
-        return $rt_s(354);
+        return $rt_s(356);
     $radix = 1 << $radixLog2;
     $mask = $radix - 1 | 0;
     $sz = (((64 - jl_Long_numberOfLeadingZeros($value) | 0) + $radixLog2 | 0) - 1 | 0) / $radixLog2 | 0;
@@ -7718,7 +7766,7 @@ jur_LeafQuantifierSet_matches = ($this, $stringIndex, $testString, $matchResult)
     return var$5;
 },
 jur_LeafQuantifierSet_getName = $this => {
-    return $rt_s(355);
+    return $rt_s(357);
 },
 jur_AltQuantifierSet = $rt_classWithoutFields(jur_LeafQuantifierSet),
 jur_AltQuantifierSet__init_ = ($this, $innerSet, $next, $type) => {
@@ -7873,10 +7921,10 @@ function nmcgsm_DisconnectedScreen() {
 let nmcgsm_DisconnectedScreen__init_ = ($this, $title, $reason, $lastScreen) => {
     nmcgs_Screen__init_($this);
     if ($title === null)
-        $title = $rt_s(356);
+        $title = $rt_s(358);
     $this.$title1 = $title;
     if ($reason === null)
-        $reason = $rt_s(72);
+        $reason = $rt_s(74);
     $this.$reason = $reason;
     $this.$lastScreen = $lastScreen;
 },
@@ -7888,11 +7936,11 @@ nmcgsm_DisconnectedScreen__init_0 = (var_0, var_1, var_2) => {
 nmcgsm_DisconnectedScreen_init = $this => {
     let $centerX;
     $centerX = $this.$width / 2 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, $this.$height - 60 | 0, 200, 20, $rt_s(357), nmcgsm_DisconnectedScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, $this.$height - 60 | 0, 200, 20, $rt_s(359), nmcgsm_DisconnectedScreen$init$lambda$_1_0__init_0($this)));
 },
 nmcgsm_DisconnectedScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $reasonY, $lines, $i, $line, $lineWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
     $titleWidth = nleva_EaglerGuiImpl_widthOf($this.$title1);
     nleva_EaglerGuiImpl_drawText($this.$title1, ($this.$width / 2 | 0) - $titleWidth / 2.0, 30.0, (-1), 1);
     $reasonY = 54;
@@ -8261,7 +8309,7 @@ ju_Objects_hashCode = $o => {
     return $o !== null ? $o.$hashCode0() : 0;
 },
 ju_Objects_requireNonNull = $obj => {
-    return ju_Objects_requireNonNull0($obj, $rt_s(72));
+    return ju_Objects_requireNonNull0($obj, $rt_s(74));
 },
 ju_Objects_requireNonNull0 = ($obj, $message) => {
     if ($obj !== null)
@@ -8373,7 +8421,7 @@ jur_PositiveLookBehind_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_PositiveLookBehind_getName = $this => {
-    return $rt_s(358);
+    return $rt_s(360);
 };
 function jur_SequenceSet() {
     let a = this; jur_LeafSet.call(a);
@@ -8436,7 +8484,7 @@ jur_SequenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$string0;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(359)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(361)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jur_SequenceSet_first = ($this, $set) => {
@@ -8616,13 +8664,13 @@ nleva_WorldGlRenderer_ensureProgram = $gl => {
         b: {
             try {
                 $vs = nlevi_PlatformOpenGL__wglCreateShader(35633);
-                nlevi_PlatformOpenGL__wglShaderSource($vs, $rt_s(360));
+                nlevi_PlatformOpenGL__wglShaderSource($vs, $rt_s(362));
                 nlevi_PlatformOpenGL__wglCompileShader($vs);
                 if (nlevi_PlatformOpenGL__wglGetShaderCompiled($vs))
                     break b;
                 var$3 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($vs);
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(361)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(363)), var$3);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
@@ -8638,13 +8686,13 @@ nleva_WorldGlRenderer_ensureProgram = $gl => {
         c: {
             try {
                 $fs = nlevi_PlatformOpenGL__wglCreateShader(35632);
-                nlevi_PlatformOpenGL__wglShaderSource($fs, $rt_s(362));
+                nlevi_PlatformOpenGL__wglShaderSource($fs, $rt_s(364));
                 nlevi_PlatformOpenGL__wglCompileShader($fs);
                 if (nlevi_PlatformOpenGL__wglGetShaderCompiled($fs))
                     break c;
                 var$3 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($fs);
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(363)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(365)), var$3);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
@@ -8667,7 +8715,7 @@ nleva_WorldGlRenderer_ensureProgram = $gl => {
                     break d;
                 var$3 = nlevi_PlatformOpenGL__wglGetProgramInfoLog(nleva_WorldGlRenderer_program);
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(364)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(366)), var$3);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
@@ -8681,9 +8729,9 @@ nleva_WorldGlRenderer_ensureProgram = $gl => {
             return 0;
         }
         try {
-            nleva_WorldGlRenderer_uMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(365));
-            nleva_WorldGlRenderer_uTex = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(366));
-            nleva_WorldGlRenderer_uSkyLight = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(367));
+            nleva_WorldGlRenderer_uMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(367));
+            nleva_WorldGlRenderer_uTex = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(368));
+            nleva_WorldGlRenderer_uSkyLight = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_WorldGlRenderer_program, $rt_s(369));
             nleva_WorldGlRenderer_vao = nlevi_PlatformOpenGL__wglCreateVertexArray();
             nlevi_PlatformOpenGL__wglBindVertexArray(nleva_WorldGlRenderer_vao);
             nlevi_PlatformOpenGL__wglEnableVertexAttribArray(0);
@@ -8706,7 +8754,7 @@ nleva_WorldGlRenderer_ensureProgram = $gl => {
     }
     var$3 = $t.$getMessage();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(368)), var$3);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(370)), var$3);
     console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
     return 0;
 },
@@ -9095,7 +9143,342 @@ jur_MatchResultImpl_hasTransparentBounds = $this => {
 },
 jur_MatchResultImpl_getPreviousMatchEnd = $this => {
     return $this.$previousMatch;
-};
+},
+nmwic_CraftingRecipes = $rt_classWithoutFields(),
+nmwic_CraftingRecipes_ALL = null,
+nmwic_CraftingRecipes_$callClinit = () => {
+    nmwic_CraftingRecipes_$callClinit = $rt_eraseClinit(nmwic_CraftingRecipes);
+    nmwic_CraftingRecipes__clinit_();
+},
+nmwic_CraftingRecipes__clinit_ = () => {
+try {
+
+    let var$1, var$2, var$3, var$4, var$5, var$6, var$7, var$8;
+    var$1 = $rt_createArray(nmwic_CraftingRecipes$Recipe, 25);
+    var$2 = var$1.data;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 351;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(371), 0, 0, 0, var$4, var$5, 15, 4);
+    var$2[0] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 352;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(372), 0, 0, 0, var$4, var$5, 16, 4);
+    var$2[1] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 353;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(373), 0, 0, 0, var$4, var$5, 17, 4);
+    var$2[2] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 354;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(374), 0, 0, 0, var$4, var$5, 18, 4);
+    var$2[3] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 355;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(375), 0, 0, 0, var$4, var$5, 19, 4);
+    var$2[4] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 356;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(376), 0, 0, 0, var$4, var$5, 20, 4);
+    var$2[5] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 357;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(377), 0, 0, 0, var$4, var$5, 21, 4);
+    var$2[6] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$4 = null;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 1);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 358;
+    var$6[0] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(378), 0, 0, 0, var$4, var$5, 22, 4);
+    var$2[7] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 2);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(379), 1, 1, 2, var$5, null, 4096, 4);
+    var$2[8] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 4);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[2] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[3] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(380), 1, 2, 2, var$5, null, 375, 1);
+    var$2[9] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 9);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[2] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[3] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[4] = var$7;
+    var$6[5] = null;
+    var$6[6] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[7] = var$7;
+    var$6[8] = null;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(381), 1, 3, 3, var$5, null, 4097, 1);
+    var$2[10] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[2] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[3] = var$7;
+    var$6[4] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[5] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(382), 1, 2, 3, var$5, null, 4098, 1);
+    var$2[11] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[1] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(383), 1, 1, 3, var$5, null, 4099, 1);
+    var$2[12] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(384), 1, 1, 3, var$5, null, 4100, 1);
+    var$2[13] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[1] = $rt_createIntArrayFromData([15, 16, 17, 18, 19, 20, 21, 22, 23]);
+    var$6[2] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[3] = var$7;
+    var$6[4] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[5] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(385), 1, 2, 3, var$5, null, 4101, 1);
+    var$2[14] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 9);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[1] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[2] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[3] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[4] = var$7;
+    var$6[5] = null;
+    var$6[6] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[7] = var$7;
+    var$6[8] = null;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(386), 1, 3, 3, var$5, null, 4102, 1);
+    var$2[15] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[1] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[2] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[3] = var$7;
+    var$6[4] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[5] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(387), 1, 2, 3, var$5, null, 4103, 1);
+    var$2[16] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[1] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(388), 1, 1, 3, var$5, null, 4104, 1);
+    var$2[17] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[1] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(389), 1, 1, 3, var$5, null, 4105, 1);
+    var$2[18] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$6 = var$5.data;
+    var$6[0] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[1] = $rt_createIntArrayFromData([4, 263, 267]);
+    var$6[2] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[3] = var$7;
+    var$6[4] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[5] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(390), 1, 2, 3, var$5, null, 4106, 1);
+    var$2[19] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 9);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[0] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[1] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[2] = var$7;
+    var$6[3] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[4] = var$7;
+    var$6[5] = null;
+    var$6[6] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[7] = var$7;
+    var$6[8] = null;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(391), 1, 3, 3, var$5, null, 4108, 1);
+    var$2[20] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$7 = var$5.data;
+    var$8 = $rt_createIntArray(1);
+    var$8.data[0] = 4107;
+    var$7[0] = var$8;
+    var$8 = $rt_createIntArray(1);
+    var$8.data[0] = 4107;
+    var$7[1] = var$8;
+    var$8 = $rt_createIntArray(1);
+    var$8.data[0] = 4107;
+    var$7[2] = var$8;
+    var$8 = $rt_createIntArray(1);
+    var$8.data[0] = 4096;
+    var$7[3] = var$8;
+    var$7[4] = null;
+    var$8 = $rt_createIntArray(1);
+    var$8.data[0] = 4096;
+    var$7[5] = var$8;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(392), 1, 2, 3, var$5, null, 4109, 1);
+    var$2[21] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[0] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[1] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(393), 1, 1, 3, var$5, null, 4110, 1);
+    var$2[22] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 3);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[0] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[1] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[2] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(394), 1, 1, 3, var$5, null, 4111, 1);
+    var$2[23] = var$3;
+    var$3 = new nmwic_CraftingRecipes$Recipe;
+    var$5 = $rt_createArray($rt_arraycls($rt_intcls), 6);
+    var$6 = var$5.data;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[0] = var$7;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4107;
+    var$6[1] = var$7;
+    var$6[2] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[3] = var$7;
+    var$6[4] = null;
+    var$7 = $rt_createIntArray(1);
+    var$7.data[0] = 4096;
+    var$6[5] = var$7;
+    nmwic_CraftingRecipes$Recipe__init_(var$3, $rt_s(395), 1, 2, 3, var$5, null, 4112, 1);
+    var$2[24] = var$3;
+    nmwic_CraftingRecipes_ALL = var$1;
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jur_UCIRangeSet() {
     let a = this; jur_LeafSet.call(a);
     a.$chars1 = null;
@@ -9119,10 +9502,10 @@ jur_UCIRangeSet_accepts = ($this, $strIndex, $testString) => {
 },
 jur_UCIRangeSet_getName = $this => {
     let var$1, var$2, var$3;
-    var$1 = !$this.$alt2 ? $rt_s(135) : $rt_s(136);
+    var$1 = !$this.$alt2 ? $rt_s(137) : $rt_s(138);
     var$2 = $this.$chars1.$toString();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(369)), var$1), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(396)), var$1), var$2);
     return jl_StringBuilder_toString(var$3);
 };
 function nmcgs_ConfirmScreen() {
@@ -9148,8 +9531,8 @@ nmcgs_ConfirmScreen_init = $this => {
     let $centerX, $buttonY;
     $centerX = $this.$width / 2 | 0;
     $buttonY = $this.$height - 60 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, $buttonY, 150, 20, $rt_s(370), nmcgs_ConfirmScreen$init$lambda$_1_0__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 5 | 0, $buttonY, 150, 20, $rt_s(318), nmcgs_ConfirmScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, $buttonY, 150, 20, $rt_s(397), nmcgs_ConfirmScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 5 | 0, $buttonY, 150, 20, $rt_s(320), nmcgs_ConfirmScreen$init$lambda$_1_1__init_0($this)));
 },
 nmcgs_ConfirmScreen_answer = ($this, $accepted) => {
     if ($this.$minecraft !== null)
@@ -9159,7 +9542,7 @@ nmcgs_ConfirmScreen_answer = ($this, $accepted) => {
 },
 nmcgs_ConfirmScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $bodyY, var$7, $line, $lineWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
     $titleWidth = nleva_EaglerGuiImpl_widthOf($this.$title0);
     nleva_EaglerGuiImpl_drawText($this.$title0, ($this.$width / 2 | 0) - $titleWidth / 2.0, 30.0, (-1), 1);
     $bodyY = 50;
@@ -9270,12 +9653,12 @@ nmcgso_OptionsScreen$DifficultyCycleButton_onClick = $this => {
     var$1.$setDifficulty(var$3);
 },
 nmcgso_OptionsScreen$DifficultyCycleButton_getTelemetryId = $this => {
-    return $rt_s(371);
+    return $rt_s(398);
 },
 nmcgso_OptionsScreen$DifficultyCycleButton__clinit_ = () => {
 try {
 
-    nmcgso_OptionsScreen$DifficultyCycleButton_NAMES = $rt_wrapArray(jl_String, [$rt_s(372), $rt_s(373), $rt_s(374), $rt_s(375)]);
+    nmcgso_OptionsScreen$DifficultyCycleButton_NAMES = $rt_wrapArray(jl_String, [$rt_s(399), $rt_s(400), $rt_s(401), $rt_s(402)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 otp_Platform = $rt_classWithoutFields(),
@@ -9322,11 +9705,11 @@ jl_Boolean__init_ = var_0 => {
 },
 jl_Boolean_parseBoolean = $s => {
     jl_Boolean_$callClinit();
-    return $s !== null && jl_String_equals(jl_String_toLowerCase($s), $rt_s(144)) ? 1 : 0;
+    return $s !== null && jl_String_equals(jl_String_toLowerCase($s), $rt_s(146)) ? 1 : 0;
 },
 jl_Boolean_toString = $value => {
     jl_Boolean_$callClinit();
-    return !$value ? $rt_s(143) : $rt_s(144);
+    return !$value ? $rt_s(145) : $rt_s(146);
 },
 jl_Boolean__clinit_ = () => {
 try {
@@ -9354,7 +9737,7 @@ nleva_WorldTextures_buildNames = () => {
     $i = 0;
     while ($i < 10) {
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(376)), $i);
+        jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(403)), $i);
         $names.$add(jl_StringBuilder_toString(var$3));
         $i = $i + 1 | 0;
     }
@@ -9423,14 +9806,14 @@ nleva_WorldTextures_requestAll = () => {
         var$2 = (__safe(nleva_WorldTextures_NAMES).data||[])[$i];
         var$3 = (__safe(nleva_WorldTextures_NAMES).data||[])[$i];
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(377)), var$3), $rt_s(42));
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(404)), var$3), $rt_s(44));
         var$3 = jl_StringBuilder_toString(var$4);
         nleva_WorldTextures_beginLoad$js_body$_15($rt_ustr(var$2), $rt_ustr(var$3));
         $i = $i + 1 | 0;
     }
     var$5 = (__safe(nleva_WorldTextures_NAMES).data||[]).length;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(378)), var$5), $rt_s(379));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(405)), var$5), $rt_s(406));
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
 },
 nleva_WorldTextures_pollPending = () => {
@@ -9446,7 +9829,7 @@ nleva_WorldTextures_pollPending = () => {
             nleva_WorldTextures_pending.$remove0($i);
             if ($data.error ? 1 : 0) {
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(380)), $name), $rt_s(381));
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(407)), $name), $rt_s(408));
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
             } else {
                 $pixels = (__safe($data).data||[]);
@@ -9464,7 +9847,7 @@ nleva_WorldTextures_pollPending = () => {
             nleva_WorldTextures_arrayTexture = nleva_WorldTextures_buildArray($gl);
             var$8 = (__safe(nleva_WorldTextures_NAMES).data||[]).length;
             var$4 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(382)), var$8), $rt_s(383));
+            jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(409)), var$8), $rt_s(410));
             console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         }
     }
@@ -9751,12 +10134,12 @@ nmcgso_MouseSettingsScreen$SensitivitySlider__init_0 = (var_0, var_1, var_2, var
 nmcgso_MouseSettingsScreen$SensitivitySlider_label = $sensitivity => {
     let var$2, var$3;
     if ($sensitivity <= 0.0)
-        return $rt_s(384);
+        return $rt_s(411);
     if ($sensitivity >= 1.0)
-        return $rt_s(385);
+        return $rt_s(412);
     var$2 = $sensitivity * 200.0 | 0;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(386)), var$2), 37);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(413)), var$2), 37);
     return jl_StringBuilder_toString(var$3);
 },
 nmcgso_MouseSettingsScreen$SensitivitySlider_displayString = $this => {
@@ -9771,7 +10154,7 @@ nmcgso_MouseSettingsScreen$SensitivitySlider_applyValue = $this => {
     }
 },
 nmcgso_MouseSettingsScreen$SensitivitySlider_getTelemetryId = $this => {
-    return $rt_s(387);
+    return $rt_s(414);
 },
 nlevit_EPKLoader$LoadErrorNativeCallback = $rt_classWithoutFields(0),
 jlr_AnnotatedElement = $rt_classWithoutFields(0),
@@ -9820,7 +10203,7 @@ jur_NegativeLookBehind_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_NegativeLookBehind_getName = $this => {
-    return $rt_s(388);
+    return $rt_s(415);
 },
 jur_BackReferenceSet = $rt_classWithoutFields(jur_CIBackReferenceSet),
 jur_BackReferenceSet__init_ = ($this, $groupIndex, $consCounter) => {
@@ -9893,7 +10276,7 @@ jur_BackReferenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$groupIndex;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(389)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(416)), var$1);
     return jl_StringBuilder_toString(var$2);
 };
 function jur_DotQuantifierSet() {
@@ -9956,7 +10339,7 @@ jur_DotQuantifierSet_findBackLineTerminator = ($this, $from, $i, $testString) =>
     return $i;
 },
 jur_DotQuantifierSet_getName = $this => {
-    return $rt_s(390);
+    return $rt_s(417);
 },
 jur_AbstractCharClass$LazyJavaJavaIdentifierPart = $rt_classWithoutFields(jur_AbstractCharClass$LazyCharClass),
 jur_AbstractCharClass$LazyJavaJavaIdentifierPart__init_ = $this => {
@@ -10006,7 +10389,7 @@ function ju_UnknownFormatConversionException() {
 let ju_UnknownFormatConversionException__init_0 = ($this, $conversion) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(391)), $conversion);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(418)), $conversion);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$conversion1 = $conversion;
 },
@@ -10146,7 +10529,7 @@ jt_DecimalFormat__init_ = ($this, $pattern, $value) => {
     jt_NumberFormat__init_($this);
     $this.$positivePrefix = $rt_createArray(jt_DecimalFormat$FormatField, 0);
     var$3 = $rt_createArray(jt_DecimalFormat$FormatField, 1);
-    var$3.data[0] = jt_DecimalFormat$TextField__init_($rt_s(392));
+    var$3.data[0] = jt_DecimalFormat$TextField__init_($rt_s(419));
     $this.$negativePrefix = var$3;
     $this.$positiveSuffix = $rt_createArray(jt_DecimalFormat$FormatField, 0);
     $this.$negativeSuffix = $rt_createArray(jt_DecimalFormat$FormatField, 0);
@@ -10702,7 +11085,7 @@ jt_DecimalFormat_applyRounding0 = ($this, $mantissa, $mantissaLength, $exponent,
             case 5:
                 if (Long_eq(Long_rem($mantissa, $rounding), Long_ZERO))
                     break a;
-                $rt_throw(jl_ArithmeticException__init_($rt_s(393)));
+                $rt_throw(jl_ArithmeticException__init_($rt_s(420)));
             case 6:
                 var$6 = Long_rem($mantissa, $rounding);
                 var$7 = Long_div($rounding, Long_fromInt(2));
@@ -10767,7 +11150,7 @@ jt_DecimalFormat_applyRounding = ($this, $mantissa, $mantissaLength, $exponent) 
             case 5:
                 if (!($mantissa.$remainder($rounding)).$equals(jm_BigInteger_ZERO))
                     break a;
-                $rt_throw(jl_ArithmeticException__init_($rt_s(393)));
+                $rt_throw(jl_ArithmeticException__init_($rt_s(420)));
             case 6:
                 if (($mantissa.$remainder($rounding)).$equals($signedRounding.$divide(jm_BigInteger_valueOf(Long_fromInt(2))))) {
                     $mantissa = ($mantissa.$divide($rounding)).$multiply1($rounding);
@@ -11671,7 +12054,7 @@ function ju_IllegalFormatCodePointException() {
 let ju_IllegalFormatCodePointException__init_ = ($this, $codePoint) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(394)), $codePoint), $rt_s(395));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(421)), $codePoint), $rt_s(422));
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$codePoint = $codePoint;
 },
@@ -11831,7 +12214,7 @@ function jl_Class() {
     let a = this; jl_Object.call(a);
     a.$flags2 = 0;
     a.$classInfo = null;
-    a.$name4 = null;
+    a.$name5 = null;
     a.$simpleName = null;
 }
 let jl_Class__init_0 = ($this, $classInfo) => {
@@ -11848,7 +12231,7 @@ jl_Class_createClass = $classInfo => {
 },
 jl_Class_toString = $this => {
     let var$1, var$2, var$3;
-    var$1 = jl_Class_isInterface($this) ? $rt_s(396) : !jl_Class_isPrimitive($this) ? $rt_s(397) : $rt_s(72);
+    var$1 = jl_Class_isInterface($this) ? $rt_s(423) : !jl_Class_isPrimitive($this) ? $rt_s(424) : $rt_s(74);
     var$2 = jl_Class_getName($this);
     var$3 = jl_StringBuilder__init_();
     jl_StringBuilder_append(jl_StringBuilder_append(var$3, var$1), var$2);
@@ -11880,15 +12263,15 @@ jl_Class_getName = $this => {
                         $result = jl_StringBuilder_toString(var$5);
                     } else {
                         var$5 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(398)), $itemName), 59);
+                        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(425)), $itemName), 59);
                         $result = jl_StringBuilder_toString(var$5);
                     }
                 }
             }
         }
-        $this.$name4 = $result;
+        $this.$name5 = $result;
     }
-    return $this.$name4;
+    return $this.$name5;
 },
 jl_Class_getSimpleName = $this => {
     let $metadataName, $result, var$3, var$4, $lastDollar, $lastDot;
@@ -11900,7 +12283,7 @@ jl_Class_getSimpleName = $this => {
             if ($this.$classInfo[$rt_meta].itemType !== null) {
                 var$3 = jl_Class_getSimpleName($rt_cls($this.$classInfo[$rt_meta].itemType));
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$4, var$3), $rt_s(399));
+                jl_StringBuilder_append(jl_StringBuilder_append(var$4, var$3), $rt_s(426));
                 $result = jl_StringBuilder_toString(var$4);
             } else if (jl_Class_getEnclosingClass($this) === null) {
                 $result = jl_Class_getName($this);
@@ -11912,10 +12295,10 @@ jl_Class_getSimpleName = $this => {
                 } else {
                     $result = jl_String_substring0($result, $lastDollar + 1 | 0);
                     if (jl_String_charAt($result, 0) >= 48 && jl_String_charAt($result, 0) <= 57)
-                        $result = $rt_s(72);
+                        $result = $rt_s(74);
                 }
             } else if ($result === null)
-                $result = $rt_s(72);
+                $result = $rt_s(74);
         }
         $this.$simpleName = $result;
     }
@@ -12248,10 +12631,10 @@ nmcm_GameConfig$QuickPlayVariant_$values = () => {
 nmcm_GameConfig$QuickPlayVariant__clinit_ = () => {
 try {
 
-    nmcm_GameConfig$QuickPlayVariant_DISABLED = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(400), 0);
-    nmcm_GameConfig$QuickPlayVariant_SINGLEPLAYER = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(401), 1);
-    nmcm_GameConfig$QuickPlayVariant_MULTIPLAYER = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(352), 2);
-    nmcm_GameConfig$QuickPlayVariant_REALMS = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(402), 3);
+    nmcm_GameConfig$QuickPlayVariant_DISABLED = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(427), 0);
+    nmcm_GameConfig$QuickPlayVariant_SINGLEPLAYER = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(428), 1);
+    nmcm_GameConfig$QuickPlayVariant_MULTIPLAYER = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(354), 2);
+    nmcm_GameConfig$QuickPlayVariant_REALMS = nmcm_GameConfig$QuickPlayVariant__init_($rt_s(429), 3);
     nmcm_GameConfig$QuickPlayVariant_$VALUES = nmcm_GameConfig$QuickPlayVariant_$values();
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
@@ -12319,9 +12702,9 @@ jl_Float_parseFloat = $string => {
                             $start = $start + 1 | 0;
                         }
                     } else {
-                        if ($c == 73 && ($end - $start | 0) == 8 && jl_String_regionMatches($string, 0, $start, $rt_s(403), 0, 8))
+                        if ($c == 73 && ($end - $start | 0) == 8 && jl_String_regionMatches($string, 0, $start, $rt_s(430), 0, 8))
                             return !$negative ? Infinity : (-Infinity);
-                        if ($c == 78 && ($end - $start | 0) == 3 && jl_String_regionMatches($string, 0, $start, $rt_s(404), 0, 3))
+                        if ($c == 78 && ($end - $start | 0) == 3 && jl_String_regionMatches($string, 0, $start, $rt_s(431), 0, 3))
                             return NaN;
                         $rt_throw(jl_NumberFormatException__init_());
                     }
@@ -12976,10 +13359,10 @@ jm_BigDecimal_aproxPrecision = $this => {
 jm_BigDecimal_toIntScale = $longScale => {
     jm_BigDecimal_$callClinit();
     if (Long_lt($longScale, Long_fromInt(-2147483648)))
-        $rt_throw(jl_ArithmeticException__init_($rt_s(405)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(432)));
     if (Long_le($longScale, Long_fromInt(2147483647)))
         return Long_lo($longScale);
-    $rt_throw(jl_ArithmeticException__init_($rt_s(406)));
+    $rt_throw(jl_ArithmeticException__init_($rt_s(433)));
 },
 jm_BigDecimal_zeroScaledBy = $longScale => {
     let var$2;
@@ -13089,7 +13472,7 @@ jur_DotSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $this.$lt0.$isLineTerminator($high) ? (-1) : $this.$next3.$matches(var$5, $testString, $matchResult);
 },
 jur_DotSet_getName = $this => {
-    return $rt_s(407);
+    return $rt_s(434);
 },
 jur_DotSet_setNext = ($this, $next) => {
     $this.$next3 = $next;
@@ -13786,7 +14169,7 @@ nlevi_PlatformApplication__init = () => {
     nlevi_PlatformApplication_registerErrorListener();
     nlevi_PlatformApplication_registerFullscreenChangeListener();
     nlevi_PlatformApplication_registerResizeListener();
-    nlevi_PlatformApplication_setPageTitle($rt_s(408));
+    nlevi_PlatformApplication_setPageTitle($rt_s(435));
     nlevi_PlatformApplication_initialized = 1;
     console.log("[PlatformApplication] Application lifecycle initialized (v26.1.2)");
 },
@@ -13838,7 +14221,7 @@ nlevi_PlatformApplication_lambda$registerErrorListener$1 = $event => {
     nlevi_PlatformApplication_$callClinit();
     $reason = $rt_str(String($event.reason || 'Unknown'));
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(409)), $reason);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(436)), $reason);
     console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformApplication_lambda$registerErrorListener$0 = $event => {
@@ -13850,11 +14233,11 @@ nlevi_PlatformApplication_lambda$registerErrorListener$0 = $event => {
     $colno = $event.colno || 0;
     $stack = $rt_str(nlevi_PlatformApplication_getErrorStack$js_body$_35($event));
     var$7 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(410)), $message), $rt_s(411)), $source), 58), $lineno), 58), $colno);
+    jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(437)), $message), $rt_s(438)), $source), 58), $lineno), 58), $colno);
     console.error($rt_ustr(jl_StringBuilder_toString(var$7)));
     if ($stack !== null && !jl_String_isEmpty($stack)) {
         var$8 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(412)), $stack);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(439)), $stack);
         console.error($rt_ustr(jl_StringBuilder_toString(var$8)));
     }
     if (nlevi_PlatformApplication_errorHandler !== null)
@@ -13922,7 +14305,7 @@ jur_CICharSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$ch4;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(var$2, $rt_s(413)), var$1);
+    jl_StringBuilder_append1(jl_StringBuilder_append(var$2, $rt_s(440)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 ju_TemplateCollections$AbstractImmutableMap = $rt_classWithoutFields(ju_AbstractMap),
@@ -14076,7 +14459,7 @@ nlevi_PlatformRuntime__init = () => {
     nlevi_PlatformRuntime_initialized = 1;
     var$1 = nlevi_PlatformRuntime_namespace;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(414)), var$1), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(441)), var$1), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
 },
 nlevi_PlatformRuntime_update = $deltaMs => {
@@ -14213,7 +14596,7 @@ nlevi_PlatformRuntime__clinit_ = () => {
 try {
 
     nlevi_PlatformRuntime_window = window;
-    nlevi_PlatformRuntime_namespace = $rt_s(415);
+    nlevi_PlatformRuntime_namespace = $rt_s(442);
     nlevi_PlatformRuntime_pageVisible = 1;
     nlevi_PlatformRuntime_initialized = 0;
     nlevi_PlatformRuntime_canvasWidth = 0;
@@ -14443,7 +14826,7 @@ jur_UEOLSet_hasConsumed = ($this, $matchResult) => {
     return $res;
 },
 jur_UEOLSet_getName = $this => {
-    return $rt_s(416);
+    return $rt_s(443);
 };
 function jur_UCICharSet() {
     jur_LeafSet.call(this);
@@ -14465,7 +14848,7 @@ jur_UCICharSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$ch2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(var$2, $rt_s(417)), var$1);
+    jl_StringBuilder_append1(jl_StringBuilder_append(var$2, $rt_s(444)), var$1);
     return jl_StringBuilder_toString(var$2);
 };
 function jur_AtomicFSet() {
@@ -14491,7 +14874,7 @@ jur_AtomicFSet_getIndex = $this => {
     return $this.$index6;
 },
 jur_AtomicFSet_getName = $this => {
-    return $rt_s(418);
+    return $rt_s(445);
 },
 jur_AtomicFSet_hasConsumed = ($this, $mr) => {
     return 0;
@@ -14613,6 +14996,182 @@ jl_Error__init_0 = (var_0, var_1) => {
     let var_2 = new jl_Error();
     jl_Error__init_(var_2, var_0, var_1);
     return var_2;
+},
+nmwic_Crafting = $rt_classWithoutFields(),
+nmwic_Crafting_match = ($gridW, $gridH, $cellIds) => {
+    let $maxX, $maxY, $filled, $y, var$8, var$9, $x, $boxW, $boxH, $all, $r, var$15, $recipe;
+    $maxX = (-1);
+    $maxY = (-1);
+    $filled = 0;
+    $y = 0;
+    var$8 = $gridW;
+    var$9 = $gridH;
+    while ($y < $gridH) {
+        $x = 0;
+        while ($x < $gridW) {
+            if ((__safe($cellIds).data||[])[$rt_imul($y, $gridW) + $x | 0]) {
+                $filled = $filled + 1 | 0;
+                if ($x < var$8)
+                    var$8 = $x;
+                if ($y < var$9)
+                    var$9 = $y;
+                if ($x > $maxX)
+                    $maxX = $x;
+                if ($y > $maxY)
+                    $maxY = $y;
+            }
+            $x = $x + 1 | 0;
+        }
+        $y = $y + 1 | 0;
+    }
+    if (!$filled)
+        return null;
+    $boxW = ($maxX - var$8 | 0) + 1 | 0;
+    $boxH = ($maxY - var$9 | 0) + 1 | 0;
+    nmwic_CraftingRecipes_$callClinit();
+    $all = nmwic_CraftingRecipes_ALL;
+    $r = 0;
+    a: {
+        b: while (true) {
+            var$15 = (__safe($all).data||[]);
+            if ($r >= var$15.length)
+                return null;
+            c: {
+                $recipe = var$15[$r];
+                if (!$recipe.$shaped) {
+                    if ($recipe.$ingredients.data.length != $filled)
+                        break c;
+                    if (!nmwic_Crafting_matchesShapeless($recipe, $cellIds, $filled))
+                        break c;
+                    else
+                        break b;
+                }
+                if ($recipe.$width3 == $boxW && $recipe.$height2 == $boxH) {
+                    if (nmwic_Crafting_matchesShaped($recipe, $gridW, $cellIds, var$8, var$9, 0))
+                        break a;
+                    if (nmwic_Crafting_matchesShaped($recipe, $gridW, $cellIds, var$8, var$9, 1))
+                        break a;
+                }
+            }
+            $r = $r + 1 | 0;
+        }
+        return $recipe;
+    }
+    return $recipe;
+},
+nmwic_Crafting_matchesShaped = ($recipe, $gridW, $cellIds, $minX, $minY, $mirrored) => {
+    let $ry, $rx, var$9, var$10, $gx, $gy, $cellId, $accepted;
+    $ry = 0;
+    a: {
+        while ($ry < $recipe.$height2) {
+            $rx = 0;
+            while ($rx < $recipe.$width3) {
+                var$9 = !$mirrored ? $rx : ($recipe.$width3 - 1 | 0) - $rx | 0;
+                b: {
+                    var$10 = (__safe($cellIds).data||[]);
+                    $gx = $minX + var$9 | 0;
+                    $gy = $minY + $ry | 0;
+                    $cellId = var$10[$rt_imul($gy, $gridW) + $gx | 0];
+                    $accepted = $recipe.$cells.data[$rt_imul($ry, $recipe.$width3) + $rx | 0];
+                    if (!$cellId) {
+                        if ($accepted === null)
+                            break b;
+                        else
+                            return 0;
+                    }
+                    if ($accepted === null)
+                        break a;
+                    if (!nmwic_Crafting_contains($accepted, $cellId))
+                        break a;
+                }
+                $rx = $rx + 1 | 0;
+            }
+            $ry = $ry + 1 | 0;
+        }
+        return 1;
+    }
+    return 0;
+},
+nmwic_Crafting_matchesShapeless = ($recipe, $cellIds, $filled) => {
+    let var$4, $n, $usedIngredient, $usedCell;
+    var$4 = (__safe($cellIds).data||[]);
+    $n = $recipe.$ingredients.data.length;
+    $usedIngredient = $rt_createBooleanArray($n);
+    $usedCell = $rt_createBooleanArray(var$4.length);
+    return nmwic_Crafting_assign($recipe, $cellIds, $usedIngredient, $usedCell, 0, $filled);
+},
+nmwic_Crafting_assign = ($recipe, $cellIds, $usedIngredient, $usedCell, $cellIndex, $remaining) => {
+    let var$7, var$8, $cellId, $i, var$11;
+    if (!$remaining)
+        return 1;
+    while (true) {
+        var$7 = (__safe($cellIds).data||[]);
+        var$8 = $rt_compare($cellIndex, var$7.length);
+        if (var$8 >= 0)
+            break;
+        if (var$7[$cellIndex])
+            break;
+        $cellIndex = $cellIndex + 1 | 0;
+    }
+    if (var$8 >= 0)
+        return 0;
+    $cellId = var$7[$cellIndex];
+    $i = 0;
+    while ($i < $recipe.$ingredients.data.length) {
+        var$7 = (__safe($usedIngredient).data||[]);
+        if (!var$7[$i]) {
+            var$11 = $recipe.$ingredients.data[$i];
+            if (nmwic_Crafting_contains(var$11, $cellId)) {
+                var$11 = (__safe($usedCell).data||[]);
+                var$7[$i] = 1;
+                var$11[$cellIndex] = 1;
+                if (nmwic_Crafting_assign($recipe, $cellIds, $usedIngredient, $usedCell, $cellIndex + 1 | 0, $remaining - 1 | 0))
+                    return 1;
+                var$7[$i] = 0;
+                var$11[$cellIndex] = 0;
+            }
+        }
+        $i = $i + 1 | 0;
+    }
+    return 0;
+},
+nmwic_Crafting_contains = ($ids, $id) => {
+    let $i, var$4;
+    $i = 0;
+    while (true) {
+        var$4 = (__safe($ids).data||[]);
+        if ($i >= var$4.length)
+            break;
+        if (var$4[$i] == $id)
+            return 1;
+        $i = $i + 1 | 0;
+    }
+    return 0;
+},
+nmwic_Crafting_consume = ($cellIds, $cellCounts) => {
+    let $i, var$4, var$5;
+    $i = 0;
+    while (true) {
+        var$4 = (__safe($cellIds).data||[]);
+        if ($i >= var$4.length)
+            break;
+        if (var$4[$i]) {
+            var$5 = (__safe($cellCounts).data||[]);
+            if (var$5[$i] > 0) {
+                var$5[$i] = var$5[$i] - 1 | 0;
+                if (!var$5[$i])
+                    var$4[$i] = 0;
+            }
+        }
+        $i = $i + 1 | 0;
+    }
+},
+nmwic_Crafting_maxStack = $id => {
+    let $item;
+    if (!nmwi_Items_isItem($id))
+        return 64;
+    $item = nmwi_Items_byId0($id);
+    return $item === null ? 1 : $item.$maxStack0;
 };
 function nmcm_ClientLevel() {
     let a = this; jl_Object.call(a);
@@ -14639,10 +15198,10 @@ let nmcm_ClientLevel__init_ = ($this, $levelName, $dimensionId) => {
     $this.$edits = ju_HashMap__init_();
     $this.$dirtySections = ju_HashSet__init_1();
     if ($levelName === null)
-        $levelName = $rt_s(419);
+        $levelName = $rt_s(446);
     $this.$levelName = $levelName;
     if ($dimensionId === null)
-        $dimensionId = $rt_s(420);
+        $dimensionId = $rt_s(447);
     $this.$dimensionId = $dimensionId;
     $this.$gameTime = Long_ZERO;
     $this.$dayTime = Long_fromInt(1000);
@@ -14652,7 +15211,7 @@ let nmcm_ClientLevel__init_ = ($this, $levelName, $dimensionId) => {
     var$3 = $this.$levelName;
     var$3 = nmcm_ClientLevel_sanitize(var$3);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(421)), var$3);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(448)), var$3);
     $this.$storageKey = jl_StringBuilder_toString(var$4);
     nmcm_ClientLevel_loadEdits($this);
     nmcm_ClientLevel_loadDayTime($this);
@@ -14839,7 +15398,7 @@ nmcm_ClientLevel_loadEdits = $this => {
                     var$8 = $this.$edits.$size();
                     var$6 = $this.$levelName;
                     var$9 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(422)), var$8), $rt_s(423)), var$6);
+                    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(449)), var$8), $rt_s(450)), var$6);
                     console.log($rt_ustr(jl_StringBuilder_toString(var$9)));
                     $this.$markRangeDirty((-16), (-64), (-16), 16, nmcm_ClientLevel_flatTopY() + 1 | 0, 16);
                 }
@@ -14850,7 +15409,7 @@ nmcm_ClientLevel_loadEdits = $this => {
                     $t = $$je;
                     var$6 = $t.$getMessage();
                     var$9 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(424)), var$6);
+                    jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(451)), var$6);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$9)));
                     break a;
                 } else {
@@ -14900,7 +15459,7 @@ nmcm_ClientLevel_parseQuad = ($raw, $start, $end) => {
 nmcm_ClientLevel_saveEdits = $this => {
     let $sb, var$2, $e, $packed, $data, var$6;
     if ($this.$edits.$isEmpty()) {
-        nlevi_PlatformRuntime_localStorageSet($this.$storageKey, $rt_s(72));
+        nlevi_PlatformRuntime_localStorageSet($this.$storageKey, $rt_s(74));
         return;
     }
     $sb = jl_StringBuilder__init_();
@@ -14922,7 +15481,7 @@ nmcm_ClientLevel_saveEdits = $this => {
     nlevi_PlatformRuntime_localStorageSet($this.$storageKey, $data);
     var$6 = $this.$edits.$size();
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(425)), var$6), $rt_s(426));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(452)), var$6), $rt_s(453));
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
 },
 nmcm_ClientLevel_editCount = $this => {
@@ -14932,7 +15491,7 @@ nmcm_ClientLevel_timeKey = $this => {
     let var$1, var$2;
     var$1 = nmcm_ClientLevel_sanitize($this.$levelName);
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(427)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(454)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 nmcm_ClientLevel_loadDayTime = $this => {
@@ -14945,14 +15504,14 @@ nmcm_ClientLevel_loadDayTime = $this => {
                 $this.$dayTime = jl_Math_max2(Long_ZERO, $t);
                 var$3 = $this.$dayTime;
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append2(jl_StringBuilder_append(var$4, $rt_s(428)), var$3);
+                jl_StringBuilder_append2(jl_StringBuilder_append(var$4, $rt_s(455)), var$3);
                 console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
                 break a;
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
                 if ($$je instanceof jl_NumberFormatException) {
                     var$4 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(429)), $raw), 39);
+                    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(456)), $raw), 39);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
                     break a;
                 } else {
@@ -15193,7 +15752,7 @@ nmcm_ClientLevel_toString = $this => {
     var$4 = $this.$edits;
     var$5 = var$4.$size();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(430)), var$1), $rt_s(431)), var$2), $rt_s(432)), var$3), $rt_s(433)), var$5), 93);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(457)), var$1), $rt_s(458)), var$2), $rt_s(459)), var$3), $rt_s(460)), var$5), 93);
     var$1 = jl_StringBuilder_toString(var$4);
     return var$1;
 };
@@ -15205,7 +15764,7 @@ function ju_FormatFlagsConversionMismatchException() {
 let ju_FormatFlagsConversionMismatchException__init_ = ($this, $flags, $conversion) => {
     let var$3;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(434)), $flags), $rt_s(435)), $conversion);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(461)), $flags), $rt_s(462)), $conversion);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$3));
     $this.$flags4 = $flags;
     $this.$conversion0 = $conversion;
@@ -15921,10 +16480,10 @@ jur_SupplRangeSet_matches = ($this, $stringIndex, $testString, $matchResult) => 
 },
 jur_SupplRangeSet_getName = $this => {
     let var$1, var$2, var$3;
-    var$1 = !$this.$alt0 ? $rt_s(135) : $rt_s(136);
+    var$1 = !$this.$alt0 ? $rt_s(137) : $rt_s(138);
     var$2 = $this.$chars.$toString();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(137)), var$1), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(139)), var$1), var$2);
     return jl_StringBuilder_toString(var$3);
 },
 jur_SupplRangeSet_contains = ($this, $ch) => {
@@ -16301,11 +16860,11 @@ jl_String_toCharArray = $this => {
 },
 jl_String_valueOf2 = $obj => {
     jl_String_$callClinit();
-    return $obj === null ? $rt_s(142) : $obj.$toString();
+    return $obj === null ? $rt_s(144) : $obj.$toString();
 },
 jl_String_valueOf1 = $b => {
     jl_String_$callClinit();
-    return !$b ? $rt_s(143) : $rt_s(144);
+    return !$b ? $rt_s(145) : $rt_s(146);
 },
 jl_String_valueOf3 = $c => {
     let var$2, var$3;
@@ -16411,23 +16970,23 @@ nmcgs_TitleScreen_init0 = $this => {
     let $topPos, $centerX, var$3, var$4, var$5, $realms, var$7, $language, $accessibility;
     $topPos = ($this.$height / 4 | 0) + 48 | 0;
     $centerX = $this.$width / 2 | 0;
-    var$3 = $this.$addRenderableWidget(nmcgc_Button_builder($rt_s(436), nmcgs_TitleScreen$init$lambda$_1_0__init_0($this)));
+    var$3 = $this.$addRenderableWidget(nmcgc_Button_builder($rt_s(463), nmcgs_TitleScreen$init$lambda$_1_0__init_0($this)));
     var$4 = $centerX - 100 | 0;
     var$3.$setPosition(var$4, $topPos);
-    var$3 = $this.$addRenderableWidget(nmcgc_Button_builder($rt_s(437), nmcgs_TitleScreen$init$lambda$_1_1__init_0($this)));
+    var$3 = $this.$addRenderableWidget(nmcgc_Button_builder($rt_s(464), nmcgs_TitleScreen$init$lambda$_1_1__init_0($this)));
     var$5 = $topPos + 24 | 0;
     var$3.$setPosition(var$4, var$5);
-    $realms = nmcgc_Button__init_(var$4, $topPos + 48 | 0, 200, 20, $rt_s(438), nmcgs_TitleScreen$init$lambda$_1_2__init_0());
+    $realms = nmcgc_Button__init_(var$4, $topPos + 48 | 0, 200, 20, $rt_s(465), nmcgs_TitleScreen$init$lambda$_1_2__init_0());
     $realms.$setActive(0);
     $this.$addRenderableWidget($realms);
     var$7 = $topPos + 84 | 0;
-    $language = nmcgc_Button__init_($centerX - 124 | 0, var$7, 20, 20, $rt_s(72), nmcgs_TitleScreen$init$lambda$_1_3__init_0());
+    $language = nmcgc_Button__init_($centerX - 124 | 0, var$7, 20, 20, $rt_s(74), nmcgs_TitleScreen$init$lambda$_1_3__init_0());
     $language.$setIcon($rt_s(21));
     $language.$setActive(0);
     $this.$addRenderableWidget($language);
-    $this.$addRenderableWidget(nmcgc_Button__init_(var$4, var$7, 98, 20, $rt_s(439), nmcgs_TitleScreen$init$lambda$_1_4__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, var$7, 98, 20, $rt_s(440), nmcgs_TitleScreen$init$lambda$_1_5__init_0()));
-    $accessibility = nmcgc_Button__init_($centerX + 104 | 0, var$7, 20, 20, $rt_s(72), nmcgs_TitleScreen$init$lambda$_1_6__init_0());
+    $this.$addRenderableWidget(nmcgc_Button__init_(var$4, var$7, 98, 20, $rt_s(466), nmcgs_TitleScreen$init$lambda$_1_4__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, var$7, 98, 20, $rt_s(467), nmcgs_TitleScreen$init$lambda$_1_5__init_0()));
+    $accessibility = nmcgc_Button__init_($centerX + 104 | 0, var$7, 20, 20, $rt_s(74), nmcgs_TitleScreen$init$lambda$_1_6__init_0());
     $accessibility.$setIcon($rt_s(22));
     $accessibility.$setActive(0);
     $this.$addRenderableWidget($accessibility);
@@ -16539,7 +17098,7 @@ jur_FSet$PossessiveFSet_matches = ($this, $stringIndex, $testString, $matchResul
     return $stringIndex;
 },
 jur_FSet$PossessiveFSet_getName = $this => {
-    return $rt_s(441);
+    return $rt_s(468);
 },
 jur_FSet$PossessiveFSet_hasConsumed = ($this, $mr) => {
     return 0;
@@ -16577,7 +17136,7 @@ jur_PosCompositeGroupQuantifierSet_matches = ($this, $stringIndex, $testString, 
 function nmwlb_Blocks$Block() {
     let a = this; jl_Object.call(a);
     a.$id = 0;
-    a.$name9 = null;
+    a.$name8 = null;
     a.$displayName = null;
     a.$destroySpeed = 0.0;
     a.$friction = 0.0;
@@ -16592,7 +17151,7 @@ function nmwlb_Blocks$Block() {
 let nmwlb_Blocks$Block__init_0 = ($this, $id, $name, $displayName, $destroySpeed, $requiresCorrectTool, $topTexture, $sideTexture, $bottomTexture, $tab, $topTint, $allTint) => {
     jl_Object__init_($this);
     $this.$id = $id;
-    $this.$name9 = $name;
+    $this.$name8 = $name;
     $this.$displayName = $displayName;
     $this.$destroySpeed = $destroySpeed;
     $this.$friction = 0.6000000238418579;
@@ -16688,20 +17247,20 @@ nmcgso_OptionsScreen_init = $this => {
         nmcgso_OptionsScreen_addGridButton($this, ($gridX + 150 | 0) + 8 | 0, $y, (__safe(nmcgso_OptionsScreen_GRID_RIGHT).data||[])[$i]);
         $i = $i + 1 | 0;
     }
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(442), nmcgso_OptionsScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(469), nmcgso_OptionsScreen$init$lambda$_1_0__init_0($this)));
 },
 nmcgso_OptionsScreen_addGridButton = ($this, $x, $y, $label) => {
     let $live, $button;
-    $live = !jl_String_equals($rt_s(443), $label) && !jl_String_equals($rt_s(444), $label) && !jl_String_equals($rt_s(445), $label) ? 0 : 1;
+    $live = !jl_String_equals($rt_s(470), $label) && !jl_String_equals($rt_s(471), $label) && !jl_String_equals($rt_s(472), $label) ? 0 : 1;
     $button = nmcgc_Button__init_($x, $y, 150, 20, $label, nmcgso_OptionsScreen$addGridButton$lambda$_2_0__init_0($this, $label));
     $button.$setActive($live);
     $this.$addRenderableWidget($button);
 },
 nmcgso_OptionsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(446));
-    nleva_EaglerGuiImpl_drawText($rt_s(446), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(473));
+    nleva_EaglerGuiImpl_drawText($rt_s(473), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_OptionsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -16721,11 +17280,11 @@ nmcgso_OptionsScreen_isPauseScreen = $this => {
 nmcgso_OptionsScreen_lambda$addGridButton$0 = ($this, $label, $b) => {
     if ($this.$minecraft === null)
         return;
-    if (jl_String_equals($rt_s(443), $label))
+    if (jl_String_equals($rt_s(470), $label))
         $this.$minecraft.$setScreen(nmcgso_AccessibilityOptionsScreen__init_0($this, $this.$options4));
-    else if (jl_String_equals($rt_s(444), $label))
+    else if (jl_String_equals($rt_s(471), $label))
         $this.$minecraft.$setScreen(nmcgso_ControlsScreen__init_0($this, $this.$options4));
-    else if (jl_String_equals($rt_s(445), $label))
+    else if (jl_String_equals($rt_s(472), $label))
         $this.$minecraft.$setScreen(nmcgso_SoundOptionsScreen__init_0($this, $this.$options4));
 },
 nmcgso_OptionsScreen_lambda$init$0 = ($this, $button) => {
@@ -16734,8 +17293,8 @@ nmcgso_OptionsScreen_lambda$init$0 = ($this, $button) => {
 nmcgso_OptionsScreen__clinit_ = () => {
 try {
 
-    nmcgso_OptionsScreen_GRID_LEFT = $rt_wrapArray(jl_String, [$rt_s(447), $rt_s(448), $rt_s(449), $rt_s(450), $rt_s(451)]);
-    nmcgso_OptionsScreen_GRID_RIGHT = $rt_wrapArray(jl_String, [$rt_s(445), $rt_s(444), $rt_s(452), $rt_s(443), $rt_s(453)]);
+    nmcgso_OptionsScreen_GRID_LEFT = $rt_wrapArray(jl_String, [$rt_s(474), $rt_s(475), $rt_s(476), $rt_s(477), $rt_s(478)]);
+    nmcgso_OptionsScreen_GRID_RIGHT = $rt_wrapArray(jl_String, [$rt_s(472), $rt_s(471), $rt_s(479), $rt_s(470), $rt_s(480)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function nmcm_ServerList() {
@@ -16755,9 +17314,9 @@ nmcm_ServerList__init_0 = () => {
 nmcm_ServerList_load = $this => {
     let $raw, var$2, var$3, var$4, $line, $split, var$7, var$8, var$9, var$10;
     $this.$entries.$clear();
-    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(454));
+    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(481));
     if ($raw !== null && !jl_String_isEmpty($raw)) {
-        var$2 = (jl_String_split($raw, $rt_s(90))).data;
+        var$2 = (jl_String_split($raw, $rt_s(92))).data;
         var$3 = var$2.length;
         var$4 = 0;
         while (var$4 < var$3) {
@@ -16789,10 +17348,10 @@ nmcm_ServerList_save = $this => {
         var$4.$append3(nmcm_ServerList_sanitize(var$5));
         $i = $i + 1 | 0;
     }
-    nlevi_PlatformRuntime_localStorageSet($rt_s(454), $sb.$toString());
+    nlevi_PlatformRuntime_localStorageSet($rt_s(481), $sb.$toString());
 },
 nmcm_ServerList_sanitize = $value => {
-    return jl_String_trim(jl_String_replace(jl_String_replace($value, $rt_s(90), $rt_s(135)), $rt_s(455), $rt_s(135)));
+    return jl_String_trim(jl_String_replace(jl_String_replace($value, $rt_s(92), $rt_s(137)), $rt_s(482), $rt_s(137)));
 },
 nmcm_ServerList_size = $this => {
     return $this.$entries.$size();
@@ -16892,7 +17451,7 @@ jur_MultiLineEOLSet_hasConsumed = ($this, $matchResult) => {
     return $res;
 },
 jur_MultiLineEOLSet_getName = $this => {
-    return $rt_s(456);
+    return $rt_s(483);
 },
 cmbs_RenderSystem = $rt_classWithoutFields(),
 cmbs_RenderSystem_isOnRenderThread = 0,
@@ -16987,7 +17546,7 @@ try {
     cmbs_RenderSystem_maxSupportTextureSize = (-1);
     cmbs_RenderSystem_shader = null;
     cmbs_RenderSystem_samplerCache = cmbs_SamplerCache__init_0();
-    cmbs_RenderSystem_backendDescription = $rt_s(457);
+    cmbs_RenderSystem_backendDescription = $rt_s(484);
     cmbs_RenderSystem_outputColorTextureOverride = null;
     cmbs_RenderSystem_outputDepthTextureOverride = null;
 
@@ -17002,13 +17561,13 @@ function nmcgc_EditBox() {
 }
 let nmcgc_EditBox__init_ = ($this, $x, $y, $width, $height, $hint) => {
     nmcgc_AbstractWidget__init_($this, $x, $y, $width, $height);
-    $this.$value = $rt_s(72);
-    $this.$hint = $rt_s(72);
+    $this.$value = $rt_s(74);
+    $this.$hint = $rt_s(74);
     $this.$focused = 0;
     $this.$cursorPos = 0;
     $this.$displayPos = 0;
     if ($hint === null)
-        $hint = $rt_s(72);
+        $hint = $rt_s(74);
     $this.$hint = $hint;
 },
 nmcgc_EditBox__init_0 = (var_0, var_1, var_2, var_3, var_4) => {
@@ -17021,7 +17580,7 @@ nmcgc_EditBox_getValue = $this => {
 },
 nmcgc_EditBox_setValue = ($this, $newValue) => {
     if ($newValue === null)
-        $newValue = $rt_s(72);
+        $newValue = $rt_s(74);
     $this.$value = $newValue;
     if ($this.$cursorPos > jl_String_length($this.$value))
         $this.$cursorPos = jl_String_length($this.$value);
@@ -17162,7 +17721,7 @@ nmcgc_EditBox_isBlinked = $this => {
 nmcgc_EditBox_visibleSubstring = $this => {
     let $i, $sb, $used, $charW;
     if ($this.$displayPos >= jl_String_length($this.$value))
-        return $rt_s(72);
+        return $rt_s(74);
     $i = nmcgc_EditBox_charAtOffset($this, $this.$displayPos);
     $sb = jl_StringBuilder__init_();
     $used = 0;
@@ -17237,17 +17796,19 @@ nmcgsm_DirectConnectScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5
     return var_6;
 },
 nmcgsm_DirectConnectScreen$1_getTelemetryId = $this => {
-    return $rt_s(458);
+    return $rt_s(485);
 };
 function nmcgsi_InventoryScreen() {
     let a = this; nmcgs_Screen.call(a);
-    a.$leftPos0 = 0;
+    a.$leftPos = 0;
     a.$topPos0 = 0;
-    a.$hoveredSlot0 = 0;
+    a.$hoveredSlot = 0;
+    a.$craft0 = null;
 }
 let nmcgsi_InventoryScreen__init_ = $this => {
     nmcgs_Screen__init_($this);
-    $this.$hoveredSlot0 = (-1);
+    $this.$hoveredSlot = (-1);
+    $this.$craft0 = nmwi_CraftingContainer__init_0(2, 2);
 },
 nmcgsi_InventoryScreen__init_0 = () => {
     let var_0 = new nmcgsi_InventoryScreen();
@@ -17255,24 +17816,51 @@ nmcgsi_InventoryScreen__init_0 = () => {
     return var_0;
 },
 nmcgsi_InventoryScreen_init = $this => {
-    $this.$leftPos0 = ($this.$width - 176 | 0) / 2 | 0;
+    $this.$leftPos = ($this.$width - 176 | 0) / 2 | 0;
     $this.$topPos0 = ($this.$height - 166 | 0) / 2 | 0;
+    $this.$craft0.$recompute();
+},
+nmcgsi_InventoryScreen_getCraftingContainer = $this => {
+    return $this.$craft0;
+},
+nmcgsi_InventoryScreen_onClose = $this => {
+    let $inventory, var$2, var$3, var$4;
+    $inventory = $this.$minecraft.$getInventory();
+    $this.$craft0.$returnContents($inventory);
+    if ($inventory.$getCarriedCount() > 0) {
+        var$2 = $inventory.$getCarriedBlock();
+        var$3 = $inventory.$getCarriedCount();
+        var$4 = nmwic_Crafting_maxStack($inventory.$getCarriedBlock());
+        $inventory.$addItem(var$2, var$3, var$4);
+        $inventory.$setCarried(0, 0);
+    }
+    nmcgs_Screen_onClose($this);
 },
 nmcgsi_InventoryScreen_slotAt = ($this, $mouseX, $mouseY) => {
-    let $mx, $my, $col, $row, var$7, var$8;
-    $mx = ($mouseX | 0) - $this.$leftPos0 | 0;
+    let $mx, $my, $ccol, $crow, var$7, var$8, $col, $row;
+    $mx = ($mouseX | 0) - $this.$leftPos | 0;
     $my = ($mouseY | 0) - $this.$topPos0 | 0;
+    $ccol = ($mx - 97 | 0) / 18 | 0;
+    $crow = ($my - 17 | 0) / 18 | 0;
+    if ($ccol >= 0 && $ccol < 2 && $crow >= 0 && $crow < 2) {
+        var$7 = 97 + ($ccol * 18 | 0) | 0;
+        var$8 = 17 + ($crow * 18 | 0) | 0;
+        if (nmcgsi_InventoryScreen_cellContains($mx, $my, var$7, var$8))
+            return (40 + ($crow * 2 | 0) | 0) + $ccol | 0;
+    }
+    if (nmcgsi_InventoryScreen_cellContains($mx, $my, 153, 27))
+        return 50;
     $col = ($mx - 7 | 0) / 18 | 0;
     $row = ($my - 83 | 0) / 18 | 0;
     if ($col >= 0 && $col < 9 && $row >= 0 && $row < 3) {
-        var$7 = 7 + ($col * 18 | 0) | 0;
-        var$8 = 83 + ($row * 18 | 0) | 0;
-        if (nmcgsi_InventoryScreen_cellContains($mx, $my, var$7, var$8))
+        var$8 = 7 + ($col * 18 | 0) | 0;
+        var$7 = 83 + ($row * 18 | 0) | 0;
+        if (nmcgsi_InventoryScreen_cellContains($mx, $my, var$8, var$7))
             return ($row * 9 | 0) + $col | 0;
     }
     if ($col >= 0 && $col < 9) {
-        var$8 = 7 + ($col * 18 | 0) | 0;
-        if (nmcgsi_InventoryScreen_cellContains($mx, $my, var$8, 141))
+        var$7 = 7 + ($col * 18 | 0) | 0;
+        if (nmcgsi_InventoryScreen_cellContains($mx, $my, var$7, 141))
             return 27 + $col | 0;
     }
     return (-1);
@@ -17284,62 +17872,97 @@ nmcgsi_InventoryScreen_inventorySlot = $interactive => {
     return $interactive >= 27 ? $interactive - 27 | 0 : $interactive + 9 | 0;
 },
 nmcgsi_InventoryScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
-    let $inventory, $hx, $hy, $i, var$9, var$10, var$11, var$12, $inv, $name;
+    let $inventory, $hx, $hy, $i, var$9, var$10, var$11, var$12, var$13, $inv, var$15;
     nleva_EaglerGuiImpl_fillRect(0.0, 0.0, $this.$width, $this.$height, (-1341124592));
-    nleva_EaglerGuiImpl_drawSprite($rt_s(23), $this.$leftPos0, $this.$topPos0, 176.0, 166.0);
-    nleva_EaglerGuiImpl_drawText($rt_s(459), $this.$leftPos0 + 97 | 0, ($this.$topPos0 + 17 | 0) - 4 | 0, (-12632257), 0);
-    nleva_EaglerGuiImpl_drawText($rt_s(460), $this.$leftPos0 + 7 | 0, ($this.$topPos0 + 83 | 0) - 10 | 0, (-12632257), 0);
+    nleva_EaglerGuiImpl_drawSprite($rt_s(23), $this.$leftPos, $this.$topPos0, 176.0, 166.0);
+    nleva_EaglerGuiImpl_drawText($rt_s(486), $this.$leftPos + 97 | 0, ($this.$topPos0 + 17 | 0) - 4 | 0, (-12632257), 0);
+    nleva_EaglerGuiImpl_drawText($rt_s(487), $this.$leftPos + 7 | 0, ($this.$topPos0 + 83 | 0) - 10 | 0, (-12632257), 0);
     $inventory = $this.$minecraft.$getInventory();
-    if ($this.$hoveredSlot0 >= 0) {
-        if ($this.$hoveredSlot0 >= 27) {
-            $hx = ($this.$leftPos0 + 7 | 0) + (($this.$hoveredSlot0 - 27 | 0) * 18 | 0) | 0;
+    if ($this.$hoveredSlot >= 0) {
+        if ($this.$hoveredSlot < 27) {
+            $hx = ($this.$leftPos + 7 | 0) + (($this.$hoveredSlot % 9 | 0) * 18 | 0) | 0;
+            $hy = ($this.$topPos0 + 83 | 0) + (($this.$hoveredSlot / 9 | 0) * 18 | 0) | 0;
+        } else if ($this.$hoveredSlot < 40) {
+            $hx = ($this.$leftPos + 7 | 0) + (($this.$hoveredSlot - 27 | 0) * 18 | 0) | 0;
             $hy = $this.$topPos0 + 141 | 0;
+        } else if ($this.$hoveredSlot >= 50) {
+            $hx = $this.$leftPos + 153 | 0;
+            $hy = $this.$topPos0 + 27 | 0;
         } else {
-            $hx = ($this.$leftPos0 + 7 | 0) + (($this.$hoveredSlot0 % 9 | 0) * 18 | 0) | 0;
-            $hy = ($this.$topPos0 + 83 | 0) + (($this.$hoveredSlot0 / 9 | 0) * 18 | 0) | 0;
+            $hx = ($this.$leftPos + 97 | 0) + ((($this.$hoveredSlot - 40 | 0) % 2 | 0) * 18 | 0) | 0;
+            $hy = ($this.$topPos0 + 17 | 0) + ((($this.$hoveredSlot - 40 | 0) / 2 | 0) * 18 | 0) | 0;
         }
         nleva_EaglerGuiImpl_fillRect($hx, $hy, 16.0, 16.0, (-2130706433));
     }
     $i = 0;
+    while ($i < 4) {
+        nmcg_Gui_drawItem($this.$craft0.$getCellId($i), $this.$craft0.$getCellCount($i), (($this.$leftPos + 97 | 0) + (($i % 2 | 0) * 18 | 0) | 0) + 1 | 0, (($this.$topPos0 + 17 | 0) + (($i / 2 | 0) * 18 | 0) | 0) + 1 | 0);
+        $i = $i + 1 | 0;
+    }
+    nmcg_Gui_drawItem($this.$craft0.$getResultId(), $this.$craft0.$getResultCount(), ($this.$leftPos + 153 | 0) + 1 | 0, ($this.$topPos0 + 27 | 0) + 1 | 0);
+    $i = 0;
     while ($i < 27) {
         var$9 = $inventory.$getBlockId(nmcgsi_InventoryScreen_inventorySlot($i));
         var$10 = $inventory.$getCount(nmcgsi_InventoryScreen_inventorySlot($i));
-        var$11 = (($this.$leftPos0 + 7 | 0) + (($i % 9 | 0) * 18 | 0) | 0) + 1 | 0;
+        var$11 = (($this.$leftPos + 7 | 0) + (($i % 9 | 0) * 18 | 0) | 0) + 1 | 0;
         var$12 = (($this.$topPos0 + 83 | 0) + (($i / 9 | 0) * 18 | 0) | 0) + 1 | 0;
         nmcg_Gui_drawItem(var$9, var$10, var$11, var$12);
         $i = $i + 1 | 0;
     }
     $i = 0;
     while ($i < 9) {
-        nmcg_Gui_drawItem($inventory.$getBlockId($i), $inventory.$getCount($i), (($this.$leftPos0 + 7 | 0) + ($i * 18 | 0) | 0) + 1 | 0, ($this.$topPos0 + 141 | 0) + 1 | 0);
+        nmcg_Gui_drawItem($inventory.$getBlockId($i), $inventory.$getCount($i), (($this.$leftPos + 7 | 0) + ($i * 18 | 0) | 0) + 1 | 0, ($this.$topPos0 + 141 | 0) + 1 | 0);
         $i = $i + 1 | 0;
     }
     nmcg_Gui_drawItem($inventory.$getCarriedBlock(), $inventory.$getCarriedCount(), $mouseX - 1 | 0, $mouseY - 1 | 0);
-    if ($this.$hoveredSlot0 >= 0 && !$inventory.$getCarriedCount()) {
-        $inv = nmcgsi_InventoryScreen_inventorySlot($this.$hoveredSlot0);
-        $name = nmcg_Gui_blockName($inventory.$getBlockId($inv));
-        if ($name !== null)
-            nmcg_Gui_drawTooltip($name, $mouseX, $mouseY, $this.$width, $this.$height);
+    if ($this.$hoveredSlot >= 0 && !$inventory.$getCarriedCount()) {
+        if ($this.$hoveredSlot == 50)
+            var$13 = nmcg_Gui_blockName($this.$craft0.$getResultId());
+        else if ($this.$hoveredSlot < 40) {
+            $inv = nmcgsi_InventoryScreen_inventorySlot($this.$hoveredSlot);
+            var$13 = nmcg_Gui_blockName($inventory.$getBlockId($inv));
+        } else {
+            var$13 = $this.$craft0;
+            var$15 = $this.$hoveredSlot - 40 | 0;
+            var$15 = var$13.$getCellId(var$15);
+            var$13 = nmcg_Gui_blockName(var$15);
+        }
+        if (var$13 !== null)
+            nmcg_Gui_drawTooltip(var$13, $mouseX, $mouseY, $this.$width, $this.$height);
     }
 },
 nmcgsi_InventoryScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => {
-    let $slot, $inventory, var$6;
+    let $slot, $inventory, $shift, var$7, var$8, var$9;
     $slot = nmcgsi_InventoryScreen_slotAt($this, $mouseX, $mouseY);
     if ($slot >= 0 && $this.$minecraft !== null) {
         $inventory = $this.$minecraft.$getInventory();
-        if (!nlevi_PlatformInput_isKeyDown(42))
-            $inventory.$clickSlot(nmcgsi_InventoryScreen_inventorySlot($slot), $button);
-        else
-            $inventory.$quickMove(nmcgsi_InventoryScreen_inventorySlot($slot));
-        var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(461)), $slot), $rt_s(462)), $button);
-        console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
+        if ($slot == 50) {
+            $shift = nlevi_PlatformInput_isKeyDown(42);
+            $this.$craft0.$clickResult($shift, $inventory);
+            var$7 = !$shift ? $rt_s(488) : $rt_s(489);
+            var$8 = jl_StringBuilder__init_();
+            jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(490)), var$7);
+            var$7 = jl_StringBuilder_toString(var$8);
+            console.log($rt_ustr(var$7));
+        } else if ($slot < 40) {
+            if (!nlevi_PlatformInput_isKeyDown(42))
+                $inventory.$clickSlot(nmcgsi_InventoryScreen_inventorySlot($slot), $button);
+            else
+                $inventory.$quickMove(nmcgsi_InventoryScreen_inventorySlot($slot));
+        } else {
+            var$7 = $this.$craft0;
+            var$9 = $slot - 40 | 0;
+            var$7.$clickCell(var$9, $button, $inventory);
+            var$7 = jl_StringBuilder__init_();
+            jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$7, $rt_s(491)), var$9), $rt_s(492)), $button);
+            console.log($rt_ustr(jl_StringBuilder_toString(var$7)));
+        }
         return 1;
     }
     return nmcgs_Screen_mouseClicked($this, $mouseX, $mouseY, $button);
 },
 nmcgsi_InventoryScreen_mouseMoved = ($this, $mouseX, $mouseY) => {
-    $this.$hoveredSlot0 = nmcgsi_InventoryScreen_slotAt($this, $mouseX, $mouseY);
+    $this.$hoveredSlot = nmcgsi_InventoryScreen_slotAt($this, $mouseX, $mouseY);
     nmcgs_Screen_mouseMoved($this, $mouseX, $mouseY);
 },
 nmcgsi_InventoryScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -17348,7 +17971,7 @@ nmcgsi_InventoryScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => 
     if ($keyCode != nmc_KeyMapping_INVENTORY.$getKey0() && !($keyCode == 1 && $this.$shouldCloseOnEsc()))
         return nmcgs_Screen_keyPressed($this, $keyCode, $scanCode, $modifiers);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(463)), $keyCode);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(493)), $keyCode);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     $this.$onClose();
     return 1;
@@ -17552,17 +18175,17 @@ nmc_Direction_getName = $this => {
         case 0:
             break;
         case 1:
-            return $rt_s(464);
+            return $rt_s(494);
         case 2:
-            return $rt_s(465);
+            return $rt_s(495);
         case 3:
-            return $rt_s(466);
+            return $rt_s(496);
         case 4:
-            return $rt_s(467);
+            return $rt_s(497);
         default:
-            return $rt_s(468);
+            return $rt_s(498);
     }
-    return $rt_s(469);
+    return $rt_s(499);
 },
 nmc_Direction__clinit_ = () => {
 try {
@@ -17690,7 +18313,7 @@ jt_DecimalFormatSymbols_clone = $this => {
         }
         return var$1;
     }
-    $rt_throw(jl_AssertionError__init_0($rt_s(470), $e));
+    $rt_throw(jl_AssertionError__init_0($rt_s(500), $e));
 };
 function ju_HashMap$AbstractMapIterator() {
     let a = this; jl_Object.call(a);
@@ -17750,7 +18373,7 @@ function nmwep_Inventory() {
     let a = this; jl_Object.call(a);
     a.$slots = null;
     a.$counts = null;
-    a.$selected1 = 0;
+    a.$selected0 = 0;
     a.$carriedBlock = 0;
     a.$carriedCount = 0;
 }
@@ -17766,36 +18389,42 @@ nmwep_Inventory__init_0 = () => {
     return var_0;
 },
 nmwep_Inventory_addItem = ($this, $blockId) => {
-    let $i, var$3;
-    if (!$blockId)
-        return 0;
-    $i = 0;
-    while (true) {
-        if ($i >= 36) {
-            $i = 0;
-            while ($i < 36) {
-                if (!$this.$counts.data[$i]) {
-                    $this.$slots.data[$i] = $blockId;
-                    $this.$counts.data[$i] = 1;
-                    return 1;
-                }
-                $i = $i + 1 | 0;
+    return $this.$addItem($blockId, 1, 64);
+},
+nmwep_Inventory_addItem0 = ($this, $blockId, $count, $maxStack) => {
+    let $cap, $i, var$6, $moved, var$8;
+    if ($blockId && $count > 0) {
+        $cap = jl_Math_max(1, jl_Math_min(64, $maxStack));
+        $i = 0;
+        var$6 = $count;
+        while ($i < 36 && var$6 > 0) {
+            if ($this.$slots.data[$i] == $blockId && $this.$counts.data[$i] > 0 && $this.$counts.data[$i] < $cap) {
+                $moved = jl_Math_min($cap - $this.$counts.data[$i] | 0, var$6);
+                var$8 = $this.$counts.data;
+                var$8[$i] = var$8[$i] + $moved | 0;
+                var$6 = var$6 - $moved | 0;
             }
-            return 0;
+            $i = $i + 1 | 0;
         }
-        if ($this.$slots.data[$i] == $blockId && $this.$counts.data[$i] > 0 && $this.$counts.data[$i] < 64)
-            break;
-        $i = $i + 1 | 0;
+        $i = 0;
+        while ($i < 36 && var$6 > 0) {
+            if (!$this.$counts.data[$i]) {
+                $moved = jl_Math_min($cap, var$6);
+                $this.$slots.data[$i] = $blockId;
+                $this.$counts.data[$i] = $moved;
+                var$6 = var$6 - $moved | 0;
+            }
+            $i = $i + 1 | 0;
+        }
+        return var$6 >= $count ? 0 : 1;
     }
-    var$3 = $this.$counts.data;
-    var$3[$i] = var$3[$i] + 1 | 0;
-    return 1;
+    return 0;
 },
 nmwep_Inventory_getSelectedBlock = $this => {
-    return $this.$counts.data[$this.$selected1] <= 0 ? 0 : $this.$slots.data[$this.$selected1];
+    return $this.$counts.data[$this.$selected0] <= 0 ? 0 : $this.$slots.data[$this.$selected0];
 },
 nmwep_Inventory_consumeSelected = $this => {
-    $this.$consumeSlot($this.$selected1);
+    $this.$consumeSlot($this.$selected0);
 },
 nmwep_Inventory_consumeSlot = ($this, $slot) => {
     let var$2;
@@ -17806,11 +18435,14 @@ nmwep_Inventory_consumeSlot = ($this, $slot) => {
             $this.$slots.data[$slot] = 0;
     }
 },
+nmwep_Inventory_swapPaint = ($this, $direction) => {
+    $this.$selected0 = ((($this.$selected0 + $direction | 0) % 9 | 0) + 9 | 0) % 9 | 0;
+},
 nmwep_Inventory_getSelected = $this => {
-    return $this.$selected1;
+    return $this.$selected0;
 },
 nmwep_Inventory_setSelected = ($this, $slot) => {
-    $this.$selected1 = jl_Math_max(0, jl_Math_min(8, $slot));
+    $this.$selected0 = jl_Math_max(0, jl_Math_min(8, $slot));
 },
 nmwep_Inventory_getCount = ($this, $slot) => {
     return $slot >= 0 && $slot < 36 ? $this.$counts.data[$slot] : 0;
@@ -17839,53 +18471,70 @@ nmwep_Inventory_setCarried = ($this, $blockId, $count) => {
     if (!($blockId && $count > 0))
         $blockId = 0;
     $this.$carriedBlock = $blockId;
-    $this.$carriedCount = jl_Math_max(0, jl_Math_min(64, $this.$carriedCount));
+    $this.$carriedCount = jl_Math_max(0, jl_Math_min(64, $count));
+},
+nmwep_Inventory_doClick = ($ids, $counts, $index, $button, $inv) => {
+    let var$6, var$7, $slotBlock, $slotCount, $cap, $take, $nb, $nc, $space, var$15, $moved;
+    if ($index >= 0) {
+        var$6 = (__safe($ids).data||[]);
+        if ($index < var$6.length) {
+            var$7 = (__safe($counts).data||[]);
+            $slotBlock = var$6[$index];
+            $slotCount = var$7[$index];
+            $cap = nmwic_Crafting_maxStack(!$slotBlock && $inv.$carriedCount > 0 ? $inv.$carriedBlock : $slotBlock);
+            if (!$inv.$carriedCount) {
+                if ($slotCount > 0) {
+                    if (!$button) {
+                        $inv.$setCarried($slotBlock, $slotCount);
+                        nmwep_Inventory_writeSlot($ids, $counts, $index, 0, 0);
+                    } else {
+                        $take = ($slotCount + 1 | 0) / 2 | 0;
+                        $inv.$setCarried($slotBlock, $take);
+                        nmwep_Inventory_writeSlot($ids, $counts, $index, $slotBlock, $slotCount - $take | 0);
+                    }
+                }
+                return;
+            }
+            if (!$slotCount) {
+                if (!$button) {
+                    nmwep_Inventory_writeSlot($ids, $counts, $index, $inv.$carriedBlock, $inv.$carriedCount);
+                    $inv.$setCarried(0, 0);
+                } else {
+                    nmwep_Inventory_writeSlot($ids, $counts, $index, $inv.$carriedBlock, 1);
+                    $inv.$setCarried($inv.$carriedBlock, $inv.$carriedCount - 1 | 0);
+                }
+                return;
+            }
+            if ($slotBlock != $inv.$carriedBlock) {
+                if (!$button) {
+                    $nb = $inv.$carriedBlock;
+                    $nc = $inv.$carriedCount;
+                    $inv.$setCarried($slotBlock, $slotCount);
+                    nmwep_Inventory_writeSlot($ids, $counts, $index, $nb, $nc);
+                }
+                return;
+            }
+            $space = $cap - $slotCount | 0;
+            var$15 = $button ? 1 : $inv.$carriedCount;
+            $moved = jl_Math_min($space, var$15);
+            if ($moved > 0) {
+                nmwep_Inventory_writeSlot($ids, $counts, $index, $slotBlock, $slotCount + $moved | 0);
+                $inv.$setCarried($inv.$carriedBlock, $inv.$carriedCount - $moved | 0);
+            }
+            return;
+        }
+    }
+},
+nmwep_Inventory_writeSlot = ($ids, $counts, $index, $blockId, $count) => {
+    let var$6;
+    if (!($blockId && $count > 0))
+        $blockId = 0;
+    var$6 = (__safe($counts).data||[]);
+    (__safe($ids).data||[])[$index] = $blockId;
+    var$6[$index] = jl_Math_max(0, jl_Math_min(64, $count));
 },
 nmwep_Inventory_clickSlot = ($this, $slot, $button) => {
-    let $slotBlock, $slotCount, $take, $nb, $nc, $space, $moved;
-    if ($slot >= 0 && $slot < 36) {
-        $slotBlock = $this.$slots.data[$slot];
-        $slotCount = $this.$counts.data[$slot];
-        if (!$this.$carriedCount) {
-            if ($slotCount > 0) {
-                if (!$button) {
-                    $this.$setCarried($slotBlock, $slotCount);
-                    $this.$setSlot($slot, 0, 0);
-                } else {
-                    $take = ($slotCount + 1 | 0) / 2 | 0;
-                    $this.$setCarried($slotBlock, $take);
-                    $this.$setSlot($slot, $slotBlock, $slotCount - $take | 0);
-                }
-            }
-            return;
-        }
-        if (!$slotCount) {
-            if (!$button) {
-                $this.$setSlot($slot, $this.$carriedBlock, $this.$carriedCount);
-                $this.$setCarried(0, 0);
-            } else {
-                $this.$setSlot($slot, $this.$carriedBlock, 1);
-                $this.$setCarried($this.$carriedBlock, $this.$carriedCount - 1 | 0);
-            }
-            return;
-        }
-        if ($slotBlock != $this.$carriedBlock) {
-            if (!$button) {
-                $nb = $this.$carriedBlock;
-                $nc = $this.$carriedCount;
-                $this.$setCarried($slotBlock, $slotCount);
-                $this.$setSlot($slot, $nb, $nc);
-            }
-            return;
-        }
-        $space = 64 - $slotCount | 0;
-        $moved = jl_Math_min($space, $button ? 1 : $this.$carriedCount);
-        if ($moved > 0) {
-            $this.$setSlot($slot, $slotBlock, $slotCount + $moved | 0);
-            $this.$setCarried($this.$carriedBlock, $this.$carriedCount - $moved | 0);
-        }
-        return;
-    }
+    nmwep_Inventory_doClick($this.$slots, $this.$counts, $slot, $button, $this);
 },
 nmwep_Inventory_quickMove = ($this, $slot) => {
     let $blockId, $count, var$4, $i, $end, $i_0, $moved;
@@ -18045,7 +18694,7 @@ function ju_IllegalFormatPrecisionException() {
 let ju_IllegalFormatPrecisionException__init_ = ($this, $precision) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(471)), $precision);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(501)), $precision);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$precision2 = $precision;
 },
@@ -18155,15 +18804,15 @@ nleva_PanoramaRenderer_render = ($gl, $fbWidth, $fbHeight) => {
 nleva_PanoramaRenderer_init = $gl => {
     let $vsh, $fsh, $cube, var$5, $quadIndices, $q, var$8, $v, var$10, var$11, var$12, var$13, $vboData, $i, var$16, $posAttrib, $iboData;
     nleva_PanoramaRenderer_$callClinit();
-    $vsh = $rt_s(472);
-    $fsh = $rt_s(473);
-    nleva_PanoramaRenderer_panoramaProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(474));
+    $vsh = $rt_s(502);
+    $fsh = $rt_s(503);
+    nleva_PanoramaRenderer_panoramaProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(504));
     if (nleva_PanoramaRenderer_panoramaProgram === null) {
         console.error("[PanoramaRenderer] failed to create the panorama program");
         return;
     }
-    nleva_PanoramaRenderer_uProjMat = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(475));
-    nleva_PanoramaRenderer_uModelViewMat = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(476));
+    nleva_PanoramaRenderer_uProjMat = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(505));
+    nleva_PanoramaRenderer_uModelViewMat = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(506));
     $cube = $rt_createFloatArray(72);
     var$5 = (__safe($cube).data||[]);
     var$5[0] = (-1.0);
@@ -18270,7 +18919,7 @@ nleva_PanoramaRenderer_init = $gl => {
     }
     var$5 = (__safe($quadIndices).data||[]);
     nlevi_PlatformOpenGL__wglBufferData(34962, $vboData, 35044);
-    $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(477));
+    $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(507));
     nlevi_PlatformOpenGL__wglEnableVertexAttribArray($posAttrib);
     nlevi_PlatformOpenGL__wglVertexAttribPointer($posAttrib, 3, 5126, 0, 12, 0);
     nleva_PanoramaRenderer_cubeIBO = nlevi_PlatformOpenGL__wglCreateBuffer();
@@ -18322,13 +18971,13 @@ nleva_PanoramaRenderer_pollFaces = $gl => {
                     nlevi_PlatformOpenGL__wglBindTexture(34067, null);
                     nleva_PanoramaRenderer_cubeTexture = $tex;
                     var$8 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(478)), $faceW), 120), $faceH), 41);
+                    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(508)), $faceW), 120), $faceH), 41);
                     console.log($rt_ustr(jl_StringBuilder_toString(var$8)));
                     return;
                 }
                 var$8 = (__safe(nleva_PanoramaRenderer_FACE_SUFFIXES).data||[])[$f];
                 var$9 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(46)), var$8);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(48)), var$8);
                 $name = jl_StringBuilder_toString(var$9);
                 $data = nleva_GuiSprites_rawPanoramaData($name);
                 $w = $data.w;
@@ -18361,19 +19010,19 @@ nleva_PanoramaRenderer_pollFaces = $gl => {
             }
             nleva_PanoramaRenderer_facesFailed = 1;
             var$8 = jl_StringBuilder__init_();
-            jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(479)), $name), $rt_s(480)), $w), 120), $h), $rt_s(481)), $faceW), 120), $faceH), 41);
+            jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(509)), $name), $rt_s(510)), $w), 120), $h), $rt_s(511)), $faceW), 120), $faceH), 41);
             console.warn($rt_ustr(jl_StringBuilder_toString(var$8)));
             nlevi_PlatformOpenGL__wglBindTexture(34067, null);
             return;
         }
         var$8 = (__safe(nleva_PanoramaRenderer_FACE_SUFFIXES).data||[])[$f];
         var$9 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(46)), var$8);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$9, $rt_s(48)), var$8);
         $name = jl_StringBuilder_toString(var$9);
         if (nleva_GuiSprites_isFailed($name)) {
             nleva_PanoramaRenderer_facesFailed = 1;
             var$8 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(482)), $name), $rt_s(483));
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(512)), $name), $rt_s(513));
             console.warn($rt_ustr(jl_StringBuilder_toString(var$8)));
             return;
         }
@@ -18487,7 +19136,7 @@ nleva_PanoramaRenderer_copyInto = ($target, $src) => {
 nleva_PanoramaRenderer__clinit_ = () => {
 try {
 
-    nleva_PanoramaRenderer_FACE_SUFFIXES = $rt_wrapArray(jl_String, [$rt_s(484), $rt_s(485), $rt_s(486), $rt_s(487), $rt_s(354), $rt_s(488)]);
+    nleva_PanoramaRenderer_FACE_SUFFIXES = $rt_wrapArray(jl_String, [$rt_s(514), $rt_s(515), $rt_s(516), $rt_s(517), $rt_s(356), $rt_s(518)]);
     nleva_PanoramaRenderer_initialized = 0;
     nleva_PanoramaRenderer_panoramaProgram = null;
     nleva_PanoramaRenderer_uProjMat = null;
@@ -18654,7 +19303,7 @@ otji_JSWrapper$Helper$FinalizationRegistryConsumer = $rt_classWithoutFields(0),
 nlevi_PlatformInput$WheelCallback = $rt_classWithoutFields(0);
 function nmc_User() {
     let a = this; jl_Object.call(a);
-    a.$name6 = null;
+    a.$name7 = null;
     a.$uuid = null;
     a.$accessToken = null;
     a.$xuid = null;
@@ -18662,7 +19311,7 @@ function nmc_User() {
 }
 let nmc_User__init_ = ($this, $name, $uuid, $accessToken, $xuid, $clientId) => {
     jl_Object__init_($this);
-    $this.$name6 = $name;
+    $this.$name7 = $name;
     $this.$uuid = $uuid;
     $this.$accessToken = $accessToken;
     $this.$xuid = $xuid;
@@ -18674,7 +19323,7 @@ nmc_User__init_0 = (var_0, var_1, var_2, var_3, var_4) => {
     return var_5;
 },
 nmc_User_getName = $this => {
-    return $this.$name6;
+    return $this.$name7;
 },
 jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart = $rt_classWithoutFields(jur_AbstractCharClass$LazyCharClass),
 jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart__init_ = $this => {
@@ -18711,7 +19360,7 @@ jur_PatternSyntaxException__init_ = (var_0, var_1, var_2) => {
 },
 jur_PatternSyntaxException_getMessage = $this => {
     let $filler, $temp, var$3, var$4, var$5, var$6;
-    $filler = $rt_s(72);
+    $filler = $rt_s(74);
     if ($this.$index3 >= 1) {
         $temp = $rt_createCharArray($this.$index3);
         ju_Arrays_fill3($temp, 32);
@@ -18722,10 +19371,10 @@ jur_PatternSyntaxException_getMessage = $this => {
         var$4 = $this.$index3;
         var$5 = $this.$pattern1;
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(var$6, var$4), $rt_s(489)), var$5), $rt_s(489)), $filler);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(var$6, var$4), $rt_s(519)), var$5), $rt_s(519)), $filler);
         var$5 = jl_StringBuilder_toString(var$6);
     } else
-        var$5 = $rt_s(72);
+        var$5 = $rt_s(74);
     var$6 = jl_StringBuilder__init_();
     jl_StringBuilder_append(jl_StringBuilder_append(var$6, var$3), var$5);
     return jl_StringBuilder_toString(var$6);
@@ -18866,165 +19515,166 @@ try {
     nmwlb_Blocks_CREATIVE_NATURAL = ju_ArrayList__init_();
     nmwlb_Blocks_TEXTURE_NAMES = ju_ArrayList__init_();
     nmwlb_Blocks_byId0 = $rt_createArray(nmwlb_Blocks$Block, 512);
-    var$1 = nmwlb_Blocks$Block__init_(0, $rt_s(490), $rt_s(491), 0.0, 0, null, null, null, 0, 0, 0);
+    var$1 = nmwlb_Blocks$Block__init_(0, $rt_s(520), $rt_s(521), 0.0, 0, null, null, null, 0, 0, 0);
     nmwlb_Blocks_AIR_BLOCK = nmwlb_Blocks_register0(var$1);
-    nmwlb_Blocks_STONE_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(1, $rt_s(492), $rt_s(493), 1.5, 1, $rt_s(492), $rt_s(492), $rt_s(492), 1, 0, 0));
-    nmwlb_Blocks_COBBLESTONE_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(4, $rt_s(494), $rt_s(495), 2.0, 1, $rt_s(494), $rt_s(494), $rt_s(494), 1, 0, 0));
-    nmwlb_Blocks_GRASS_BLOCK_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(9, $rt_s(496), $rt_s(497), 0.6000000238418579, 0, $rt_s(498), $rt_s(499), $rt_s(500), 3, (-7226023), 0));
-    nmwlb_Blocks_DIRT_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(10, $rt_s(500), $rt_s(501), 0.5, 0, $rt_s(500), $rt_s(500), $rt_s(500), 3, 0, 0));
-    nmwlb_Blocks_OAK_PLANKS_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(15, $rt_s(502), $rt_s(503), 2.0, 0, $rt_s(502), $rt_s(502), $rt_s(502), 1, 0, 0));
-    nmwlb_Blocks_BEDROCK_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(33, $rt_s(504), $rt_s(505), (-1.0), 1, $rt_s(504), $rt_s(504), $rt_s(504), 0, 0, 0));
-    nmwlb_Blocks_register(5, $rt_s(506), $rt_s(507), 2.0, 1, $rt_s(506), $rt_s(506), $rt_s(506), 1, 0, 0);
-    nmwlb_Blocks_register(6, $rt_s(508), $rt_s(509), 1.5, 1, $rt_s(508), $rt_s(508), $rt_s(508), 1, 0, 0);
-    nmwlb_Blocks_register(7, $rt_s(510), $rt_s(511), 1.5, 1, $rt_s(510), $rt_s(510), $rt_s(510), 1, 0, 0);
-    nmwlb_Blocks_register(8, $rt_s(512), $rt_s(513), 1.5, 1, $rt_s(512), $rt_s(512), $rt_s(512), 1, 0, 0);
-    nmwlb_Blocks_register(11, $rt_s(514), $rt_s(515), 0.5, 0, $rt_s(514), $rt_s(514), $rt_s(514), 3, 0, 0);
-    nmwlb_Blocks_register(12, $rt_s(516), $rt_s(517), 0.5, 0, $rt_s(518), $rt_s(519), $rt_s(500), 3, 0, 0);
-    nmwlb_Blocks_register(13, $rt_s(520), $rt_s(521), 0.5, 0, $rt_s(520), $rt_s(520), $rt_s(520), 3, 0, 0);
-    nmwlb_Blocks_register(14, $rt_s(522), $rt_s(523), 0.5, 0, $rt_s(522), $rt_s(522), $rt_s(522), 3, 0, 0);
-    nmwlb_Blocks_register(16, $rt_s(524), $rt_s(525), 2.0, 0, $rt_s(524), $rt_s(524), $rt_s(524), 1, 0, 0);
-    nmwlb_Blocks_register(17, $rt_s(526), $rt_s(527), 2.0, 0, $rt_s(526), $rt_s(526), $rt_s(526), 1, 0, 0);
-    nmwlb_Blocks_register(18, $rt_s(528), $rt_s(529), 2.0, 0, $rt_s(528), $rt_s(528), $rt_s(528), 1, 0, 0);
-    nmwlb_Blocks_register(19, $rt_s(530), $rt_s(531), 2.0, 0, $rt_s(530), $rt_s(530), $rt_s(530), 1, 0, 0);
-    nmwlb_Blocks_register(20, $rt_s(532), $rt_s(533), 2.0, 0, $rt_s(532), $rt_s(532), $rt_s(532), 1, 0, 0);
-    nmwlb_Blocks_register(21, $rt_s(534), $rt_s(535), 2.0, 0, $rt_s(534), $rt_s(534), $rt_s(534), 1, 0, 0);
-    nmwlb_Blocks_register(22, $rt_s(536), $rt_s(537), 2.0, 0, $rt_s(536), $rt_s(536), $rt_s(536), 1, 0, 0);
-    nmwlb_Blocks_register(23, $rt_s(538), $rt_s(539), 2.0, 0, $rt_s(538), $rt_s(538), $rt_s(538), 1, 0, 0);
-    nmwlb_Blocks_register(34, $rt_s(540), $rt_s(541), 3.0, 1, $rt_s(540), $rt_s(540), $rt_s(540), 3, 0, 0);
-    nmwlb_Blocks_register(35, $rt_s(542), $rt_s(543), 4.5, 1, $rt_s(542), $rt_s(542), $rt_s(542), 3, 0, 0);
-    nmwlb_Blocks_register(36, $rt_s(544), $rt_s(545), 3.0, 1, $rt_s(544), $rt_s(544), $rt_s(544), 3, 0, 0);
-    nmwlb_Blocks_register(37, $rt_s(546), $rt_s(547), 4.5, 1, $rt_s(546), $rt_s(546), $rt_s(546), 3, 0, 0);
-    nmwlb_Blocks_register(38, $rt_s(548), $rt_s(549), 3.0, 1, $rt_s(548), $rt_s(548), $rt_s(548), 3, 0, 0);
-    nmwlb_Blocks_register(39, $rt_s(550), $rt_s(551), 4.5, 1, $rt_s(550), $rt_s(550), $rt_s(550), 3, 0, 0);
-    nmwlb_Blocks_register(40, $rt_s(552), $rt_s(553), 3.0, 1, $rt_s(552), $rt_s(552), $rt_s(552), 3, 0, 0);
-    nmwlb_Blocks_register(41, $rt_s(554), $rt_s(555), 4.5, 1, $rt_s(554), $rt_s(554), $rt_s(554), 3, 0, 0);
-    nmwlb_Blocks_register(42, $rt_s(556), $rt_s(557), 3.0, 1, $rt_s(556), $rt_s(556), $rt_s(556), 3, 0, 0);
-    nmwlb_Blocks_register(43, $rt_s(558), $rt_s(559), 4.5, 1, $rt_s(558), $rt_s(558), $rt_s(558), 3, 0, 0);
-    nmwlb_Blocks_register(44, $rt_s(560), $rt_s(561), 3.0, 1, $rt_s(560), $rt_s(560), $rt_s(560), 3, 0, 0);
-    nmwlb_Blocks_register(45, $rt_s(562), $rt_s(563), 4.5, 1, $rt_s(562), $rt_s(562), $rt_s(562), 3, 0, 0);
-    nmwlb_Blocks_register(46, $rt_s(564), $rt_s(565), 3.0, 1, $rt_s(564), $rt_s(564), $rt_s(564), 3, 0, 0);
-    nmwlb_Blocks_register(47, $rt_s(566), $rt_s(567), 4.5, 1, $rt_s(566), $rt_s(566), $rt_s(566), 3, 0, 0);
-    nmwlb_Blocks_register(48, $rt_s(568), $rt_s(569), 3.0, 1, $rt_s(568), $rt_s(568), $rt_s(568), 3, 0, 0);
-    nmwlb_Blocks_register(49, $rt_s(570), $rt_s(571), 4.5, 1, $rt_s(570), $rt_s(570), $rt_s(570), 3, 0, 0);
-    nmwlb_Blocks_register(256, $rt_s(572), $rt_s(573), 1.5, 1, $rt_s(572), $rt_s(572), $rt_s(572), 1, 0, 0);
-    nmwlb_Blocks_register(257, $rt_s(574), $rt_s(575), 2.0, 1, $rt_s(574), $rt_s(574), $rt_s(574), 1, 0, 0);
-    nmwlb_Blocks_register(258, $rt_s(576), $rt_s(577), 1.5, 1, $rt_s(576), $rt_s(576), $rt_s(576), 1, 0, 0);
-    nmwlb_Blocks_register(259, $rt_s(578), $rt_s(579), 2.0, 1, $rt_s(578), $rt_s(578), $rt_s(578), 1, 0, 0);
-    nmwlb_Blocks_register(260, $rt_s(580), $rt_s(581), 1.5, 1, $rt_s(580), $rt_s(580), $rt_s(580), 1, 0, 0);
-    nmwlb_Blocks_register(261, $rt_s(582), $rt_s(583), 2.0, 1, $rt_s(582), $rt_s(582), $rt_s(582), 1, 0, 0);
-    nmwlb_Blocks_register(262, $rt_s(584), $rt_s(585), 3.0, 1, $rt_s(586), $rt_s(584), $rt_s(586), 1, 0, 0);
-    nmwlb_Blocks_register(263, $rt_s(587), $rt_s(588), 3.5, 1, $rt_s(587), $rt_s(587), $rt_s(587), 1, 0, 0);
-    nmwlb_Blocks_register(264, $rt_s(589), $rt_s(590), 3.5, 1, $rt_s(589), $rt_s(589), $rt_s(589), 1, 0, 0);
-    nmwlb_Blocks_register(265, $rt_s(591), $rt_s(592), 3.5, 1, $rt_s(591), $rt_s(591), $rt_s(591), 1, 0, 0);
-    nmwlb_Blocks_register(266, $rt_s(593), $rt_s(594), 3.5, 1, $rt_s(593), $rt_s(593), $rt_s(593), 1, 0, 0);
-    nmwlb_Blocks_register(267, $rt_s(595), $rt_s(596), 1.5, 1, $rt_s(597), $rt_s(595), $rt_s(597), 1, 0, 0);
-    nmwlb_Blocks_register(268, $rt_s(598), $rt_s(599), 2.0, 1, $rt_s(598), $rt_s(598), $rt_s(598), 1, 0, 0);
-    nmwlb_Blocks_register(269, $rt_s(600), $rt_s(601), 2.0, 1, $rt_s(600), $rt_s(600), $rt_s(600), 1, 0, 0);
-    nmwlb_Blocks_register(270, $rt_s(602), $rt_s(603), 0.800000011920929, 1, $rt_s(604), $rt_s(602), $rt_s(605), 1, 0, 0);
-    nmwlb_Blocks_register(271, $rt_s(606), $rt_s(607), 2.0, 1, $rt_s(604), $rt_s(604), $rt_s(604), 1, 0, 0);
-    nmwlb_Blocks_register(272, $rt_s(608), $rt_s(609), 0.800000011920929, 1, $rt_s(610), $rt_s(608), $rt_s(611), 1, 0, 0);
-    nmwlb_Blocks_register(273, $rt_s(612), $rt_s(613), 2.0, 1, $rt_s(610), $rt_s(610), $rt_s(610), 1, 0, 0);
-    nmwlb_Blocks_register(274, $rt_s(614), $rt_s(615), 2.0, 1, $rt_s(614), $rt_s(614), $rt_s(614), 1, 0, 0);
-    nmwlb_Blocks_register(275, $rt_s(616), $rt_s(617), 0.30000001192092896, 0, $rt_s(616), $rt_s(616), $rt_s(616), 1, 0, 0);
-    nmwlb_Blocks_register(276, $rt_s(618), $rt_s(619), 0.30000001192092896, 0, $rt_s(618), $rt_s(618), $rt_s(618), 1, 0, 0);
-    nmwlb_Blocks_register(277, $rt_s(620), $rt_s(621), 50.0, 1, $rt_s(620), $rt_s(620), $rt_s(620), 1, 0, 0);
-    nmwlb_Blocks_register(278, $rt_s(622), $rt_s(623), 50.0, 1, $rt_s(622), $rt_s(622), $rt_s(622), 1, 0, 0);
-    nmwlb_Blocks_register(279, $rt_s(624), $rt_s(625), 1.5, 1, $rt_s(624), $rt_s(624), $rt_s(624), 1, 0, 0);
-    nmwlb_Blocks_register(280, $rt_s(626), $rt_s(627), 3.0, 1, $rt_s(626), $rt_s(626), $rt_s(626), 1, 0, 0);
-    nmwlb_Blocks_register(281, $rt_s(628), $rt_s(629), 3.0, 1, $rt_s(628), $rt_s(628), $rt_s(628), 1, 0, 0);
-    nmwlb_Blocks_register(282, $rt_s(630), $rt_s(631), 0.4000000059604645, 1, $rt_s(630), $rt_s(630), $rt_s(630), 1, 0, 0);
-    nmwlb_Blocks_register(283, $rt_s(632), $rt_s(633), 2.0, 1, $rt_s(632), $rt_s(632), $rt_s(632), 1, 0, 0);
-    nmwlb_Blocks_register(284, $rt_s(634), $rt_s(635), 2.0, 1, $rt_s(634), $rt_s(634), $rt_s(634), 1, 0, 0);
-    nmwlb_Blocks_register(285, $rt_s(636), $rt_s(637), 0.800000011920929, 1, $rt_s(638), $rt_s(639), $rt_s(638), 1, 0, 0);
-    nmwlb_Blocks_register(286, $rt_s(640), $rt_s(641), 2.0, 1, $rt_s(642), $rt_s(642), $rt_s(642), 1, 0, 0);
-    nmwlb_Blocks_register(287, $rt_s(643), $rt_s(644), 1.5, 1, $rt_s(643), $rt_s(643), $rt_s(643), 1, 0, 0);
-    nmwlb_Blocks_register(288, $rt_s(645), $rt_s(646), 1.5, 1, $rt_s(645), $rt_s(645), $rt_s(645), 1, 0, 0);
-    nmwlb_Blocks_register(289, $rt_s(647), $rt_s(648), 1.5, 0, $rt_s(502), $rt_s(647), $rt_s(502), 1, 0, 0);
-    nmwlb_Blocks_register(290, $rt_s(649), $rt_s(650), 5.0, 1, $rt_s(649), $rt_s(649), $rt_s(649), 1, 0, 0);
-    nmwlb_Blocks_register(291, $rt_s(651), $rt_s(652), 3.0, 1, $rt_s(651), $rt_s(651), $rt_s(651), 1, 0, 0);
-    nmwlb_Blocks_register(292, $rt_s(653), $rt_s(654), 5.0, 1, $rt_s(653), $rt_s(653), $rt_s(653), 1, 0, 0);
-    nmwlb_Blocks_register(293, $rt_s(655), $rt_s(656), 5.0, 1, $rt_s(655), $rt_s(655), $rt_s(655), 1, 0, 0);
-    nmwlb_Blocks_register(294, $rt_s(657), $rt_s(658), 3.0, 1, $rt_s(657), $rt_s(657), $rt_s(657), 1, 0, 0);
-    nmwlb_Blocks_register(295, $rt_s(659), $rt_s(660), 5.0, 1, $rt_s(659), $rt_s(659), $rt_s(659), 1, 0, 0);
-    nmwlb_Blocks_register(296, $rt_s(661), $rt_s(662), 3.0, 1, $rt_s(661), $rt_s(661), $rt_s(661), 1, 0, 0);
-    nmwlb_Blocks_register(297, $rt_s(663), $rt_s(664), 0.800000011920929, 0, $rt_s(663), $rt_s(663), $rt_s(663), 2, 0, 0);
-    nmwlb_Blocks_register(298, $rt_s(665), $rt_s(666), 0.800000011920929, 0, $rt_s(665), $rt_s(665), $rt_s(665), 2, 0, 0);
-    nmwlb_Blocks_register(299, $rt_s(667), $rt_s(668), 0.800000011920929, 0, $rt_s(667), $rt_s(667), $rt_s(667), 2, 0, 0);
-    nmwlb_Blocks_register(300, $rt_s(669), $rt_s(670), 0.800000011920929, 0, $rt_s(669), $rt_s(669), $rt_s(669), 2, 0, 0);
-    nmwlb_Blocks_register(301, $rt_s(671), $rt_s(672), 0.800000011920929, 0, $rt_s(671), $rt_s(671), $rt_s(671), 2, 0, 0);
-    nmwlb_Blocks_register(302, $rt_s(673), $rt_s(674), 0.800000011920929, 0, $rt_s(673), $rt_s(673), $rt_s(673), 2, 0, 0);
-    nmwlb_Blocks_register(303, $rt_s(675), $rt_s(676), 0.800000011920929, 0, $rt_s(675), $rt_s(675), $rt_s(675), 2, 0, 0);
-    nmwlb_Blocks_register(304, $rt_s(677), $rt_s(678), 0.800000011920929, 0, $rt_s(677), $rt_s(677), $rt_s(677), 2, 0, 0);
-    nmwlb_Blocks_register(305, $rt_s(679), $rt_s(680), 0.800000011920929, 0, $rt_s(679), $rt_s(679), $rt_s(679), 2, 0, 0);
-    nmwlb_Blocks_register(306, $rt_s(681), $rt_s(682), 0.800000011920929, 0, $rt_s(681), $rt_s(681), $rt_s(681), 2, 0, 0);
-    nmwlb_Blocks_register(307, $rt_s(683), $rt_s(684), 0.800000011920929, 0, $rt_s(683), $rt_s(683), $rt_s(683), 2, 0, 0);
-    nmwlb_Blocks_register(308, $rt_s(685), $rt_s(686), 0.800000011920929, 0, $rt_s(685), $rt_s(685), $rt_s(685), 2, 0, 0);
-    nmwlb_Blocks_register(309, $rt_s(687), $rt_s(688), 0.800000011920929, 0, $rt_s(687), $rt_s(687), $rt_s(687), 2, 0, 0);
-    nmwlb_Blocks_register(310, $rt_s(689), $rt_s(690), 0.800000011920929, 0, $rt_s(689), $rt_s(689), $rt_s(689), 2, 0, 0);
-    nmwlb_Blocks_register(311, $rt_s(691), $rt_s(692), 0.800000011920929, 0, $rt_s(691), $rt_s(691), $rt_s(691), 2, 0, 0);
-    nmwlb_Blocks_register(312, $rt_s(693), $rt_s(694), 0.800000011920929, 0, $rt_s(693), $rt_s(693), $rt_s(693), 2, 0, 0);
-    nmwlb_Blocks_register(313, $rt_s(695), $rt_s(696), 1.7999999523162842, 1, $rt_s(695), $rt_s(695), $rt_s(695), 2, 0, 0);
-    nmwlb_Blocks_register(314, $rt_s(697), $rt_s(698), 1.7999999523162842, 1, $rt_s(697), $rt_s(697), $rt_s(697), 2, 0, 0);
-    nmwlb_Blocks_register(315, $rt_s(699), $rt_s(700), 1.7999999523162842, 1, $rt_s(699), $rt_s(699), $rt_s(699), 2, 0, 0);
-    nmwlb_Blocks_register(316, $rt_s(701), $rt_s(702), 1.7999999523162842, 1, $rt_s(701), $rt_s(701), $rt_s(701), 2, 0, 0);
-    nmwlb_Blocks_register(317, $rt_s(703), $rt_s(704), 1.7999999523162842, 1, $rt_s(703), $rt_s(703), $rt_s(703), 2, 0, 0);
-    nmwlb_Blocks_register(318, $rt_s(705), $rt_s(706), 1.7999999523162842, 1, $rt_s(705), $rt_s(705), $rt_s(705), 2, 0, 0);
-    nmwlb_Blocks_register(319, $rt_s(707), $rt_s(708), 1.7999999523162842, 1, $rt_s(707), $rt_s(707), $rt_s(707), 2, 0, 0);
-    nmwlb_Blocks_register(320, $rt_s(709), $rt_s(710), 1.7999999523162842, 1, $rt_s(709), $rt_s(709), $rt_s(709), 2, 0, 0);
-    nmwlb_Blocks_register(321, $rt_s(711), $rt_s(712), 1.7999999523162842, 1, $rt_s(711), $rt_s(711), $rt_s(711), 2, 0, 0);
-    nmwlb_Blocks_register(322, $rt_s(713), $rt_s(714), 1.7999999523162842, 1, $rt_s(713), $rt_s(713), $rt_s(713), 2, 0, 0);
-    nmwlb_Blocks_register(323, $rt_s(715), $rt_s(716), 1.7999999523162842, 1, $rt_s(715), $rt_s(715), $rt_s(715), 2, 0, 0);
-    nmwlb_Blocks_register(324, $rt_s(717), $rt_s(718), 1.7999999523162842, 1, $rt_s(717), $rt_s(717), $rt_s(717), 2, 0, 0);
-    nmwlb_Blocks_register(325, $rt_s(719), $rt_s(720), 1.7999999523162842, 1, $rt_s(719), $rt_s(719), $rt_s(719), 2, 0, 0);
-    nmwlb_Blocks_register(326, $rt_s(721), $rt_s(722), 1.7999999523162842, 1, $rt_s(721), $rt_s(721), $rt_s(721), 2, 0, 0);
-    nmwlb_Blocks_register(327, $rt_s(723), $rt_s(724), 1.7999999523162842, 1, $rt_s(723), $rt_s(723), $rt_s(723), 2, 0, 0);
-    nmwlb_Blocks_register(328, $rt_s(725), $rt_s(726), 1.7999999523162842, 1, $rt_s(725), $rt_s(725), $rt_s(725), 2, 0, 0);
-    nmwlb_Blocks_register(329, $rt_s(727), $rt_s(728), 1.25, 1, $rt_s(727), $rt_s(727), $rt_s(727), 2, 0, 0);
-    nmwlb_Blocks_register(330, $rt_s(729), $rt_s(730), 1.25, 1, $rt_s(729), $rt_s(729), $rt_s(729), 2, 0, 0);
-    nmwlb_Blocks_register(331, $rt_s(731), $rt_s(732), 1.25, 1, $rt_s(731), $rt_s(731), $rt_s(731), 2, 0, 0);
-    nmwlb_Blocks_register(332, $rt_s(733), $rt_s(734), 1.25, 1, $rt_s(733), $rt_s(733), $rt_s(733), 2, 0, 0);
-    nmwlb_Blocks_register(333, $rt_s(735), $rt_s(736), 1.25, 1, $rt_s(735), $rt_s(735), $rt_s(735), 2, 0, 0);
-    nmwlb_Blocks_register(334, $rt_s(737), $rt_s(738), 1.25, 1, $rt_s(737), $rt_s(737), $rt_s(737), 2, 0, 0);
-    nmwlb_Blocks_register(335, $rt_s(739), $rt_s(740), 1.25, 1, $rt_s(739), $rt_s(739), $rt_s(739), 2, 0, 0);
-    nmwlb_Blocks_register(336, $rt_s(741), $rt_s(742), 1.25, 1, $rt_s(741), $rt_s(741), $rt_s(741), 2, 0, 0);
-    nmwlb_Blocks_register(337, $rt_s(743), $rt_s(744), 1.25, 1, $rt_s(743), $rt_s(743), $rt_s(743), 2, 0, 0);
-    nmwlb_Blocks_register(338, $rt_s(745), $rt_s(746), 1.25, 1, $rt_s(745), $rt_s(745), $rt_s(745), 2, 0, 0);
-    nmwlb_Blocks_register(339, $rt_s(747), $rt_s(748), 1.25, 1, $rt_s(747), $rt_s(747), $rt_s(747), 2, 0, 0);
-    nmwlb_Blocks_register(340, $rt_s(749), $rt_s(750), 1.25, 1, $rt_s(749), $rt_s(749), $rt_s(749), 2, 0, 0);
-    nmwlb_Blocks_register(341, $rt_s(751), $rt_s(752), 1.25, 1, $rt_s(751), $rt_s(751), $rt_s(751), 2, 0, 0);
-    nmwlb_Blocks_register(342, $rt_s(753), $rt_s(754), 1.25, 1, $rt_s(753), $rt_s(753), $rt_s(753), 2, 0, 0);
-    nmwlb_Blocks_register(343, $rt_s(755), $rt_s(756), 1.25, 1, $rt_s(755), $rt_s(755), $rt_s(755), 2, 0, 0);
-    nmwlb_Blocks_register(344, $rt_s(757), $rt_s(758), 1.25, 1, $rt_s(757), $rt_s(757), $rt_s(757), 2, 0, 0);
-    nmwlb_Blocks_register(345, $rt_s(759), $rt_s(760), 0.5, 0, $rt_s(759), $rt_s(759), $rt_s(759), 3, 0, 0);
-    nmwlb_Blocks_register(346, $rt_s(761), $rt_s(762), 0.5, 0, $rt_s(761), $rt_s(761), $rt_s(761), 3, 0, 0);
-    nmwlb_Blocks_register(347, $rt_s(763), $rt_s(764), 0.6000000238418579, 0, $rt_s(763), $rt_s(763), $rt_s(763), 3, 0, 0);
-    nmwlb_Blocks_register(348, $rt_s(765), $rt_s(766), 0.6000000238418579, 0, $rt_s(765), $rt_s(765), $rt_s(765), 3, 0, 0);
-    nmwlb_Blocks_register(349, $rt_s(767), $rt_s(768), 0.20000000298023224, 1, $rt_s(769), $rt_s(769), $rt_s(769), 3, 0, 0);
-    nmwlb_Blocks_register(350, $rt_s(770), $rt_s(771), 0.10000000149011612, 0, $rt_s(770), $rt_s(770), $rt_s(770), 3, 0, 0);
-    nmwlb_Blocks_register(351, $rt_s(772), $rt_s(773), 2.0, 0, $rt_s(774), $rt_s(772), $rt_s(774), 3, 0, 0);
-    nmwlb_Blocks_register(352, $rt_s(775), $rt_s(776), 2.0, 0, $rt_s(777), $rt_s(775), $rt_s(777), 3, 0, 0);
-    nmwlb_Blocks_register(353, $rt_s(778), $rt_s(779), 2.0, 0, $rt_s(780), $rt_s(778), $rt_s(780), 3, 0, 0);
-    nmwlb_Blocks_register(354, $rt_s(781), $rt_s(782), 2.0, 0, $rt_s(783), $rt_s(781), $rt_s(783), 3, 0, 0);
-    nmwlb_Blocks_register(355, $rt_s(784), $rt_s(785), 2.0, 0, $rt_s(786), $rt_s(784), $rt_s(786), 3, 0, 0);
-    nmwlb_Blocks_register(356, $rt_s(787), $rt_s(788), 2.0, 0, $rt_s(789), $rt_s(787), $rt_s(789), 3, 0, 0);
-    nmwlb_Blocks_register(357, $rt_s(790), $rt_s(791), 2.0, 0, $rt_s(792), $rt_s(790), $rt_s(792), 3, 0, 0);
-    nmwlb_Blocks_register(358, $rt_s(793), $rt_s(794), 2.0, 0, $rt_s(795), $rt_s(793), $rt_s(795), 3, 0, 0);
-    nmwlb_Blocks_register(359, $rt_s(796), $rt_s(797), 0.20000000298023224, 0, $rt_s(796), $rt_s(796), $rt_s(796), 3, 0, 7842607);
-    nmwlb_Blocks_register(360, $rt_s(798), $rt_s(799), 0.20000000298023224, 0, $rt_s(798), $rt_s(798), $rt_s(798), 3, 0, 6396257);
-    nmwlb_Blocks_register(361, $rt_s(800), $rt_s(801), 0.20000000298023224, 0, $rt_s(800), $rt_s(800), $rt_s(800), 3, 0, 8431445);
-    nmwlb_Blocks_register(362, $rt_s(802), $rt_s(803), 0.20000000298023224, 0, $rt_s(802), $rt_s(802), $rt_s(802), 3, 0, 7842607);
-    nmwlb_Blocks_register(363, $rt_s(804), $rt_s(805), 0.20000000298023224, 0, $rt_s(804), $rt_s(804), $rt_s(804), 3, 0, 7842607);
-    nmwlb_Blocks_register(364, $rt_s(806), $rt_s(807), 0.20000000298023224, 0, $rt_s(806), $rt_s(806), $rt_s(806), 3, 0, 7842607);
-    nmwlb_Blocks_register(365, $rt_s(808), $rt_s(809), 0.20000000298023224, 0, $rt_s(808), $rt_s(808), $rt_s(808), 3, 0, 7842607);
-    nmwlb_Blocks_register(366, $rt_s(810), $rt_s(811), 0.20000000298023224, 0, $rt_s(810), $rt_s(810), $rt_s(810), 3, 0, 0);
-    nmwlb_Blocks_register(367, $rt_s(812), $rt_s(813), 0.20000000298023224, 0, $rt_s(812), $rt_s(812), $rt_s(812), 3, 0, 7842607);
-    nmwlb_Blocks_register(368, $rt_s(814), $rt_s(815), 30.0, 1, $rt_s(816), $rt_s(817), $rt_s(816), 3, 0, 0);
-    nmwlb_Blocks_register(369, $rt_s(818), $rt_s(819), 0.5, 0, $rt_s(820), $rt_s(821), $rt_s(820), 3, 0, 0);
-    nmwlb_Blocks_register(370, $rt_s(822), $rt_s(823), 0.5, 0, $rt_s(824), $rt_s(825), $rt_s(824), 3, 0, 0);
-    nmwlb_Blocks_register(371, $rt_s(826), $rt_s(827), 1.0, 0, $rt_s(828), $rt_s(829), $rt_s(828), 3, 0, 0);
-    nmwlb_Blocks_register(372, $rt_s(830), $rt_s(831), 1.0, 0, $rt_s(832), $rt_s(833), $rt_s(832), 3, 0, 0);
-    nmwlb_Blocks_register(373, $rt_s(834), $rt_s(835), 0.4000000059604645, 0, $rt_s(836), $rt_s(837), $rt_s(838), 3, 0, 0);
-    nmwlb_Blocks_register(374, $rt_s(839), $rt_s(840), 0.20000000298023224, 0, $rt_s(839), $rt_s(839), $rt_s(839), 3, 0, 0);
+    nmwlb_Blocks_STONE_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(1, $rt_s(522), $rt_s(523), 1.5, 1, $rt_s(522), $rt_s(522), $rt_s(522), 1, 0, 0));
+    nmwlb_Blocks_COBBLESTONE_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(4, $rt_s(524), $rt_s(525), 2.0, 1, $rt_s(524), $rt_s(524), $rt_s(524), 1, 0, 0));
+    nmwlb_Blocks_GRASS_BLOCK_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(9, $rt_s(526), $rt_s(527), 0.6000000238418579, 0, $rt_s(528), $rt_s(529), $rt_s(530), 3, (-7226023), 0));
+    nmwlb_Blocks_DIRT_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(10, $rt_s(530), $rt_s(531), 0.5, 0, $rt_s(530), $rt_s(530), $rt_s(530), 3, 0, 0));
+    nmwlb_Blocks_OAK_PLANKS_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(15, $rt_s(532), $rt_s(533), 2.0, 0, $rt_s(532), $rt_s(532), $rt_s(532), 1, 0, 0));
+    nmwlb_Blocks_BEDROCK_BLOCK = nmwlb_Blocks_register0(nmwlb_Blocks$Block__init_(33, $rt_s(534), $rt_s(535), (-1.0), 1, $rt_s(534), $rt_s(534), $rt_s(534), 0, 0, 0));
+    nmwlb_Blocks_register(5, $rt_s(536), $rt_s(537), 2.0, 1, $rt_s(536), $rt_s(536), $rt_s(536), 1, 0, 0);
+    nmwlb_Blocks_register(6, $rt_s(538), $rt_s(539), 1.5, 1, $rt_s(538), $rt_s(538), $rt_s(538), 1, 0, 0);
+    nmwlb_Blocks_register(7, $rt_s(540), $rt_s(541), 1.5, 1, $rt_s(540), $rt_s(540), $rt_s(540), 1, 0, 0);
+    nmwlb_Blocks_register(8, $rt_s(542), $rt_s(543), 1.5, 1, $rt_s(542), $rt_s(542), $rt_s(542), 1, 0, 0);
+    nmwlb_Blocks_register(11, $rt_s(544), $rt_s(545), 0.5, 0, $rt_s(544), $rt_s(544), $rt_s(544), 3, 0, 0);
+    nmwlb_Blocks_register(12, $rt_s(546), $rt_s(547), 0.5, 0, $rt_s(548), $rt_s(549), $rt_s(530), 3, 0, 0);
+    nmwlb_Blocks_register(13, $rt_s(550), $rt_s(551), 0.5, 0, $rt_s(550), $rt_s(550), $rt_s(550), 3, 0, 0);
+    nmwlb_Blocks_register(14, $rt_s(552), $rt_s(553), 0.5, 0, $rt_s(552), $rt_s(552), $rt_s(552), 3, 0, 0);
+    nmwlb_Blocks_register(16, $rt_s(554), $rt_s(555), 2.0, 0, $rt_s(554), $rt_s(554), $rt_s(554), 1, 0, 0);
+    nmwlb_Blocks_register(17, $rt_s(556), $rt_s(557), 2.0, 0, $rt_s(556), $rt_s(556), $rt_s(556), 1, 0, 0);
+    nmwlb_Blocks_register(18, $rt_s(558), $rt_s(559), 2.0, 0, $rt_s(558), $rt_s(558), $rt_s(558), 1, 0, 0);
+    nmwlb_Blocks_register(19, $rt_s(560), $rt_s(561), 2.0, 0, $rt_s(560), $rt_s(560), $rt_s(560), 1, 0, 0);
+    nmwlb_Blocks_register(20, $rt_s(562), $rt_s(563), 2.0, 0, $rt_s(562), $rt_s(562), $rt_s(562), 1, 0, 0);
+    nmwlb_Blocks_register(21, $rt_s(564), $rt_s(565), 2.0, 0, $rt_s(564), $rt_s(564), $rt_s(564), 1, 0, 0);
+    nmwlb_Blocks_register(22, $rt_s(566), $rt_s(567), 2.0, 0, $rt_s(566), $rt_s(566), $rt_s(566), 1, 0, 0);
+    nmwlb_Blocks_register(23, $rt_s(568), $rt_s(569), 2.0, 0, $rt_s(568), $rt_s(568), $rt_s(568), 1, 0, 0);
+    nmwlb_Blocks_register(34, $rt_s(570), $rt_s(571), 3.0, 1, $rt_s(570), $rt_s(570), $rt_s(570), 3, 0, 0);
+    nmwlb_Blocks_register(35, $rt_s(572), $rt_s(573), 4.5, 1, $rt_s(572), $rt_s(572), $rt_s(572), 3, 0, 0);
+    nmwlb_Blocks_register(36, $rt_s(574), $rt_s(575), 3.0, 1, $rt_s(574), $rt_s(574), $rt_s(574), 3, 0, 0);
+    nmwlb_Blocks_register(37, $rt_s(576), $rt_s(577), 4.5, 1, $rt_s(576), $rt_s(576), $rt_s(576), 3, 0, 0);
+    nmwlb_Blocks_register(38, $rt_s(578), $rt_s(579), 3.0, 1, $rt_s(578), $rt_s(578), $rt_s(578), 3, 0, 0);
+    nmwlb_Blocks_register(39, $rt_s(580), $rt_s(581), 4.5, 1, $rt_s(580), $rt_s(580), $rt_s(580), 3, 0, 0);
+    nmwlb_Blocks_register(40, $rt_s(582), $rt_s(583), 3.0, 1, $rt_s(582), $rt_s(582), $rt_s(582), 3, 0, 0);
+    nmwlb_Blocks_register(41, $rt_s(584), $rt_s(585), 4.5, 1, $rt_s(584), $rt_s(584), $rt_s(584), 3, 0, 0);
+    nmwlb_Blocks_register(42, $rt_s(586), $rt_s(587), 3.0, 1, $rt_s(586), $rt_s(586), $rt_s(586), 3, 0, 0);
+    nmwlb_Blocks_register(43, $rt_s(588), $rt_s(589), 4.5, 1, $rt_s(588), $rt_s(588), $rt_s(588), 3, 0, 0);
+    nmwlb_Blocks_register(44, $rt_s(590), $rt_s(591), 3.0, 1, $rt_s(590), $rt_s(590), $rt_s(590), 3, 0, 0);
+    nmwlb_Blocks_register(45, $rt_s(592), $rt_s(593), 4.5, 1, $rt_s(592), $rt_s(592), $rt_s(592), 3, 0, 0);
+    nmwlb_Blocks_register(46, $rt_s(594), $rt_s(595), 3.0, 1, $rt_s(594), $rt_s(594), $rt_s(594), 3, 0, 0);
+    nmwlb_Blocks_register(47, $rt_s(596), $rt_s(597), 4.5, 1, $rt_s(596), $rt_s(596), $rt_s(596), 3, 0, 0);
+    nmwlb_Blocks_register(48, $rt_s(598), $rt_s(599), 3.0, 1, $rt_s(598), $rt_s(598), $rt_s(598), 3, 0, 0);
+    nmwlb_Blocks_register(49, $rt_s(600), $rt_s(601), 4.5, 1, $rt_s(600), $rt_s(600), $rt_s(600), 3, 0, 0);
+    nmwlb_Blocks_register(256, $rt_s(602), $rt_s(603), 1.5, 1, $rt_s(602), $rt_s(602), $rt_s(602), 1, 0, 0);
+    nmwlb_Blocks_register(257, $rt_s(604), $rt_s(605), 2.0, 1, $rt_s(604), $rt_s(604), $rt_s(604), 1, 0, 0);
+    nmwlb_Blocks_register(258, $rt_s(606), $rt_s(607), 1.5, 1, $rt_s(606), $rt_s(606), $rt_s(606), 1, 0, 0);
+    nmwlb_Blocks_register(259, $rt_s(608), $rt_s(609), 2.0, 1, $rt_s(608), $rt_s(608), $rt_s(608), 1, 0, 0);
+    nmwlb_Blocks_register(260, $rt_s(610), $rt_s(611), 1.5, 1, $rt_s(610), $rt_s(610), $rt_s(610), 1, 0, 0);
+    nmwlb_Blocks_register(261, $rt_s(612), $rt_s(613), 2.0, 1, $rt_s(612), $rt_s(612), $rt_s(612), 1, 0, 0);
+    nmwlb_Blocks_register(262, $rt_s(614), $rt_s(615), 3.0, 1, $rt_s(616), $rt_s(614), $rt_s(616), 1, 0, 0);
+    nmwlb_Blocks_register(263, $rt_s(617), $rt_s(618), 3.5, 1, $rt_s(617), $rt_s(617), $rt_s(617), 1, 0, 0);
+    nmwlb_Blocks_register(264, $rt_s(619), $rt_s(620), 3.5, 1, $rt_s(619), $rt_s(619), $rt_s(619), 1, 0, 0);
+    nmwlb_Blocks_register(265, $rt_s(621), $rt_s(622), 3.5, 1, $rt_s(621), $rt_s(621), $rt_s(621), 1, 0, 0);
+    nmwlb_Blocks_register(266, $rt_s(623), $rt_s(624), 3.5, 1, $rt_s(623), $rt_s(623), $rt_s(623), 1, 0, 0);
+    nmwlb_Blocks_register(267, $rt_s(625), $rt_s(626), 1.5, 1, $rt_s(627), $rt_s(625), $rt_s(627), 1, 0, 0);
+    nmwlb_Blocks_register(268, $rt_s(628), $rt_s(629), 2.0, 1, $rt_s(628), $rt_s(628), $rt_s(628), 1, 0, 0);
+    nmwlb_Blocks_register(269, $rt_s(630), $rt_s(631), 2.0, 1, $rt_s(630), $rt_s(630), $rt_s(630), 1, 0, 0);
+    nmwlb_Blocks_register(270, $rt_s(632), $rt_s(633), 0.800000011920929, 1, $rt_s(634), $rt_s(632), $rt_s(635), 1, 0, 0);
+    nmwlb_Blocks_register(271, $rt_s(636), $rt_s(637), 2.0, 1, $rt_s(634), $rt_s(634), $rt_s(634), 1, 0, 0);
+    nmwlb_Blocks_register(272, $rt_s(638), $rt_s(639), 0.800000011920929, 1, $rt_s(640), $rt_s(638), $rt_s(641), 1, 0, 0);
+    nmwlb_Blocks_register(273, $rt_s(642), $rt_s(643), 2.0, 1, $rt_s(640), $rt_s(640), $rt_s(640), 1, 0, 0);
+    nmwlb_Blocks_register(274, $rt_s(644), $rt_s(645), 2.0, 1, $rt_s(644), $rt_s(644), $rt_s(644), 1, 0, 0);
+    nmwlb_Blocks_register(275, $rt_s(646), $rt_s(647), 0.30000001192092896, 0, $rt_s(646), $rt_s(646), $rt_s(646), 1, 0, 0);
+    nmwlb_Blocks_register(276, $rt_s(648), $rt_s(649), 0.30000001192092896, 0, $rt_s(648), $rt_s(648), $rt_s(648), 1, 0, 0);
+    nmwlb_Blocks_register(277, $rt_s(650), $rt_s(651), 50.0, 1, $rt_s(650), $rt_s(650), $rt_s(650), 1, 0, 0);
+    nmwlb_Blocks_register(278, $rt_s(652), $rt_s(653), 50.0, 1, $rt_s(652), $rt_s(652), $rt_s(652), 1, 0, 0);
+    nmwlb_Blocks_register(279, $rt_s(654), $rt_s(655), 1.5, 1, $rt_s(654), $rt_s(654), $rt_s(654), 1, 0, 0);
+    nmwlb_Blocks_register(280, $rt_s(656), $rt_s(657), 3.0, 1, $rt_s(656), $rt_s(656), $rt_s(656), 1, 0, 0);
+    nmwlb_Blocks_register(281, $rt_s(658), $rt_s(659), 3.0, 1, $rt_s(658), $rt_s(658), $rt_s(658), 1, 0, 0);
+    nmwlb_Blocks_register(282, $rt_s(660), $rt_s(661), 0.4000000059604645, 1, $rt_s(660), $rt_s(660), $rt_s(660), 1, 0, 0);
+    nmwlb_Blocks_register(283, $rt_s(662), $rt_s(663), 2.0, 1, $rt_s(662), $rt_s(662), $rt_s(662), 1, 0, 0);
+    nmwlb_Blocks_register(284, $rt_s(664), $rt_s(665), 2.0, 1, $rt_s(664), $rt_s(664), $rt_s(664), 1, 0, 0);
+    nmwlb_Blocks_register(285, $rt_s(666), $rt_s(667), 0.800000011920929, 1, $rt_s(668), $rt_s(669), $rt_s(668), 1, 0, 0);
+    nmwlb_Blocks_register(286, $rt_s(670), $rt_s(671), 2.0, 1, $rt_s(672), $rt_s(672), $rt_s(672), 1, 0, 0);
+    nmwlb_Blocks_register(287, $rt_s(673), $rt_s(674), 1.5, 1, $rt_s(673), $rt_s(673), $rt_s(673), 1, 0, 0);
+    nmwlb_Blocks_register(288, $rt_s(675), $rt_s(676), 1.5, 1, $rt_s(675), $rt_s(675), $rt_s(675), 1, 0, 0);
+    nmwlb_Blocks_register(289, $rt_s(677), $rt_s(678), 1.5, 0, $rt_s(532), $rt_s(677), $rt_s(532), 1, 0, 0);
+    nmwlb_Blocks_register(290, $rt_s(679), $rt_s(680), 5.0, 1, $rt_s(679), $rt_s(679), $rt_s(679), 1, 0, 0);
+    nmwlb_Blocks_register(291, $rt_s(681), $rt_s(682), 3.0, 1, $rt_s(681), $rt_s(681), $rt_s(681), 1, 0, 0);
+    nmwlb_Blocks_register(292, $rt_s(683), $rt_s(684), 5.0, 1, $rt_s(683), $rt_s(683), $rt_s(683), 1, 0, 0);
+    nmwlb_Blocks_register(293, $rt_s(685), $rt_s(686), 5.0, 1, $rt_s(685), $rt_s(685), $rt_s(685), 1, 0, 0);
+    nmwlb_Blocks_register(294, $rt_s(687), $rt_s(688), 3.0, 1, $rt_s(687), $rt_s(687), $rt_s(687), 1, 0, 0);
+    nmwlb_Blocks_register(295, $rt_s(689), $rt_s(690), 5.0, 1, $rt_s(689), $rt_s(689), $rt_s(689), 1, 0, 0);
+    nmwlb_Blocks_register(296, $rt_s(691), $rt_s(692), 3.0, 1, $rt_s(691), $rt_s(691), $rt_s(691), 1, 0, 0);
+    nmwlb_Blocks_register(297, $rt_s(693), $rt_s(694), 0.800000011920929, 0, $rt_s(693), $rt_s(693), $rt_s(693), 2, 0, 0);
+    nmwlb_Blocks_register(298, $rt_s(695), $rt_s(696), 0.800000011920929, 0, $rt_s(695), $rt_s(695), $rt_s(695), 2, 0, 0);
+    nmwlb_Blocks_register(299, $rt_s(697), $rt_s(698), 0.800000011920929, 0, $rt_s(697), $rt_s(697), $rt_s(697), 2, 0, 0);
+    nmwlb_Blocks_register(300, $rt_s(699), $rt_s(700), 0.800000011920929, 0, $rt_s(699), $rt_s(699), $rt_s(699), 2, 0, 0);
+    nmwlb_Blocks_register(301, $rt_s(701), $rt_s(702), 0.800000011920929, 0, $rt_s(701), $rt_s(701), $rt_s(701), 2, 0, 0);
+    nmwlb_Blocks_register(302, $rt_s(703), $rt_s(704), 0.800000011920929, 0, $rt_s(703), $rt_s(703), $rt_s(703), 2, 0, 0);
+    nmwlb_Blocks_register(303, $rt_s(705), $rt_s(706), 0.800000011920929, 0, $rt_s(705), $rt_s(705), $rt_s(705), 2, 0, 0);
+    nmwlb_Blocks_register(304, $rt_s(707), $rt_s(708), 0.800000011920929, 0, $rt_s(707), $rt_s(707), $rt_s(707), 2, 0, 0);
+    nmwlb_Blocks_register(305, $rt_s(709), $rt_s(710), 0.800000011920929, 0, $rt_s(709), $rt_s(709), $rt_s(709), 2, 0, 0);
+    nmwlb_Blocks_register(306, $rt_s(711), $rt_s(712), 0.800000011920929, 0, $rt_s(711), $rt_s(711), $rt_s(711), 2, 0, 0);
+    nmwlb_Blocks_register(307, $rt_s(713), $rt_s(714), 0.800000011920929, 0, $rt_s(713), $rt_s(713), $rt_s(713), 2, 0, 0);
+    nmwlb_Blocks_register(308, $rt_s(715), $rt_s(716), 0.800000011920929, 0, $rt_s(715), $rt_s(715), $rt_s(715), 2, 0, 0);
+    nmwlb_Blocks_register(309, $rt_s(717), $rt_s(718), 0.800000011920929, 0, $rt_s(717), $rt_s(717), $rt_s(717), 2, 0, 0);
+    nmwlb_Blocks_register(310, $rt_s(719), $rt_s(720), 0.800000011920929, 0, $rt_s(719), $rt_s(719), $rt_s(719), 2, 0, 0);
+    nmwlb_Blocks_register(311, $rt_s(721), $rt_s(722), 0.800000011920929, 0, $rt_s(721), $rt_s(721), $rt_s(721), 2, 0, 0);
+    nmwlb_Blocks_register(312, $rt_s(723), $rt_s(724), 0.800000011920929, 0, $rt_s(723), $rt_s(723), $rt_s(723), 2, 0, 0);
+    nmwlb_Blocks_register(313, $rt_s(725), $rt_s(726), 1.7999999523162842, 1, $rt_s(725), $rt_s(725), $rt_s(725), 2, 0, 0);
+    nmwlb_Blocks_register(314, $rt_s(727), $rt_s(728), 1.7999999523162842, 1, $rt_s(727), $rt_s(727), $rt_s(727), 2, 0, 0);
+    nmwlb_Blocks_register(315, $rt_s(729), $rt_s(730), 1.7999999523162842, 1, $rt_s(729), $rt_s(729), $rt_s(729), 2, 0, 0);
+    nmwlb_Blocks_register(316, $rt_s(731), $rt_s(732), 1.7999999523162842, 1, $rt_s(731), $rt_s(731), $rt_s(731), 2, 0, 0);
+    nmwlb_Blocks_register(317, $rt_s(733), $rt_s(734), 1.7999999523162842, 1, $rt_s(733), $rt_s(733), $rt_s(733), 2, 0, 0);
+    nmwlb_Blocks_register(318, $rt_s(735), $rt_s(736), 1.7999999523162842, 1, $rt_s(735), $rt_s(735), $rt_s(735), 2, 0, 0);
+    nmwlb_Blocks_register(319, $rt_s(737), $rt_s(738), 1.7999999523162842, 1, $rt_s(737), $rt_s(737), $rt_s(737), 2, 0, 0);
+    nmwlb_Blocks_register(320, $rt_s(739), $rt_s(740), 1.7999999523162842, 1, $rt_s(739), $rt_s(739), $rt_s(739), 2, 0, 0);
+    nmwlb_Blocks_register(321, $rt_s(741), $rt_s(742), 1.7999999523162842, 1, $rt_s(741), $rt_s(741), $rt_s(741), 2, 0, 0);
+    nmwlb_Blocks_register(322, $rt_s(743), $rt_s(744), 1.7999999523162842, 1, $rt_s(743), $rt_s(743), $rt_s(743), 2, 0, 0);
+    nmwlb_Blocks_register(323, $rt_s(745), $rt_s(746), 1.7999999523162842, 1, $rt_s(745), $rt_s(745), $rt_s(745), 2, 0, 0);
+    nmwlb_Blocks_register(324, $rt_s(747), $rt_s(748), 1.7999999523162842, 1, $rt_s(747), $rt_s(747), $rt_s(747), 2, 0, 0);
+    nmwlb_Blocks_register(325, $rt_s(749), $rt_s(750), 1.7999999523162842, 1, $rt_s(749), $rt_s(749), $rt_s(749), 2, 0, 0);
+    nmwlb_Blocks_register(326, $rt_s(751), $rt_s(752), 1.7999999523162842, 1, $rt_s(751), $rt_s(751), $rt_s(751), 2, 0, 0);
+    nmwlb_Blocks_register(327, $rt_s(753), $rt_s(754), 1.7999999523162842, 1, $rt_s(753), $rt_s(753), $rt_s(753), 2, 0, 0);
+    nmwlb_Blocks_register(328, $rt_s(755), $rt_s(756), 1.7999999523162842, 1, $rt_s(755), $rt_s(755), $rt_s(755), 2, 0, 0);
+    nmwlb_Blocks_register(329, $rt_s(757), $rt_s(758), 1.25, 1, $rt_s(757), $rt_s(757), $rt_s(757), 2, 0, 0);
+    nmwlb_Blocks_register(330, $rt_s(759), $rt_s(760), 1.25, 1, $rt_s(759), $rt_s(759), $rt_s(759), 2, 0, 0);
+    nmwlb_Blocks_register(331, $rt_s(761), $rt_s(762), 1.25, 1, $rt_s(761), $rt_s(761), $rt_s(761), 2, 0, 0);
+    nmwlb_Blocks_register(332, $rt_s(763), $rt_s(764), 1.25, 1, $rt_s(763), $rt_s(763), $rt_s(763), 2, 0, 0);
+    nmwlb_Blocks_register(333, $rt_s(765), $rt_s(766), 1.25, 1, $rt_s(765), $rt_s(765), $rt_s(765), 2, 0, 0);
+    nmwlb_Blocks_register(334, $rt_s(767), $rt_s(768), 1.25, 1, $rt_s(767), $rt_s(767), $rt_s(767), 2, 0, 0);
+    nmwlb_Blocks_register(335, $rt_s(769), $rt_s(770), 1.25, 1, $rt_s(769), $rt_s(769), $rt_s(769), 2, 0, 0);
+    nmwlb_Blocks_register(336, $rt_s(771), $rt_s(772), 1.25, 1, $rt_s(771), $rt_s(771), $rt_s(771), 2, 0, 0);
+    nmwlb_Blocks_register(337, $rt_s(773), $rt_s(774), 1.25, 1, $rt_s(773), $rt_s(773), $rt_s(773), 2, 0, 0);
+    nmwlb_Blocks_register(338, $rt_s(775), $rt_s(776), 1.25, 1, $rt_s(775), $rt_s(775), $rt_s(775), 2, 0, 0);
+    nmwlb_Blocks_register(339, $rt_s(777), $rt_s(778), 1.25, 1, $rt_s(777), $rt_s(777), $rt_s(777), 2, 0, 0);
+    nmwlb_Blocks_register(340, $rt_s(779), $rt_s(780), 1.25, 1, $rt_s(779), $rt_s(779), $rt_s(779), 2, 0, 0);
+    nmwlb_Blocks_register(341, $rt_s(781), $rt_s(782), 1.25, 1, $rt_s(781), $rt_s(781), $rt_s(781), 2, 0, 0);
+    nmwlb_Blocks_register(342, $rt_s(783), $rt_s(784), 1.25, 1, $rt_s(783), $rt_s(783), $rt_s(783), 2, 0, 0);
+    nmwlb_Blocks_register(343, $rt_s(785), $rt_s(786), 1.25, 1, $rt_s(785), $rt_s(785), $rt_s(785), 2, 0, 0);
+    nmwlb_Blocks_register(344, $rt_s(787), $rt_s(788), 1.25, 1, $rt_s(787), $rt_s(787), $rt_s(787), 2, 0, 0);
+    nmwlb_Blocks_register(345, $rt_s(789), $rt_s(790), 0.5, 0, $rt_s(789), $rt_s(789), $rt_s(789), 3, 0, 0);
+    nmwlb_Blocks_register(346, $rt_s(791), $rt_s(792), 0.5, 0, $rt_s(791), $rt_s(791), $rt_s(791), 3, 0, 0);
+    nmwlb_Blocks_register(347, $rt_s(793), $rt_s(794), 0.6000000238418579, 0, $rt_s(793), $rt_s(793), $rt_s(793), 3, 0, 0);
+    nmwlb_Blocks_register(348, $rt_s(795), $rt_s(796), 0.6000000238418579, 0, $rt_s(795), $rt_s(795), $rt_s(795), 3, 0, 0);
+    nmwlb_Blocks_register(349, $rt_s(797), $rt_s(798), 0.20000000298023224, 1, $rt_s(799), $rt_s(799), $rt_s(799), 3, 0, 0);
+    nmwlb_Blocks_register(350, $rt_s(800), $rt_s(801), 0.10000000149011612, 0, $rt_s(800), $rt_s(800), $rt_s(800), 3, 0, 0);
+    nmwlb_Blocks_register(351, $rt_s(802), $rt_s(803), 2.0, 0, $rt_s(804), $rt_s(802), $rt_s(804), 3, 0, 0);
+    nmwlb_Blocks_register(352, $rt_s(805), $rt_s(806), 2.0, 0, $rt_s(807), $rt_s(805), $rt_s(807), 3, 0, 0);
+    nmwlb_Blocks_register(353, $rt_s(808), $rt_s(809), 2.0, 0, $rt_s(810), $rt_s(808), $rt_s(810), 3, 0, 0);
+    nmwlb_Blocks_register(354, $rt_s(811), $rt_s(812), 2.0, 0, $rt_s(813), $rt_s(811), $rt_s(813), 3, 0, 0);
+    nmwlb_Blocks_register(355, $rt_s(814), $rt_s(815), 2.0, 0, $rt_s(816), $rt_s(814), $rt_s(816), 3, 0, 0);
+    nmwlb_Blocks_register(356, $rt_s(817), $rt_s(818), 2.0, 0, $rt_s(819), $rt_s(817), $rt_s(819), 3, 0, 0);
+    nmwlb_Blocks_register(357, $rt_s(820), $rt_s(821), 2.0, 0, $rt_s(822), $rt_s(820), $rt_s(822), 3, 0, 0);
+    nmwlb_Blocks_register(358, $rt_s(823), $rt_s(824), 2.0, 0, $rt_s(825), $rt_s(823), $rt_s(825), 3, 0, 0);
+    nmwlb_Blocks_register(359, $rt_s(826), $rt_s(827), 0.20000000298023224, 0, $rt_s(826), $rt_s(826), $rt_s(826), 3, 0, 7842607);
+    nmwlb_Blocks_register(360, $rt_s(828), $rt_s(829), 0.20000000298023224, 0, $rt_s(828), $rt_s(828), $rt_s(828), 3, 0, 6396257);
+    nmwlb_Blocks_register(361, $rt_s(830), $rt_s(831), 0.20000000298023224, 0, $rt_s(830), $rt_s(830), $rt_s(830), 3, 0, 8431445);
+    nmwlb_Blocks_register(362, $rt_s(832), $rt_s(833), 0.20000000298023224, 0, $rt_s(832), $rt_s(832), $rt_s(832), 3, 0, 7842607);
+    nmwlb_Blocks_register(363, $rt_s(834), $rt_s(835), 0.20000000298023224, 0, $rt_s(834), $rt_s(834), $rt_s(834), 3, 0, 7842607);
+    nmwlb_Blocks_register(364, $rt_s(836), $rt_s(837), 0.20000000298023224, 0, $rt_s(836), $rt_s(836), $rt_s(836), 3, 0, 7842607);
+    nmwlb_Blocks_register(365, $rt_s(838), $rt_s(839), 0.20000000298023224, 0, $rt_s(838), $rt_s(838), $rt_s(838), 3, 0, 7842607);
+    nmwlb_Blocks_register(366, $rt_s(840), $rt_s(841), 0.20000000298023224, 0, $rt_s(840), $rt_s(840), $rt_s(840), 3, 0, 0);
+    nmwlb_Blocks_register(367, $rt_s(842), $rt_s(843), 0.20000000298023224, 0, $rt_s(842), $rt_s(842), $rt_s(842), 3, 0, 7842607);
+    nmwlb_Blocks_register(368, $rt_s(844), $rt_s(845), 30.0, 1, $rt_s(846), $rt_s(847), $rt_s(846), 3, 0, 0);
+    nmwlb_Blocks_register(369, $rt_s(848), $rt_s(849), 0.5, 0, $rt_s(850), $rt_s(851), $rt_s(850), 3, 0, 0);
+    nmwlb_Blocks_register(370, $rt_s(852), $rt_s(853), 0.5, 0, $rt_s(854), $rt_s(855), $rt_s(854), 3, 0, 0);
+    nmwlb_Blocks_register(371, $rt_s(856), $rt_s(857), 1.0, 0, $rt_s(858), $rt_s(859), $rt_s(858), 3, 0, 0);
+    nmwlb_Blocks_register(372, $rt_s(860), $rt_s(861), 1.0, 0, $rt_s(862), $rt_s(863), $rt_s(862), 3, 0, 0);
+    nmwlb_Blocks_register(373, $rt_s(864), $rt_s(865), 0.4000000059604645, 0, $rt_s(866), $rt_s(867), $rt_s(868), 3, 0, 0);
+    nmwlb_Blocks_register(374, $rt_s(869), $rt_s(870), 0.20000000298023224, 0, $rt_s(869), $rt_s(869), $rt_s(869), 3, 0, 0);
+    nmwlb_Blocks_register(375, $rt_s(871), $rt_s(872), 2.5, 0, $rt_s(873), $rt_s(874), $rt_s(873), 0, 0, 0);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jt_DecimalFormatParser() {
@@ -19066,7 +19716,7 @@ jt_DecimalFormatParser_parse = ($this, $string) => {
     if ($this.$index == jl_String_length($string)) {
         var$2 = new jl_IllegalArgumentException;
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(841)), $string);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(875)), $string);
         jl_IllegalArgumentException__init_(var$2, jl_StringBuilder_toString(var$3));
         $rt_throw(var$2);
     }
@@ -19082,7 +19732,7 @@ jt_DecimalFormatParser_parse = ($this, $string) => {
             var$2 = new jl_IllegalArgumentException;
             var$5 = $this.$index;
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(842)), var$5), $rt_s(431)), $string);
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(876)), var$5), $rt_s(458)), $string);
             jl_IllegalArgumentException__init_(var$2, jl_StringBuilder_toString(var$3));
             $rt_throw(var$2);
         }
@@ -19132,7 +19782,7 @@ jt_DecimalFormatParser_parseText = ($this, $suffix, $end) => {
                             var$7 = $this.$index;
                             var$8 = $this.$string;
                             var$9 = jl_StringBuilder__init_();
-                            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(843)), var$7), $rt_s(431)), var$8);
+                            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(877)), var$7), $rt_s(458)), var$8);
                             jl_IllegalArgumentException__init_(var$6, jl_StringBuilder_toString(var$9));
                             $rt_throw(var$6);
                         case 37:
@@ -19152,7 +19802,7 @@ jt_DecimalFormatParser_parseText = ($this, $suffix, $end) => {
                                 var$7 = $this.$index;
                                 var$8 = $this.$string;
                                 var$9 = jl_StringBuilder__init_();
-                                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(844)), var$7), $rt_s(845)), var$8);
+                                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(878)), var$7), $rt_s(879)), var$8);
                                 jl_IllegalArgumentException__init_(var$6, jl_StringBuilder_toString(var$9));
                                 $rt_throw(var$6);
                             }
@@ -19202,7 +19852,7 @@ jt_DecimalFormatParser_parseText = ($this, $suffix, $end) => {
             var$7 = $this.$index;
             var$8 = $this.$string;
             var$9 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(843)), var$7), $rt_s(431)), var$8);
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(877)), var$7), $rt_s(458)), var$8);
             jl_IllegalArgumentException__init_(var$6, jl_StringBuilder_toString(var$9));
             $rt_throw(var$6);
         }
@@ -19211,7 +19861,7 @@ jt_DecimalFormatParser_parseText = ($this, $suffix, $end) => {
             var$7 = $this.$index;
             var$8 = $this.$string;
             var$9 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(843)), var$7), $rt_s(431)), var$8);
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$9, $rt_s(877)), var$7), $rt_s(458)), var$8);
             jl_IllegalArgumentException__init_(var$6, jl_StringBuilder_toString(var$9));
             $rt_throw(var$6);
         }
@@ -19267,7 +19917,7 @@ jt_DecimalFormatParser_parseIntegerPart = ($this, $apply) => {
                     var$8 = $this.$index;
                     var$9 = $this.$string;
                     var$10 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(846)), var$8), $rt_s(431)), var$9);
+                    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(880)), var$8), $rt_s(458)), var$9);
                     jl_IllegalArgumentException__init_(var$7, jl_StringBuilder_toString(var$10));
                     $rt_throw(var$7);
                 }
@@ -19281,7 +19931,7 @@ jt_DecimalFormatParser_parseIntegerPart = ($this, $apply) => {
         var$8 = $this.$index;
         var$9 = $this.$string;
         var$10 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(847)), var$8), $rt_s(431)), var$9);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(881)), var$8), $rt_s(458)), var$9);
         jl_IllegalArgumentException__init_(var$7, jl_StringBuilder_toString(var$10));
         $rt_throw(var$7);
     }
@@ -19290,7 +19940,7 @@ jt_DecimalFormatParser_parseIntegerPart = ($this, $apply) => {
         var$8 = $this.$index;
         var$9 = $this.$string;
         var$10 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(848)), var$8), $rt_s(431)), var$9);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(882)), var$8), $rt_s(458)), var$9);
         jl_IllegalArgumentException__init_(var$7, jl_StringBuilder_toString(var$10));
         $rt_throw(var$7);
     }
@@ -19299,7 +19949,7 @@ jt_DecimalFormatParser_parseIntegerPart = ($this, $apply) => {
         var$8 = $this.$index;
         var$9 = $this.$string;
         var$10 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(849)), var$8), $rt_s(431)), var$9);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$10, $rt_s(883)), var$8), $rt_s(458)), var$9);
         jl_IllegalArgumentException__init_(var$7, jl_StringBuilder_toString(var$10));
         $rt_throw(var$7);
     }
@@ -19328,7 +19978,7 @@ jt_DecimalFormatParser_parseFractionalPart = ($this, $apply) => {
                         var$6 = $this.$index;
                         var$7 = $this.$string;
                         var$8 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(850)), var$6), $rt_s(431)), var$7);
+                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(884)), var$6), $rt_s(458)), var$7);
                         jl_IllegalArgumentException__init_(var$5, jl_StringBuilder_toString(var$8));
                         $rt_throw(var$5);
                     case 46:
@@ -19336,7 +19986,7 @@ jt_DecimalFormatParser_parseFractionalPart = ($this, $apply) => {
                         var$6 = $this.$index;
                         var$7 = $this.$string;
                         var$8 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(851)), var$6), $rt_s(431)), var$7);
+                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(885)), var$6), $rt_s(458)), var$7);
                         jl_IllegalArgumentException__init_(var$5, jl_StringBuilder_toString(var$8));
                         $rt_throw(var$5);
                     case 48:
@@ -19357,7 +20007,7 @@ jt_DecimalFormatParser_parseFractionalPart = ($this, $apply) => {
         var$6 = $this.$index;
         var$7 = $this.$string;
         var$8 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(852)), var$6), $rt_s(431)), var$7);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(886)), var$6), $rt_s(458)), var$7);
         jl_IllegalArgumentException__init_(var$5, jl_StringBuilder_toString(var$8));
         $rt_throw(var$5);
     }
@@ -19392,7 +20042,7 @@ jt_DecimalFormatParser_parseExponent = ($this, $apply) => {
         var$4 = $this.$index;
         var$5 = $this.$string;
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(853)), var$4), $rt_s(431)), var$5);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(887)), var$4), $rt_s(458)), var$5);
         jl_IllegalArgumentException__init_(var$3, jl_StringBuilder_toString(var$6));
         $rt_throw(var$3);
     }
@@ -19405,7 +20055,7 @@ jt_DecimalFormatParser_parseExponent = ($this, $apply) => {
     var$4 = $this.$index;
     var$5 = $this.$string;
     var$6 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(854)), var$4), $rt_s(431)), var$5);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(888)), var$4), $rt_s(458)), var$5);
     jl_IllegalArgumentException__init_(var$3, jl_StringBuilder_toString(var$6));
     $rt_throw(var$3);
 };
@@ -19432,7 +20082,7 @@ jur_Pattern_split = ($this, $inputSeq, $limit) => {
     $curPos = 0;
     if (!$inputSeq.$length()) {
         var$7 = $rt_createArray(jl_String, 1);
-        var$7.data[0] = $rt_s(72);
+        var$7.data[0] = $rt_s(74);
         return var$7;
     }
     while (jur_Matcher_find0($mat)) {
@@ -19468,9 +20118,9 @@ jur_Pattern_pattern = $this => {
 },
 jur_Pattern_compile0 = ($pattern, $flags) => {
     if ($pattern === null)
-        $rt_throw(jl_NullPointerException__init_0($rt_s(855)));
+        $rt_throw(jl_NullPointerException__init_0($rt_s(889)));
     if ($flags && ($flags | 255) != 255)
-        $rt_throw(jl_IllegalArgumentException__init_2($rt_s(72)));
+        $rt_throw(jl_IllegalArgumentException__init_2($rt_s(74)));
     jur_AbstractSet_$callClinit();
     jur_AbstractSet_counter = 1;
     return jur_Pattern_compileImpl(jur_Pattern__init_0(), $pattern, $flags);
@@ -19483,7 +20133,7 @@ jur_Pattern_compileImpl = ($this, $pattern, $flags) => {
         jur_Pattern_finalizeCompile($this);
         return $this;
     }
-    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
 },
 jur_Pattern_processAlternations = ($this, $last) => {
     let $auxRange, var$3, $rangeSet;
@@ -19733,7 +20383,7 @@ jur_Pattern_processSubExpression = ($this, $last) => {
         $cur = jur_Pattern_processQuantifier($this, $last, $term);
     } else {
         if ($last instanceof jur_FinalSet)
-            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
         $cur = jur_EmptySet__init_($last);
     }
     a: {
@@ -19887,7 +20537,7 @@ jur_Pattern_processTerminal = ($this, $last) => {
                         $newFlags = $this.$flags0;
                     $term = jur_Pattern_processExpression($this, $ch, $newFlags, $last);
                     if ($this.$lexemes.$peek() != (-536870871))
-                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
                     $this.$lexemes.$next0();
                 }
             } else {
@@ -19963,7 +20613,7 @@ jur_Pattern_processTerminal = ($this, $last) => {
                                 }
                                 $term = jur_Pattern_processRange($this, $negative, $last);
                                 if ($this.$lexemes.$peek() != (-536870819))
-                                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+                                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
                                 $this.$lexemes.$setMode(1);
                                 $this.$lexemes.$next0();
                                 break a;
@@ -19998,7 +20648,7 @@ jur_Pattern_processTerminal = ($this, $last) => {
                     }
                     $number = ($ch & 2147483647) - 48 | 0;
                     if ($this.$globalGroupIndex < $number)
-                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
                     $this.$lexemes.$next0();
                     $this.$consCount0 = $this.$consCount0 + 1 | 0;
                     $term = !jur_Pattern_hasFlag($this, 2) ? jur_BackReferenceSet__init_0($number, $this.$consCount0) : jur_Pattern_hasFlag($this, 64) ? jur_UCIBackReferenceSet__init_0($number, $this.$consCount0) : jur_CIBackReferenceSet__init_0($number, $this.$consCount0);
@@ -20020,7 +20670,7 @@ jur_Pattern_processTerminal = ($this, $last) => {
                         $rt_throw(var$9);
                     }
                     if ($last instanceof jur_FinalSet)
-                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
+                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$lexemes.$toString(), $this.$lexemes.$getIndex()));
                     $term = jur_EmptySet__init_($last);
                 }
             }
@@ -20178,16 +20828,16 @@ jur_Pattern_processRangeExpression = ($this, $alt) => {
                 }
                 $firstInClass = 0;
             }
-            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), jur_Pattern_pattern($this), $this.$lexemes.$getIndex()));
+            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), jur_Pattern_pattern($this), $this.$lexemes.$getIndex()));
         }
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), jur_Pattern_pattern($this), $this.$lexemes.$getIndex()));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), jur_Pattern_pattern($this), $this.$lexemes.$getIndex()));
     }
     if (!$notClosed) {
         if ($buffer >= 0)
             $res.$add0($buffer);
         return $res;
     }
-    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), jur_Pattern_pattern($this), $this.$lexemes.$getIndex() - 1 | 0));
+    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), jur_Pattern_pattern($this), $this.$lexemes.$getIndex() - 1 | 0));
 },
 jur_Pattern_processCharSet = ($this, $ch) => {
     let $isSupplCodePoint;
@@ -20256,17 +20906,17 @@ jur_Pattern_finalizeCompile = $this => {
 },
 jur_Pattern_quote = $s => {
     let $sb, $apos, var$4, $apos_0;
-    $sb = (jl_StringBuilder__init_()).$append3($rt_s(856));
+    $sb = (jl_StringBuilder__init_()).$append3($rt_s(890));
     $apos = 0;
     while (true) {
-        var$4 = jl_String_indexOf1($s, $rt_s(857), $apos);
+        var$4 = jl_String_indexOf1($s, $rt_s(891), $apos);
         if (var$4 < 0)
             break;
         $apos_0 = var$4 + 2 | 0;
-        ($sb.$append3(jl_String_substring($s, $apos, $apos_0))).$append3($rt_s(858));
+        ($sb.$append3(jl_String_substring($s, $apos, $apos_0))).$append3($rt_s(892));
         $apos = $apos_0;
     }
-    return (($sb.$append3(jl_String_substring0($s, $apos))).$append3($rt_s(857))).$toString();
+    return (($sb.$append3(jl_String_substring0($s, $apos))).$append3($rt_s(891))).$toString();
 },
 jur_Pattern_namedGroups = $this => {
     return $this.$namedGroups0;
@@ -20454,12 +21104,12 @@ nleva_MenuBlurRenderer_ensureTargets = ($gl, $width, $height) => {
         if ($statusA == 36053 && $statusB == 36053) {
             nleva_MenuBlurRenderer_targetsOk = 1;
             var$6 = jl_StringBuilder__init_();
-            jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(859)), $width), 120), $height), 41);
+            jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(893)), $width), 120), $height), 41);
             console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
             return 1;
         }
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(860)), $statusA), $rt_s(861)), $statusB), $rt_s(862));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(894)), $statusA), $rt_s(895)), $statusB), $rt_s(896));
         console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
         nleva_MenuBlurRenderer_targetsOk = 0;
         return 0;
@@ -20505,17 +21155,17 @@ nleva_MenuBlurRenderer_createTargetTexture = ($gl, $width, $height) => {
 nleva_MenuBlurRenderer_initPrograms = $gl => {
     let $quadVsh, $blurFsh, $blitFsh, $quad, var$6, var$7, $vboData, $i, $posAttrib, $uvAttrib;
     nleva_MenuBlurRenderer_$callClinit();
-    $quadVsh = $rt_s(863);
-    $blurFsh = $rt_s(864);
-    $blitFsh = $rt_s(865);
-    nleva_MenuBlurRenderer_blurProgram = nleva_EaglerShaderImpl_createProgramFromSource($quadVsh, $blurFsh, $rt_s(866));
-    nleva_MenuBlurRenderer_blitProgram = nleva_EaglerShaderImpl_createProgramFromSource($quadVsh, $blitFsh, $rt_s(867));
+    $quadVsh = $rt_s(897);
+    $blurFsh = $rt_s(898);
+    $blitFsh = $rt_s(899);
+    nleva_MenuBlurRenderer_blurProgram = nleva_EaglerShaderImpl_createProgramFromSource($quadVsh, $blurFsh, $rt_s(900));
+    nleva_MenuBlurRenderer_blitProgram = nleva_EaglerShaderImpl_createProgramFromSource($quadVsh, $blitFsh, $rt_s(901));
     if (nleva_MenuBlurRenderer_blurProgram !== null && nleva_MenuBlurRenderer_blitProgram !== null) {
-        nleva_MenuBlurRenderer_uInSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(868));
-        nleva_MenuBlurRenderer_uBlurDir = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(869));
-        nleva_MenuBlurRenderer_uRadius = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(870));
-        nleva_MenuBlurRenderer_uInSize = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(871));
-        nleva_MenuBlurRenderer_blitUInSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blitProgram, $rt_s(868));
+        nleva_MenuBlurRenderer_uInSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(902));
+        nleva_MenuBlurRenderer_uBlurDir = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(903));
+        nleva_MenuBlurRenderer_uRadius = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(904));
+        nleva_MenuBlurRenderer_uInSize = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(905));
+        nleva_MenuBlurRenderer_blitUInSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_MenuBlurRenderer_blitProgram, $rt_s(902));
         $quad = $rt_createFloatArray(24);
         var$6 = (__safe($quad).data||[]);
         var$6[0] = (-1.0);
@@ -20554,8 +21204,8 @@ nleva_MenuBlurRenderer_initPrograms = $gl => {
             $i = $i + 1 | 0;
         }
         nlevi_PlatformOpenGL__wglBufferData(34962, $vboData, 35044);
-        $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(128));
-        $uvAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(872));
+        $posAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(130));
+        $uvAttrib = nleva_EaglerShaderImpl_getAttribLocation(nleva_MenuBlurRenderer_blurProgram, $rt_s(906));
         nlevi_PlatformOpenGL__wglEnableVertexAttribArray($posAttrib);
         nlevi_PlatformOpenGL__wglVertexAttribPointer($posAttrib, 2, 5126, 0, 16, 0);
         nlevi_PlatformOpenGL__wglEnableVertexAttribArray($uvAttrib);
@@ -20680,13 +21330,13 @@ cmbv_PoseStack__init_0 = () => {
 };
 function nmcgso_SoundOptionsScreen$VolumeSlider() {
     let a = this; nmcgc_AbstractSliderButton.call(a);
-    a.$name5 = null;
+    a.$name6 = null;
     a.$sink = null;
     a.$telemetryId = null;
 }
 let nmcgso_SoundOptionsScreen$VolumeSlider__init_ = ($this, $x, $y, $width, $height, $name, $initial, $sink, $telemetryId) => {
     nmcgc_AbstractSliderButton__init_($this, $x, $y, $width, $height, $initial);
-    $this.$name5 = $name;
+    $this.$name6 = $name;
     $this.$sink = $sink;
     $this.$telemetryId = $telemetryId;
 },
@@ -20699,16 +21349,16 @@ nmcgso_SoundOptionsScreen$VolumeSlider_label = ($name, $value) => {
     let var$3, var$4;
     if ($value <= 0.0) {
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $name), $rt_s(873));
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $name), $rt_s(907));
         return jl_StringBuilder_toString(var$3);
     }
     var$4 = Long_lo((jl_Math_round0($value * 100.0)));
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $name), $rt_s(80)), var$4), 37);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $name), $rt_s(82)), var$4), 37);
     return jl_StringBuilder_toString(var$3);
 },
 nmcgso_SoundOptionsScreen$VolumeSlider_displayString = $this => {
-    return nmcgso_SoundOptionsScreen$VolumeSlider_label($this.$name5, $this.$value0);
+    return nmcgso_SoundOptionsScreen$VolumeSlider_label($this.$name6, $this.$value0);
 },
 nmcgso_SoundOptionsScreen$VolumeSlider_applyValue = $this => {
     $this.$sink.$accept($this.$value0);
@@ -20847,8 +21497,8 @@ nmcgsm_EditServerScreen_init = $this => {
     let $centerX, $boxX, $name, $address, $footerY, var$6, var$7;
     $centerX = $this.$width / 2 | 0;
     $boxX = $centerX - 120 | 0;
-    $name = $this.$editing === null ? $rt_s(72) : $this.$editing.$name1;
-    $address = $this.$editing === null ? $rt_s(72) : $this.$editing.$ip;
+    $name = $this.$editing === null ? $rt_s(74) : $this.$editing.$name1;
+    $address = $this.$editing === null ? $rt_s(74) : $this.$editing.$ip;
     $this.$nameBox = nmcgsm_EditServerScreen$1__init_0($this, $boxX, 64, 240, 18, $name);
     $this.$nameBox.$setValue0($name);
     $this.$addressBox = nmcgsm_EditServerScreen$2__init_0($this, $boxX, 104, 240, 18, $address);
@@ -20858,10 +21508,10 @@ nmcgsm_EditServerScreen_init = $this => {
     $footerY = $this.$height - 60 | 0;
     var$6 = new nmcgc_Button;
     var$7 = $centerX - 102 | 0;
-    nmcgc_Button__init_0(var$6, var$7, $footerY, 100, 20, $this.$editing === null ? $rt_s(442) : $rt_s(442), nmcgsm_EditServerScreen$init$lambda$_1_0__init_0($this));
+    nmcgc_Button__init_0(var$6, var$7, $footerY, 100, 20, $this.$editing === null ? $rt_s(469) : $rt_s(469), nmcgsm_EditServerScreen$init$lambda$_1_0__init_0($this));
     $this.$doneButton = var$6;
     $this.$addRenderableWidget($this.$doneButton);
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, $footerY, 100, 20, $rt_s(874), nmcgsm_EditServerScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, $footerY, 100, 20, $rt_s(908), nmcgsm_EditServerScreen$init$lambda$_1_1__init_0($this)));
     nmcgsm_EditServerScreen_syncDoneEnabled($this);
 },
 nmcgsm_EditServerScreen_syncDoneEnabled = $this => {
@@ -20872,7 +21522,7 @@ nmcgsm_EditServerScreen_apply = $this => {
     let $name, $address, $list;
     $name = jl_String_trim($this.$nameBox.$getValue1());
     if (jl_String_isEmpty($name))
-        $name = $rt_s(875);
+        $name = $rt_s(909);
     $address = jl_String_trim($this.$addressBox.$getValue1());
     $list = nmcm_ServerList_getOrLoad();
     if ($this.$editIndex < 0)
@@ -20883,14 +21533,14 @@ nmcgsm_EditServerScreen_apply = $this => {
 },
 nmcgsm_EditServerScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $title, $titleWidth, $boxX, var$8;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $title = $this.$editing === null ? $rt_s(876) : $rt_s(877);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $title = $this.$editing === null ? $rt_s(910) : $rt_s(911);
     $titleWidth = nleva_EaglerGuiImpl_widthOf($title);
     nleva_EaglerGuiImpl_drawText($title, ($this.$width / 2 | 0) - $titleWidth / 2.0, 30.0, (-1), 1);
     $boxX = ($this.$width / 2 | 0) - 120 | 0;
     var$8 = $boxX;
-    nleva_EaglerGuiImpl_drawText($rt_s(878), var$8, 52.0, (-6250336), 1);
-    nleva_EaglerGuiImpl_drawText($rt_s(879), var$8, 92.0, (-6250336), 1);
+    nleva_EaglerGuiImpl_drawText($rt_s(912), var$8, 52.0, (-6250336), 1);
+    nleva_EaglerGuiImpl_drawText($rt_s(913), var$8, 92.0, (-6250336), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgsm_EditServerScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => {
@@ -20976,13 +21626,13 @@ nmcgsm_DirectConnectScreen_init = $this => {
     let $centerX, $boxX, $footerY;
     $centerX = $this.$width / 2 | 0;
     $boxX = $centerX - 155 | 0;
-    $this.$addressBox0 = nmcgsm_DirectConnectScreen$1__init_0($this, $boxX, 64, 310, 18, $rt_s(72));
+    $this.$addressBox0 = nmcgsm_DirectConnectScreen$1__init_0($this, $boxX, 64, 310, 18, $rt_s(74));
     $this.$addressBox0.$setFocused(1);
     $this.$addRenderableWidget($this.$addressBox0);
     $footerY = $this.$height - 60 | 0;
-    $this.$joinButton = nmcgc_Button__init_($centerX - 102 | 0, $footerY, 100, 20, $rt_s(880), nmcgsm_DirectConnectScreen$init$lambda$_1_0__init_0($this));
+    $this.$joinButton = nmcgc_Button__init_($centerX - 102 | 0, $footerY, 100, 20, $rt_s(914), nmcgsm_DirectConnectScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget($this.$joinButton);
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, $footerY, 100, 20, $rt_s(874), nmcgsm_DirectConnectScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 2 | 0, $footerY, 100, 20, $rt_s(908), nmcgsm_DirectConnectScreen$init$lambda$_1_1__init_0($this)));
     nmcgsm_DirectConnectScreen_syncJoinEnabled($this);
 },
 nmcgsm_DirectConnectScreen_syncJoinEnabled = $this => {
@@ -20993,17 +21643,17 @@ nmcgsm_DirectConnectScreen_join = $this => {
     let $address;
     $address = jl_String_trim($this.$addressBox0.$getValue1());
     if (!jl_String_isEmpty($address) && $this.$minecraft !== null) {
-        $this.$minecraft.$setScreen(nmcgsm_ConnectScreen__init_0($this.$lastScreen0, nmcm_ServerList$ServerData__init_0($rt_s(875), $address)));
+        $this.$minecraft.$setScreen(nmcgsm_ConnectScreen__init_0($this.$lastScreen0, nmcm_ServerList$ServerData__init_0($rt_s(909), $address)));
         return;
     }
 },
 nmcgsm_DirectConnectScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $boxX;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(881));
-    nleva_EaglerGuiImpl_drawText($rt_s(881), ($this.$width / 2 | 0) - $titleWidth / 2.0, 30.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(915));
+    nleva_EaglerGuiImpl_drawText($rt_s(915), ($this.$width / 2 | 0) - $titleWidth / 2.0, 30.0, (-1), 1);
     $boxX = ($this.$width / 2 | 0) - 155 | 0;
-    nleva_EaglerGuiImpl_drawText($rt_s(879), $boxX, 52.0, (-6250336), 1);
+    nleva_EaglerGuiImpl_drawText($rt_s(913), $boxX, 52.0, (-6250336), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgsm_DirectConnectScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => {
@@ -21064,7 +21714,7 @@ nmcgsm_DirectConnectScreen_lambda$init$0 = ($this, $b) => {
 nlev_WorldStorage = $rt_classWithoutFields(),
 nlev_WorldStorage_listWorlds = () => {
     let $raw, $records, $count, $i, var$5, var$6, $out, $outi, $s, var$10, var$11;
-    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(882));
+    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(916));
     if ($raw !== null && !jl_String_isEmpty($raw)) {
         $records = nlev_WorldStorage_splitRecords($raw);
         $count = 0;
@@ -21107,12 +21757,12 @@ nlev_WorldStorage_saveWorld = $summary => {
                 break;
             if (!jl_String_equals($summary.$name0, var$5[$i].$name0)) {
                 $sb.$append3(nlev_WorldStorage_serialize(var$5[$i]));
-                $sb.$append3($rt_s(90));
+                $sb.$append3($rt_s(92));
             }
             $i = $i + 1 | 0;
         }
         $sb.$append3(nlev_WorldStorage_serialize($summary));
-        nlevi_PlatformRuntime_localStorageSet($rt_s(882), $sb.$toString());
+        nlevi_PlatformRuntime_localStorageSet($rt_s(916), $sb.$toString());
         return;
     }
 },
@@ -21138,13 +21788,13 @@ nlev_WorldStorage_deleteWorld = $name => {
             $found = 1;
         else {
             if ($sb.$length() > 0)
-                $sb.$append3($rt_s(90));
+                $sb.$append3($rt_s(92));
             $sb.$append3(nlev_WorldStorage_serialize(var$6[$i]));
         }
         $i = $i + 1 | 0;
     }
     if ($found)
-        nlevi_PlatformRuntime_localStorageSet($rt_s(882), $sb.$toString());
+        nlevi_PlatformRuntime_localStorageSet($rt_s(916), $sb.$toString());
     return $found;
 },
 nlev_WorldStorage_findWorld = $name => {
@@ -21163,13 +21813,13 @@ nlev_WorldStorage_findWorld = $name => {
 },
 nlev_WorldStorage_ensureSeeded = () => {
     let $milestone;
-    if (nlevi_PlatformRuntime_localStorageGet($rt_s(883)) !== null)
+    if (nlevi_PlatformRuntime_localStorageGet($rt_s(917)) !== null)
         return;
     if (!(nlev_WorldStorage_listWorlds()).data.length) {
         $milestone = nlev_WorldStorage$WorldSummary__init_();
-        $milestone.$name0 = $rt_s(419);
-        $milestone.$seed = $rt_s(72);
-        $milestone.$gameMode0 = $rt_s(884);
+        $milestone.$name0 = $rt_s(446);
+        $milestone.$seed = $rt_s(74);
+        $milestone.$gameMode0 = $rt_s(918);
         $milestone.$allowCommands0 = 0;
         $milestone.$generateStructures = 1;
         $milestone.$bonusChest = 0;
@@ -21177,25 +21827,25 @@ nlev_WorldStorage_ensureSeeded = () => {
         nlev_WorldStorage_saveWorld($milestone);
         console.log("[WorldStorage] seeded milestone world");
     }
-    nlevi_PlatformRuntime_localStorageSet($rt_s(883), $rt_s(484));
+    nlevi_PlatformRuntime_localStorageSet($rt_s(917), $rt_s(514));
 },
 nlev_WorldStorage_serialize = $s => {
     let $sb;
     $sb = jl_StringBuilder__init_();
     $sb.$append3($s.$name0);
-    $sb.$append3($rt_s(455));
-    $sb.$append3($s.$seed !== null ? $s.$seed : $rt_s(72));
-    $sb.$append3($rt_s(455));
+    $sb.$append3($rt_s(482));
+    $sb.$append3($s.$seed !== null ? $s.$seed : $rt_s(74));
+    $sb.$append3($rt_s(482));
     $sb.$append3($s.$gameMode0);
-    $sb.$append3($rt_s(455));
-    $sb.$append3(!$s.$allowCommands0 ? $rt_s(354) : $rt_s(484));
-    $sb.$append3($rt_s(455));
-    $sb.$append3(!$s.$generateStructures ? $rt_s(354) : $rt_s(484));
-    $sb.$append3($rt_s(455));
-    $sb.$append3(!$s.$bonusChest ? $rt_s(354) : $rt_s(484));
-    $sb.$append3($rt_s(455));
+    $sb.$append3($rt_s(482));
+    $sb.$append3(!$s.$allowCommands0 ? $rt_s(356) : $rt_s(514));
+    $sb.$append3($rt_s(482));
+    $sb.$append3(!$s.$generateStructures ? $rt_s(356) : $rt_s(514));
+    $sb.$append3($rt_s(482));
+    $sb.$append3(!$s.$bonusChest ? $rt_s(356) : $rt_s(514));
+    $sb.$append3($rt_s(482));
     $sb.$append3(jl_String_valueOf4($s.$lastPlayed));
-    $sb.$append3($rt_s(455));
+    $sb.$append3($rt_s(482));
     $sb.$append3($s.$version0);
     return $sb.$toString();
 },
@@ -21208,9 +21858,9 @@ nlev_WorldStorage_parse = $record => {
         $s.$name0 = var$3[0];
         $s.$seed = var$3[1];
         $s.$gameMode0 = var$3[2];
-        $s.$allowCommands0 = jl_String_equals($rt_s(484), var$3[3]);
-        $s.$generateStructures = jl_String_equals($rt_s(484), var$3[4]);
-        $s.$bonusChest = jl_String_equals($rt_s(484), var$3[5]);
+        $s.$allowCommands0 = jl_String_equals($rt_s(514), var$3[3]);
+        $s.$generateStructures = jl_String_equals($rt_s(514), var$3[4]);
+        $s.$bonusChest = jl_String_equals($rt_s(514), var$3[5]);
         a: {
             try {
                 $s.$lastPlayed = jl_Long_parseLong(var$3[6]);
@@ -21317,10 +21967,10 @@ jur_RangeSet_accepts = ($this, $strIndex, $testString) => {
 },
 jur_RangeSet_getName = $this => {
     let var$1, var$2, var$3;
-    var$1 = !$this.$alt3 ? $rt_s(135) : $rt_s(136);
+    var$1 = !$this.$alt3 ? $rt_s(137) : $rt_s(138);
     var$2 = $this.$chars0.$toString();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(137)), var$1), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(139)), var$1), var$2);
     return jl_StringBuilder_toString(var$3);
 },
 jur_RangeSet_first = ($this, $set) => {
@@ -21375,7 +22025,7 @@ let nmcgc_Button__init_0 = ($this, $x, $y, $width, $height, $message, $onPress) 
     nmcgc_AbstractWidget__init_($this, $x, $y, $width, $height);
     $this.$iconSprite = null;
     if ($message === null)
-        $message = $rt_s(72);
+        $message = $rt_s(74);
     $this.$message = $message;
     $this.$onPress0 = $onPress;
 },
@@ -21450,7 +22100,7 @@ nmcgc_Button_onClick = $this => {
         $this.$onPress0.$onPress($this);
 },
 nmcgc_Button_getTelemetryId = $this => {
-    return $this.$message === null ? null : jl_String_replaceAll(jl_String_toLowerCase($this.$message), $rt_s(885), $rt_s(72));
+    return $this.$message === null ? null : jl_String_replaceAll(jl_String_toLowerCase($this.$message), $rt_s(919), $rt_s(74));
 };
 function nmcgc_CycleButton() {
     let a = this; nmcgc_Button.call(a);
@@ -21462,11 +22112,11 @@ function nmcgc_CycleButton() {
 let nmcgc_CycleButton__init_ = ($this, $x, $y, $width, $height, $prefix, $values, $initialIndex, $onValueChange) => {
     nmcgc_Button__init_0($this, $x, $y, $width, $height, nmcgc_CycleButton_compose($prefix, $values, $initialIndex), nmcgc_CycleButton$_init_$lambda$_0_0__init_0());
     if ($prefix === null)
-        $prefix = $rt_s(72);
+        $prefix = $rt_s(74);
     $this.$prefix = $prefix;
     if (!($values !== null && (__safe($values).data||[]).length > 0)) {
         $values = $rt_createArray(jl_String, 1);
-        (__safe($values).data||[])[0] = $rt_s(72);
+        (__safe($values).data||[])[0] = $rt_s(74);
     }
     $this.$values1 = $values;
     $this.$index2 = jl_Math_max(0, jl_Math_min($initialIndex, $this.$values1.data.length - 1 | 0));
@@ -21488,11 +22138,11 @@ nmcgc_CycleButton_compose = ($prefix, $values, $index) => {
                 break a;
             }
         }
-        $value = $rt_s(72);
+        $value = $rt_s(74);
     }
     if ($prefix !== null && !jl_String_isEmpty($prefix)) {
         var$7 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $prefix), $rt_s(80)), $value);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $prefix), $rt_s(82)), $value);
         $value = jl_StringBuilder_toString(var$7);
     }
     return $value;
@@ -21515,12 +22165,12 @@ nmcgc_CycleButton_onClick = $this => {
 },
 nmcgc_CycleButton_getTelemetryId = $this => {
     let var$1, $base, $value, $vs, var$5;
-    var$1 = $this.$prefix !== null ? $this.$prefix : $rt_s(72);
-    $base = jl_String_replaceAll(jl_String_toLowerCase(var$1), $rt_s(885), $rt_s(72));
-    $value = $this.$getValue1() !== null ? $this.$getValue1() : $rt_s(72);
-    $vs = jl_String_replaceAll(jl_String_toLowerCase($value), $rt_s(885), $rt_s(72));
+    var$1 = $this.$prefix !== null ? $this.$prefix : $rt_s(74);
+    $base = jl_String_replaceAll(jl_String_toLowerCase(var$1), $rt_s(919), $rt_s(74));
+    $value = $this.$getValue1() !== null ? $this.$getValue1() : $rt_s(74);
+    $vs = jl_String_replaceAll(jl_String_toLowerCase($value), $rt_s(919), $rt_s(74));
     if (jl_String_isEmpty($vs))
-        var$1 = $rt_s(72);
+        var$1 = $rt_s(74);
     else {
         var$1 = jl_StringBuilder__init_();
         jl_StringBuilder_append(jl_StringBuilder_append1(var$1, 58), $vs);
@@ -21647,7 +22297,7 @@ nlevi_PlatformNetworking_connect = $uri => {
         nlevi_PlatformNetworking_connectionState = 3;
         var$3 = $e.$getMessage();
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(886)), var$3);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(920)), var$3);
         console.error($rt_ustr(jl_StringBuilder_toString(var$4)));
         return 0;
     }
@@ -21677,7 +22327,7 @@ nlevi_PlatformNetworking_scheduleReconnect = () => {
     $delay = jl_Math_min2(Long_mul(Long_fromInt(1000), Long_shl(Long_fromInt(1), nlevi_PlatformNetworking_reconnectAttempts - 1 | 0)), Long_fromInt(30000));
     var$2 = nlevi_PlatformNetworking_reconnectAttempts;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(var$3, $rt_s(887)), $delay), $rt_s(888)), var$2), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(var$3, $rt_s(921)), $delay), $rt_s(922)), var$2), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
     setTimeout(nlevi_PlatformNetworking$scheduleReconnect$lambda$_11_0__init_0(), $delay);
 },
@@ -21687,7 +22337,7 @@ nlevi_PlatformNetworking_lambda$connect$3 = $message => {
     if (nlevi_PlatformNetworking_connectionState == 1) {
         nlevi_PlatformNetworking_connectionState = 3;
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(889)), $message);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(923)), $message);
         console.error($rt_ustr(jl_StringBuilder_toString(var$2)));
         if (nlevi_PlatformNetworking_autoReconnect && nlevi_PlatformNetworking_reconnectAttempts < 5)
             nlevi_PlatformNetworking_scheduleReconnect();
@@ -21698,7 +22348,7 @@ nlevi_PlatformNetworking_lambda$connect$2 = ($code, $reason) => {
     nlevi_PlatformNetworking_$callClinit();
     nlevi_PlatformNetworking_connectionState = 0;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(890)), $code), $rt_s(891)), $reason), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(924)), $code), $rt_s(925)), $reason), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
     if (nlevi_PlatformNetworking_autoReconnect && nlevi_PlatformNetworking_reconnectAttempts < 5)
         nlevi_PlatformNetworking_scheduleReconnect();
@@ -21718,7 +22368,7 @@ nlevi_PlatformNetworking_lambda$connect$0 = () => {
     var$1 = nlevi_PlatformNetworking_currentURI;
     var$2 = nlevi_PlatformNetworking_compressionEnabled;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(892)), var$1), $rt_s(893)), var$2), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(926)), var$1), $rt_s(927)), var$2), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformNetworking__clinit_ = () => {
@@ -22085,7 +22735,7 @@ cgcc_Maps_newHashMapWithExpectedSize = $expectedSize => {
 },
 cgcc_Maps_capacity = $expectedSize => {
     if ($expectedSize < 3) {
-        cgcc_CollectPreconditions_checkNonnegative($expectedSize, $rt_s(894));
+        cgcc_CollectPreconditions_checkNonnegative($expectedSize, $rt_s(928));
         return $expectedSize + 1 | 0;
     }
     if ($expectedSize >= 1073741824)
@@ -22286,8 +22936,8 @@ function otrfm_InMemoryVirtualFileSystem() {
 }
 let otrfm_InMemoryVirtualFileSystem__init_ = var$0 => {
     jl_Object__init_(var$0);
-    var$0.$root = otrfm_InMemoryVirtualDirectory__init_0($rt_s(72));
-    var$0.$userDir = $rt_s(895);
+    var$0.$root = otrfm_InMemoryVirtualDirectory__init_0($rt_s(74));
+    var$0.$userDir = $rt_s(929);
 },
 otrfm_InMemoryVirtualFileSystem__init_0 = () => {
     let var_0 = new otrfm_InMemoryVirtualFileSystem();
@@ -22443,19 +23093,19 @@ nmc_KeyMapping_saveBinds = () => {
         (($sb.$append3($mapping.$name2)).$append0(61)).$append1($mapping.$key0);
         $i = $i + 1 | 0;
     }
-    nlevi_PlatformRuntime_localStorageSet($rt_s(896), $sb.$toString());
+    nlevi_PlatformRuntime_localStorageSet($rt_s(930), $sb.$toString());
     var$4 = nmc_KeyMapping_ALL.$size();
     var$5 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(897)), var$4), $rt_s(898));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(931)), var$4), $rt_s(932));
     console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
 },
 nmc_KeyMapping_loadBinds = () => {
     let $raw, $loaded, var$3, var$4, var$5, $entry, $eq, $mapping, var$9, $key, var$11, $$je;
     nmc_KeyMapping_$callClinit();
-    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(896));
+    $raw = nlevi_PlatformRuntime_localStorageGet($rt_s(930));
     if ($raw !== null && !jl_String_isEmpty($raw)) {
         $loaded = 0;
-        var$3 = (jl_String_split($raw, $rt_s(899))).data;
+        var$3 = (jl_String_split($raw, $rt_s(933))).data;
         var$4 = var$3.length;
         var$5 = 0;
         while (var$5 < var$4) {
@@ -22489,7 +23139,7 @@ nmc_KeyMapping_loadBinds = () => {
             var$5 = var$5 + 1 | 0;
         }
         var$11 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$11, $rt_s(900)), $loaded), $rt_s(898));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$11, $rt_s(934)), $loaded), $rt_s(932));
         console.log($rt_ustr(jl_StringBuilder_toString(var$11)));
         return;
     }
@@ -22498,48 +23148,48 @@ nmc_KeyMapping_keyName0 = $key => {
     let var$2;
     nmc_KeyMapping_$callClinit();
     if (!$key)
-        return $rt_s(901);
+        return $rt_s(935);
     switch ($key) {
         case 1:
             break;
         case 15:
-            return $rt_s(902);
+            return $rt_s(936);
         case 16:
-            return $rt_s(903);
+            return $rt_s(937);
         case 17:
-            return $rt_s(177);
-        case 18:
-            return $rt_s(904);
-        case 20:
-            return $rt_s(905);
-        case 29:
-            return $rt_s(906);
-        case 30:
-            return $rt_s(907);
-        case 31:
             return $rt_s(179);
-        case 32:
+        case 18:
+            return $rt_s(938);
+        case 20:
+            return $rt_s(939);
+        case 29:
+            return $rt_s(940);
+        case 30:
+            return $rt_s(941);
+        case 31:
             return $rt_s(181);
+        case 32:
+            return $rt_s(183);
         case 42:
-            return $rt_s(908);
+            return $rt_s(942);
         case 43:
-            return $rt_s(909);
+            return $rt_s(943);
         case 57:
-            return $rt_s(175);
+            return $rt_s(177);
         case 60:
-            return $rt_s(910);
+            return $rt_s(944);
         case 63:
-            return $rt_s(911);
+            return $rt_s(945);
         case 87:
-            return $rt_s(912);
+            return $rt_s(946);
         default:
             if ($key >= 2 && $key <= 10)
                 return jl_String_valueOf(($key - 2 | 0) + 1 | 0);
             var$2 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(913)), $key);
+            jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(947)), $key);
             return jl_StringBuilder_toString(var$2);
     }
-    return $rt_s(914);
+    return $rt_s(948);
 },
 nmc_KeyMapping_keyName = $this => {
     return nmc_KeyMapping_keyName0($this.$key0);
@@ -22550,30 +23200,30 @@ try {
     let var$1;
     nmc_KeyMapping_ALL = ju_ArrayList__init_();
     nmc_KeyMapping$Category_$callClinit();
-    nmc_KeyMapping_FORWARD = nmc_KeyMapping_register($rt_s(915), nmc_KeyMapping$Category_MOVEMENT, 17);
-    nmc_KeyMapping_LEFT = nmc_KeyMapping_register($rt_s(916), nmc_KeyMapping$Category_MOVEMENT, 30);
-    nmc_KeyMapping_BACK = nmc_KeyMapping_register($rt_s(917), nmc_KeyMapping$Category_MOVEMENT, 31);
-    nmc_KeyMapping_RIGHT = nmc_KeyMapping_register($rt_s(918), nmc_KeyMapping$Category_MOVEMENT, 32);
-    nmc_KeyMapping_JUMP = nmc_KeyMapping_register($rt_s(919), nmc_KeyMapping$Category_MOVEMENT, 57);
-    nmc_KeyMapping_SNEAK = nmc_KeyMapping_register($rt_s(920), nmc_KeyMapping$Category_MOVEMENT, 42);
-    nmc_KeyMapping_SPRINT = nmc_KeyMapping_register($rt_s(921), nmc_KeyMapping$Category_MOVEMENT, 29);
-    nmc_KeyMapping_INVENTORY = nmc_KeyMapping_register($rt_s(922), nmc_KeyMapping$Category_INVENTORY, 18);
-    nmc_KeyMapping_DROP = nmc_KeyMapping_register($rt_s(923), nmc_KeyMapping$Category_INVENTORY, 16);
-    nmc_KeyMapping_HOTBAR_1 = nmc_KeyMapping_register($rt_s(924), nmc_KeyMapping$Category_INVENTORY, 2);
-    nmc_KeyMapping_HOTBAR_2 = nmc_KeyMapping_register($rt_s(925), nmc_KeyMapping$Category_INVENTORY, 3);
-    nmc_KeyMapping_HOTBAR_3 = nmc_KeyMapping_register($rt_s(926), nmc_KeyMapping$Category_INVENTORY, 4);
-    nmc_KeyMapping_HOTBAR_4 = nmc_KeyMapping_register($rt_s(927), nmc_KeyMapping$Category_INVENTORY, 5);
-    nmc_KeyMapping_HOTBAR_5 = nmc_KeyMapping_register($rt_s(928), nmc_KeyMapping$Category_INVENTORY, 6);
-    nmc_KeyMapping_HOTBAR_6 = nmc_KeyMapping_register($rt_s(929), nmc_KeyMapping$Category_INVENTORY, 7);
-    nmc_KeyMapping_HOTBAR_7 = nmc_KeyMapping_register($rt_s(930), nmc_KeyMapping$Category_INVENTORY, 8);
-    nmc_KeyMapping_HOTBAR_8 = nmc_KeyMapping_register($rt_s(931), nmc_KeyMapping$Category_INVENTORY, 9);
-    nmc_KeyMapping_HOTBAR_9 = nmc_KeyMapping_register($rt_s(932), nmc_KeyMapping$Category_INVENTORY, 10);
-    nmc_KeyMapping_CHAT = nmc_KeyMapping_register($rt_s(933), nmc_KeyMapping$Category_INTERFACE, 20);
-    nmc_KeyMapping_PLAYERLIST = nmc_KeyMapping_register($rt_s(934), nmc_KeyMapping$Category_INTERFACE, 15);
-    nmc_KeyMapping_SCREENSHOT = nmc_KeyMapping_register($rt_s(935), nmc_KeyMapping$Category_INTERFACE, 60);
+    nmc_KeyMapping_FORWARD = nmc_KeyMapping_register($rt_s(949), nmc_KeyMapping$Category_MOVEMENT, 17);
+    nmc_KeyMapping_LEFT = nmc_KeyMapping_register($rt_s(950), nmc_KeyMapping$Category_MOVEMENT, 30);
+    nmc_KeyMapping_BACK = nmc_KeyMapping_register($rt_s(951), nmc_KeyMapping$Category_MOVEMENT, 31);
+    nmc_KeyMapping_RIGHT = nmc_KeyMapping_register($rt_s(952), nmc_KeyMapping$Category_MOVEMENT, 32);
+    nmc_KeyMapping_JUMP = nmc_KeyMapping_register($rt_s(953), nmc_KeyMapping$Category_MOVEMENT, 57);
+    nmc_KeyMapping_SNEAK = nmc_KeyMapping_register($rt_s(954), nmc_KeyMapping$Category_MOVEMENT, 42);
+    nmc_KeyMapping_SPRINT = nmc_KeyMapping_register($rt_s(955), nmc_KeyMapping$Category_MOVEMENT, 29);
+    nmc_KeyMapping_INVENTORY = nmc_KeyMapping_register($rt_s(956), nmc_KeyMapping$Category_INVENTORY, 18);
+    nmc_KeyMapping_DROP = nmc_KeyMapping_register($rt_s(957), nmc_KeyMapping$Category_INVENTORY, 16);
+    nmc_KeyMapping_HOTBAR_1 = nmc_KeyMapping_register($rt_s(958), nmc_KeyMapping$Category_INVENTORY, 2);
+    nmc_KeyMapping_HOTBAR_2 = nmc_KeyMapping_register($rt_s(959), nmc_KeyMapping$Category_INVENTORY, 3);
+    nmc_KeyMapping_HOTBAR_3 = nmc_KeyMapping_register($rt_s(960), nmc_KeyMapping$Category_INVENTORY, 4);
+    nmc_KeyMapping_HOTBAR_4 = nmc_KeyMapping_register($rt_s(961), nmc_KeyMapping$Category_INVENTORY, 5);
+    nmc_KeyMapping_HOTBAR_5 = nmc_KeyMapping_register($rt_s(962), nmc_KeyMapping$Category_INVENTORY, 6);
+    nmc_KeyMapping_HOTBAR_6 = nmc_KeyMapping_register($rt_s(963), nmc_KeyMapping$Category_INVENTORY, 7);
+    nmc_KeyMapping_HOTBAR_7 = nmc_KeyMapping_register($rt_s(964), nmc_KeyMapping$Category_INVENTORY, 8);
+    nmc_KeyMapping_HOTBAR_8 = nmc_KeyMapping_register($rt_s(965), nmc_KeyMapping$Category_INVENTORY, 9);
+    nmc_KeyMapping_HOTBAR_9 = nmc_KeyMapping_register($rt_s(966), nmc_KeyMapping$Category_INVENTORY, 10);
+    nmc_KeyMapping_CHAT = nmc_KeyMapping_register($rt_s(967), nmc_KeyMapping$Category_INTERFACE, 20);
+    nmc_KeyMapping_PLAYERLIST = nmc_KeyMapping_register($rt_s(968), nmc_KeyMapping$Category_INTERFACE, 15);
+    nmc_KeyMapping_SCREENSHOT = nmc_KeyMapping_register($rt_s(969), nmc_KeyMapping$Category_INTERFACE, 60);
     var$1 = nmc_KeyMapping$Category_INTERFACE;
-    nmc_KeyMapping_TOGGLE_PERSPECTIVE = nmc_KeyMapping_register($rt_s(936), var$1, 63);
-    nmc_KeyMapping_FULLSCREEN = nmc_KeyMapping_register($rt_s(937), nmc_KeyMapping$Category_INTERFACE, 87);
+    nmc_KeyMapping_TOGGLE_PERSPECTIVE = nmc_KeyMapping_register($rt_s(970), var$1, 63);
+    nmc_KeyMapping_FULLSCREEN = nmc_KeyMapping_register($rt_s(971), nmc_KeyMapping$Category_INTERFACE, 87);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function nmcgso_OptionsScreen$init$lambda$_1_0() {
@@ -22750,14 +23400,14 @@ jl_Long_parseLong0 = ($s, $radix) => {
     jl_Long_$callClinit();
     if ($s !== null)
         return jl_Long_parseLongImpl($s, 0, jl_String_length($s), $radix);
-    $rt_throw(jl_NumberFormatException__init_1($rt_s(76)));
+    $rt_throw(jl_NumberFormatException__init_1($rt_s(78)));
 },
 jl_Long_parseLongImpl = ($s, $beginIndex, $endIndex, $radix) => {
     let $negative, var$6, $value, var$8, $maxValue, var$10, $digit, var$12, var$13, var$14, var$15;
     jl_Long_$callClinit();
     if ($radix >= 2 && $radix <= 36) {
         if ($beginIndex == $endIndex)
-            $rt_throw(jl_NumberFormatException__init_1($rt_s(77)));
+            $rt_throw(jl_NumberFormatException__init_1($rt_s(79)));
         a: {
             $negative = 0;
             switch ($s.$charAt($beginIndex)) {
@@ -22789,7 +23439,7 @@ jl_Long_parseLongImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$12 = new jl_NumberFormatException;
                 var$13 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$14 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$14, $rt_s(78)), var$13);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$14, $rt_s(80)), var$13);
                 jl_NumberFormatException__init_0(var$12, jl_StringBuilder_toString(var$14));
                 $rt_throw(var$12);
             }
@@ -22797,7 +23447,7 @@ jl_Long_parseLongImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$14 = new jl_NumberFormatException;
                 var$15 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$12 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$12, $rt_s(79)), $radix), $rt_s(80)), var$15);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$12, $rt_s(81)), $radix), $rt_s(82)), var$15);
                 jl_NumberFormatException__init_0(var$14, jl_StringBuilder_toString(var$12));
                 $rt_throw(var$14);
             }
@@ -22810,17 +23460,17 @@ jl_Long_parseLongImpl = ($s, $beginIndex, $endIndex, $radix) => {
                 var$12 = new jl_NumberFormatException;
                 var$13 = jl_String_valueOf2($s.$subSequence($beginIndex, $endIndex));
                 var$14 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$14, $rt_s(938)), var$13);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$14, $rt_s(972)), var$13);
                 jl_NumberFormatException__init_0(var$12, jl_StringBuilder_toString(var$14));
                 $rt_throw(var$12);
             }
             var$6 = var$10;
         }
-        $rt_throw(jl_NumberFormatException__init_1($rt_s(939)));
+        $rt_throw(jl_NumberFormatException__init_1($rt_s(973)));
     }
     var$13 = new jl_NumberFormatException;
     var$14 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$14, $rt_s(83)), $radix);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$14, $rt_s(85)), $radix);
     jl_NumberFormatException__init_0(var$13, jl_StringBuilder_toString(var$14));
     $rt_throw(var$13);
 },
@@ -23063,7 +23713,7 @@ nmcm_MultiPlayerGameMode_destroyBlock = ($this, $x, $y, $z) => {
         return;
     $level.$setBlockState($x, $y, $z, 0);
     if (!$level.$isCreative())
-        ($this.$minecraft3.$getInventory()).$addItem($state);
+        ($this.$minecraft3.$getInventory()).$addItem0($state);
 },
 nmcm_MultiPlayerGameMode_useItemOn = ($this, $hit, $blockId) => {
     let var$3, $player, var$5, $level, $nx, $ny, $nz, var$10, var$11, var$12, $overlapsPlayer;
@@ -23307,7 +23957,7 @@ jm_BigInteger_testBit = ($this, $n) => {
     if (!$n)
         return !($this.$digits.data[0] & 1) ? 0 : 1;
     if ($n < 0)
-        $rt_throw(jl_ArithmeticException__init_($rt_s(940)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(974)));
     $intCount = $n >> 5;
     if ($intCount >= $this.$numberLength)
         return $this.$sign2 >= 0 ? 0 : 1;
@@ -23376,7 +24026,7 @@ jm_BigInteger_multiply = ($this, $val) => {
 jm_BigInteger_pow = ($this, $exp) => {
     let $x;
     if ($exp < 0)
-        $rt_throw(jl_ArithmeticException__init_($rt_s(941)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(975)));
     if (!$exp) {
         jm_BigInteger_$callClinit();
         return jm_BigInteger_ONE;
@@ -23399,7 +24049,7 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
     let $divisorSign, $divisorLen, $divisorDigits, $thisDigits, $thisLen, var$7, $cmp, var$9, var$10, $thisSign, $quotientLength, $quotientSign, $quotientDigits, $remainderDigits, $result0, $result1;
     $divisorSign = $divisor.$sign2;
     if (!$divisorSign)
-        $rt_throw(jl_ArithmeticException__init_($rt_s(942)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(976)));
     $divisorLen = $divisor.$numberLength;
     $divisorDigits = $divisor.$digits;
     if ($divisorLen == 1)
@@ -23430,7 +24080,7 @@ jm_BigInteger_divideAndRemainder = ($this, $divisor) => {
 jm_BigInteger_divide = ($this, $divisor) => {
     let $divisorSign, $thisSign, $thisLen, $divisorLen, $val, var$7, $cmp, $resLength, $resDigits, $resSign, $result;
     if (!$divisor.$sign2)
-        $rt_throw(jl_ArithmeticException__init_($rt_s(942)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(976)));
     $divisorSign = $divisor.$sign2;
     if ($divisor.$isOne()) {
         if ($divisor.$sign2 <= 0)
@@ -23466,7 +24116,7 @@ jm_BigInteger_divide = ($this, $divisor) => {
 jm_BigInteger_remainder = ($this, $divisor) => {
     let $thisLen, $divisorLen, var$4, $resDigits, $qLen, $result;
     if (!$divisor.$sign2)
-        $rt_throw(jl_ArithmeticException__init_($rt_s(942)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(976)));
     $thisLen = $this.$numberLength;
     $divisorLen = $divisor.$numberLength;
     var$4 = $rt_compare($thisLen, $divisorLen);
@@ -23621,24 +24271,24 @@ nlevit_EPKLoader___onLoadComplete = $data => {
     if ($fileCount < 0) {
         var$3 = $data.byteLength;
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(943)), var$3), $rt_s(944));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(977)), var$3), $rt_s(978));
         console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
     } else {
         var$3 = $data.byteLength;
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(945)), var$3), $rt_s(946)), $fileCount), $rt_s(947));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(979)), var$3), $rt_s(980)), $fileCount), $rt_s(981));
         console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         $lang = nlevit_EPKLoader_extractFile$js_body$_15($data, "lang/en_US.json");
         if ($lang === null)
-            var$4 = $rt_s(948);
+            var$4 = $rt_s(982);
         else {
             var$3 = $lang.byteLength;
             var$4 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append0(var$4, var$3), $rt_s(949));
+            jl_StringBuilder_append(jl_StringBuilder_append0(var$4, var$3), $rt_s(983));
             var$4 = jl_StringBuilder_toString(var$4);
         }
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(950)), var$4);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(984)), var$4);
         var$4 = jl_StringBuilder_toString(var$6);
         console.log($rt_ustr(var$4));
     }
@@ -23655,7 +24305,7 @@ nlevit_EPKLoader___onLoadError = $error => {
     nlevit_EPKLoader_$callClinit();
     nlevit_EPKLoader_loadState = 3;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(951)), $error);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(985)), $error);
     console.error($rt_ustr(jl_StringBuilder_toString(var$2)));
 },
 nlevit_EPKLoader_lambda$loadEPK$2 = $error => {
@@ -23856,18 +24506,18 @@ nleva_EaglerGuiImpl_init = $gl => {
     nleva_EaglerGuiImpl_$callClinit();
     if (nleva_EaglerGuiImpl_initialized)
         return;
-    $vsh = $rt_s(952);
-    $fsh = $rt_s(953);
-    nleva_EaglerGuiImpl_guiProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(954));
+    $vsh = $rt_s(986);
+    $fsh = $rt_s(987);
+    nleva_EaglerGuiImpl_guiProgram = nleva_EaglerShaderImpl_createProgramFromSource($vsh, $fsh, $rt_s(988));
     if (nleva_EaglerGuiImpl_guiProgram === null) {
         console.error("[EaglerGuiImpl] Failed to create the 2D GUI shader program");
         return;
     }
-    nleva_EaglerGuiImpl_uResolution = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(126));
-    nleva_EaglerGuiImpl_uSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(366));
-    nleva_EaglerGuiImpl_aPos = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(128));
-    nleva_EaglerGuiImpl_aColor = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(955));
-    nleva_EaglerGuiImpl_aUv = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(872));
+    nleva_EaglerGuiImpl_uResolution = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(128));
+    nleva_EaglerGuiImpl_uSampler = nleva_EaglerShaderImpl_getUniformLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(368));
+    nleva_EaglerGuiImpl_aPos = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(130));
+    nleva_EaglerGuiImpl_aColor = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(989));
+    nleva_EaglerGuiImpl_aUv = nleva_EaglerShaderImpl_getAttribLocation(nleva_EaglerGuiImpl_guiProgram, $rt_s(906));
     nlevi_PlatformOpenGL__wglUseProgram(nleva_EaglerGuiImpl_guiProgram);
     nlevi_PlatformOpenGL__wglActiveTexture(33984);
     nlevi_PlatformOpenGL__wglUniform1i(nleva_EaglerGuiImpl_uSampler, 0);
@@ -24176,16 +24826,16 @@ nleva_EaglerGuiImpl_wrapText = ($text, $maxWidth) => {
     nleva_EaglerGuiImpl_$callClinit();
     $lines = ju_ArrayList__init_();
     if ($text === null) {
-        $lines.$add($rt_s(72));
+        $lines.$add($rt_s(74));
         return $lines;
     }
-    var$4 = (jl_String_split0($text, $rt_s(90), (-1))).data;
+    var$4 = (jl_String_split0($text, $rt_s(92), (-1))).data;
     var$5 = var$4.length;
     var$6 = 0;
     while (var$6 < var$5) {
         $paragraph = var$4[var$6];
         $line = jl_StringBuilder__init_();
-        var$9 = (jl_String_split0($paragraph, $rt_s(135), (-1))).data;
+        var$9 = (jl_String_split0($paragraph, $rt_s(137), (-1))).data;
         var$10 = var$9.length;
         var$11 = 0;
         while (var$11 < var$10) {
@@ -24234,7 +24884,7 @@ nleva_EaglerGuiImpl_wrapText = ($text, $maxWidth) => {
         var$6 = var$6 + 1 | 0;
     }
     if ($lines.$isEmpty())
-        $lines.$add($rt_s(72));
+        $lines.$add($rt_s(74));
     return $lines;
 },
 nleva_EaglerGuiImpl_openBatch = $gl => {
@@ -24513,7 +25163,7 @@ function nmcgsm_ConnectScreen() {
 }
 let nmcgsm_ConnectScreen__init_ = ($this, $lastScreen, $serverData) => {
     nmcgs_Screen__init_($this);
-    $this.$status = $rt_s(956);
+    $this.$status = $rt_s(990);
     $this.$lastScreen7 = $lastScreen;
     $this.$serverData = $serverData;
 },
@@ -24528,13 +25178,13 @@ nmcgsm_ConnectScreen_init = $this => {
     $uri = nmcgsm_ConnectScreen_normalizeUri($this.$serverData.$ip);
     var$2 = $this.$serverData.$ip;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(957)), var$2), $rt_s(958));
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(991)), var$2), $rt_s(992));
     $this.$status = jl_StringBuilder_toString(var$3);
     if (!nlevi_PlatformNetworking_connect($uri)) {
         $state = nlevi_PlatformNetworking_getConnectionState();
         var$2 = $this.$serverData.$ip;
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(959)), var$2), 34);
+        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(993)), var$2), 34);
         $this.$status = jl_StringBuilder_toString(var$3);
         if ($state != 3)
             nlevi_PlatformNetworking_disconnect();
@@ -24543,9 +25193,9 @@ nmcgsm_ConnectScreen_init = $this => {
 nmcgsm_ConnectScreen_normalizeUri = $address => {
     let $trimmed, var$3;
     $trimmed = jl_String_trim($address);
-    if (!jl_String_startsWith($trimmed, $rt_s(960)) && !jl_String_startsWith($trimmed, $rt_s(961))) {
+    if (!jl_String_startsWith($trimmed, $rt_s(994)) && !jl_String_startsWith($trimmed, $rt_s(995))) {
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(961)), $trimmed);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(995)), $trimmed);
         return jl_StringBuilder_toString(var$3);
     }
     return $trimmed;
@@ -24554,27 +25204,27 @@ nmcgsm_ConnectScreen_tick = $this => {
     let $state, $elapsed;
     $state = nlevi_PlatformNetworking_getConnectionState();
     if ($state == 3) {
-        nmcgsm_ConnectScreen_fail($this, $rt_s(962));
+        nmcgsm_ConnectScreen_fail($this, $rt_s(996));
         return;
     }
     if ($state == 2) {
         nlevi_PlatformNetworking_disconnect();
-        nmcgsm_ConnectScreen_fail($this, $rt_s(963));
+        nmcgsm_ConnectScreen_fail($this, $rt_s(997));
         return;
     }
     $elapsed = Long_sub(nlevi_PlatformRuntime_getCurrentTimeMillis(), $this.$startTime);
     if (Long_gt($elapsed, Long_fromInt(10000)))
-        nmcgsm_ConnectScreen_fail($this, $rt_s(964));
+        nmcgsm_ConnectScreen_fail($this, $rt_s(998));
 },
 nmcgsm_ConnectScreen_fail = ($this, $reason) => {
     if ($this.$minecraft !== null)
-        $this.$minecraft.$setScreen(nmcgsm_DisconnectedScreen__init_0($rt_s(965), $reason, $this.$lastScreen7));
+        $this.$minecraft.$setScreen(nmcgsm_DisconnectedScreen__init_0($rt_s(999), $reason, $this.$lastScreen7));
 },
 nmcgsm_ConnectScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $statusWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(966));
-    nleva_EaglerGuiImpl_drawText($rt_s(966), ($this.$width / 2 | 0) - $titleWidth / 2.0, 20.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1000));
+    nleva_EaglerGuiImpl_drawText($rt_s(1000), ($this.$width / 2 | 0) - $titleWidth / 2.0, 20.0, (-1), 1);
     $statusWidth = nleva_EaglerGuiImpl_widthOf($this.$status);
     nleva_EaglerGuiImpl_drawText($this.$status, ($this.$width / 2 | 0) - $statusWidth / 2.0, ($this.$height / 2 | 0) + (-50) | 0, (-3092272), 1);
 },
@@ -24762,7 +25412,7 @@ jur_UCISequenceSet_getName = $this => {
     let var$1, var$2;
     var$1 = $this.$string3;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(967)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1001)), var$1);
     return jl_StringBuilder_toString(var$2);
 };
 function jur_CharClass$16() {
@@ -24828,8 +25478,8 @@ jur_CharClass$15_contains = ($this, $ch) => {
 };
 function cmbp_RenderTarget() {
     let a = this; jl_Object.call(a);
-    a.$width3 = 0;
-    a.$height3 = 0;
+    a.$width5 = 0;
+    a.$height5 = 0;
     a.$useDepth = 0;
     a.$useStencil = 0;
     a.$useMultisample = 0;
@@ -24858,8 +25508,8 @@ cmbp_RenderTarget__init_ = ($this, $width, $height, $useDepth, $useStencil) => {
     $this.$clearColorG = 0.0;
     $this.$clearColorB = 0.0;
     $this.$clearColorA = 0.0;
-    $this.$width3 = $width;
-    $this.$height3 = $height;
+    $this.$width5 = $width;
+    $this.$height5 = $height;
     $this.$useDepth = $useDepth;
     $this.$useStencil = $useStencil;
     $this.$useMultisample = 0;
@@ -24871,8 +25521,8 @@ cmbp_RenderTarget__init_0 = (var_0, var_1, var_2, var_3) => {
 },
 cmbp_RenderTarget_create = ($this, $width, $height, $useDepth, $useStencil) => {
     let $gl, $status, var$7, var$8, var$9;
-    $this.$width3 = $width;
-    $this.$height3 = $height;
+    $this.$width5 = $width;
+    $this.$height5 = $height;
     $this.$useDepth = $useDepth;
     $this.$useStencil = $useStencil;
     $gl = nlevit_ClientMain_getWebGL2();
@@ -24906,7 +25556,7 @@ cmbp_RenderTarget_create = ($this, $width, $height, $useDepth, $useStencil) => {
     $status = $gl.checkFramebufferStatus(36160);
     if ($status != 36053) {
         var$7 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(var$7, $rt_s(968)), $status);
+        jl_StringBuilder_append0(jl_StringBuilder_append(var$7, $rt_s(1002)), $status);
         console.error($rt_ustr(jl_StringBuilder_toString(var$7)));
     }
     var$8 = null;
@@ -25287,7 +25937,7 @@ jur_CompositeRangeSet_getName = $this => {
     var$1 = jl_String_valueOf2($this.$withoutSurrogates);
     var$2 = jl_String_valueOf2($this.$withSurrogates);
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(969)), var$1), $rt_s(970)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1003)), var$1), $rt_s(1004)), var$2);
     return jl_StringBuilder_toString(var$3);
 },
 jur_CompositeRangeSet_hasConsumed = ($this, $matchResult) => {
@@ -25326,37 +25976,37 @@ nmcgso_SoundOptionsScreen_init = $this => {
     $gridX = ($centerX - 150 | 0) - 4 | 0;
     $rightX = $centerX + 4 | 0;
     $rowY = 34;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen$VolumeSlider__init_0($gridX, $rowY, 308, 20, $rt_s(971), $this.$options.$masterVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_0__init_0($this), $rt_s(972)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen$VolumeSlider__init_0($gridX, $rowY, 308, 20, $rt_s(1005), $this.$options.$masterVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_0__init_0($this), $rt_s(1006)));
     $row1Y = 62;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row1Y, $rt_s(973), $this.$options.$musicVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_1__init_0($this), $rt_s(974)));
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row1Y, $rt_s(975), $this.$options.$recordVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_2__init_0($this), $rt_s(976)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row1Y, $rt_s(1007), $this.$options.$musicVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_1__init_0($this), $rt_s(1008)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row1Y, $rt_s(1009), $this.$options.$recordVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_2__init_0($this), $rt_s(1010)));
     $row2Y = 86;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row2Y, $rt_s(977), $this.$options.$weatherVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_3__init_0($this), $rt_s(978)));
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row2Y, $rt_s(979), $this.$options.$blockVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_4__init_0($this), $rt_s(980)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row2Y, $rt_s(1011), $this.$options.$weatherVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_3__init_0($this), $rt_s(1012)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row2Y, $rt_s(1013), $this.$options.$blockVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_4__init_0($this), $rt_s(1014)));
     $row3Y = 110;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row3Y, $rt_s(981), $this.$options.$hostileVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_5__init_0($this), $rt_s(982)));
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row3Y, $rt_s(983), $this.$options.$neutralVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_6__init_0($this), $rt_s(984)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row3Y, $rt_s(1015), $this.$options.$hostileVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_5__init_0($this), $rt_s(1016)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row3Y, $rt_s(1017), $this.$options.$neutralVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_6__init_0($this), $rt_s(1018)));
     $row4Y = 134;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row4Y, $rt_s(985), $this.$options.$playerVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_7__init_0($this), $rt_s(986)));
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row4Y, $rt_s(987), $this.$options.$ambientVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_8__init_0($this), $rt_s(988)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row4Y, $rt_s(1019), $this.$options.$playerVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_7__init_0($this), $rt_s(1020)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $rightX, $row4Y, $rt_s(1021), $this.$options.$ambientVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_8__init_0($this), $rt_s(1022)));
     $row5Y = 158;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row5Y, $rt_s(989), $this.$options.$voiceVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_9__init_0($this), $rt_s(990)));
-    $device = nmcgc_Button__init_($rightX, $row5Y, 150, 20, $rt_s(991), nmcgso_SoundOptionsScreen$init$lambda$_1_10__init_0());
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_volumeSlider($this, $gridX, $row5Y, $rt_s(1023), $this.$options.$voiceVolume, nmcgso_SoundOptionsScreen$init$lambda$_1_9__init_0($this), $rt_s(1024)));
+    $device = nmcgc_Button__init_($rightX, $row5Y, 150, 20, $rt_s(1025), nmcgso_SoundOptionsScreen$init$lambda$_1_10__init_0());
     $device.$setActive(0);
     $this.$addRenderableWidget($device);
     $row6Y = 182;
     var$12 = new nmcgc_CycleButton;
-    var$13 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$12, $gridX, $row6Y, 150, 20, $rt_s(994), var$13, !$this.$options.$showSubtitles ? 0 : 1, nmcgso_SoundOptionsScreen$init$lambda$_1_11__init_0($this));
+    var$13 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$12, $gridX, $row6Y, 150, 20, $rt_s(1028), var$13, !$this.$options.$showSubtitles ? 0 : 1, nmcgso_SoundOptionsScreen$init$lambda$_1_11__init_0($this));
     $this.$addRenderableWidget(var$12);
     var$12 = new nmcgc_CycleButton;
-    var$14 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$12, $rightX, $row6Y, 150, 20, $rt_s(995), var$14, !$this.$options.$directionalAudio ? 0 : 1, nmcgso_SoundOptionsScreen$init$lambda$_1_12__init_0($this));
+    var$14 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$12, $rightX, $row6Y, 150, 20, $rt_s(1029), var$14, !$this.$options.$directionalAudio ? 0 : 1, nmcgso_SoundOptionsScreen$init$lambda$_1_12__init_0($this));
     $this.$addRenderableWidget(var$12);
     $row7Y = 206;
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_disabledButton($this, $gridX, $row7Y, $rt_s(996)));
-    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_disabledButton($this, $rightX, $row7Y, $rt_s(997)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(442), nmcgso_SoundOptionsScreen$init$lambda$_1_13__init_0($this)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_disabledButton($this, $gridX, $row7Y, $rt_s(1030)));
+    $this.$addRenderableWidget(nmcgso_SoundOptionsScreen_disabledButton($this, $rightX, $row7Y, $rt_s(1031)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(469), nmcgso_SoundOptionsScreen$init$lambda$_1_13__init_0($this)));
 },
 nmcgso_SoundOptionsScreen_volumeSlider = ($this, $x, $y, $name, $initial, $sink, $telemetryId) => {
     return nmcgso_SoundOptionsScreen$VolumeSlider__init_0($x, $y, 150, 20, $name, $initial, $sink, $telemetryId);
@@ -25369,9 +26019,9 @@ nmcgso_SoundOptionsScreen_disabledButton = ($this, $x, $y, $label) => {
 },
 nmcgso_SoundOptionsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(998));
-    nleva_EaglerGuiImpl_drawText($rt_s(998), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1032));
+    nleva_EaglerGuiImpl_drawText($rt_s(1032), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_SoundOptionsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -25542,7 +26192,7 @@ jur_FinalSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $stringIndex;
 },
 jur_FinalSet_getName = $this => {
-    return $rt_s(999);
+    return $rt_s(1033);
 };
 function nmcgso_AccessibilityOptionsScreen() {
     let a = this; nmcgs_Screen.call(a);
@@ -25565,13 +26215,13 @@ nmcgso_AccessibilityOptionsScreen_init = $this => {
     $gridX = ($centerX - 150 | 0) - 4 | 0;
     $rowY = 34;
     $this.$addRenderableWidget(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider__init_0($gridX, $rowY, 150, 20, $this.$options8));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(442), nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(469), nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0__init_0($this)));
 },
 nmcgso_AccessibilityOptionsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1000));
-    nleva_EaglerGuiImpl_drawText($rt_s(1000), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1034));
+    nleva_EaglerGuiImpl_drawText($rt_s(1034), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_AccessibilityOptionsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -25759,7 +26409,7 @@ jur_EmptySet_findBack = ($this, $stringIndex, $startSearch, $testString, $matchR
     return $startSearch;
 },
 jur_EmptySet_getName = $this => {
-    return $rt_s(1001);
+    return $rt_s(1035);
 },
 jur_EmptySet_hasConsumed = ($this, $mr) => {
     return 0;
@@ -25823,12 +26473,10 @@ nmc_MouseHandler_cursorPressed = ($this, $window, $button, $action, $modifiers) 
         $this.$minecraft0.$screen.$mouseReleased($mx, $my, $button);
 },
 nmc_MouseHandler_onScroll = ($this, $window, $xOffset, $yOffset) => {
-    let $direction, $current, $next;
-    if ($this.$mouseGrabbed && $this.$minecraft0.$screen === null && $this.$minecraft0.$isLevelLoaded()) {
+    let $direction;
+    if ($this.$minecraft0.$screen === null && $this.$minecraft0.$isLevelLoaded()) {
         $direction = !($yOffset < 0.0) ? 1 : (-1);
-        $current = ($this.$minecraft0.$getGui()).$getSelectedHotbarSlot();
-        $next = ((($current + $direction | 0) % 9 | 0) + 9 | 0) % 9 | 0;
-        ($this.$minecraft0.$getGui()).$setSelectedHotbarSlot($next);
+        ($this.$minecraft0.$getInventory()).$swapPaint($direction);
         $this.$minecraft0.$playerSelectedSlotChanged();
         return;
     }
@@ -25868,7 +26516,7 @@ nmc_MouseHandler_turnPlayer = $this => {
 },
 nmc_MouseHandler_grabMouse = $this => {
     nlevi_PlatformInput_requestPointerLock();
-    $this.$mouseGrabbed = nlevi_PlatformInput_isPointerLocked();
+    $this.$mouseGrabbed = 1;
 },
 nmc_MouseHandler_releaseMouse = $this => {
     nlevi_PlatformInput_exitPointerLock();
@@ -25881,9 +26529,16 @@ nmc_MouseHandler_isLeftPressed = $this => {
     return $this.$mouseGrabbed && nlevi_PlatformInput_isMouseDown(0) ? 1 : 0;
 },
 nmc_MouseHandler_tick = $this => {
+    let $locked;
     $this.$xpos0 = nmc_MouseHandler_toGuiX($this, nlevi_PlatformInput_getMouseX());
     $this.$ypos0 = nmc_MouseHandler_toGuiY($this, nlevi_PlatformInput_getMouseY());
-    $this.$mouseGrabbed = nlevi_PlatformInput_isPointerLocked();
+    $locked = nlevi_PlatformInput_isPointerLocked();
+    if ($locked && !$this.$mouseGrabbed) {
+        nlevi_PlatformInput_clearMouseDeltas();
+        $this.$accumulatedDX = 0.0;
+        $this.$accumulatedDY = 0.0;
+    }
+    $this.$mouseGrabbed = $locked;
 },
 nmc_MouseHandler_xpos = $this => {
     return $this.$xpos0;
@@ -25950,10 +26605,10 @@ let jl_StackTraceElement_toString = $this => {
     $sb = jl_StringBuilder__init_();
     ((($sb.$append3($this.$declaringClass)).$append0(46)).$append3($this.$methodName)).$append0(40);
     if ($this.$fileName === null)
-        $sb.$append3($rt_s(1002));
+        $sb.$append3($rt_s(1036));
     else
         (($sb.$append3($this.$fileName)).$append0(58)).$append1($this.$lineNumber);
-    $sb.$append3($rt_s(1003));
+    $sb.$append3($rt_s(1037));
     return $sb.$toString();
 },
 nlevi_PlatformInput$suppressDragDrop$lambda$_13_1 = $rt_classWithoutFields(),
@@ -26175,7 +26830,7 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                         $t = $$je;
                         var$9 = $t.$getMessage();
                         var$32 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(var$32, $rt_s(1004)), var$9);
+                        jl_StringBuilder_append(jl_StringBuilder_append(var$32, $rt_s(1038)), var$9);
                         console.warn($rt_ustr(jl_StringBuilder_toString(var$32)));
                         break a;
                     } else {
@@ -26380,53 +27035,53 @@ nmc_Options_load = $this => {
             $this.$enableVsync = nlev_EaglerProfile_isVsync();
             $this.$heldItemTooltips = nlev_EaglerProfile_isHeldItemTooltips();
             $this.$showFPS = nlev_EaglerProfile_isShowFPS();
-            $val = nlevi_PlatformRuntime_localStorageGet($rt_s(1005));
+            $val = nlevi_PlatformRuntime_localStorageGet($rt_s(1039));
             if ($val !== null)
                 $this.$gamma = jl_Double_parseDouble($val);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1006));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1040));
             if (var$2 !== null)
                 $this.$cloudsOption = jl_Integer_parseInt(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1007));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1041));
             if (var$2 !== null)
                 $this.$chatScale = jl_Float_parseFloat(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1008));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1042));
             if (var$2 !== null)
                 $this.$chatWidth = jl_Float_parseFloat(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1009));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1043));
             if (var$2 !== null)
                 $this.$mainHand = jl_Integer_parseInt(var$2);
             console.log("[Options] Loaded from localStorage");
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1010));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1044));
             if (var$2 !== null)
                 $this.$menuBackgroundBlurriness = jl_Math_max(0, jl_Math_min(10, jl_Integer_parseInt(var$2)));
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1011));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1045));
             if (var$2 !== null)
                 $this.$sensitivity = jl_Math_max1(0.0, jl_Math_min0(1.0, jl_Float_parseFloat(var$2)));
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1012));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1046));
             if (var$2 !== null)
                 $this.$invertMouseY = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1013));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1047));
             if (var$2 !== null)
                 $this.$toggleCrouch = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1014));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1048));
             if (var$2 !== null)
                 $this.$toggleSprint = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1015));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1049));
             if (var$2 !== null)
                 $this.$toggleAttack = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1016));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1050));
             if (var$2 !== null)
                 $this.$toggleUse = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1017));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1051));
             if (var$2 !== null)
                 $this.$autoJump = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1018));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1052));
             if (var$2 !== null)
                 $this.$sprintWindow = jl_Math_max(0, jl_Math_min(10, jl_Integer_parseInt(var$2)));
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1019));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1053));
             if (var$2 !== null)
                 $this.$showSubtitles = jl_Boolean_parseBoolean(var$2);
-            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1020));
+            var$2 = nlevi_PlatformRuntime_localStorageGet($rt_s(1054));
             if (var$2 !== null)
                 $this.$directionalAudio = jl_Boolean_parseBoolean(var$2);
             nmc_KeyMapping_loadBinds();
@@ -26437,7 +27092,7 @@ nmc_Options_load = $this => {
                 $e = $$je;
                 var$2 = $e.$getMessage();
                 var$4 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1021)), var$2);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1055)), var$2);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
                 break a;
             } else {
@@ -26463,65 +27118,65 @@ nmc_Options_save = $this => {
             nlev_EaglerProfile_setVsync($this.$enableVsync);
             nlev_EaglerProfile_setHeldItemTooltips($this.$heldItemTooltips);
             nlev_EaglerProfile_setShowFPS($this.$showFPS);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1005), jl_String_valueOf5($this.$gamma));
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1006), jl_String_valueOf($this.$cloudsOption));
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1007), jl_String_valueOf0($this.$chatScale));
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1008), jl_String_valueOf0($this.$chatWidth));
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1009), jl_String_valueOf($this.$mainHand));
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1039), jl_String_valueOf5($this.$gamma));
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1040), jl_String_valueOf($this.$cloudsOption));
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1041), jl_String_valueOf0($this.$chatScale));
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1042), jl_String_valueOf0($this.$chatWidth));
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1043), jl_String_valueOf($this.$mainHand));
             var$1 = $this.$menuBackgroundBlurriness;
             var$2 = jl_String_valueOf(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1010), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1044), var$2);
             var$3 = $this.$sensitivity;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1011), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1045), var$2);
             var$1 = $this.$invertMouseY;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1012), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1046), var$2);
             var$1 = $this.$toggleCrouch;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1013), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1047), var$2);
             var$1 = $this.$toggleSprint;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1014), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1048), var$2);
             var$1 = $this.$toggleAttack;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1015), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1049), var$2);
             var$1 = $this.$toggleUse;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1016), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1050), var$2);
             var$1 = $this.$autoJump;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1017), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1051), var$2);
             var$1 = $this.$sprintWindow;
             var$2 = jl_String_valueOf(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1018), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1052), var$2);
             var$1 = $this.$showSubtitles;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1019), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1053), var$2);
             var$1 = $this.$directionalAudio;
             var$2 = jl_String_valueOf1(var$1);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1020), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1054), var$2);
             var$3 = $this.$recordVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1022), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1056), var$2);
             var$3 = $this.$weatherVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1023), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1057), var$2);
             var$3 = $this.$blockVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1024), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1058), var$2);
             var$3 = $this.$hostileVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1025), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1059), var$2);
             var$3 = $this.$neutralVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1026), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1060), var$2);
             var$3 = $this.$playerVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1027), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1061), var$2);
             var$3 = $this.$voiceVolume;
             var$2 = jl_String_valueOf0(var$3);
-            nlevi_PlatformRuntime_localStorageSet($rt_s(1028), var$2);
+            nlevi_PlatformRuntime_localStorageSet($rt_s(1062), var$2);
             nmc_KeyMapping_saveBinds();
             nlev_EaglerProfile_save();
             $this.$dirty = 0;
@@ -26533,7 +27188,7 @@ nmc_Options_save = $this => {
                 $e = $$je;
                 var$4 = $e.$getMessage();
                 var$2 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1029)), var$4);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1063)), var$4);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$2)));
                 break a;
             } else {
@@ -26616,7 +27271,7 @@ nlev_EaglerCraft_makeOfflineUUID = $username => {
     var$4 = var$3.data;
     var$4[0] = jl_Integer_valueOf($hash);
     var$4[1] = jl_Long_valueOf(Long_and(Long_mul(Long_fromInt($hash), Long_fromInt(31)), Long_create(4294967295, 65535)));
-    var$5 = jl_String_format($rt_s(1030), var$3);
+    var$5 = jl_String_format($rt_s(1064), var$3);
     return ju_UUID_fromString(var$5);
 },
 nlev_EaglerCraft_initialize = () => {
@@ -26625,7 +27280,7 @@ nlev_EaglerCraft_initialize = () => {
     if (nlev_EaglerCraft_gameState) {
         var$1 = nlev_EaglerCraft_gameState;
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1031)), var$1), 41);
+        jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1065)), var$1), 41);
         console.warn($rt_ustr(jl_StringBuilder_toString(var$2)));
         return;
     }
@@ -26651,7 +27306,7 @@ nlev_EaglerCraft_initialize = () => {
             console.log("[EaglerCraft] === Initialization complete ===");
             var$2 = nleva_EaglerShaderImpl_getShaderStats();
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1032)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1066)), var$2);
             console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
             nlevit_ClientMain___eaglercraftReady();
             nlev_EaglerCraft_pushGameTelemetry();
@@ -26664,10 +27319,10 @@ nlev_EaglerCraft_initialize = () => {
                 var$2 = jl_Class_getName(jl_Object_getClass($t));
                 var$3 = $t.$getMessage();
                 var$5 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1033)), var$2), $rt_s(80)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1067)), var$2), $rt_s(82)), var$3);
                 $message = jl_StringBuilder_toString(var$5);
                 var$2 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1032)), $message);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1066)), $message);
                 console.error($rt_ustr(jl_StringBuilder_toString(var$2)));
                 $stack = $t.$getStackTrace();
                 var$8 = (__safe($stack).data||[]);
@@ -26677,7 +27332,7 @@ nlev_EaglerCraft_initialize = () => {
                     $element = var$8[var$9];
                     var$2 = jl_StackTraceElement_toString($element);
                     var$3 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1034)), var$2);
+                    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1068)), var$2);
                     console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
                     var$9 = var$9 + 1 | 0;
                 }
@@ -26708,19 +27363,19 @@ nlev_EaglerCraft_setupRenderingPipeline = () => {
     nlevi_PlatformOpenGL__wglDisable(3089);
     nleva_EaglerShaderImpl_resetStats();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1035)), $width), 120), $height), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1069)), $width), 120), $height), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
     var$3 = nlevi_PlatformOpenGL_getGLVersion();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1036)), var$3);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1070)), var$3);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     var$3 = nlevi_PlatformOpenGL_getGLVendor();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1037)), var$3);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1071)), var$3);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     var$3 = nlevi_PlatformOpenGL_getGLRenderer();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1038)), var$3);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1072)), var$3);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
 },
 nlev_EaglerCraft_applyAudioSettings = () => {
@@ -26730,7 +27385,7 @@ nlev_EaglerCraft_applyAudioSettings = () => {
     var$2 = nlev_EaglerProfile_getMusicVolume();
     var$3 = nlev_EaglerProfile_getSFXVolume();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append5(jl_StringBuilder_append(jl_StringBuilder_append5(jl_StringBuilder_append(jl_StringBuilder_append5(jl_StringBuilder_append(var$4, $rt_s(1039)), var$1), $rt_s(1040)), var$2), $rt_s(1041)), var$3);
+    jl_StringBuilder_append5(jl_StringBuilder_append(jl_StringBuilder_append5(jl_StringBuilder_append(jl_StringBuilder_append5(jl_StringBuilder_append(var$4, $rt_s(1073)), var$1), $rt_s(1074)), var$2), $rt_s(1075)), var$3);
     var$4 = jl_StringBuilder_toString(var$4);
     console.log($rt_ustr(var$4));
     nlevi_PlatformAudio_setMasterVolume(nlev_EaglerProfile_getMasterVolume());
@@ -26744,10 +27399,10 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
     a: {
         try {
             console.log("[EaglerCraft] Attempting to construct Minecraft...");
-            $gameDir = ji_File__init_($rt_s(1042));
-            $resourceDir = ji_File__init_($rt_s(1043));
-            $assetDir = ji_File__init_($rt_s(1044));
-            $folderData = nmcm_GameConfig$FolderData__init_0($gameDir, $resourceDir, $assetDir, $rt_s(1045));
+            $gameDir = ji_File__init_($rt_s(1076));
+            $resourceDir = ji_File__init_($rt_s(1077));
+            $assetDir = ji_File__init_($rt_s(1078));
+            $folderData = nmcm_GameConfig$FolderData__init_0($gameDir, $resourceDir, $assetDir, $rt_s(1079));
             $canvasWidth = nlevi_PlatformRuntime_getCanvasDrawableWidth();
             $canvasHeight = nlevi_PlatformRuntime_getCanvasDrawableHeight();
             $displayData = new cmbp_DisplayData;
@@ -26757,17 +27412,17 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
             var$8 = nlev_EaglerProfile_getUsername();
             var$10 = nlev_EaglerCraft_makeOfflineUUID(nlev_EaglerProfile_getUsername());
             var$11 = ju_Optional_empty();
-            nmc_User__init_($user, var$8, var$10, $rt_s(354), var$11, ju_Optional_empty());
+            nmc_User__init_($user, var$8, var$10, $rt_s(356), var$11, ju_Optional_empty());
             $userData = new nmcm_GameConfig$UserData;
             cmap_PropertyMap_$callClinit();
             nmcm_GameConfig$UserData__init_($userData, $user, cmap_PropertyMap_EMPTY);
-            $gameData = nmcm_GameConfig$GameData__init_0(0, $rt_s(1045), $rt_s(1046), 0, 0, 0, 0, 0);
+            $gameData = nmcm_GameConfig$GameData__init_0(0, $rt_s(1079), $rt_s(1080), 0, 0, 0, 0, 0);
             $quickPlayData = new nmcm_GameConfig$QuickPlayData;
             nmcm_GameConfig$QuickPlayVariant_$callClinit();
-            nmcm_GameConfig$QuickPlayData__init_($quickPlayData, $rt_s(72), nmcm_GameConfig$QuickPlayVariant_DISABLED);
+            nmcm_GameConfig$QuickPlayData__init_($quickPlayData, $rt_s(74), nmcm_GameConfig$QuickPlayVariant_DISABLED);
             $gameConfig = nmcm_GameConfig__init_0($userData, $displayData, $folderData, $gameData, $quickPlayData);
             var$8 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(1047)), $canvasWidth), 120), $canvasHeight), $rt_s(1048));
+            jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$8, $rt_s(1081)), $canvasWidth), 120), $canvasHeight), $rt_s(1082));
             console.log($rt_ustr(jl_StringBuilder_toString(var$8)));
             console.log("[EaglerCraft] This will initialize DataFixers, resource packs, rendering, etc.");
             console.log("[EaglerCraft] May take several minutes on slow devices...");
@@ -26782,7 +27437,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                         $t2 = $$je;
                         var$8 = $t2.$getMessage();
                         var$10 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1049)), var$8);
+                        jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1083)), var$8);
                         console.warn($rt_ustr(jl_StringBuilder_toString(var$10)));
                         break b;
                     } else {
@@ -26798,12 +27453,12 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                 var$8 = jl_Class_getName(jl_Object_getClass($t));
                 var$10 = $t.$getMessage();
                 var$18 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1050)), var$8), $rt_s(80)), var$10);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1084)), var$8), $rt_s(82)), var$10);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$18)));
                 $jsStack = $rt_str(nlev_EaglerCraft_getJsErrorStack$js_body$_47());
                 if ($jsStack !== null && !jl_String_isEmpty($jsStack)) {
                     var$8 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1051)), $jsStack);
+                    jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1085)), $jsStack);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$8)));
                 }
                 $stack = $t.$getStackTrace();
@@ -26814,7 +27469,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                         break;
                     var$8 = jl_StackTraceElement_toString(var$22[$i]);
                     var$10 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1034)), var$8);
+                    jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1068)), var$8);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$10)));
                     $i = $i + 1 | 0;
                 }
@@ -26823,7 +27478,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                         var$8 = jl_Class_getName(jl_Object_getClass($t.$getCause()));
                         var$10 = ($t.$getCause()).$getMessage();
                         var$18 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1052)), var$8), $rt_s(80)), var$10);
+                        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1086)), var$8), $rt_s(82)), var$10);
                         console.warn($rt_ustr(jl_StringBuilder_toString(var$18)));
                         $causeStack = ($t.$getCause()).$getStackTrace();
                         $i = 0;
@@ -26833,7 +27488,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                                 break c;
                             var$8 = jl_StackTraceElement_toString(var$22[$i]);
                             var$10 = jl_StringBuilder__init_();
-                            jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1034)), var$8);
+                            jl_StringBuilder_append(jl_StringBuilder_append(var$10, $rt_s(1068)), var$8);
                             console.warn($rt_ustr(jl_StringBuilder_toString(var$10)));
                             $i = $i + 1 | 0;
                         }
@@ -26916,7 +27571,7 @@ nlev_EaglerCraft_gameLogicTick = () => {
         $mc = nlev_EaglerCraft_minecraftInstance;
         if (!$mc.$isLevelLoaded()) {
             console.log("[EaglerCraft] enterWorld() requested via telemetry bridge");
-            $mc.$doWorldLoad($rt_s(419));
+            $mc.$doWorldLoad($rt_s(446));
         }
     }
     a: {
@@ -26934,7 +27589,7 @@ nlev_EaglerCraft_gameLogicTick = () => {
                         break a;
                     var$2 = $t.$getMessage();
                     var$4 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1053)), var$2);
+                    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1087)), var$2);
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$4)));
                     break a;
                 } else {
@@ -26971,7 +27626,7 @@ nlev_EaglerCraft_renderTitleScreen = ($width, $height) => {
     var$4 = nlev_EaglerProfile_getUsername();
     var$5 = Long_lo(Long_div(nlev_EaglerCraft_totalTicks, Long_fromInt(20)));
     var$6 = Long_lo(nlev_EaglerCraft_totalFrames);
-    nleva_EaglerShaderImpl_renderTitleScreen($gl, $width, $height, $rt_s(1054), $rt_s(1055), var$4, var$5, var$6);
+    nleva_EaglerShaderImpl_renderTitleScreen($gl, $width, $height, $rt_s(1088), $rt_s(1089), var$4, var$5, var$6);
 },
 nlev_EaglerCraft_canEnterWorld = () => {
     nlev_EaglerCraft_$callClinit();
@@ -26980,18 +27635,18 @@ nlev_EaglerCraft_canEnterWorld = () => {
 nlev_EaglerCraft_pushGameTelemetry = () => {
     let $screen, $inWorld, $guiScale, $buttonsJson, $mc, $gameplayJson, var$7, var$8, var$9, var$10, var$11, var$12, var$13, var$14, var$15, $$je;
     nlev_EaglerCraft_$callClinit();
-    $screen = $rt_s(1056);
+    $screen = $rt_s(1090);
     $inWorld = 0;
     $guiScale = 1;
-    $buttonsJson = $rt_s(399);
+    $buttonsJson = $rt_s(426);
     if (nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
         $mc = nlev_EaglerCraft_minecraftInstance;
-        $screen = $mc.$getScreen() === null ? $rt_s(1057) : jl_Class_getName(jl_Object_getClass($mc.$getScreen()));
+        $screen = $mc.$getScreen() === null ? $rt_s(1091) : jl_Class_getName(jl_Object_getClass($mc.$getScreen()));
         $inWorld = $mc.$isLevelLoaded();
         $guiScale = $mc.$getWindow() === null ? 1 : ($mc.$getWindow()).$getGuiScale();
         $buttonsJson = nlev_EaglerCraft_buildButtonsJson($mc);
     }
-    $gameplayJson = $rt_s(142);
+    $gameplayJson = $rt_s(144);
     if (nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
         $mc = nlev_EaglerCraft_minecraftInstance;
         nlev_EaglerCraft_consumeHotbarTelemetryRequests($mc);
@@ -27023,33 +27678,33 @@ nlev_EaglerCraft_pushGameTelemetry = () => {
     }
 },
 nlev_EaglerCraft_buildGameplayJson = $mc => {
-    let var$2, $level, $sb, $p, $inv, $i, $id, $count, var$10, $hit, $gm;
+    let var$2, $level, $sb, $p, $inv, $i, $id, $count, var$10, $craft, $hit, $gm, var$14;
     nlev_EaglerCraft_$callClinit();
     var$2 = $mc.$getLevel();
     if (var$2 instanceof nmcm_ClientLevel) {
         $level = var$2;
         if ($mc.$isLevelLoaded()) {
             $sb = jl_StringBuilder__init_0(512);
-            ($sb.$append3($rt_s(1058))).$append19($level.$isCreative());
-            ($sb.$append3($rt_s(1059))).$append1($level.$editCount());
-            var$2 = ($sb.$append3($rt_s(1060))).$append17(nlev_EaglerCraft_fmt($level.$getSpawnX()));
+            ($sb.$append3($rt_s(1092))).$append19($level.$isCreative());
+            ($sb.$append3($rt_s(1093))).$append1($level.$editCount());
+            var$2 = ($sb.$append3($rt_s(1094))).$append17(nlev_EaglerCraft_fmt($level.$getSpawnX()));
             var$2 = (var$2.$append0(44)).$append17(nlev_EaglerCraft_fmt($level.$getSpawnY()));
             ((var$2.$append0(44)).$append17(nlev_EaglerCraft_fmt($level.$getSpawnZ()))).$append0(93);
             $p = $mc.$getPlayer();
             if ($p !== null) {
-                var$2 = ($sb.$append3($rt_s(1061))).$append17(nlev_EaglerCraft_fmt($p.$x0));
-                var$2 = (var$2.$append3($rt_s(1062))).$append17(nlev_EaglerCraft_fmt($p.$y0));
-                var$2 = (var$2.$append3($rt_s(1063))).$append17(nlev_EaglerCraft_fmt($p.$z));
-                var$2 = (var$2.$append3($rt_s(1064))).$append17(nlev_EaglerCraft_fmt($p.$yRot));
-                var$2 = (var$2.$append3($rt_s(1065))).$append17(nlev_EaglerCraft_fmt($p.$xRot));
-                var$2 = (var$2.$append3($rt_s(1066))).$append19($p.$onGround);
-                var$2 = (var$2.$append3($rt_s(1067))).$append19($p.$flying);
-                var$2 = (var$2.$append3($rt_s(1068))).$append19($p.$crouching);
+                var$2 = ($sb.$append3($rt_s(1095))).$append17(nlev_EaglerCraft_fmt($p.$x0));
+                var$2 = (var$2.$append3($rt_s(1096))).$append17(nlev_EaglerCraft_fmt($p.$y0));
+                var$2 = (var$2.$append3($rt_s(1097))).$append17(nlev_EaglerCraft_fmt($p.$z));
+                var$2 = (var$2.$append3($rt_s(1098))).$append17(nlev_EaglerCraft_fmt($p.$yRot));
+                var$2 = (var$2.$append3($rt_s(1099))).$append17(nlev_EaglerCraft_fmt($p.$xRot));
+                var$2 = (var$2.$append3($rt_s(1100))).$append19($p.$onGround);
+                var$2 = (var$2.$append3($rt_s(1101))).$append19($p.$flying);
+                var$2 = (var$2.$append3($rt_s(1102))).$append19($p.$crouching);
                 var$2.$append0(125);
             }
             $inv = $mc.$getInventory();
-            var$2 = ($sb.$append3($rt_s(1069))).$append1($inv.$getSelected());
-            var$2.$append3($rt_s(1070));
+            var$2 = ($sb.$append3($rt_s(1103))).$append1($inv.$getSelected());
+            var$2.$append3($rt_s(1104));
             $i = 0;
             while ($i < 9) {
                 if ($i > 0)
@@ -27059,12 +27714,12 @@ nlev_EaglerCraft_buildGameplayJson = $mc => {
                 if ($count > 0 && $id)
                     (((($sb.$append0(91)).$append1($id)).$append0(44)).$append1($count)).$append0(93);
                 else
-                    $sb.$append3($rt_s(142));
+                    $sb.$append3($rt_s(144));
                 $i = $i + 1 | 0;
             }
             $sb.$append0(93);
             $sb.$append0(125);
-            $sb.$append3($rt_s(1071));
+            $sb.$append3($rt_s(1105));
             $i = 0;
             while ($i < 27) {
                 if ($i > 0)
@@ -27075,56 +27730,86 @@ nlev_EaglerCraft_buildGameplayJson = $mc => {
                 if ($count > 0 && $id)
                     (((($sb.$append0(91)).$append1($id)).$append0(44)).$append1($count)).$append0(93);
                 else
-                    $sb.$append3($rt_s(142));
+                    $sb.$append3($rt_s(144));
                 $i = $i + 1 | 0;
             }
             $sb.$append0(93);
             if ($inv.$getCarriedCount() > 0 && $inv.$getCarriedBlock()) {
-                var$2 = ($sb.$append3($rt_s(1072))).$append1($inv.$getCarriedBlock());
+                var$2 = ($sb.$append3($rt_s(1106))).$append1($inv.$getCarriedBlock());
                 ((var$2.$append0(44)).$append1($inv.$getCarriedCount())).$append0(93);
             } else
-                $sb.$append3($rt_s(1073));
+                $sb.$append3($rt_s(1107));
+            $craft = null;
+            if ($mc.$getScreen() instanceof nmcgsi_InventoryScreen)
+                $craft = ($mc.$getScreen()).$getCraftingContainer();
+            else if ($mc.$getScreen() instanceof nmcgsi_CraftingTableScreen)
+                $craft = ($mc.$getScreen()).$getCraftingContainer();
+            if ($craft !== null) {
+                var$2 = ($sb.$append3($rt_s(1108))).$append1($craft.$getWidth());
+                var$2.$append3($rt_s(1109));
+                $i = 0;
+                while ($i < $craft.$getSize()) {
+                    if ($i > 0)
+                        $sb.$append0(44);
+                    $id = $craft.$getCellId($i);
+                    $count = $craft.$getCellCount($i);
+                    if ($count > 0 && $id) {
+                        var$2 = (($sb.$append0(91)).$append1($id)).$append0(44);
+                        (var$2.$append1($count)).$append0(93);
+                    } else
+                        $sb.$append3($rt_s(144));
+                    $i = $i + 1 | 0;
+                }
+                $sb.$append3($rt_s(1110));
+                if ($craft.$getResultCount() > 0 && $craft.$getResultId()) {
+                    var$2 = ($sb.$append0(91)).$append1($craft.$getResultId());
+                    var$2 = (var$2.$append0(44)).$append1($craft.$getResultCount());
+                    var$2.$append0(93);
+                } else
+                    $sb.$append3($rt_s(144));
+                $sb.$append0(125);
+            }
             a: {
                 $hit = $mc.$getHitResult();
                 if ($hit !== null) {
                     var$2 = $hit.$type;
                     nmwp_BlockHitResult$Type_$callClinit();
                     if (var$2 === nmwp_BlockHitResult$Type_BLOCK) {
-                        var$2 = ($sb.$append3($rt_s(1074))).$append1($hit.$blockX);
-                        var$2 = (var$2.$append3($rt_s(1062))).$append1($hit.$blockY);
-                        (var$2.$append3($rt_s(1063))).$append1($hit.$blockZ);
+                        var$2 = ($sb.$append3($rt_s(1111))).$append1($hit.$blockX);
+                        var$2 = (var$2.$append3($rt_s(1096))).$append1($hit.$blockY);
+                        (var$2.$append3($rt_s(1097))).$append1($hit.$blockZ);
                         if ($hit.$direction !== null)
-                            (($sb.$append3($rt_s(1075))).$append3(nmc_Direction_getName($hit.$direction))).$append0(34);
+                            (($sb.$append3($rt_s(1112))).$append3(nmc_Direction_getName($hit.$direction))).$append0(34);
                         $sb.$append0(125);
                         break a;
                     }
                 }
-                $sb.$append3($rt_s(1076));
+                $sb.$append3($rt_s(1113));
             }
             $gm = $mc.$getGameMode();
             if (!$gm.$isDestroying())
-                $sb.$append3($rt_s(1077));
+                $sb.$append3($rt_s(1114));
             else {
-                var$2 = ($sb.$append3($rt_s(1078))).$append1($gm.$getDestroyStage());
-                var$2 = (var$2.$append3($rt_s(1079))).$append1($gm.$getDestroyX());
-                var$2 = (var$2.$append3($rt_s(1062))).$append1($gm.$getDestroyY());
-                var$2 = (var$2.$append3($rt_s(1063))).$append1($gm.$getDestroyZ());
+                var$14 = ($sb.$append3($rt_s(1115))).$append1($gm.$getDestroyStage());
+                var$2 = (var$14.$append3($rt_s(1116))).$append1($gm.$getDestroyX());
+                var$2 = (var$2.$append3($rt_s(1096))).$append1($gm.$getDestroyY());
+                var$2 = (var$2.$append3($rt_s(1097))).$append1($gm.$getDestroyZ());
                 var$2.$append0(125);
             }
-            ($sb.$append3($rt_s(1080))).$append4($level.$getDayTime());
-            ($sb.$append3($rt_s(1081))).$append4($level.$getDayTime());
-            ($sb.$append3($rt_s(1082))).$append1(nleva_SkyRenderer_skyColorRgb());
-            ($sb.$append3($rt_s(1083))).$append1(nleva_SkyRenderer_fogColorRgb());
-            ($sb.$append3($rt_s(1084))).$append17(nlev_EaglerCraft_fmt(nleva_SkyRenderer_sunAngleDeg()));
-            ($sb.$append3($rt_s(1085))).$append17(nlev_EaglerCraft_fmt(nleva_SkyRenderer_starBrightness0()));
-            ($sb.$append3($rt_s(1086))).$append1(nleva_SkyRenderer_moonPhase0());
-            ($sb.$append3($rt_s(1087))).$append1(nleva_SkyRenderer_skyLightRgb());
+            ($sb.$append3($rt_s(1117))).$append4($level.$getDayTime());
+            ($sb.$append3($rt_s(1118))).$append4($level.$getDayTime());
+            ($sb.$append3($rt_s(1119))).$append1(nleva_SkyRenderer_skyColorRgb());
+            ($sb.$append3($rt_s(1120))).$append1(nleva_SkyRenderer_fogColorRgb());
+            ($sb.$append3($rt_s(1121))).$append17(nlev_EaglerCraft_fmt(nleva_SkyRenderer_sunAngleDeg()));
+            ($sb.$append3($rt_s(1122))).$append17(nlev_EaglerCraft_fmt(nleva_SkyRenderer_starBrightness0()));
+            ($sb.$append3($rt_s(1123))).$append1(nleva_SkyRenderer_moonPhase0());
+            ($sb.$append3($rt_s(1124))).$append1(nleva_SkyRenderer_skyLightRgb());
             $sb.$append0(125);
             $sb.$append0(125);
             return $sb.$toString();
         }
     }
-    return $rt_s(142);
+    return $rt_s(144);
 },
 nlev_EaglerCraft_fmt = $v => {
     nlev_EaglerCraft_$callClinit();
@@ -27154,10 +27839,11 @@ nlev_EaglerCraft_consumeHotbarTelemetryRequests = $mc => {
     window.__eaglercraftHotbarReq = null;
     $inv = $mc.$getInventory();
     if ($slot >= 0 && $slot < 9) {
-        $inv.$setSelected($slot);
-        if ($id >= 0)
+        if ($id < 0) {
+            $inv.$setSelected($slot);
+            $mc.$playerSelectedSlotChanged();
+        } else
             $inv.$telemetrySetSlot($slot, $id, jl_Math_max(0, jl_Math_min(64, $count)));
-        $mc.$playerSelectedSlotChanged();
     }
 },
 nlev_EaglerCraft_consumeLookRequest = $mc => {
@@ -27185,7 +27871,7 @@ nlev_EaglerCraft_consumeTimeRequest = $mc => {
             var$5 = Long_fromNumber($t);
             $level.$setDayTime(var$5);
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(var$3, $rt_s(1088)), var$5), $rt_s(1089));
+            jl_StringBuilder_append(jl_StringBuilder_append2(jl_StringBuilder_append(var$3, $rt_s(1125)), var$5), $rt_s(1126));
             console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
         }
         return;
@@ -27215,8 +27901,8 @@ nlev_EaglerCraft_buildButtonsJson = $mc => {
     nlev_EaglerCraft_$callClinit();
     $screen = $mc.$getScreen();
     if ($screen === null)
-        return $rt_s(399);
-    $sb = jl_StringBuilder__init_1($rt_s(1090));
+        return $rt_s(426);
+    $sb = jl_StringBuilder__init_1($rt_s(1127));
     $first = 1;
     var$5 = ($screen.$children()).$iterator();
     while (var$5.$hasNext()) {
@@ -27227,18 +27913,18 @@ nlev_EaglerCraft_buildButtonsJson = $mc => {
         if (jl_String_isEmpty($id))
             continue;
         if (!$first)
-            $sb.$append3($rt_s(1091));
+            $sb.$append3($rt_s(1128));
         $first = 0;
-        var$8 = (($sb.$append3($rt_s(1092))).$append3($id)).$append3($rt_s(1093));
-        var$8 = ((var$8.$append3($rt_s(1094))).$append3($id)).$append3($rt_s(1093));
-        var$8 = (var$8.$append3($rt_s(1095))).$append19($widget.$isActive());
-        var$8 = (var$8.$append3($rt_s(1079))).$append1($widget.$getX0());
-        var$8 = (var$8.$append3($rt_s(1062))).$append1($widget.$getY0());
-        var$8 = (var$8.$append3($rt_s(1096))).$append1($widget.$getWidth());
-        var$8 = (var$8.$append3($rt_s(1097))).$append1($widget.$getHeight());
-        var$8.$append3($rt_s(1098));
+        var$8 = (($sb.$append3($rt_s(1129))).$append3($id)).$append3($rt_s(1130));
+        var$8 = ((var$8.$append3($rt_s(1131))).$append3($id)).$append3($rt_s(1130));
+        var$8 = (var$8.$append3($rt_s(1132))).$append19($widget.$isActive());
+        var$8 = (var$8.$append3($rt_s(1116))).$append1($widget.$getX0());
+        var$8 = (var$8.$append3($rt_s(1096))).$append1($widget.$getY0());
+        var$8 = (var$8.$append3($rt_s(1133))).$append1($widget.$getWidth());
+        var$8 = (var$8.$append3($rt_s(1134))).$append1($widget.$getHeight());
+        var$8.$append3($rt_s(1135));
     }
-    $sb.$append3($rt_s(1099));
+    $sb.$append3($rt_s(1136));
     return $sb.$toString();
 },
 nlev_EaglerCraft_lambda$pushGameTelemetry$0 = ($x, $y, $z) => {
@@ -27418,7 +28104,7 @@ jur_Quantifier_max = $this => {
 jur_Quantifier_toString = $this => {
     let var$1, var$2, var$3;
     var$1 = $this.$min4;
-    var$2 = $this.$max4 == 2147483647 ? $rt_s(72) : jl_Integer_toString($this.$max4);
+    var$2 = $this.$max4 == 2147483647 ? $rt_s(74) : jl_Integer_toString($this.$max4);
     var$3 = jl_StringBuilder__init_();
     jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append1(var$3, 123), var$1), 44), var$2), 125);
     return jl_StringBuilder_toString(var$3);
@@ -27438,7 +28124,85 @@ jur_AbstractCharClass$LazyJavaUpperCase$1__init_0 = var_0 => {
 },
 jur_AbstractCharClass$LazyJavaUpperCase$1_contains = ($this, $ch) => {
     return jl_Character_isUpperCase($ch);
-};
+},
+nmwi_Items = $rt_classWithoutFields(),
+nmwi_Items_REGISTRY = null,
+nmwi_Items_byId = null,
+nmwi_Items_STICK = 0,
+nmwi_Items_WOODEN_PICKAXE = 0,
+nmwi_Items_WOODEN_AXE = 0,
+nmwi_Items_WOODEN_SHOVEL = 0,
+nmwi_Items_WOODEN_SWORD = 0,
+nmwi_Items_WOODEN_HOE = 0,
+nmwi_Items_STONE_PICKAXE = 0,
+nmwi_Items_STONE_AXE = 0,
+nmwi_Items_STONE_SHOVEL = 0,
+nmwi_Items_STONE_SWORD = 0,
+nmwi_Items_STONE_HOE = 0,
+nmwi_Items_IRON_INGOT = 0,
+nmwi_Items_IRON_PICKAXE = 0,
+nmwi_Items_IRON_AXE = 0,
+nmwi_Items_IRON_SHOVEL = 0,
+nmwi_Items_IRON_SWORD = 0,
+nmwi_Items_IRON_HOE = 0,
+nmwi_Items_$callClinit = () => {
+    nmwi_Items_$callClinit = $rt_eraseClinit(nmwi_Items);
+    nmwi_Items__clinit_();
+},
+nmwi_Items_register = ($id, $name, $displayName, $maxStack) => {
+    let var$5, var$6;
+    nmwi_Items_$callClinit();
+    nmwi_Items_REGISTRY.$add(nmwi_Items$Item__init_0($id, $name, $displayName, $maxStack));
+    if ($id >= 0 && $id < (__safe(nmwi_Items_byId).data||[]).length) {
+        var$5 = nmwi_Items_byId;
+        var$6 = (__safe(nmwi_Items_byId).data||[])[$id] === null ? nmwi_Items$Item__init_0($id, $name, $displayName, $maxStack) : (__safe(nmwi_Items_byId).data||[])[$id];
+        var$5.data[$id] = var$6;
+    }
+    return $id;
+},
+nmwi_Items_byId0 = $id => {
+    nmwi_Items_$callClinit();
+    return $id >= 4096 && $id < (__safe(nmwi_Items_byId).data||[]).length ? (__safe(nmwi_Items_byId).data||[])[$id] : null;
+},
+nmwi_Items_isItem = $id => {
+    nmwi_Items_$callClinit();
+    return $id < 4096 ? 0 : 1;
+},
+nmwi_Items_allTextureNames = () => {
+    let $names, var$2, $item;
+    nmwi_Items_$callClinit();
+    $names = ju_ArrayList__init_();
+    var$2 = nmwi_Items_REGISTRY.$iterator();
+    while (var$2.$hasNext()) {
+        $item = var$2.$next();
+        $names.$add($item.$name3);
+    }
+    return $names;
+},
+nmwi_Items__clinit_ = () => {
+try {
+
+    nmwi_Items_REGISTRY = ju_ArrayList__init_();
+    nmwi_Items_byId = $rt_createArray(nmwi_Items$Item, 4224);
+    nmwi_Items_STICK = nmwi_Items_register(4096, $rt_s(1137), $rt_s(1138), 64);
+    nmwi_Items_WOODEN_PICKAXE = nmwi_Items_register(4097, $rt_s(1139), $rt_s(1140), 1);
+    nmwi_Items_WOODEN_AXE = nmwi_Items_register(4098, $rt_s(1141), $rt_s(1142), 1);
+    nmwi_Items_WOODEN_SHOVEL = nmwi_Items_register(4099, $rt_s(1143), $rt_s(1144), 1);
+    nmwi_Items_WOODEN_SWORD = nmwi_Items_register(4100, $rt_s(1145), $rt_s(1146), 1);
+    nmwi_Items_WOODEN_HOE = nmwi_Items_register(4101, $rt_s(1147), $rt_s(1148), 1);
+    nmwi_Items_STONE_PICKAXE = nmwi_Items_register(4102, $rt_s(1149), $rt_s(1150), 1);
+    nmwi_Items_STONE_AXE = nmwi_Items_register(4103, $rt_s(1151), $rt_s(1152), 1);
+    nmwi_Items_STONE_SHOVEL = nmwi_Items_register(4104, $rt_s(1153), $rt_s(1154), 1);
+    nmwi_Items_STONE_SWORD = nmwi_Items_register(4105, $rt_s(1155), $rt_s(1156), 1);
+    nmwi_Items_STONE_HOE = nmwi_Items_register(4106, $rt_s(1157), $rt_s(1158), 1);
+    nmwi_Items_IRON_INGOT = nmwi_Items_register(4107, $rt_s(1159), $rt_s(1160), 64);
+    nmwi_Items_IRON_PICKAXE = nmwi_Items_register(4108, $rt_s(1161), $rt_s(1162), 1);
+    nmwi_Items_IRON_AXE = nmwi_Items_register(4109, $rt_s(1163), $rt_s(1164), 1);
+    nmwi_Items_IRON_SHOVEL = nmwi_Items_register(4110, $rt_s(1165), $rt_s(1166), 1);
+    nmwi_Items_IRON_SWORD = nmwi_Items_register(4111, $rt_s(1167), $rt_s(1168), 1);
+    nmwi_Items_IRON_HOE = nmwi_Items_register(4112, $rt_s(1169), $rt_s(1170), 1);
+
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_Date() {
     jl_Object.call(this);
     this.$value4 = Long_ZERO;
@@ -27618,7 +28382,7 @@ ju_Locale_$callClinit = () => {
 },
 ju_Locale__init_1 = ($this, $language, $country) => {
     ju_Locale_$callClinit();
-    ju_Locale__init_0($this, $language, $country, $rt_s(72));
+    ju_Locale__init_0($this, $language, $country, $rt_s(74));
 },
 ju_Locale__init_ = (var_0, var_1) => {
     let var_2 = new ju_Locale();
@@ -27630,8 +28394,8 @@ ju_Locale__init_0 = ($this, $language, $country, $variant) => {
     jl_Object__init_($this);
     if ($language !== null && $country !== null && $variant !== null) {
         if (jl_String_isEmpty($language) && jl_String_isEmpty($country)) {
-            $this.$languageCode0 = $rt_s(72);
-            $this.$countryCode = $rt_s(72);
+            $this.$languageCode0 = $rt_s(74);
+            $this.$countryCode = $rt_s(74);
             $this.$variantCode = $variant;
             return;
         }
@@ -27661,31 +28425,31 @@ ju_Locale__clinit_ = () => {
 try {
 
     let $localeName, $countryIndex;
-    ju_Locale_CANADA = ju_Locale__init_($rt_s(1100), $rt_s(1101));
-    ju_Locale_CANADA_FRENCH = ju_Locale__init_($rt_s(1102), $rt_s(1101));
-    ju_Locale_CHINA = ju_Locale__init_($rt_s(1103), $rt_s(1104));
-    ju_Locale_CHINESE = ju_Locale__init_($rt_s(1103), $rt_s(72));
-    ju_Locale_ENGLISH = ju_Locale__init_($rt_s(1100), $rt_s(72));
-    ju_Locale_FRANCE = ju_Locale__init_($rt_s(1102), $rt_s(1105));
-    ju_Locale_FRENCH = ju_Locale__init_($rt_s(1102), $rt_s(72));
-    ju_Locale_GERMAN = ju_Locale__init_($rt_s(1106), $rt_s(72));
-    ju_Locale_GERMANY = ju_Locale__init_($rt_s(1106), $rt_s(1107));
-    ju_Locale_ITALIAN = ju_Locale__init_($rt_s(1108), $rt_s(72));
-    ju_Locale_ITALY = ju_Locale__init_($rt_s(1108), $rt_s(1109));
-    ju_Locale_JAPAN = ju_Locale__init_($rt_s(1110), $rt_s(1111));
-    ju_Locale_JAPANESE = ju_Locale__init_($rt_s(1110), $rt_s(72));
-    ju_Locale_KOREA = ju_Locale__init_($rt_s(1112), $rt_s(1113));
-    ju_Locale_KOREAN = ju_Locale__init_($rt_s(1112), $rt_s(72));
-    ju_Locale_PRC = ju_Locale__init_($rt_s(1103), $rt_s(1104));
-    ju_Locale_SIMPLIFIED_CHINESE = ju_Locale__init_($rt_s(1103), $rt_s(1104));
-    ju_Locale_TAIWAN = ju_Locale__init_($rt_s(1103), $rt_s(1114));
-    ju_Locale_TRADITIONAL_CHINESE = ju_Locale__init_($rt_s(1103), $rt_s(1114));
-    ju_Locale_UK = ju_Locale__init_($rt_s(1100), $rt_s(1115));
-    ju_Locale_US = ju_Locale__init_($rt_s(1100), $rt_s(1116));
-    ju_Locale_ROOT = ju_Locale__init_($rt_s(72), $rt_s(72));
+    ju_Locale_CANADA = ju_Locale__init_($rt_s(1171), $rt_s(1172));
+    ju_Locale_CANADA_FRENCH = ju_Locale__init_($rt_s(1173), $rt_s(1172));
+    ju_Locale_CHINA = ju_Locale__init_($rt_s(1174), $rt_s(1175));
+    ju_Locale_CHINESE = ju_Locale__init_($rt_s(1174), $rt_s(74));
+    ju_Locale_ENGLISH = ju_Locale__init_($rt_s(1171), $rt_s(74));
+    ju_Locale_FRANCE = ju_Locale__init_($rt_s(1173), $rt_s(1176));
+    ju_Locale_FRENCH = ju_Locale__init_($rt_s(1173), $rt_s(74));
+    ju_Locale_GERMAN = ju_Locale__init_($rt_s(1177), $rt_s(74));
+    ju_Locale_GERMANY = ju_Locale__init_($rt_s(1177), $rt_s(1178));
+    ju_Locale_ITALIAN = ju_Locale__init_($rt_s(1179), $rt_s(74));
+    ju_Locale_ITALY = ju_Locale__init_($rt_s(1179), $rt_s(1180));
+    ju_Locale_JAPAN = ju_Locale__init_($rt_s(1181), $rt_s(1182));
+    ju_Locale_JAPANESE = ju_Locale__init_($rt_s(1181), $rt_s(74));
+    ju_Locale_KOREA = ju_Locale__init_($rt_s(1183), $rt_s(1184));
+    ju_Locale_KOREAN = ju_Locale__init_($rt_s(1183), $rt_s(74));
+    ju_Locale_PRC = ju_Locale__init_($rt_s(1174), $rt_s(1175));
+    ju_Locale_SIMPLIFIED_CHINESE = ju_Locale__init_($rt_s(1174), $rt_s(1175));
+    ju_Locale_TAIWAN = ju_Locale__init_($rt_s(1174), $rt_s(1185));
+    ju_Locale_TRADITIONAL_CHINESE = ju_Locale__init_($rt_s(1174), $rt_s(1185));
+    ju_Locale_UK = ju_Locale__init_($rt_s(1171), $rt_s(1186));
+    ju_Locale_US = ju_Locale__init_($rt_s(1171), $rt_s(1187));
+    ju_Locale_ROOT = ju_Locale__init_($rt_s(74), $rt_s(74));
     $localeName = ((otciu_CLDRHelper_getDefaultLocale()).value !== null ? $rt_str((otciu_CLDRHelper_getDefaultLocale()).value) : null);
     $countryIndex = jl_String_indexOf0($localeName, 95);
-    ju_Locale_defaultLocale = ju_Locale__init_2(jl_String_substring($localeName, 0, $countryIndex), jl_String_substring0($localeName, $countryIndex + 1 | 0), $rt_s(72));
+    ju_Locale_defaultLocale = ju_Locale__init_2(jl_String_substring($localeName, 0, $countryIndex), jl_String_substring0($localeName, $countryIndex + 1 | 0), $rt_s(74));
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Short = $rt_classWithoutFields(jl_Number),
@@ -27908,7 +28672,7 @@ jur_EOISet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_EOISet_getName = $this => {
-    return $rt_s(1117);
+    return $rt_s(1188);
 },
 jur_AbstractCharClass$LazyUpper = $rt_classWithoutFields(jur_AbstractCharClass$LazyCharClass),
 jur_AbstractCharClass$LazyUpper__init_ = $this => {
@@ -27980,7 +28744,7 @@ otji_JSWrapper_wrap = $o => {
     if ($o === null)
         return null;
     $type = $rt_str(typeof $o);
-    $isObject = !jl_String_equals($type, $rt_s(1118)) && !jl_String_equals($type, $rt_s(1119)) ? 0 : 1;
+    $isObject = !jl_String_equals($type, $rt_s(1189)) && !jl_String_equals($type, $rt_s(1190)) ? 0 : 1;
     otji_JSWrapper$Helper_$callClinit();
     $wrappers = otji_JSWrapper$Helper_wrappers;
     if ($wrappers !== null) {
@@ -27993,7 +28757,7 @@ otji_JSWrapper_wrap = $o => {
             $wrappers.set($o, new WeakRef($wrapper));
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1120))) {
+        if (jl_String_equals($type, $rt_s(1191))) {
             $jsString = $o;
             $stringWrappers = otji_JSWrapper$Helper_stringWrappers;
             $stringFinalizationRegistry = otji_JSWrapper$Helper_stringFinalizationRegistry;
@@ -28007,7 +28771,7 @@ otji_JSWrapper_wrap = $o => {
             $stringFinalizationRegistry.register($wrapperAsJs, $jsString);
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1121))) {
+        if (jl_String_equals($type, $rt_s(1192))) {
             $jsNumber = $o;
             $numberWrappers = otji_JSWrapper$Helper_numberWrappers;
             $numberFinalizationRegistry = otji_JSWrapper$Helper_numberFinalizationRegistry;
@@ -28021,7 +28785,7 @@ otji_JSWrapper_wrap = $o => {
             $numberFinalizationRegistry.register($wrapperAsJs, $jsNumber);
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1122))) {
+        if (jl_String_equals($type, $rt_s(1193))) {
             $existingRef = otji_JSWrapper$Helper_undefinedWrapper;
             $existing = $existingRef === null ? void 0 : $existingRef.deref();
             if (!(typeof $existing == 'undefined' ? 1 : 0))
@@ -28170,7 +28934,7 @@ jur_MultiLineSOLSet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_MultiLineSOLSet_getName = $this => {
-    return $rt_s(1123);
+    return $rt_s(1194);
 };
 function nmcgsm_JoinMultiplayerScreen() {
     let a = this; nmcgs_Screen.call(a);
@@ -28205,18 +28969,18 @@ nmcgsm_JoinMultiplayerScreen_init = $this => {
     $centerX = $this.$width / 2 | 0;
     $footer2Y = ($this.$height - 33 | 0) + 6 | 0;
     $footer1Y = ($footer2Y - 20 | 0) - 4 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_(($centerX - 150 | 0) - 10 | 0, $footer1Y, 100, 20, $rt_s(880), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 50 | 0, $footer1Y, 100, 20, $rt_s(881), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_(($centerX + 50 | 0) + 10 | 0, $footer1Y, 100, 20, $rt_s(876), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_(($centerX - 150 | 0) - 10 | 0, $footer1Y, 100, 20, $rt_s(914), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 50 | 0, $footer1Y, 100, 20, $rt_s(915), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_(($centerX + 50 | 0) + 10 | 0, $footer1Y, 100, 20, $rt_s(910), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2__init_0($this)));
     $row2X = $centerX - 163 | 0;
-    $edit = nmcgc_Button__init_($row2X, $footer2Y, 74, 20, $rt_s(1124), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_0($this));
+    $edit = nmcgc_Button__init_($row2X, $footer2Y, 74, 20, $rt_s(1195), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_0($this));
     $edit.$setActive($this.$selected < 0 ? 0 : 1);
     $this.$addRenderableWidget($edit);
-    $delete = nmcgc_Button__init_(($row2X + 74 | 0) + 10 | 0, $footer2Y, 74, 20, $rt_s(1125), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_0($this));
+    $delete = nmcgc_Button__init_(($row2X + 74 | 0) + 10 | 0, $footer2Y, 74, 20, $rt_s(1196), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_0($this));
     $delete.$setActive($this.$selected < 0 ? 0 : 1);
     $this.$addRenderableWidget($delete);
-    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 168 | 0, $footer2Y, 74, 20, $rt_s(1126), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 252 | 0, $footer2Y, 74, 20, $rt_s(874), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 168 | 0, $footer2Y, 74, 20, $rt_s(1197), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 252 | 0, $footer2Y, 74, 20, $rt_s(908), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6__init_0($this)));
 },
 nmcgsm_JoinMultiplayerScreen_joinSelected = $this => {
     let $data;
@@ -28238,8 +29002,8 @@ nmcgsm_JoinMultiplayerScreen_confirmDelete = $this => {
         var$3 = new nmcgs_ConfirmScreen;
         var$4 = $data.$name1;
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append1(var$5, 34), var$4), $rt_s(1127));
-        nmcgs_ConfirmScreen__init_(var$3, $this, $rt_s(1128), jl_StringBuilder_toString(var$5), nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_0($this));
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append1(var$5, 34), var$4), $rt_s(1198));
+        nmcgs_ConfirmScreen__init_(var$3, $this, $rt_s(1199), jl_StringBuilder_toString(var$5), nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_0($this));
         var$2.$setScreen(var$3);
         return;
     }
@@ -28252,14 +29016,14 @@ nmcgsm_JoinMultiplayerScreen_refreshFooterButtons = $this => {
 nmcgsm_JoinMultiplayerScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $rowX, $rowW, $hint, $hintWidth, $i, $screenY, var$12, $hovered, $isSelected, $data, var$16, var$17, var$18, var$19;
     a: {
-        nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-        $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1129));
-        nleva_EaglerGuiImpl_drawText($rt_s(1129), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+        nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+        $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1200));
+        nleva_EaglerGuiImpl_drawText($rt_s(1200), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
         $rowX = jl_Math_max(10, ($this.$width / 2 | 0) - 245 | 0);
         $rowW = jl_Math_min(480, $this.$width - 20 | 0);
         $this.$hoveredRow = (-1);
         if (!$this.$serverList.$size()) {
-            $hint = $rt_s(1130);
+            $hint = $rt_s(1201);
             $hintWidth = nleva_EaglerGuiImpl_widthOf($hint);
             nleva_EaglerGuiImpl_drawText($hint, ($this.$width / 2 | 0) - $hintWidth / 2.0, $this.$listTop0 + 14 | 0, (-6250336), 1);
         } else {
@@ -28397,7 +29161,7 @@ let ju_IllegalFormatConversionException__init_0 = ($this, $conversion, $argument
     let var$3, var$4;
     var$3 = jl_String_valueOf2($argumentClass);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1131)), var$3), $rt_s(1132)), $conversion), $rt_s(1133));
+    jl_StringBuilder_append(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1202)), var$3), $rt_s(1203)), $conversion), $rt_s(1204));
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$4));
     $this.$conversion = $conversion;
     $this.$argumentClass = $argumentClass;
@@ -28452,7 +29216,7 @@ jur_PreviousMatch_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_PreviousMatch_getName = $this => {
-    return $rt_s(1134);
+    return $rt_s(1205);
 },
 nlevit_MainClass = $rt_classWithoutFields(),
 nlevit_MainClass_$callClinit = () => {
@@ -28485,10 +29249,29 @@ jur_NonCapFSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $this.$next3.$matches($stringIndex, $testString, $matchResult);
 },
 jur_NonCapFSet_getName = $this => {
-    return $rt_s(1135);
+    return $rt_s(1206);
 },
 jur_NonCapFSet_hasConsumed = ($this, $mr) => {
     return 0;
+};
+function nmwi_Items$Item() {
+    let a = this; jl_Object.call(a);
+    a.$id0 = 0;
+    a.$name3 = null;
+    a.$displayName0 = null;
+    a.$maxStack0 = 0;
+}
+let nmwi_Items$Item__init_ = ($this, $id, $name, $displayName, $maxStack) => {
+    jl_Object__init_($this);
+    $this.$id0 = $id;
+    $this.$name3 = $name;
+    $this.$displayName0 = $displayName;
+    $this.$maxStack0 = $maxStack;
+},
+nmwi_Items$Item__init_0 = (var_0, var_1, var_2, var_3) => {
+    let var_4 = new nmwi_Items$Item();
+    nmwi_Items$Item__init_(var_4, var_0, var_1, var_2, var_3);
+    return var_4;
 };
 function nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0() {
     jl_Object.call(this);
@@ -28534,7 +29317,7 @@ jur_UCISupplCharSet_getName = $this => {
     let var$1, var$2;
     var$1 = jl_String__init_(jl_Character_toChars($this.$ch3));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(417)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(444)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jl_System = $rt_classWithoutFields(),
@@ -28588,7 +29371,7 @@ jl_System_arraycopy = ($src, $srcPos, $dest, $destPos, $length) => {
         }
         $rt_throw(jl_IndexOutOfBoundsException__init_());
     }
-    $rt_throw(jl_NullPointerException__init_0($rt_s(1136)));
+    $rt_throw(jl_NullPointerException__init_0($rt_s(1207)));
 },
 jl_System_fastArraycopy = ($src, $srcPos, $dest, $destPos, $length) => {
     let var$6;
@@ -28852,7 +29635,7 @@ jur_Matcher_processReplacement = ($this, $replacement) => {
         }
         $rt_throw(jl_IndexOutOfBoundsException__init_());
     }
-    $rt_throw(jl_IllegalArgumentException__init_2($rt_s(72)));
+    $rt_throw(jl_IllegalArgumentException__init_2($rt_s(74)));
 },
 jur_Matcher_reset = $this => {
     $this.$leftBound = 0;
@@ -28985,7 +29768,7 @@ jur_DotAllSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $this.$next3.$matches(var$5, $testString, $matchResult);
 },
 jur_DotAllSet_getName = $this => {
-    return $rt_s(1137);
+    return $rt_s(1208);
 },
 jur_DotAllSet_setNext = ($this, $next) => {
     $this.$next3 = $next;
@@ -29070,8 +29853,8 @@ nmcgso_KeyBindsScreen_init = $this => {
     $this.$scrollAmount = 0.0;
     $this.$listening = null;
     $centerX = $this.$width / 2 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(1138), nmcgso_KeyBindsScreen$init$lambda$_1_0__init_0()));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 5 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(442), nmcgso_KeyBindsScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(1209), nmcgso_KeyBindsScreen$init$lambda$_1_0__init_0()));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 5 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(469), nmcgso_KeyBindsScreen$init$lambda$_1_1__init_0($this)));
 },
 nmcgso_KeyBindsScreen_rebuildRows = $this => {
     let var$1, var$2, var$3, $category, $any, var$6, $mapping, var$8, var$9, var$10;
@@ -29108,9 +29891,9 @@ nmcgso_KeyBindsScreen_rebuildRows = $this => {
     }
 },
 nmcgso_KeyBindsScreen_addMouseRows = ($this, $category) => {
-    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1139), 1));
-    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1140), 1));
-    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1141), 1));
+    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1210), 1));
+    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1211), 1));
+    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1212), 1));
 },
 nmcgso_KeyBindsScreen_categoryName = $category => {
     nmcgso_KeyBindsScreen$1_$callClinit();
@@ -29118,21 +29901,21 @@ nmcgso_KeyBindsScreen_categoryName = $category => {
         case 1:
             break;
         case 2:
-            return $rt_s(1142);
+            return $rt_s(1213);
         case 3:
-            return $rt_s(460);
+            return $rt_s(487);
         case 4:
-            return $rt_s(1143);
+            return $rt_s(1214);
         case 5:
-            return $rt_s(1144);
+            return $rt_s(1215);
         case 6:
-            return $rt_s(437);
+            return $rt_s(464);
         case 7:
-            return $rt_s(1145);
+            return $rt_s(1216);
         default:
             return jl_Enum_name($category);
     }
-    return $rt_s(1146);
+    return $rt_s(1217);
 },
 nmcgso_KeyBindsScreen_bindName = $name => {
     let var$2;
@@ -29140,117 +29923,117 @@ nmcgso_KeyBindsScreen_bindName = $name => {
         var$2 = (-1);
         switch (jl_String_hashCode($name)) {
             case -2034966387:
-                if (!jl_String_equals($name, $rt_s(922)))
+                if (!jl_String_equals($name, $rt_s(956)))
                     break a;
                 var$2 = 7;
                 break a;
             case -1452371847:
-                if (!jl_String_equals($name, $rt_s(936)))
+                if (!jl_String_equals($name, $rt_s(970)))
                     break a;
                 var$2 = 21;
                 break a;
             case -861821867:
-                if (!jl_String_equals($name, $rt_s(935)))
+                if (!jl_String_equals($name, $rt_s(969)))
                     break a;
                 var$2 = 20;
                 break a;
             case -335308118:
-                if (!jl_String_equals($name, $rt_s(937)))
+                if (!jl_String_equals($name, $rt_s(971)))
                     break a;
                 var$2 = 22;
                 break a;
             case -14946167:
-                if (!jl_String_equals($name, $rt_s(921)))
+                if (!jl_String_equals($name, $rt_s(955)))
                     break a;
                 var$2 = 6;
                 break a;
             case -11539560:
-                if (!jl_String_equals($name, $rt_s(924)))
+                if (!jl_String_equals($name, $rt_s(958)))
                     break a;
                 var$2 = 9;
                 break a;
             case -11539559:
-                if (!jl_String_equals($name, $rt_s(925)))
+                if (!jl_String_equals($name, $rt_s(959)))
                     break a;
                 var$2 = 10;
                 break a;
             case -11539558:
-                if (!jl_String_equals($name, $rt_s(926)))
+                if (!jl_String_equals($name, $rt_s(960)))
                     break a;
                 var$2 = 11;
                 break a;
             case -11539557:
-                if (!jl_String_equals($name, $rt_s(927)))
+                if (!jl_String_equals($name, $rt_s(961)))
                     break a;
                 var$2 = 12;
                 break a;
             case -11539556:
-                if (!jl_String_equals($name, $rt_s(928)))
+                if (!jl_String_equals($name, $rt_s(962)))
                     break a;
                 var$2 = 13;
                 break a;
             case -11539555:
-                if (!jl_String_equals($name, $rt_s(929)))
+                if (!jl_String_equals($name, $rt_s(963)))
                     break a;
                 var$2 = 14;
                 break a;
             case -11539554:
-                if (!jl_String_equals($name, $rt_s(930)))
+                if (!jl_String_equals($name, $rt_s(964)))
                     break a;
                 var$2 = 15;
                 break a;
             case -11539553:
-                if (!jl_String_equals($name, $rt_s(931)))
+                if (!jl_String_equals($name, $rt_s(965)))
                     break a;
                 var$2 = 16;
                 break a;
             case -11539552:
-                if (!jl_String_equals($name, $rt_s(932)))
+                if (!jl_String_equals($name, $rt_s(966)))
                     break a;
                 var$2 = 17;
                 break a;
             case 455328534:
-                if (!jl_String_equals($name, $rt_s(917)))
+                if (!jl_String_equals($name, $rt_s(951)))
                     break a;
                 var$2 = 2;
                 break a;
             case 455364999:
-                if (!jl_String_equals($name, $rt_s(933)))
+                if (!jl_String_equals($name, $rt_s(967)))
                     break a;
                 var$2 = 18;
                 break a;
             case 455404830:
-                if (!jl_String_equals($name, $rt_s(923)))
+                if (!jl_String_equals($name, $rt_s(957)))
                     break a;
                 var$2 = 8;
                 break a;
             case 455586397:
-                if (!jl_String_equals($name, $rt_s(919)))
+                if (!jl_String_equals($name, $rt_s(953)))
                     break a;
                 var$2 = 4;
                 break a;
             case 455630390:
-                if (!jl_String_equals($name, $rt_s(916)))
+                if (!jl_String_equals($name, $rt_s(950)))
                     break a;
                 var$2 = 1;
                 break a;
             case 855798326:
-                if (!jl_String_equals($name, $rt_s(915)))
+                if (!jl_String_equals($name, $rt_s(949)))
                     break a;
                 var$2 = 0;
                 break a;
             case 1245301197:
-                if (!jl_String_equals($name, $rt_s(918)))
+                if (!jl_String_equals($name, $rt_s(952)))
                     break a;
                 var$2 = 3;
                 break a;
             case 1246371525:
-                if (!jl_String_equals($name, $rt_s(920)))
+                if (!jl_String_equals($name, $rt_s(954)))
                     break a;
                 var$2 = 5;
                 break a;
             case 1651184110:
-                if (!jl_String_equals($name, $rt_s(934)))
+                if (!jl_String_equals($name, $rt_s(968)))
                     break a;
                 var$2 = 19;
                 break a;
@@ -29259,51 +30042,51 @@ nmcgso_KeyBindsScreen_bindName = $name => {
     }
     switch (var$2) {
         case 0:
-            return $rt_s(1147);
+            return $rt_s(1218);
         case 1:
-            return $rt_s(1148);
+            return $rt_s(1219);
         case 2:
-            return $rt_s(1149);
+            return $rt_s(1220);
         case 3:
-            return $rt_s(1150);
+            return $rt_s(1221);
         case 4:
-            return $rt_s(1151);
+            return $rt_s(1222);
         case 5:
-            return $rt_s(1152);
+            return $rt_s(1223);
         case 6:
-            return $rt_s(1153);
+            return $rt_s(1224);
         case 7:
-            return $rt_s(1154);
+            return $rt_s(1225);
         case 8:
-            return $rt_s(1155);
+            return $rt_s(1226);
         case 9:
-            return $rt_s(1156);
+            return $rt_s(1227);
         case 10:
-            return $rt_s(1157);
+            return $rt_s(1228);
         case 11:
-            return $rt_s(1158);
+            return $rt_s(1229);
         case 12:
-            return $rt_s(1159);
+            return $rt_s(1230);
         case 13:
-            return $rt_s(1160);
+            return $rt_s(1231);
         case 14:
-            return $rt_s(1161);
+            return $rt_s(1232);
         case 15:
-            return $rt_s(1162);
+            return $rt_s(1233);
         case 16:
-            return $rt_s(1163);
+            return $rt_s(1234);
         case 17:
-            return $rt_s(1164);
+            return $rt_s(1235);
         case 18:
-            return $rt_s(1165);
+            return $rt_s(1236);
         case 19:
-            return $rt_s(1166);
+            return $rt_s(1237);
         case 20:
-            return $rt_s(1167);
+            return $rt_s(1238);
         case 21:
-            return $rt_s(1168);
+            return $rt_s(1239);
         case 22:
-            return $rt_s(1169);
+            return $rt_s(1240);
         default:
     }
     return $name;
@@ -29314,17 +30097,17 @@ nmcgso_KeyBindsScreen_mouseBindLabel = $label => {
         var$2 = (-1);
         switch (jl_String_hashCode($label)) {
             case -1446778930:
-                if (!jl_String_equals($label, $rt_s(1141)))
+                if (!jl_String_equals($label, $rt_s(1212)))
                     break a;
                 var$2 = 2;
                 break a;
             case 85351:
-                if (!jl_String_equals($label, $rt_s(1140)))
+                if (!jl_String_equals($label, $rt_s(1211)))
                     break a;
                 var$2 = 1;
                 break a;
             case 1971575400:
-                if (!jl_String_equals($label, $rt_s(1139)))
+                if (!jl_String_equals($label, $rt_s(1210)))
                     break a;
                 var$2 = 0;
                 break a;
@@ -29333,11 +30116,11 @@ nmcgso_KeyBindsScreen_mouseBindLabel = $label => {
     }
     switch (var$2) {
         case 0:
-            return $rt_s(1170);
+            return $rt_s(1241);
         case 1:
-            return $rt_s(1171);
+            return $rt_s(1242);
         case 2:
-            return $rt_s(1172);
+            return $rt_s(1243);
         default:
     }
     return $label;
@@ -29350,9 +30133,9 @@ nmcgso_KeyBindsScreen_maxScroll = $this => {
 },
 nmcgso_KeyBindsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $rowX, $rowW, $keyButtonX, $i, $screenY, var$11, $row, var$13, var$14, var$15, $key, var$17, $keyWidth, $mapping, $isListening, $hovered, var$22;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1173));
-    nleva_EaglerGuiImpl_drawText($rt_s(1173), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1244));
+    nleva_EaglerGuiImpl_drawText($rt_s(1244), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     $rowX = jl_Math_max(10, ($this.$width / 2 | 0) - 245 | 0);
     $rowW = jl_Math_min(480, $this.$width - 20 | 0);
     $keyButtonX = (($rowX + $rowW | 0) - 50 | 0) - 2 | 0;
@@ -29381,7 +30164,7 @@ nmcgso_KeyBindsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTic
                 var$14 = $rowX;
                 var$17 = $screenY + 6 | 0;
                 nleva_EaglerGuiImpl_drawText(var$13, var$14, var$17, (-5197648), 1);
-                $key = !$isListening ? $mapping.$keyName0() : $rt_s(1174);
+                $key = !$isListening ? $mapping.$keyName0() : $rt_s(1245);
                 $keyWidth = nleva_EaglerGuiImpl_widthOf($key);
                 $hovered = $mouseX >= $keyButtonX && $mouseX < ($keyButtonX + 50 | 0) && $mouseY >= $screenY && $mouseY < (var$11 - 2 | 0) ? 1 : 0;
                 var$14 = $keyButtonX;
@@ -29488,10 +30271,10 @@ jur_UCISupplRangeSet_contains = ($this, $ch) => {
 },
 jur_UCISupplRangeSet_getName = $this => {
     let var$1, var$2, var$3;
-    var$1 = !$this.$alt0 ? $rt_s(135) : $rt_s(136);
+    var$1 = !$this.$alt0 ? $rt_s(137) : $rt_s(138);
     var$2 = $this.$chars.$toString();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(369)), var$1), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(396)), var$1), var$2);
     return jl_StringBuilder_toString(var$3);
 },
 jur_AbstractCharClass$LazyJavaUpperCase = $rt_classWithoutFields(jur_AbstractCharClass$LazyCharClass),
@@ -29516,7 +30299,7 @@ function ju_DuplicateFormatFlagsException() {
 let ju_DuplicateFormatFlagsException__init_ = ($this, $flags) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1175)), $flags);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1246)), $flags);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$flags3 = $flags;
 },
@@ -29553,7 +30336,7 @@ jur_HangulDecomposedCharSet_getName = $this => {
     let var$1, var$2;
     var$1 = jur_HangulDecomposedCharSet_getDecomposedChar($this);
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1176)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1247)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jur_HangulDecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResult) => {
@@ -29627,6 +30410,192 @@ jur_HangulDecomposedCharSet_first = ($this, $set) => {
 jur_HangulDecomposedCharSet_hasConsumed = ($this, $matchResult) => {
     return 1;
 };
+function nmcgsi_CraftingTableScreen() {
+    let a = this; nmcgs_Screen.call(a);
+    a.$leftPos0 = 0;
+    a.$topPos1 = 0;
+    a.$hoveredSlot0 = 0;
+    a.$craft = null;
+}
+let nmcgsi_CraftingTableScreen__init_ = $this => {
+    nmcgs_Screen__init_($this);
+    $this.$hoveredSlot0 = (-1);
+    $this.$craft = nmwi_CraftingContainer__init_0(3, 3);
+},
+nmcgsi_CraftingTableScreen__init_0 = () => {
+    let var_0 = new nmcgsi_CraftingTableScreen();
+    nmcgsi_CraftingTableScreen__init_(var_0);
+    return var_0;
+},
+nmcgsi_CraftingTableScreen_init = $this => {
+    $this.$leftPos0 = ($this.$width - 176 | 0) / 2 | 0;
+    $this.$topPos1 = ($this.$height - 166 | 0) / 2 | 0;
+    $this.$craft.$recompute();
+},
+nmcgsi_CraftingTableScreen_getCraftingContainer = $this => {
+    return $this.$craft;
+},
+nmcgsi_CraftingTableScreen_onClose = $this => {
+    let $inventory, var$2, var$3, var$4;
+    $inventory = $this.$minecraft.$getInventory();
+    $this.$craft.$returnContents($inventory);
+    if ($inventory.$getCarriedCount() > 0) {
+        var$2 = $inventory.$getCarriedBlock();
+        var$3 = $inventory.$getCarriedCount();
+        var$4 = nmwic_Crafting_maxStack($inventory.$getCarriedBlock());
+        $inventory.$addItem(var$2, var$3, var$4);
+        $inventory.$setCarried(0, 0);
+    }
+    nmcgs_Screen_onClose($this);
+},
+nmcgsi_CraftingTableScreen_slotAt = ($this, $mouseX, $mouseY) => {
+    let $mx, $my, $gcol, $grow, var$7, var$8, $col, $row;
+    $mx = ($mouseX | 0) - $this.$leftPos0 | 0;
+    $my = ($mouseY | 0) - $this.$topPos1 | 0;
+    $gcol = ($mx - 30 | 0) / 18 | 0;
+    $grow = ($my - 17 | 0) / 18 | 0;
+    if ($gcol >= 0 && $gcol < 3 && $grow >= 0 && $grow < 3) {
+        var$7 = 30 + ($gcol * 18 | 0) | 0;
+        var$8 = 17 + ($grow * 18 | 0) | 0;
+        if (nmcgsi_CraftingTableScreen_cellContains($mx, $my, var$7, var$8))
+            return ($grow * 3 | 0) + $gcol | 0;
+    }
+    if (nmcgsi_CraftingTableScreen_cellContains($mx, $my, 124, 35))
+        return 60;
+    $col = ($mx - 8 | 0) / 18 | 0;
+    $row = ($my - 84 | 0) / 18 | 0;
+    if ($col >= 0 && $col < 9 && $row >= 0 && $row < 3) {
+        var$8 = 8 + ($col * 18 | 0) | 0;
+        var$7 = 84 + ($row * 18 | 0) | 0;
+        if (nmcgsi_CraftingTableScreen_cellContains($mx, $my, var$8, var$7))
+            return (20 + ($row * 9 | 0) | 0) + $col | 0;
+    }
+    if ($col >= 0 && $col < 9) {
+        var$7 = 8 + ($col * 18 | 0) | 0;
+        if (nmcgsi_CraftingTableScreen_cellContains($mx, $my, var$7, 142))
+            return 47 + $col | 0;
+    }
+    return (-1);
+},
+nmcgsi_CraftingTableScreen_cellContains = ($mx, $my, $cellX, $cellY) => {
+    return $mx >= $cellX && $mx < ($cellX + 18 | 0) && $my >= $cellY && $my < ($cellY + 18 | 0) ? 1 : 0;
+},
+nmcgsi_CraftingTableScreen_inventorySlot = $interactive => {
+    return $interactive >= 47 ? $interactive - 47 | 0 : $interactive - 11 | 0;
+},
+nmcgsi_CraftingTableScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
+    let $inventory, $hx, $hy, $i, var$9, var$10, var$11, var$12, var$13, var$14, var$15, $inv;
+    nleva_EaglerGuiImpl_fillRect(0.0, 0.0, $this.$width, $this.$height, (-1341124592));
+    nleva_EaglerGuiImpl_drawSprite($rt_s(24), $this.$leftPos0, $this.$topPos1, 176.0, 166.0);
+    nleva_EaglerGuiImpl_drawText($rt_s(486), $this.$leftPos0 + 28 | 0, $this.$topPos1 + 6 | 0, (-12632257), 0);
+    $inventory = $this.$minecraft.$getInventory();
+    if ($this.$hoveredSlot0 >= 0) {
+        if ($this.$hoveredSlot0 < 9) {
+            $hx = ($this.$leftPos0 + 30 | 0) + (($this.$hoveredSlot0 % 3 | 0) * 18 | 0) | 0;
+            $hy = ($this.$topPos1 + 17 | 0) + (($this.$hoveredSlot0 / 3 | 0) * 18 | 0) | 0;
+        } else if ($this.$hoveredSlot0 == 60) {
+            $hx = $this.$leftPos0 + 124 | 0;
+            $hy = $this.$topPos1 + 35 | 0;
+        } else if ($this.$hoveredSlot0 >= 47) {
+            $hx = ($this.$leftPos0 + 8 | 0) + (($this.$hoveredSlot0 - 47 | 0) * 18 | 0) | 0;
+            $hy = $this.$topPos1 + 142 | 0;
+        } else {
+            $hx = ($this.$leftPos0 + 8 | 0) + ((($this.$hoveredSlot0 - 20 | 0) % 9 | 0) * 18 | 0) | 0;
+            $hy = ($this.$topPos1 + 84 | 0) + ((($this.$hoveredSlot0 - 20 | 0) / 9 | 0) * 18 | 0) | 0;
+        }
+        nleva_EaglerGuiImpl_fillRect($hx, $hy, 16.0, 16.0, (-2130706433));
+    }
+    $i = 0;
+    while ($i < 9) {
+        nmcg_Gui_drawItem($this.$craft.$getCellId($i), $this.$craft.$getCellCount($i), (($this.$leftPos0 + 30 | 0) + (($i % 3 | 0) * 18 | 0) | 0) + 1 | 0, (($this.$topPos1 + 17 | 0) + (($i / 3 | 0) * 18 | 0) | 0) + 1 | 0);
+        $i = $i + 1 | 0;
+    }
+    nmcg_Gui_drawItem($this.$craft.$getResultId(), $this.$craft.$getResultCount(), ($this.$leftPos0 + 124 | 0) + 1 | 0, ($this.$topPos1 + 35 | 0) + 1 | 0);
+    $i = 0;
+    while ($i < 27) {
+        var$9 = 20 + $i | 0;
+        var$10 = $inventory.$getBlockId(nmcgsi_CraftingTableScreen_inventorySlot(var$9));
+        var$11 = $inventory.$getCount(nmcgsi_CraftingTableScreen_inventorySlot(var$9));
+        var$12 = (($this.$leftPos0 + 8 | 0) + (($i % 9 | 0) * 18 | 0) | 0) + 1 | 0;
+        var$13 = (($this.$topPos1 + 84 | 0) + (($i / 9 | 0) * 18 | 0) | 0) + 1 | 0;
+        nmcg_Gui_drawItem(var$10, var$11, var$12, var$13);
+        $i = $i + 1 | 0;
+    }
+    $i = 0;
+    while ($i < 9) {
+        var$9 = $inventory.$getBlockId($i);
+        var$14 = $inventory.$getCount($i);
+        var$12 = (($this.$leftPos0 + 8 | 0) + ($i * 18 | 0) | 0) + 1 | 0;
+        var$13 = ($this.$topPos1 + 142 | 0) + 1 | 0;
+        nmcg_Gui_drawItem(var$9, var$14, var$12, var$13);
+        $i = $i + 1 | 0;
+    }
+    var$9 = $inventory.$getCarriedBlock();
+    var$14 = $inventory.$getCarriedCount();
+    var$12 = $mouseX - 1 | 0;
+    var$13 = $mouseY - 1 | 0;
+    nmcg_Gui_drawItem(var$9, var$14, var$12, var$13);
+    if ($this.$hoveredSlot0 >= 0 && !$inventory.$getCarriedCount()) {
+        if ($this.$hoveredSlot0 == 60)
+            var$15 = nmcg_Gui_blockName($this.$craft.$getResultId());
+        else if ($this.$hoveredSlot0 < 9)
+            var$15 = nmcg_Gui_blockName($this.$craft.$getCellId($this.$hoveredSlot0));
+        else {
+            $inv = nmcgsi_CraftingTableScreen_inventorySlot($this.$hoveredSlot0);
+            var$15 = nmcg_Gui_blockName($inventory.$getBlockId($inv));
+        }
+        if (var$15 !== null)
+            nmcg_Gui_drawTooltip(var$15, $mouseX, $mouseY, $this.$width, $this.$height);
+    }
+},
+nmcgsi_CraftingTableScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => {
+    let $slot, $inventory, var$6, $shift, var$8;
+    $slot = nmcgsi_CraftingTableScreen_slotAt($this, $mouseX, $mouseY);
+    if ($slot >= 0 && $this.$minecraft !== null) {
+        $inventory = $this.$minecraft.$getInventory();
+        if ($slot != 60) {
+            if ($slot >= 9) {
+                if (!nlevi_PlatformInput_isKeyDown(42))
+                    $inventory.$clickSlot(nmcgsi_CraftingTableScreen_inventorySlot($slot), $button);
+                else
+                    $inventory.$quickMove(nmcgsi_CraftingTableScreen_inventorySlot($slot));
+            } else {
+                $this.$craft.$clickCell($slot, $button, $inventory);
+                var$6 = jl_StringBuilder__init_();
+                jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(1248)), $slot), $rt_s(492)), $button);
+                console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
+            }
+        } else {
+            $shift = nlevi_PlatformInput_isKeyDown(42);
+            $this.$craft.$clickResult($shift, $inventory);
+            var$6 = !$shift ? $rt_s(488) : $rt_s(489);
+            var$8 = jl_StringBuilder__init_();
+            jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1249)), var$6);
+            var$6 = jl_StringBuilder_toString(var$8);
+            console.log($rt_ustr(var$6));
+        }
+        return 1;
+    }
+    return nmcgs_Screen_mouseClicked($this, $mouseX, $mouseY, $button);
+},
+nmcgsi_CraftingTableScreen_mouseMoved = ($this, $mouseX, $mouseY) => {
+    $this.$hoveredSlot0 = nmcgsi_CraftingTableScreen_slotAt($this, $mouseX, $mouseY);
+    nmcgs_Screen_mouseMoved($this, $mouseX, $mouseY);
+},
+nmcgsi_CraftingTableScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
+    let var$4;
+    nmc_KeyMapping_$callClinit();
+    if ($keyCode != nmc_KeyMapping_INVENTORY.$getKey0() && !($keyCode == 1 && $this.$shouldCloseOnEsc()))
+        return nmcgs_Screen_keyPressed($this, $keyCode, $scanCode, $modifiers);
+    var$4 = jl_StringBuilder__init_();
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1250)), $keyCode);
+    console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
+    $this.$onClose();
+    return 1;
+},
+nmcgsi_CraftingTableScreen_isPauseScreen = $this => {
+    return 0;
+};
 function nmcgso_SoundOptionsScreen$init$lambda$_1_13() {
     jl_Object.call(this);
     this.$_029 = null;
@@ -29662,7 +30631,7 @@ function ju_MissingFormatWidthException() {
 let ju_MissingFormatWidthException__init_0 = ($this, $formatSpecifier) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1177)), $formatSpecifier);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1251)), $formatSpecifier);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$formatSpecifier = $formatSpecifier;
 },
@@ -30289,7 +31258,7 @@ nlevit_ClientMain__main = () => {
                     nlevit_ClientMain_createCanvasAndContext();
                 var$1 = nlevit_ClientMain_webgl === null ? 0 : 1;
                 var$2 = jl_StringBuilder__init_();
-                jl_StringBuilder_append3(jl_StringBuilder_append(var$2, $rt_s(1178)), var$1);
+                jl_StringBuilder_append3(jl_StringBuilder_append(var$2, $rt_s(1252)), var$1);
                 var$2 = jl_StringBuilder_toString(var$2);
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
@@ -30305,7 +31274,7 @@ nlevit_ClientMain__main = () => {
                     console.log($rt_ustr(var$2));
                     if (nlevit_ClientMain_webgl !== null)
                         break c;
-                    nlevit_ClientMain_showCrashScreen($rt_s(1179));
+                    nlevit_ClientMain_showCrashScreen($rt_s(1253));
                 } catch ($$e) {
                     $$je = $rt_wrapException($$e);
                     if ($$je instanceof jl_Throwable) {
@@ -30347,11 +31316,11 @@ nlevit_ClientMain__main = () => {
         var$2 = jl_Class_getName(jl_Object_getClass($t));
         var$4 = $t.$getMessage();
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1180)), var$2), $rt_s(80)), var$4);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1254)), var$2), $rt_s(82)), var$4);
         console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
         var$2 = $t.$getMessage();
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1181)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1255)), var$2);
         nlevit_ClientMain_showCrashScreen(jl_StringBuilder_toString(var$4));
     }
 },
@@ -30372,7 +31341,7 @@ nlevit_ClientMain_detectBrowserFeatures = () => {
 nlevit_ClientMain_createCanvasAndContext = () => {
     let $containerId, $container, $containerIsCanvas, var$4, var$5;
     nlevit_ClientMain_$callClinit();
-    $containerId = $rt_s(1182);
+    $containerId = $rt_s(1256);
     if (nlevit_ClientMain_config !== null && $rt_str(nlevit_ClientMain_config.container) !== null)
         $containerId = $rt_str(nlevit_ClientMain_config.container);
     $container = nlevit_ClientMain_document.getElementById($rt_ustr($containerId));
@@ -30428,7 +31397,7 @@ nlevit_ClientMain_beginAssetBundleLoad = () => {
             console.log("[ClientMain] Requesting asset bundle (assets.epk)...");
             var$1 = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_0();
             var$2 = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1__init_0();
-            nlevit_EPKLoader_loadEPK($rt_s(1183), otji_JSWrapper_unwrap(var$1), otji_JSWrapper_unwrap(var$2));
+            nlevit_EPKLoader_loadEPK($rt_s(1257), otji_JSWrapper_unwrap(var$1), otji_JSWrapper_unwrap(var$2));
             break a;
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -30436,7 +31405,7 @@ nlevit_ClientMain_beginAssetBundleLoad = () => {
                 $t = $$je;
                 var$3 = jl_String_valueOf2($t);
                 var$1 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$1, $rt_s(1184)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$1, $rt_s(1258)), var$3);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$1)));
                 break a;
             } else {
@@ -30469,7 +31438,7 @@ nlevit_ClientMain_lambda$beginAssetBundleLoad$1 = ($loaded, $total) => {
         var$3 = $loaded >> 20;
         var$4 = $total >> 20;
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1185)), var$3), $rt_s(1186)), var$4), $rt_s(1187));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1259)), var$3), $rt_s(1260)), var$4), $rt_s(1261));
         console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
     }
 },
@@ -30478,7 +31447,7 @@ nlevit_ClientMain_lambda$beginAssetBundleLoad$0 = $data => {
     nlevit_ClientMain_$callClinit();
     var$2 = $data.byteLength;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1188)), var$2), $rt_s(949));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1262)), var$2), $rt_s(983));
     var$3 = jl_StringBuilder_toString(var$3);
     console.log($rt_ustr(var$3));
 },
@@ -30779,7 +31748,7 @@ jm_Multiplication_powerOf10 = $exp => {
         return ((__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0($intExp)).$shiftLeft1($intExp);
     $byteArraySize = Long_add(Long_fromInt(1), Long_fromNumber(Long_toNumber($exp) / 2.4082399653118496));
     if (Long_gt($byteArraySize, Long_fromInt(1000000)))
-        $rt_throw(jl_ArithmeticException__init_($rt_s(1189)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(1263)));
     if (Long_le($exp, Long_fromInt(2147483647)))
         return ((__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0($intExp)).$shiftLeft1($intExp);
     $powerOfFive = (__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0(2147483647);
@@ -30856,7 +31825,7 @@ jur_WordBoundary_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_WordBoundary_getName = $this => {
-    return $rt_s(1190);
+    return $rt_s(1264);
 },
 jur_WordBoundary_isSpace = ($this, $ch, $index, $leftBound, $testString) => {
     let var$5;
@@ -30926,8 +31895,8 @@ nlevi_PlatformInput_currentKeyCode = null,
 nlevi_PlatformInput_imeComposing = 0,
 nlevi_PlatformInput_compositionText = null,
 nlevi_PlatformInput_mouseDown = null,
-nlevi_PlatformInput_mousePressedLatch = null,
-nlevi_PlatformInput_mouseReleasedLatch = null,
+nlevi_PlatformInput_mousePressedCount = null,
+nlevi_PlatformInput_mouseReleasedCount = null,
 nlevi_PlatformInput_mouseX = 0,
 nlevi_PlatformInput_mouseY = 0,
 nlevi_PlatformInput_dx = 0,
@@ -30960,7 +31929,7 @@ nlevi_PlatformInput__init = () => {
     nlevi_PlatformInput_$callClinit();
     nlevi_PlatformInput_canvas = nlevit_ClientMain_getCanvas();
     if (nlevi_PlatformInput_canvas === null)
-        $rt_throw(jl_RuntimeException__init_1($rt_s(1191)));
+        $rt_throw(jl_RuntimeException__init_1($rt_s(1265)));
     nlevi_PlatformInput_registerKeyListeners();
     nlevi_PlatformInput_registerMouseListeners();
     nlevi_PlatformInput_registerTouchListeners();
@@ -30975,13 +31944,13 @@ nlevi_PlatformInput_isBrowserShortcut = $event => {
     let $code, $ctrlOrCmd;
     nlevi_PlatformInput_$callClinit();
     $code = $rt_str($event.code);
-    if (jl_String_equals($rt_s(1192), $code))
+    if (jl_String_equals($rt_s(1266), $code))
         return 1;
     $ctrlOrCmd = !($event.ctrlKey ? 1 : 0) && !($event.metaKey ? 1 : 0) ? 0 : 1;
-    if ($ctrlOrCmd && jl_String_equals($rt_s(1193), $code))
+    if ($ctrlOrCmd && jl_String_equals($rt_s(1267), $code))
         return 1;
     if (($event.ctrlKey ? 1 : 0) && ($event.shiftKey ? 1 : 0))
-        return !jl_String_equals($rt_s(1194), $code) && !jl_String_equals($rt_s(1195), $code) && !jl_String_equals($rt_s(1196), $code) ? 0 : 1;
+        return !jl_String_equals($rt_s(1268), $code) && !jl_String_equals($rt_s(1269), $code) && !jl_String_equals($rt_s(1270), $code) ? 0 : 1;
     return 0;
 },
 nlevi_PlatformInput_setKeyEventObserver = $observer => {
@@ -31144,21 +32113,25 @@ nlevi_PlatformInput_isMouseDown = $button => {
     return 0;
 },
 nlevi_PlatformInput_consumeMousePress = $button => {
+    let var$2;
     nlevi_PlatformInput_$callClinit();
     if ($button >= 0 && $button < 8) {
-        if (!(__safe(nlevi_PlatformInput_mousePressedLatch).data||[])[$button])
+        if ((__safe(nlevi_PlatformInput_mousePressedCount).data||[])[$button] <= 0)
             return 0;
-        (__safe(nlevi_PlatformInput_mousePressedLatch).data||[])[$button] = 0;
+        var$2 = (__safe(nlevi_PlatformInput_mousePressedCount).data||[]);
+        var$2[$button] = var$2[$button] - 1 | 0;
         return 1;
     }
     return 0;
 },
 nlevi_PlatformInput_consumeMouseRelease = $button => {
+    let var$2;
     nlevi_PlatformInput_$callClinit();
     if ($button >= 0 && $button < 8) {
-        if (!(__safe(nlevi_PlatformInput_mouseReleasedLatch).data||[])[$button])
+        if ((__safe(nlevi_PlatformInput_mouseReleasedCount).data||[])[$button] <= 0)
             return 0;
-        (__safe(nlevi_PlatformInput_mouseReleasedLatch).data||[])[$button] = 0;
+        var$2 = (__safe(nlevi_PlatformInput_mouseReleasedCount).data||[]);
+        var$2[$button] = var$2[$button] - 1 | 0;
         return 1;
     }
     return 0;
@@ -31175,7 +32148,7 @@ nlevi_PlatformInput_enqueueKeyEvent = ($keyCode, $keyStr, $code) => {
 nlevi_PlatformInput_openURL = ($url, $target) => {
     nlevi_PlatformInput_$callClinit();
     if ($target === null)
-        $target = $rt_s(1197);
+        $target = $rt_s(1271);
     window.open($rt_ustr($url), $rt_ustr($target));
 },
 nlevi_PlatformInput_updateTouchState = $event => {
@@ -31269,7 +32242,7 @@ nlevi_PlatformInput_lambda$registerGamepadListeners$1 = $event => {
         }
     }
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1198)), $index);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1272)), $index);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
 },
 nlevi_PlatformInput_lambda$registerGamepadListeners$0 = $event => {
@@ -31280,7 +32253,7 @@ nlevi_PlatformInput_lambda$registerGamepadListeners$0 = $event => {
         nlevi_PlatformInput_activeGamepadIndex = $index;
     nlevi_PlatformInput_gamepadConnected = 1;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1199)), $index);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1273)), $index);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformInput_lambda$registerPointerLockListener$0 = $event => {
@@ -31331,23 +32304,29 @@ nlevi_PlatformInput_lambda$registerMouseListeners$2 = $event => {
     }
 },
 nlevi_PlatformInput_lambda$registerMouseListeners$1 = $event => {
-    let $button;
+    let $button, var$3;
     nlevi_PlatformInput_$callClinit();
     $event.preventDefault();
     $button = $event.button;
     if ($button >= 0 && $button < 8) {
         (__safe(nlevi_PlatformInput_mouseDown).data||[])[$button] = 0;
-        (__safe(nlevi_PlatformInput_mouseReleasedLatch).data||[])[$button] = 1;
+        if ((__safe(nlevi_PlatformInput_mouseReleasedCount).data||[])[$button] < 8) {
+            var$3 = (__safe(nlevi_PlatformInput_mouseReleasedCount).data||[]);
+            var$3[$button] = var$3[$button] + 1 | 0;
+        }
     }
 },
 nlevi_PlatformInput_lambda$registerMouseListeners$0 = $event => {
-    let $button;
+    let $button, var$3;
     nlevi_PlatformInput_$callClinit();
     $event.preventDefault();
     $button = $event.button;
     if ($button >= 0 && $button < 8) {
         (__safe(nlevi_PlatformInput_mouseDown).data||[])[$button] = 1;
-        (__safe(nlevi_PlatformInput_mousePressedLatch).data||[])[$button] = 1;
+        if ((__safe(nlevi_PlatformInput_mousePressedCount).data||[])[$button] < 8) {
+            var$3 = (__safe(nlevi_PlatformInput_mousePressedCount).data||[]);
+            var$3[$button] = var$3[$button] + 1 | 0;
+        }
     }
 },
 nlevi_PlatformInput_lambda$registerKeyListeners$4 = $event => {
@@ -31355,7 +32334,7 @@ nlevi_PlatformInput_lambda$registerKeyListeners$4 = $event => {
     nlevi_PlatformInput_imeComposing = 0;
     nlevi_PlatformInput_compositionText = $rt_str($event.data || '');
     nlevi_PlatformInput_currentKeyStr = nlevi_PlatformInput_compositionText;
-    nlevi_PlatformInput_currentKeyCode = $rt_s(72);
+    nlevi_PlatformInput_currentKeyCode = $rt_s(74);
 },
 nlevi_PlatformInput_lambda$registerKeyListeners$3 = $event => {
     nlevi_PlatformInput_$callClinit();
@@ -31364,7 +32343,7 @@ nlevi_PlatformInput_lambda$registerKeyListeners$3 = $event => {
 nlevi_PlatformInput_lambda$registerKeyListeners$2 = $event => {
     nlevi_PlatformInput_$callClinit();
     nlevi_PlatformInput_imeComposing = 1;
-    nlevi_PlatformInput_compositionText = $rt_s(72);
+    nlevi_PlatformInput_compositionText = $rt_s(74);
 },
 nlevi_PlatformInput_lambda$registerKeyListeners$1 = $event => {
     let $code, $keyCode, $$je;
@@ -31435,10 +32414,10 @@ try {
     nlevi_PlatformInput_currentKeyStr = null;
     nlevi_PlatformInput_currentKeyCode = null;
     nlevi_PlatformInput_imeComposing = 0;
-    nlevi_PlatformInput_compositionText = $rt_s(72);
+    nlevi_PlatformInput_compositionText = $rt_s(74);
     nlevi_PlatformInput_mouseDown = $rt_createBooleanArray(8);
-    nlevi_PlatformInput_mousePressedLatch = $rt_createBooleanArray(8);
-    nlevi_PlatformInput_mouseReleasedLatch = $rt_createBooleanArray(8);
+    nlevi_PlatformInput_mousePressedCount = $rt_createIntArray(8);
+    nlevi_PlatformInput_mouseReleasedCount = $rt_createIntArray(8);
     nlevi_PlatformInput_mouseX = 0;
     nlevi_PlatformInput_mouseY = 0;
     nlevi_PlatformInput_dx = 0;
@@ -31535,12 +32514,12 @@ nlevi_PlatformInput_pollGamepad0$js_body$_65 = (var$1, var$2, var$3) => {
 };
 function nmcgsi_CreativeModeInventoryScreen() {
     let a = this; nmcgs_Screen.call(a);
-    a.$leftPos = 0;
+    a.$leftPos1 = 0;
     a.$topPos = 0;
     a.$tabIndex = 0;
     a.$scrollRow = 0;
     a.$tabLists = null;
-    a.$hoveredSlot = 0;
+    a.$hoveredSlot1 = 0;
 }
 let nmcgsi_CreativeModeInventoryScreen_TAB_KEYS = null,
 nmcgsi_CreativeModeInventoryScreen_TAB_LABELS = null,
@@ -31551,7 +32530,7 @@ nmcgsi_CreativeModeInventoryScreen_$callClinit = () => {
 nmcgsi_CreativeModeInventoryScreen__init_ = $this => {
     nmcgsi_CreativeModeInventoryScreen_$callClinit();
     nmcgs_Screen__init_($this);
-    $this.$hoveredSlot = (-1);
+    $this.$hoveredSlot1 = (-1);
 },
 nmcgsi_CreativeModeInventoryScreen__init_0 = () => {
     let var_0 = new nmcgsi_CreativeModeInventoryScreen();
@@ -31560,7 +32539,7 @@ nmcgsi_CreativeModeInventoryScreen__init_0 = () => {
 },
 nmcgsi_CreativeModeInventoryScreen_init = $this => {
     let $i;
-    $this.$leftPos = ($this.$width - 195 | 0) / 2 | 0;
+    $this.$leftPos1 = ($this.$width - 195 | 0) / 2 | 0;
     $this.$topPos = ($this.$height - 136 | 0) / 2 | 0;
     nmcgsi_CreativeModeInventoryScreen_$callClinit();
     $this.$tabLists = $rt_createArray(ju_List, (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_KEYS).data||[]).length);
@@ -31601,7 +32580,7 @@ nmcgsi_CreativeModeInventoryScreen_gridBlock = ($this, $cell) => {
 },
 nmcgsi_CreativeModeInventoryScreen_slotAt = ($this, $mouseX, $mouseY) => {
     let $mx, $my, $col, $row, var$7, var$8;
-    $mx = ($mouseX | 0) - $this.$leftPos | 0;
+    $mx = ($mouseX | 0) - $this.$leftPos1 | 0;
     $my = ($mouseY | 0) - $this.$topPos | 0;
     $col = ($mx - 8 | 0) / 18 | 0;
     $row = ($my - 17 | 0) / 18 | 0;
@@ -31627,7 +32606,7 @@ nmcgsi_CreativeModeInventoryScreen_inCell = ($mx, $my, $cellX, $cellY) => {
 nmcgsi_CreativeModeInventoryScreen_tabAt = ($this, $mouseX, $mouseY) => {
     let $widths, $x, $i, $w;
     $widths = nmcgsi_CreativeModeInventoryScreen_tabWidths($this);
-    $x = $this.$leftPos;
+    $x = $this.$leftPos1;
     $i = 0;
     while (true) {
         if ($i >= (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_KEYS).data||[]).length)
@@ -31654,16 +32633,16 @@ nmcgsi_CreativeModeInventoryScreen_tabWidths = $this => {
 nmcgsi_CreativeModeInventoryScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $widths, $tx, $i, $selected, var$9, var$10, var$11, $sprite, var$13, $labelW, var$15, var$16, $inventory, var$18, $cell, $block, $maxRow, $frac, $thumbY, $name;
     nleva_EaglerGuiImpl_fillRect(0.0, 0.0, $this.$width, $this.$height, (-1341124592));
-    nleva_EaglerGuiImpl_drawSprite($rt_s(24), $this.$leftPos, $this.$topPos, 195.0, 136.0);
+    nleva_EaglerGuiImpl_drawSprite($rt_s(25), $this.$leftPos1, $this.$topPos, 195.0, 136.0);
     $widths = nmcgsi_CreativeModeInventoryScreen_tabWidths($this);
-    $tx = $this.$leftPos;
+    $tx = $this.$leftPos1;
     $i = 0;
     while ($i < (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_LABELS).data||[]).length) {
         $selected = $i != $this.$tabIndex ? 0 : 1;
-        var$9 = !$selected ? $rt_s(1200) : $rt_s(1201);
+        var$9 = !$selected ? $rt_s(1274) : $rt_s(1275);
         var$10 = (__safe($widths).data||[]);
         var$11 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$11, $rt_s(1202)), var$9), 50);
+        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$11, $rt_s(1276)), var$9), 50);
         $sprite = jl_StringBuilder_toString(var$11);
         var$13 = $tx;
         nleva_EaglerGuiImpl_drawSprite9Slices($sprite, var$13, $this.$topPos - 28 | 0, var$10[$i], 32.0, 2, 2, 2, 0);
@@ -31677,15 +32656,15 @@ nmcgsi_CreativeModeInventoryScreen_render = ($this, $poseStack, $mouseX, $mouseY
         $i = $i + 1 | 0;
     }
     $inventory = $this.$minecraft.$getInventory();
-    if ($this.$hoveredSlot >= 0) {
-        if ($this.$hoveredSlot < 45) {
-            var$16 = ($this.$leftPos + 8 | 0) + (($this.$hoveredSlot % 9 | 0) * 18 | 0) | 0;
-            var$18 = ($this.$topPos + 17 | 0) + (($this.$hoveredSlot / 9 | 0) * 18 | 0) | 0;
-        } else if ($this.$hoveredSlot >= 54) {
-            var$16 = $this.$leftPos + 174 | 0;
+    if ($this.$hoveredSlot1 >= 0) {
+        if ($this.$hoveredSlot1 < 45) {
+            var$16 = ($this.$leftPos1 + 8 | 0) + (($this.$hoveredSlot1 % 9 | 0) * 18 | 0) | 0;
+            var$18 = ($this.$topPos + 17 | 0) + (($this.$hoveredSlot1 / 9 | 0) * 18 | 0) | 0;
+        } else if ($this.$hoveredSlot1 >= 54) {
+            var$16 = $this.$leftPos1 + 174 | 0;
             var$18 = $this.$topPos + 111 | 0;
         } else {
-            var$16 = ($this.$leftPos + 8 | 0) + (($this.$hoveredSlot - 45 | 0) * 18 | 0) | 0;
+            var$16 = ($this.$leftPos1 + 8 | 0) + (($this.$hoveredSlot1 - 45 | 0) * 18 | 0) | 0;
             var$18 = $this.$topPos + 111 | 0;
         }
         nleva_EaglerGuiImpl_fillRect(var$16, var$18, 16.0, 16.0, (-2130706433));
@@ -31695,30 +32674,30 @@ nmcgsi_CreativeModeInventoryScreen_render = ($this, $poseStack, $mouseX, $mouseY
         $block = nmcgsi_CreativeModeInventoryScreen_gridBlock($this, $cell);
         nmwlb_Blocks_$callClinit();
         if ($block !== nmwlb_Blocks_AIR_BLOCK)
-            nmcg_Gui_drawItemIcon($block.$id, (($this.$leftPos + 8 | 0) + (($cell % 9 | 0) * 18 | 0) | 0) + 1 | 0, (($this.$topPos + 17 | 0) + (($cell / 9 | 0) * 18 | 0) | 0) + 1 | 0);
+            nmcg_Gui_drawItemIcon($block.$id, (($this.$leftPos1 + 8 | 0) + (($cell % 9 | 0) * 18 | 0) | 0) + 1 | 0, (($this.$topPos + 17 | 0) + (($cell / 9 | 0) * 18 | 0) | 0) + 1 | 0);
         $cell = $cell + 1 | 0;
     }
     $i = 0;
     while ($i < 9) {
-        nmcg_Gui_drawItem($inventory.$getBlockId($i), $inventory.$getCount($i), (($this.$leftPos + 8 | 0) + ($i * 18 | 0) | 0) + 1 | 0, ($this.$topPos + 111 | 0) + 1 | 0);
+        nmcg_Gui_drawItem($inventory.$getBlockId($i), $inventory.$getCount($i), (($this.$leftPos1 + 8 | 0) + ($i * 18 | 0) | 0) + 1 | 0, ($this.$topPos + 111 | 0) + 1 | 0);
         $i = $i + 1 | 0;
     }
     $maxRow = nmcgsi_CreativeModeInventoryScreen_maxScrollRow($this);
     if ($maxRow > 0) {
         $frac = $this.$scrollRow / $maxRow;
         $thumbY = ($this.$topPos + 17 | 0) + $frac * 75.0;
-        nleva_EaglerGuiImpl_drawSprite($rt_s(29), $this.$leftPos + 174 | 0, $thumbY, 12.0, 15.0);
+        nleva_EaglerGuiImpl_drawSprite($rt_s(30), $this.$leftPos1 + 174 | 0, $thumbY, 12.0, 15.0);
     }
     nmcg_Gui_drawItem($inventory.$getCarriedBlock(), $inventory.$getCarriedCount(), $mouseX - 1 | 0, $mouseY - 1 | 0);
-    if ($this.$hoveredSlot >= 0 && !$inventory.$getCarriedCount()) {
+    if ($this.$hoveredSlot1 >= 0 && !$inventory.$getCarriedCount()) {
         $name = null;
-        if ($this.$hoveredSlot < 45) {
-            $block = nmcgsi_CreativeModeInventoryScreen_gridBlock($this, $this.$hoveredSlot);
+        if ($this.$hoveredSlot1 < 45) {
+            $block = nmcgsi_CreativeModeInventoryScreen_gridBlock($this, $this.$hoveredSlot1);
             nmwlb_Blocks_$callClinit();
             if ($block !== nmwlb_Blocks_AIR_BLOCK)
                 $name = $block.$displayName;
-        } else if ($this.$hoveredSlot < 54) {
-            var$16 = $this.$hoveredSlot - 45 | 0;
+        } else if ($this.$hoveredSlot1 < 54) {
+            var$16 = $this.$hoveredSlot1 - 45 | 0;
             var$16 = $inventory.$getBlockId(var$16);
             $name = nmcg_Gui_blockName(var$16);
         }
@@ -31735,11 +32714,11 @@ nmcgsi_CreativeModeInventoryScreen_mouseClicked = ($this, $mouseX, $mouseY, $but
     if ($tab >= 0 && $tab != $this.$tabIndex) {
         var$6 = (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_LABELS).data||[])[$tab];
         var$7 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1203)), var$6);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1277)), var$6);
         console.log($rt_ustr(jl_StringBuilder_toString(var$7)));
         $this.$tabIndex = $tab;
         $this.$scrollRow = 0;
-        $this.$hoveredSlot = (-1);
+        $this.$hoveredSlot1 = (-1);
         return 1;
     }
     $slot = nmcgsi_CreativeModeInventoryScreen_slotAt($this, $mouseX, $mouseY);
@@ -31778,7 +32757,7 @@ nmcgsi_CreativeModeInventoryScreen_mouseScrolled = ($this, $mouseX, $mouseY, $de
     return nmcgs_Screen_mouseScrolled($this, $mouseX, $mouseY, $delta);
 },
 nmcgsi_CreativeModeInventoryScreen_mouseMoved = ($this, $mouseX, $mouseY) => {
-    $this.$hoveredSlot = nmcgsi_CreativeModeInventoryScreen_slotAt($this, $mouseX, $mouseY);
+    $this.$hoveredSlot1 = nmcgsi_CreativeModeInventoryScreen_slotAt($this, $mouseX, $mouseY);
     nmcgs_Screen_mouseMoved($this, $mouseX, $mouseY);
 },
 nmcgsi_CreativeModeInventoryScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -31787,7 +32766,7 @@ nmcgsi_CreativeModeInventoryScreen_keyPressed = ($this, $keyCode, $scanCode, $mo
     if ($keyCode != nmc_KeyMapping_INVENTORY.$getKey0() && !($keyCode == 1 && $this.$shouldCloseOnEsc()))
         return nmcgs_Screen_keyPressed($this, $keyCode, $scanCode, $modifiers);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1204)), $keyCode);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1278)), $keyCode);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     $this.$onClose();
     return 1;
@@ -31799,7 +32778,7 @@ nmcgsi_CreativeModeInventoryScreen__clinit_ = () => {
 try {
 
     nmcgsi_CreativeModeInventoryScreen_TAB_KEYS = $rt_createIntArrayFromData([1, 2, 3]);
-    nmcgsi_CreativeModeInventoryScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1205), $rt_s(1206), $rt_s(1207)]);
+    nmcgsi_CreativeModeInventoryScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1279), $rt_s(1280), $rt_s(1281)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Double = $rt_classWithoutFields(jl_Number),
@@ -31862,9 +32841,9 @@ jl_Double_parseDouble = $string => {
                             $start = $start + 1 | 0;
                         }
                     } else {
-                        if ($c == 73 && ($end - $start | 0) == 8 && jl_String_regionMatches($string, 0, $start, $rt_s(403), 0, 8))
+                        if ($c == 73 && ($end - $start | 0) == 8 && jl_String_regionMatches($string, 0, $start, $rt_s(430), 0, 8))
                             return !$negative ? Infinity : (-Infinity);
-                        if ($c == 78 && ($end - $start | 0) == 3 && jl_String_regionMatches($string, 0, $start, $rt_s(404), 0, 3))
+                        if ($c == 78 && ($end - $start | 0) == 3 && jl_String_regionMatches($string, 0, $start, $rt_s(431), 0, 3))
                             return NaN;
                         $rt_throw(jl_NumberFormatException__init_());
                     }
@@ -32229,7 +33208,7 @@ nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_displayString =
     let var$1, var$2;
     var$1 = $this.$options5.$menuBackgroundBlurriness;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1208)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1282)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue = $this => {
@@ -32241,7 +33220,7 @@ nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue = $t
     }
 },
 nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_getTelemetryId = $this => {
-    return $rt_s(1209);
+    return $rt_s(1283);
 },
 jur_IntHash = $rt_classWithoutFields(),
 nleva_PlatformWebService = $rt_classWithoutFields(),
@@ -32258,31 +33237,31 @@ nleva_PlatformWebService_init = () => {
     console.log("[PlatformWebService] Initializing service locator...");
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformOpenGL));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1210)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1284)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformRuntime));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1211)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1285)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformAudio));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1212)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1286)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformNetworking));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1213)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1287)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformInput));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1214)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1288)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformApplication));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1215)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1289)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformFilesystem));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1216)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1290)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     nleva_PlatformWebService_initialized = 1;
     console.log("[PlatformWebService] Service locator initialized");
@@ -32383,24 +33362,24 @@ nmcgs_SelectWorldScreen_init = $this => {
     $gridX = $centerX - 154 | 0;
     $row1Y = ($this.$height - 60 | 0) + 8 | 0;
     $row2Y = ($row1Y + 20 | 0) + 4 | 0;
-    $this.$playWorldButton = nmcgc_Button__init_($gridX, $row1Y, 150, 20, $rt_s(1217), nmcgs_SelectWorldScreen$init$lambda$_1_0__init_0($this));
+    $this.$playWorldButton = nmcgc_Button__init_($gridX, $row1Y, 150, 20, $rt_s(1291), nmcgs_SelectWorldScreen$init$lambda$_1_0__init_0($this));
     $this.$playWorldButton.$setActive(0);
     $this.$addRenderableWidget($this.$playWorldButton);
     $create = new nmcgc_Button;
     var$6 = $gridX + 158 | 0;
-    nmcgc_Button__init_0($create, var$6, $row1Y, 150, 20, $rt_s(1218), nmcgs_SelectWorldScreen$init$lambda$_1_1__init_0($this));
+    nmcgc_Button__init_0($create, var$6, $row1Y, 150, 20, $rt_s(1292), nmcgs_SelectWorldScreen$init$lambda$_1_1__init_0($this));
     $this.$addRenderableWidget($create);
-    $edit = nmcgc_Button__init_($gridX, $row2Y, 71, 20, $rt_s(1124), nmcgs_SelectWorldScreen$init$lambda$_1_2__init_0());
+    $edit = nmcgc_Button__init_($gridX, $row2Y, 71, 20, $rt_s(1195), nmcgs_SelectWorldScreen$init$lambda$_1_2__init_0());
     $edit.$setActive(0);
     $this.$addRenderableWidget($edit);
-    $delete = nmcgc_Button__init_($gridX + 79 | 0, $row2Y, 71, 20, $rt_s(1125), nmcgs_SelectWorldScreen$init$lambda$_1_3__init_0($this));
+    $delete = nmcgc_Button__init_($gridX + 79 | 0, $row2Y, 71, 20, $rt_s(1196), nmcgs_SelectWorldScreen$init$lambda$_1_3__init_0($this));
     $delete.$setActive(0);
     $this.$deleteButton = $delete;
     $this.$addRenderableWidget($delete);
-    $recreate = nmcgc_Button__init_(var$6, $row2Y, 71, 20, $rt_s(1219), nmcgs_SelectWorldScreen$init$lambda$_1_4__init_0());
+    $recreate = nmcgc_Button__init_(var$6, $row2Y, 71, 20, $rt_s(1293), nmcgs_SelectWorldScreen$init$lambda$_1_4__init_0());
     $recreate.$setActive(0);
     $this.$addRenderableWidget($recreate);
-    $this.$addRenderableWidget(nmcgc_Button__init_($gridX + 237 | 0, $row2Y, 71, 20, $rt_s(357), nmcgs_SelectWorldScreen$init$lambda$_1_5__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($gridX + 237 | 0, $row2Y, 71, 20, $rt_s(359), nmcgs_SelectWorldScreen$init$lambda$_1_5__init_0($this)));
     $rowLeft = $centerX - 135 | 0;
     $this.$worldEntries.$clear();
     $this.$selectedEntry = null;
@@ -32430,7 +33409,7 @@ nmcgs_SelectWorldScreen_deleteSelectedWorld = $this => {
     if ($this.$minecraft !== null && $this.$selectedEntry !== null) {
         $name = $this.$selectedEntry.$summary.$name0;
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1220)), $name), 39);
+        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1294)), $name), 39);
         console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
         nlev_WorldStorage_deleteWorld($name);
         $this.$init0($this.$minecraft, $this.$width, $this.$height);
@@ -32441,33 +33420,33 @@ nmcgs_SelectWorldScreen_joinSelectedWorld = $this => {
     let $name, var$2;
     if ($this.$minecraft === null)
         return;
-    $name = $this.$selectedEntry === null ? $rt_s(419) : $this.$selectedEntry.$summary.$name0;
+    $name = $this.$selectedEntry === null ? $rt_s(446) : $this.$selectedEntry.$summary.$name0;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1221)), $name), 39);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1295)), $name), 39);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     $this.$minecraft.$doWorldLoad($name);
 },
 nmcgs_SelectWorldScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $bgDrawn, $listTop, $listBottom, $titleWidth, $searchX, var$10;
-    $bgDrawn = nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $bgDrawn = nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
     $listTop = 49;
     $listBottom = $this.$height - 60 | 0;
     if (!$bgDrawn)
         nleva_EaglerGuiImpl_fillRect(0.0, 49.0, $this.$width, $listBottom - $listTop | 0, (-1879048192));
     else {
-        nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(32), 0.0, 49.0, $this.$width, $listBottom - $listTop | 0, 0.0, 0.0, 32);
-        nleva_EaglerGuiImpl_drawSprite($rt_s(33), 0.0, 47.0, $this.$width, 2.0);
-        nleva_EaglerGuiImpl_drawSprite($rt_s(34), 0.0, $listBottom, $this.$width, 2.0);
+        nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(34), 0.0, 49.0, $this.$width, $listBottom - $listTop | 0, 0.0, 0.0, 32);
+        nleva_EaglerGuiImpl_drawSprite($rt_s(35), 0.0, 47.0, $this.$width, 2.0);
+        nleva_EaglerGuiImpl_drawSprite($rt_s(36), 0.0, $listBottom, $this.$width, 2.0);
     }
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1222));
-    nleva_EaglerGuiImpl_drawText($rt_s(1222), nmcgs_SelectWorldScreen_centerX($this) - $titleWidth / 2.0, 8.0, (-1), 1);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1296));
+    nleva_EaglerGuiImpl_drawText($rt_s(1296), nmcgs_SelectWorldScreen_centerX($this) - $titleWidth / 2.0, 8.0, (-1), 1);
     $searchX = nmcgs_SelectWorldScreen_centerX($this) - 100 | 0;
     var$10 = $searchX;
     if (!nleva_EaglerGuiImpl_drawSprite($rt_s(5), var$10, 22.0, 200.0, 20.0)) {
         nleva_EaglerGuiImpl_fillRect(var$10, 22.0, 200.0, 20.0, (-16777216));
         nleva_EaglerGuiImpl_fillRect($searchX + 1 | 0, 23.0, 198.0, 18.0, (-7631989));
     }
-    nleva_EaglerGuiImpl_drawText($rt_s(1223), $searchX + 4 | 0, 28.0, (-6250336), 0);
+    nleva_EaglerGuiImpl_drawText($rt_s(1297), $searchX + 4 | 0, 28.0, (-6250336), 0);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgs_SelectWorldScreen_centerX = $this => {
@@ -32479,18 +33458,18 @@ nmcgs_SelectWorldScreen_isPauseScreen = $this => {
 nmcgs_SelectWorldScreen_formatDate = $millis => {
     let $d, $month, $day, $year, $sb;
     if (Long_le($millis, Long_ZERO))
-        return $rt_s(72);
+        return $rt_s(74);
     $d = ju_Date__init_0($millis);
     $month = $d.$getMonth() + 1 | 0;
     $day = $d.$getDate();
     $year = ($d.$getYear() + 1900 | 0) % 100 | 0;
     $sb = jl_StringBuilder__init_();
     $sb.$append3(jl_String_valueOf($month));
-    $sb.$append3($rt_s(895));
+    $sb.$append3($rt_s(929));
     $sb.$append3(jl_String_valueOf($day));
-    $sb.$append3($rt_s(895));
+    $sb.$append3($rt_s(929));
     if ($year < 10)
-        $sb.$append3($rt_s(354));
+        $sb.$append3($rt_s(356));
     $sb.$append3(jl_String_valueOf($year));
     return $sb.$toString();
 },
@@ -32576,7 +33555,7 @@ nmcgso_ControlsScreen$SprintWindowSlider_displayString = $this => {
     let var$1, var$2;
     var$1 = $this.$options2.$sprintWindow;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1224)), var$1), $rt_s(1225));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1298)), var$1), $rt_s(1299));
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_ControlsScreen$SprintWindowSlider_applyValue = $this => {
@@ -32588,7 +33567,7 @@ nmcgso_ControlsScreen$SprintWindowSlider_applyValue = $this => {
     }
 },
 nmcgso_ControlsScreen$SprintWindowSlider_getTelemetryId = $this => {
-    return $rt_s(1226);
+    return $rt_s(1300);
 };
 function ji_File() {
     jl_Object.call(this);
@@ -32717,20 +33696,20 @@ nmcgso_OptionsScreen$FovSlider_toNormalized = $fov => {
 },
 nmcgso_OptionsScreen$FovSlider_fovLabel = $fov => {
     if ($fov == 70)
-        return $rt_s(1227);
+        return $rt_s(1301);
     if ($fov != 110)
         return jl_String_valueOf($fov);
-    return $rt_s(1228);
+    return $rt_s(1302);
 },
 nmcgso_OptionsScreen$FovSlider_displayString = $this => {
     let var$1, var$2;
     var$1 = nmcgso_OptionsScreen$FovSlider_fovLabel($this.$options6.$getFov());
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1229)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1303)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_OptionsScreen$FovSlider_getTelemetryId = $this => {
-    return $rt_s(1230);
+    return $rt_s(1304);
 },
 nmcgso_OptionsScreen$FovSlider_applyValue = $this => {
     let $fov;
@@ -32751,7 +33730,7 @@ function nlev_WorldStorage$WorldSummary() {
 }
 let nlev_WorldStorage$WorldSummary__init_0 = $this => {
     jl_Object__init_($this);
-    $this.$version0 = $rt_s(1045);
+    $this.$version0 = $rt_s(1079);
 },
 nlev_WorldStorage$WorldSummary__init_ = () => {
     let var_0 = new nlev_WorldStorage$WorldSummary();
@@ -32847,7 +33826,7 @@ ju_Formatter$FormatWriter_formatValue = ($this, $specifier) => {
     a: {
         switch ($specifier) {
             case 37:
-                $this.$out.$append30($rt_s(1231));
+                $this.$out.$append30($rt_s(1305));
                 break a;
             case 66:
                 break;
@@ -32927,13 +33906,13 @@ ju_Formatter$FormatWriter_formatFloat = ($this, $specifier, $upperCase) => {
     $format.$setMinimumFractionDigits($this.$precision0);
     $format.$setGroupingUsed(!($this.$flags & 64) ? 0 : 1);
     if ($this.$flags & 128) {
-        $format.$setNegativePrefix($rt_s(1232));
-        $format.$setNegativeSuffix($rt_s(1003));
+        $format.$setNegativePrefix($rt_s(1306));
+        $format.$setNegativeSuffix($rt_s(1037));
     }
     if ($this.$flags & 8)
-        $format.$setPositivePrefix($rt_s(1233));
+        $format.$setPositivePrefix($rt_s(1307));
     else if ($this.$flags & 16)
-        $format.$setPositivePrefix($rt_s(135));
+        $format.$setPositivePrefix($rt_s(137));
     $str = jt_Format_format($format, $arg);
     $this.$precision0 = (-1);
     ju_Formatter$FormatWriter_formatGivenString($this, $upperCase, $str);
@@ -32954,9 +33933,9 @@ ju_Formatter$FormatWriter_predictDecimalSize = ($this, $negative, $format) => {
 },
 ju_Formatter$FormatWriter_verifyFloatFlags = $this => {
     if ($this.$flags & 8 && $this.$flags & 16)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1234)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1308)));
     if ($this.$flags & 32 && $this.$flags & 1)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1235)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1309)));
     if ($this.$flags & 1 && $this.$width1 < 0)
         $rt_throw(ju_MissingFormatWidthException__init_(jl_String_substring($this.$format8, $this.$formatSpecifierStart, $this.$index1)));
 },
@@ -32971,7 +33950,7 @@ ju_Formatter$FormatWriter_formatHex = ($this, $specifier, $upperCase) => {
     let $arg, $s;
     ju_Formatter$FormatWriter_verifyFlagsForGeneralFormat($this, $specifier);
     $arg = $this.$args.data[$this.$argumentIndex];
-    $s = $arg === null ? $rt_s(142) : jl_Integer_toHexString($arg.$hashCode0());
+    $s = $arg === null ? $rt_s(144) : jl_Integer_toHexString($arg.$hashCode0());
     ju_Formatter$FormatWriter_formatGivenString($this, $upperCase, $s);
 },
 ju_Formatter$FormatWriter_formatString = ($this, $specifier, $upperCase) => {
@@ -33002,7 +33981,7 @@ ju_Formatter$FormatWriter_formatChar = ($this, $specifier, $upperCase) => {
     else {
         if (!($arg instanceof jl_Integer)) {
             if ($arg === null) {
-                ju_Formatter$FormatWriter_formatGivenString($this, $upperCase, $rt_s(142));
+                ju_Formatter$FormatWriter_formatGivenString($this, $upperCase, $rt_s(144));
                 return;
             }
             $rt_throw(ju_IllegalFormatConversionException__init_($specifier, jl_Object_getClass($arg)));
@@ -33099,7 +34078,7 @@ ju_Formatter$FormatWriter_formatRadixInt = ($this, $specifier, $radixLog2, $uppe
     }
     $sb = jl_StringBuilder__init_();
     if ($this.$flags & 4) {
-        $prefix = $radixLog2 != 4 ? $rt_s(354) : $rt_s(1236);
+        $prefix = $radixLog2 != 4 ? $rt_s(356) : $rt_s(1310);
         var$8 = jl_StringBuilder__init_();
         jl_StringBuilder_append(jl_StringBuilder_append(var$8, $prefix), $str);
         $str = jl_StringBuilder_toString(var$8);
@@ -33120,9 +34099,9 @@ ju_Formatter$FormatWriter_formatRadixInt = ($this, $specifier, $radixLog2, $uppe
 },
 ju_Formatter$FormatWriter_verifyIntFlags = $this => {
     if ($this.$flags & 8 && $this.$flags & 16)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1234)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1308)));
     if ($this.$flags & 32 && $this.$flags & 1)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1235)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1309)));
     if ($this.$precision0 >= 0)
         $rt_throw(ju_IllegalFormatPrecisionException__init_0($this.$precision0));
     if ($this.$flags & 1 && $this.$width1 < 0)
@@ -33152,7 +34131,7 @@ ju_Formatter$FormatWriter_verifyFlags = ($this, $conversion, $mask) => {
 ju_Formatter$FormatWriter_flagsToString = ($this, $flags) => {
     let $flagIndex;
     $flagIndex = jl_Integer_numberOfTrailingZeros($flags);
-    return jl_String_valueOf3(jl_String_charAt($rt_s(1237), $flagIndex));
+    return jl_String_valueOf3(jl_String_charAt($rt_s(1311), $flagIndex));
 },
 ju_Formatter$FormatWriter_mayBeAppendSpaces = ($this, $str) => {
     let $diff, $sb, $i;
@@ -33486,14 +34465,14 @@ nmcgso_MouseSettingsScreen_init = $this => {
     $rowY = 34;
     $this.$addRenderableWidget(nmcgso_MouseSettingsScreen$SensitivitySlider__init_0($gridX, $rowY, 150, 20, $this.$options1));
     var$5 = new nmcgc_CycleButton;
-    var$6 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$5, $rightX, $rowY, 150, 20, $rt_s(1238), var$6, !$this.$options1.$invertMouseY ? 0 : 1, nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_0($this));
+    var$6 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$5, $rightX, $rowY, 150, 20, $rt_s(1312), var$6, !$this.$options1.$invertMouseY ? 0 : 1, nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget(var$5);
     $row2Y = 58;
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, $row2Y, $rt_s(1239)));
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $rightX, $row2Y, $rt_s(1240)));
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, 82, $rt_s(1241)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(442), nmcgso_MouseSettingsScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, $row2Y, $rt_s(1313)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $rightX, $row2Y, $rt_s(1314)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, 82, $rt_s(1315)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(469), nmcgso_MouseSettingsScreen$init$lambda$_1_1__init_0($this)));
 },
 nmcgso_MouseSettingsScreen_disabledButton = ($this, $x, $y, $label) => {
     let $button;
@@ -33503,9 +34482,9 @@ nmcgso_MouseSettingsScreen_disabledButton = ($this, $x, $y, $label) => {
 },
 nmcgso_MouseSettingsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1242));
-    nleva_EaglerGuiImpl_drawText($rt_s(1242), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1316));
+    nleva_EaglerGuiImpl_drawText($rt_s(1316), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_MouseSettingsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -33550,7 +34529,7 @@ jur_SOLSet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_SOLSet_getName = $this => {
-    return $rt_s(1243);
+    return $rt_s(1317);
 };
 function otpp_AsyncCallbackWrapper() {
     jl_Object.call(this);
@@ -33585,7 +34564,7 @@ nmcgsm_EditServerScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) =
     return var_6;
 },
 nmcgsm_EditServerScreen$1_getTelemetryId = $this => {
-    return $rt_s(1244);
+    return $rt_s(1318);
 },
 nlevi_PlatformOpenGL = $rt_classWithoutFields(),
 nlevi_PlatformOpenGL_gl = null,
@@ -33605,7 +34584,7 @@ nlevi_PlatformOpenGL__init = () => {
     nlevi_PlatformOpenGL_$callClinit();
     nlevi_PlatformOpenGL_gl = nlevit_ClientMain_getWebGL2();
     if (nlevi_PlatformOpenGL_gl === null)
-        $rt_throw(jl_RuntimeException__init_1($rt_s(1245)));
+        $rt_throw(jl_RuntimeException__init_1($rt_s(1319)));
     nlevi_PlatformOpenGL_extColorBufferFloat = nlevi_PlatformOpenGL_gl.getExtension("EXT_color_buffer_float");
     nlevi_PlatformOpenGL_extTextureFloatLinear = nlevi_PlatformOpenGL_gl.getExtension("OES_texture_float_linear");
     nlevi_PlatformOpenGL_extMultiDraw = nlevi_PlatformOpenGL_gl.getExtension("WEBGL_multi_draw");
@@ -33618,12 +34597,12 @@ nlevi_PlatformOpenGL__init = () => {
     nlevi_PlatformOpenGL_glRenderer = nlevi_PlatformOpenGL_getParameterString(7937);
     var$1 = nlevi_PlatformOpenGL_glVersion;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1246)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1320)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = nlevi_PlatformOpenGL_glVendor;
     var$2 = nlevi_PlatformOpenGL_glRenderer;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1247)), var$1), $rt_s(1248)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1321)), var$1), $rt_s(1322)), var$2);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformOpenGL_getParameterString = $pname => {
@@ -33915,7 +34894,7 @@ nmcgsm_EditServerScreen$2__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) =
     return var_6;
 },
 nmcgsm_EditServerScreen$2_getTelemetryId = $this => {
-    return $rt_s(1249);
+    return $rt_s(1323);
 },
 otjt_ArrayBuffer = $rt_classWithoutFields();
 function ju_HashMap$HashMapEntrySet() {
@@ -34024,14 +35003,14 @@ jm_RoundingMode_$values = () => {
 jm_RoundingMode__clinit_ = () => {
 try {
 
-    jm_RoundingMode_UP = jm_RoundingMode__init_($rt_s(1250), 0, 0);
-    jm_RoundingMode_DOWN = jm_RoundingMode__init_($rt_s(1251), 1, 1);
-    jm_RoundingMode_CEILING = jm_RoundingMode__init_($rt_s(1252), 2, 2);
-    jm_RoundingMode_FLOOR = jm_RoundingMode__init_($rt_s(1253), 3, 3);
-    jm_RoundingMode_HALF_UP = jm_RoundingMode__init_($rt_s(1254), 4, 4);
-    jm_RoundingMode_HALF_DOWN = jm_RoundingMode__init_($rt_s(1255), 5, 5);
-    jm_RoundingMode_HALF_EVEN = jm_RoundingMode__init_($rt_s(1256), 6, 6);
-    jm_RoundingMode_UNNECESSARY = jm_RoundingMode__init_($rt_s(1257), 7, 7);
+    jm_RoundingMode_UP = jm_RoundingMode__init_($rt_s(1324), 0, 0);
+    jm_RoundingMode_DOWN = jm_RoundingMode__init_($rt_s(1325), 1, 1);
+    jm_RoundingMode_CEILING = jm_RoundingMode__init_($rt_s(1326), 2, 2);
+    jm_RoundingMode_FLOOR = jm_RoundingMode__init_($rt_s(1327), 3, 3);
+    jm_RoundingMode_HALF_UP = jm_RoundingMode__init_($rt_s(1328), 4, 4);
+    jm_RoundingMode_HALF_DOWN = jm_RoundingMode__init_($rt_s(1329), 5, 5);
+    jm_RoundingMode_HALF_EVEN = jm_RoundingMode__init_($rt_s(1330), 6, 6);
+    jm_RoundingMode_UNNECESSARY = jm_RoundingMode__init_($rt_s(1331), 7, 7);
     jm_RoundingMode_$VALUES = jm_RoundingMode_$values();
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
@@ -34123,7 +35102,7 @@ cgcc_CollectPreconditions = $rt_classWithoutFields(),
 cgcc_CollectPreconditions_checkNonnegative = ($value, $name) => {
     if ($value >= 0)
         return $value;
-    $rt_throw(jl_IllegalArgumentException__init_2(((((jl_StringBuilder__init_()).$append3($name)).$append3($rt_s(1258))).$append1($value)).$toString()));
+    $rt_throw(jl_IllegalArgumentException__init_2(((((jl_StringBuilder__init_()).$append3($name)).$append3($rt_s(1332))).$append1($value)).$toString()));
 };
 function nmcr_TextureManager() {
     let a = this; jl_Object.call(a);
@@ -34140,6 +35119,123 @@ nmcr_TextureManager__init_0 = () => {
     let var_0 = new nmcr_TextureManager();
     nmcr_TextureManager__init_(var_0);
     return var_0;
+};
+function nmwi_CraftingContainer() {
+    let a = this; jl_Object.call(a);
+    a.$width4 = 0;
+    a.$height3 = 0;
+    a.$cellIds = null;
+    a.$cellCounts = null;
+    a.$resultId = 0;
+    a.$resultCount = 0;
+    a.$resultPresent = 0;
+}
+let nmwi_CraftingContainer__init_ = ($this, $width, $height) => {
+    let var$3;
+    jl_Object__init_($this);
+    $this.$width4 = $width;
+    $this.$height3 = $height;
+    var$3 = $rt_imul($width, $height);
+    $this.$cellIds = $rt_createIntArray(var$3);
+    $this.$cellCounts = $rt_createIntArray(var$3);
+},
+nmwi_CraftingContainer__init_0 = (var_0, var_1) => {
+    let var_2 = new nmwi_CraftingContainer();
+    nmwi_CraftingContainer__init_(var_2, var_0, var_1);
+    return var_2;
+},
+nmwi_CraftingContainer_getWidth = $this => {
+    return $this.$width4;
+},
+nmwi_CraftingContainer_getSize = $this => {
+    return $this.$cellIds.data.length;
+},
+nmwi_CraftingContainer_getCellId = ($this, $index) => {
+    return $index >= 0 && $index < $this.$cellIds.data.length ? $this.$cellIds.data[$index] : 0;
+},
+nmwi_CraftingContainer_getCellCount = ($this, $index) => {
+    return $index >= 0 && $index < $this.$cellCounts.data.length ? $this.$cellCounts.data[$index] : 0;
+},
+nmwi_CraftingContainer_getResultId = $this => {
+    return !$this.$resultPresent ? 0 : $this.$resultId;
+},
+nmwi_CraftingContainer_getResultCount = $this => {
+    return !$this.$resultPresent ? 0 : $this.$resultCount;
+},
+nmwi_CraftingContainer_recompute = $this => {
+    let $recipe;
+    $recipe = nmwic_Crafting_match($this.$width4, $this.$height3, $this.$cellIds);
+    if ($recipe === null) {
+        $this.$resultId = 0;
+        $this.$resultCount = 0;
+        $this.$resultPresent = 0;
+    } else {
+        $this.$resultId = $recipe.$resultId0;
+        $this.$resultCount = $recipe.$resultCount0;
+        $this.$resultPresent = 1;
+    }
+},
+nmwi_CraftingContainer_clickCell = ($this, $index, $button, $inventory) => {
+    nmwep_Inventory_doClick($this.$cellIds, $this.$cellCounts, $index, $button, $inventory);
+    $this.$recompute();
+},
+nmwi_CraftingContainer_clickResult = ($this, $shift, $inventory) => {
+    let $cap, $carriedId, $carriedCount, $any, $guard, $guard_0, $cap2;
+    $this.$recompute();
+    if (!$this.$resultPresent)
+        return 0;
+    $cap = nmwic_Crafting_maxStack($this.$resultId);
+    if (!$shift) {
+        $carriedId = $inventory.$getCarriedBlock();
+        $carriedCount = $inventory.$getCarriedCount();
+        if (!$carriedCount)
+            $inventory.$setCarried($this.$resultId, $this.$resultCount);
+        else if ($carriedId == $this.$resultId && ($carriedCount + $this.$resultCount | 0) <= $cap)
+            $inventory.$setCarried($this.$resultId, $carriedCount + $this.$resultCount | 0);
+        else
+            return 0;
+        nmwic_Crafting_consume($this.$cellIds, $this.$cellCounts);
+        $this.$recompute();
+        return 1;
+    }
+    $any = 0;
+    $guard = 2304;
+    a: {
+        while (true) {
+            $guard_0 = $guard + (-1) | 0;
+            if ($guard <= 0)
+                break a;
+            $this.$recompute();
+            if (!$this.$resultPresent)
+                break a;
+            $cap2 = nmwic_Crafting_maxStack($this.$resultId);
+            if (!$inventory.$addItem($this.$resultId, $this.$resultCount, $cap2))
+                break;
+            nmwic_Crafting_consume($this.$cellIds, $this.$cellCounts);
+            $any = 1;
+            $guard = $guard_0;
+        }
+    }
+    if ($any)
+        $this.$recompute();
+    return $any;
+},
+nmwi_CraftingContainer_returnContents = ($this, $inventory) => {
+    let $i, var$3, var$4, var$5;
+    $i = 0;
+    while ($i < $this.$cellIds.data.length) {
+        if ($this.$cellIds.data[$i] && $this.$cellCounts.data[$i] > 0) {
+            var$3 = $this.$cellIds.data[$i];
+            var$4 = $this.$cellCounts.data[$i];
+            var$5 = $this.$cellIds.data[$i];
+            var$5 = nmwic_Crafting_maxStack(var$5);
+            $inventory.$addItem(var$3, var$4, var$5);
+        }
+        $this.$cellIds.data[$i] = 0;
+        $this.$cellCounts.data[$i] = 0;
+        $i = $i + 1 | 0;
+    }
+    $this.$recompute();
 },
 nmc_BlockPos = $rt_classWithoutFields(),
 nmc_BlockPos_asLong = ($x, $y, $z) => {
@@ -34254,44 +35350,44 @@ nmcgso_ControlsScreen_init = $this => {
     $topY = 34;
     $leftX = ($centerX - 150 | 0) - 4 | 0;
     $rightX = $centerX + 4 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($leftX, $topY, 150, 20, $rt_s(1259), nmcgso_ControlsScreen$init$lambda$_1_0__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($rightX, $topY, 150, 20, $rt_s(1260), nmcgso_ControlsScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($leftX, $topY, 150, 20, $rt_s(1333), nmcgso_ControlsScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($rightX, $topY, 150, 20, $rt_s(1334), nmcgso_ControlsScreen$init$lambda$_1_1__init_0($this)));
     $rowY = 62;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1261), $rt_s(1262)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $rowY, 150, 20, $rt_s(1263), var$7, !$this.$options0.$toggleCrouch ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_2__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1335), $rt_s(1336)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $rowY, 150, 20, $rt_s(1337), var$7, !$this.$options0.$toggleCrouch ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_2__init_0($this));
     $this.$addRenderableWidget(var$6);
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1261), $rt_s(1262)]);
-    nmcgc_CycleButton__init_(var$6, $rightX, $rowY, 150, 20, $rt_s(1264), var$7, !$this.$options0.$toggleSprint ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_3__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1335), $rt_s(1336)]);
+    nmcgc_CycleButton__init_(var$6, $rightX, $rowY, 150, 20, $rt_s(1338), var$7, !$this.$options0.$toggleSprint ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_3__init_0($this));
     $this.$addRenderableWidget(var$6);
     $row2Y = 86;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1261), $rt_s(1262)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row2Y, 150, 20, $rt_s(1265), var$7, !$this.$options0.$toggleAttack ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_4__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1335), $rt_s(1336)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $row2Y, 150, 20, $rt_s(1339), var$7, !$this.$options0.$toggleAttack ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_4__init_0($this));
     $this.$addRenderableWidget(var$6);
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1261), $rt_s(1262)]);
-    nmcgc_CycleButton__init_(var$6, $rightX, $row2Y, 150, 20, $rt_s(1266), var$7, !$this.$options0.$toggleUse ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_5__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1335), $rt_s(1336)]);
+    nmcgc_CycleButton__init_(var$6, $rightX, $row2Y, 150, 20, $rt_s(1340), var$7, !$this.$options0.$toggleUse ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_5__init_0($this));
     $this.$addRenderableWidget(var$6);
     $row3Y = 110;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row3Y, 150, 20, $rt_s(1267), var$7, !$this.$options0.$autoJump ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_6__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $row3Y, 150, 20, $rt_s(1341), var$7, !$this.$options0.$autoJump ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_6__init_0($this));
     $this.$addRenderableWidget(var$6);
     $this.$addRenderableWidget(nmcgso_ControlsScreen$SprintWindowSlider__init_0($rightX, $row3Y, 150, 20, $this.$options0));
     $row4Y = 134;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row4Y, 150, 20, $rt_s(1268), var$7, !$this.$options0.$operatorItemsTab ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_7__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $row4Y, 150, 20, $rt_s(1342), var$7, !$this.$options0.$operatorItemsTab ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_7__init_0($this));
     $this.$addRenderableWidget(var$6);
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(442), nmcgso_ControlsScreen$init$lambda$_1_8__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(469), nmcgso_ControlsScreen$init$lambda$_1_8__init_0($this)));
 },
 nmcgso_ControlsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1269));
-    nleva_EaglerGuiImpl_drawText($rt_s(1269), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1343));
+    nleva_EaglerGuiImpl_drawText($rt_s(1343), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_ControlsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -34802,20 +35898,20 @@ nleva_SkyRenderer_clamp01 = $v => {
 },
 nleva_SkyRenderer_init = $gl => {
     nleva_SkyRenderer_$callClinit();
-    nleva_SkyRenderer_discProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1270), $rt_s(1271), $rt_s(1272));
-    nleva_SkyRenderer_tintProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1273), $rt_s(1274), $rt_s(1275));
-    nleva_SkyRenderer_celestialProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1276), $rt_s(1277), $rt_s(1278));
-    nleva_SkyRenderer_starsProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1279), $rt_s(1280), $rt_s(1281));
+    nleva_SkyRenderer_discProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1344), $rt_s(1345), $rt_s(1346));
+    nleva_SkyRenderer_tintProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1347), $rt_s(1348), $rt_s(1349));
+    nleva_SkyRenderer_celestialProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1350), $rt_s(1351), $rt_s(1352));
+    nleva_SkyRenderer_starsProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1353), $rt_s(1354), $rt_s(1355));
     if (nleva_SkyRenderer_discProgram !== null && nleva_SkyRenderer_tintProgram !== null && nleva_SkyRenderer_celestialProgram !== null && nleva_SkyRenderer_starsProgram !== null) {
-        nleva_SkyRenderer_discUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(365));
-        nleva_SkyRenderer_discUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1282));
-        nleva_SkyRenderer_discUFogColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1283));
-        nleva_SkyRenderer_tintUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(365));
-        nleva_SkyRenderer_tintUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(1282));
-        nleva_SkyRenderer_celestialUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(365));
-        nleva_SkyRenderer_celestialUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(1282));
-        nleva_SkyRenderer_starsUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(365));
-        nleva_SkyRenderer_starsUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(1282));
+        nleva_SkyRenderer_discUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(367));
+        nleva_SkyRenderer_discUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1356));
+        nleva_SkyRenderer_discUFogColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1357));
+        nleva_SkyRenderer_tintUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(367));
+        nleva_SkyRenderer_tintUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(1356));
+        nleva_SkyRenderer_celestialUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(367));
+        nleva_SkyRenderer_celestialUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(1356));
+        nleva_SkyRenderer_starsUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(367));
+        nleva_SkyRenderer_starsUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(1356));
         nleva_SkyRenderer_topDiscVbo = nleva_SkyRenderer_buildDisc($gl, 16.0, 0);
         nleva_SkyRenderer_bottomDiscVbo = nleva_SkyRenderer_buildDisc($gl, (-16.0), 1);
         nleva_SkyRenderer_sunriseVbo = nleva_SkyRenderer_buildSunrise($gl);
@@ -34844,7 +35940,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
                     break b;
                 var$6 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($vs);
                 var$7 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1284)), $name), $rt_s(1285)), var$6);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1358)), $name), $rt_s(1359)), var$6);
                 var$6 = jl_StringBuilder_toString(var$7);
                 console.warn($rt_ustr(var$6));
                 var$6 = null;
@@ -34868,7 +35964,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
                     break c;
                 var$6 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($fs);
                 var$7 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1284)), $name), $rt_s(1286)), var$6);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1358)), $name), $rt_s(1360)), var$6);
                 var$6 = jl_StringBuilder_toString(var$7);
                 console.warn($rt_ustr(var$6));
                 var$6 = null;
@@ -34905,7 +36001,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
         try {
             var$6 = nlevi_PlatformOpenGL__wglGetProgramInfoLog($program);
             var$7 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1284)), $name), $rt_s(1287)), var$6);
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1358)), $name), $rt_s(1361)), var$6);
             var$6 = jl_StringBuilder_toString(var$7);
             console.warn($rt_ustr(var$6));
             var$6 = null;
@@ -34922,7 +36018,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
     }
     var$6 = $t.$getMessage();
     var$7 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1284)), $name), $rt_s(1288)), var$6);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1358)), $name), $rt_s(1362)), var$6);
     console.warn($rt_ustr(jl_StringBuilder_toString(var$7)));
     return null;
 },
@@ -35113,7 +36209,7 @@ nleva_SkyRenderer_buildStars = $gl => {
     }
     var$54 = $count / 3 | 0;
     var$57 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$57, $rt_s(1284)), var$54), $rt_s(1289));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$57, $rt_s(1358)), var$54), $rt_s(1363));
     console.log($rt_ustr(jl_StringBuilder_toString(var$57)));
     return nleva_SkyRenderer_upload($gl, $tris);
 };
@@ -35241,11 +36337,11 @@ nleva_SkyRenderer_pollTextures = $gl => {
         $i = 0;
         while ($i < (__safe(nleva_SkyRenderer_MOON_PHASE_NAMES).data||[]).length) {
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1290)), $i);
+            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1364)), $i);
             var$4 = jl_StringBuilder_toString(var$3);
             var$3 = (__safe(nleva_SkyRenderer_MOON_PHASE_NAMES).data||[])[$i];
             var$5 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1291)), var$3), $rt_s(42));
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1365)), var$3), $rt_s(44));
             nleva_SkyRenderer_beginLoad$js_body$_38($rt_ustr(var$4), $rt_ustr(jl_StringBuilder_toString(var$5)));
             $i = $i + 1 | 0;
         }
@@ -35266,13 +36362,13 @@ nleva_SkyRenderer_pollTextures = $gl => {
     while ($i < 8) {
         if (otji_JSWrapper_unwrap((__safe(nleva_SkyRenderer_moonTextures).data||[])[$i]) === null) {
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1290)), $i);
+            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1364)), $i);
             $data = window.__eaglerSkyTextures && window.__eaglerSkyTextures[$rt_ustr(jl_StringBuilder_toString(var$3))] || null;
             if ($data !== null) {
                 if ($data.error ? 1 : 0) {
                     nleva_SkyRenderer_texturesFailed = 1;
                     var$3 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1292)), $i), $rt_s(1293));
+                    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1366)), $i), $rt_s(1367));
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$3)));
                     return;
                 }
@@ -35427,7 +36523,7 @@ nleva_SkyRenderer_scale = ($x, $y, $z, $out) => {
 nleva_SkyRenderer__clinit_ = () => {
 try {
 
-    nleva_SkyRenderer_MOON_PHASE_NAMES = $rt_wrapArray(jl_String, [$rt_s(1294), $rt_s(1295), $rt_s(1296), $rt_s(1297), $rt_s(1298), $rt_s(1299), $rt_s(1300), $rt_s(1301)]);
+    nleva_SkyRenderer_MOON_PHASE_NAMES = $rt_wrapArray(jl_String, [$rt_s(1368), $rt_s(1369), $rt_s(1370), $rt_s(1371), $rt_s(1372), $rt_s(1373), $rt_s(1374), $rt_s(1375)]);
     nleva_SkyRenderer_initialized = 0;
     nleva_SkyRenderer_discProgram = null;
     nleva_SkyRenderer_discUColor = null;
@@ -35663,9 +36759,9 @@ nmcgs_CreateWorldScreen_init = $this => {
     nmcgs_CreateWorldScreen_applyTabVisibility($this);
     nmcgs_CreateWorldScreen_applyGameModeLocks($this);
     $footerY = ($this.$height - 33 | 0) + 6 | 0;
-    $create = nmcgc_Button__init_($centerX - 154 | 0, $footerY, 150, 20, $rt_s(1218), nmcgs_CreateWorldScreen$init$lambda$_1_0__init_0($this));
+    $create = nmcgc_Button__init_($centerX - 154 | 0, $footerY, 150, 20, $rt_s(1292), nmcgs_CreateWorldScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget($create);
-    $cancel = nmcgc_Button__init_($centerX + 4 | 0, $footerY, 150, 20, $rt_s(874), nmcgs_CreateWorldScreen$init$lambda$_1_1__init_0($this));
+    $cancel = nmcgc_Button__init_($centerX + 4 | 0, $footerY, 150, 20, $rt_s(908), nmcgs_CreateWorldScreen$init$lambda$_1_1__init_0($this));
     $this.$addRenderableWidget($cancel);
     if ($this.$nameEdit !== null && !$this.$selectedTab)
         $this.$nameEdit.$setFocused(1);
@@ -35679,20 +36775,20 @@ nmcgs_CreateWorldScreen_contentY = ($this, $contentHeight) => {
 nmcgs_CreateWorldScreen_layoutGameTab = ($this, $centerX) => {
     let $y0, var$3, var$4, var$5, var$6;
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 109);
-    $this.$nameEdit = nmcgc_EditBox__init_0($centerX - 104 | 0, $y0 + 13 | 0, 208, 20, $rt_s(1302));
-    $this.$nameEdit.$setValue0($rt_s(419));
+    $this.$nameEdit = nmcgc_EditBox__init_0($centerX - 104 | 0, $y0 + 13 | 0, 208, 20, $rt_s(1376));
+    $this.$nameEdit.$setValue0($rt_s(446));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$nameEdit);
     var$3 = new nmcgc_CycleButton;
     var$4 = $centerX - 105 | 0;
-    nmcgc_CycleButton__init_(var$3, var$4, $y0 + 41 | 0, 210, 20, $rt_s(1303), nmcgs_CreateWorldScreen_GAME_MODES, $this.$gameModeIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_0($this));
+    nmcgc_CycleButton__init_(var$3, var$4, $y0 + 41 | 0, 210, 20, $rt_s(1377), nmcgs_CreateWorldScreen_GAME_MODES, $this.$gameModeIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_0($this));
     $this.$gameModeButton = var$3;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$gameModeButton);
-    $this.$difficultyButton = nmcgc_CycleButton__init_0(var$4, $y0 + 69 | 0, 210, 20, $rt_s(1304), nmcgs_CreateWorldScreen_DIFFICULTIES, $this.$difficultyIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_0($this));
+    $this.$difficultyButton = nmcgc_CycleButton__init_0(var$4, $y0 + 69 | 0, 210, 20, $rt_s(1378), nmcgs_CreateWorldScreen_DIFFICULTIES, $this.$difficultyIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_0($this));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$difficultyButton);
     var$3 = new nmcgc_CycleButton;
     var$5 = $y0 + 97 | 0;
-    var$6 = $rt_wrapArray(jl_String, [$rt_s(992), $rt_s(993)]);
-    nmcgc_CycleButton__init_(var$3, var$4, var$5, 210, 20, $rt_s(1305), var$6, !$this.$allowCommands ? 0 : 1, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_0($this));
+    var$6 = $rt_wrapArray(jl_String, [$rt_s(1026), $rt_s(1027)]);
+    nmcgc_CycleButton__init_(var$3, var$4, var$5, 210, 20, $rt_s(1379), var$6, !$this.$allowCommands ? 0 : 1, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_0($this));
     $this.$allowCommandsButton = var$3;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$allowCommandsButton);
 },
@@ -35700,26 +36796,26 @@ nmcgs_CreateWorldScreen_layoutWorldTab = ($this, $centerX) => {
     let $y0, $gridLeft, $seedLabelY, var$5, var$6, var$7, var$8, var$9, var$10;
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 113);
     $gridLeft = $centerX - 155 | 0;
-    $this.$worldTypeButton = nmcgc_CycleButton__init_0($gridLeft, $y0, 150, 20, $rt_s(1306), nmcgs_CreateWorldScreen_WORLD_TYPES, 0, null);
+    $this.$worldTypeButton = nmcgc_CycleButton__init_0($gridLeft, $y0, 150, 20, $rt_s(1380), nmcgs_CreateWorldScreen_WORLD_TYPES, 0, null);
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$worldTypeButton);
-    $this.$customizeTypeButton = nmcgc_Button__init_($gridLeft + 160 | 0, $y0, 150, 20, $rt_s(1307), nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0__init_0());
+    $this.$customizeTypeButton = nmcgc_Button__init_($gridLeft + 160 | 0, $y0, 150, 20, $rt_s(1381), nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0__init_0());
     $this.$customizeTypeButton.$setActive(0);
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$customizeTypeButton);
     $seedLabelY = $y0 + 28 | 0;
-    $this.$seedEdit = nmcgc_EditBox__init_0($centerX - 154 | 0, $seedLabelY + 13 | 0, 308, 20, $rt_s(1308));
-    $this.$seedEdit.$setValue0($rt_s(72));
+    $this.$seedEdit = nmcgc_EditBox__init_0($centerX - 154 | 0, $seedLabelY + 13 | 0, 308, 20, $rt_s(1382));
+    $this.$seedEdit.$setValue0($rt_s(74));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$seedEdit);
     var$5 = new nmcgc_CycleButton;
     var$6 = ($gridLeft + 310 | 0) - 44 | 0;
     var$7 = $y0 + 69 | 0;
-    var$8 = $rt_wrapArray(jl_String, [$rt_s(993), $rt_s(992)]);
-    nmcgc_CycleButton__init_(var$5, var$6, var$7, 44, 20, $rt_s(72), var$8, !$this.$generateStructures0 ? 1 : 0, nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1__init_0($this));
+    var$8 = $rt_wrapArray(jl_String, [$rt_s(1027), $rt_s(1026)]);
+    nmcgc_CycleButton__init_(var$5, var$6, var$7, 44, 20, $rt_s(74), var$8, !$this.$generateStructures0 ? 1 : 0, nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1__init_0($this));
     $this.$generateStructuresButton = var$5;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$generateStructuresButton);
     var$9 = new nmcgc_CycleButton;
     var$7 = (var$7 + 20 | 0) + 4 | 0;
-    var$10 = $rt_wrapArray(jl_String, [$rt_s(993), $rt_s(992)]);
-    nmcgc_CycleButton__init_(var$9, var$6, var$7, 44, 20, $rt_s(72), var$10, !$this.$bonusChest0 ? 1 : 0, nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2__init_0($this));
+    var$10 = $rt_wrapArray(jl_String, [$rt_s(1027), $rt_s(1026)]);
+    nmcgc_CycleButton__init_(var$9, var$6, var$7, 44, 20, $rt_s(74), var$10, !$this.$bonusChest0 ? 1 : 0, nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2__init_0($this));
     $this.$bonusChestButton = var$9;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$bonusChestButton);
 },
@@ -35728,9 +36824,9 @@ nmcgs_CreateWorldScreen_layoutMoreTab = ($this, $centerX) => {
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 76);
     $labels = $rt_createArray(jl_String, 3);
     var$4 = (__safe($labels).data||[]);
-    var$4[0] = $rt_s(1309);
-    var$4[1] = $rt_s(1310);
-    var$4[2] = $rt_s(1311);
+    var$4[0] = $rt_s(1383);
+    var$4[1] = $rt_s(1384);
+    var$4[2] = $rt_s(1385);
     $i = 0;
     while ($i < var$4.length) {
         $button = nmcgc_Button__init_($centerX - 105 | 0, $y0 + ($i * 28 | 0) | 0, 210, 20, var$4[$i], nmcgs_CreateWorldScreen$layoutMoreTab$lambda$_5_0__init_0());
@@ -35773,8 +36869,8 @@ nmcgs_CreateWorldScreen_onCreate = $this => {
     let $name, $seed, var$3, var$4, var$5, var$6, var$7, var$8, $summary;
     if ($this.$minecraft === null)
         return;
-    $name = $this.$nameEdit !== null && !jl_String_isEmpty(jl_String_trim($this.$nameEdit.$getValue1())) ? jl_String_trim($this.$nameEdit.$getValue1()) : $rt_s(419);
-    $seed = $this.$seedEdit === null ? $rt_s(72) : $this.$seedEdit.$getValue1();
+    $name = $this.$nameEdit !== null && !jl_String_isEmpty(jl_String_trim($this.$nameEdit.$getValue1())) ? jl_String_trim($this.$nameEdit.$getValue1()) : $rt_s(446);
+    $seed = $this.$seedEdit === null ? $rt_s(74) : $this.$seedEdit.$getValue1();
     nmcgs_CreateWorldScreen_$callClinit();
     var$3 = (__safe(nmcgs_CreateWorldScreen_GAME_MODES).data||[])[$this.$gameModeIndex];
     var$4 = (__safe(nmcgs_CreateWorldScreen_DIFFICULTIES).data||[])[$this.$difficultyIndex];
@@ -35783,7 +36879,7 @@ nmcgs_CreateWorldScreen_onCreate = $this => {
     var$7 = $this.$worldTypeButton;
     var$7 = var$6[var$7.$getIndex()];
     var$8 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1312)), $name), $rt_s(1313)), var$3), $rt_s(1314)), var$4), $rt_s(1315)), var$5), $rt_s(1316)), var$7), $rt_s(1317)), $seed), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1386)), $name), $rt_s(1387)), var$3), $rt_s(1388)), var$4), $rt_s(1389)), var$5), $rt_s(1390)), var$7), $rt_s(1391)), $seed), 41);
     var$3 = jl_StringBuilder_toString(var$8);
     console.log($rt_ustr(var$3));
     $summary = nlev_WorldStorage$WorldSummary__init_();
@@ -35803,7 +36899,7 @@ nmcgs_CreateWorldScreen_popScreen = $this => {
 },
 nmcgs_CreateWorldScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $tabsWidth, $tabWidth, $barX, $separatorOk, $labelY, $bonusY, var$11, var$12, var$13;
-    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(31), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
+    nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
     $tabsWidth = jl_Math_min(400, $this.$width) - 28 | 0;
     $tabWidth = $tabsWidth / 3 | 0;
     if ($tabWidth & 1)
@@ -35811,28 +36907,28 @@ nmcgs_CreateWorldScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialT
     $barX = ($this.$width - $tabsWidth | 0) / 2 | 0;
     if ($barX & 1)
         $barX = $barX + 1 | 0;
-    $separatorOk = nleva_EaglerGuiImpl_drawSprite($rt_s(33), 0.0, 22.0, $barX, 2.0);
+    $separatorOk = nleva_EaglerGuiImpl_drawSprite($rt_s(35), 0.0, 22.0, $barX, 2.0);
     nmcgs_CreateWorldScreen_$callClinit();
-    nleva_EaglerGuiImpl_drawSprite($rt_s(33), $barX + $rt_imul($tabWidth, (__safe(nmcgs_CreateWorldScreen_TAB_LABELS).data||[]).length) | 0, 22.0, $this.$width - ($barX + $rt_imul($tabWidth, (__safe(nmcgs_CreateWorldScreen_TAB_LABELS).data||[]).length) | 0) | 0, 2.0);
+    nleva_EaglerGuiImpl_drawSprite($rt_s(35), $barX + $rt_imul($tabWidth, (__safe(nmcgs_CreateWorldScreen_TAB_LABELS).data||[]).length) | 0, 22.0, $this.$width - ($barX + $rt_imul($tabWidth, (__safe(nmcgs_CreateWorldScreen_TAB_LABELS).data||[]).length) | 0) | 0, 2.0);
     if (!$separatorOk)
         nleva_EaglerGuiImpl_fillRect(0.0, 22.0, $this.$width, 2.0, (-16777216));
     if ($this.$selectedTab == 1 && $this.$generateStructuresButton !== null) {
         $labelY = $this.$generateStructuresButton.$getY0() + 6 | 0;
-        nleva_EaglerGuiImpl_drawText($rt_s(1318), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $labelY, (-1), 0);
+        nleva_EaglerGuiImpl_drawText($rt_s(1392), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $labelY, (-1), 0);
         $bonusY = $this.$bonusChestButton.$getY0() + 6 | 0;
-        nleva_EaglerGuiImpl_drawText($rt_s(1319), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $bonusY, (-1), 0);
+        nleva_EaglerGuiImpl_drawText($rt_s(1393), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $bonusY, (-1), 0);
     }
     if ($this.$nameEdit !== null && !$this.$selectedTab) {
         var$11 = nmcgs_CreateWorldScreen_centerX($this);
         var$12 = $this.$nameEdit;
         var$13 = (var$12.$getY0() - 8 | 0) - 4 | 0;
-        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1302), var$11, var$13);
+        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1376), var$11, var$13);
     }
     if ($this.$seedEdit !== null && $this.$selectedTab == 1) {
         var$11 = nmcgs_CreateWorldScreen_centerX($this);
         var$12 = $this.$seedEdit;
         var$13 = (var$12.$getY0() - 8 | 0) - 4 | 0;
-        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1320), var$11, var$13);
+        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1394), var$11, var$13);
     }
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
@@ -35924,10 +37020,10 @@ nmcgs_CreateWorldScreen_lambda$init$0 = ($this, $button) => {
 nmcgs_CreateWorldScreen__clinit_ = () => {
 try {
 
-    nmcgs_CreateWorldScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1321), $rt_s(1322), $rt_s(1323)]);
-    nmcgs_CreateWorldScreen_GAME_MODES = $rt_wrapArray(jl_String, [$rt_s(884), $rt_s(1324), $rt_s(1325)]);
-    nmcgs_CreateWorldScreen_DIFFICULTIES = $rt_wrapArray(jl_String, [$rt_s(1326), $rt_s(1327), $rt_s(1227), $rt_s(1328)]);
-    nmcgs_CreateWorldScreen_WORLD_TYPES = $rt_wrapArray(jl_String, [$rt_s(1329), $rt_s(1330), $rt_s(1331), $rt_s(1332)]);
+    nmcgs_CreateWorldScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1395), $rt_s(1396), $rt_s(1397)]);
+    nmcgs_CreateWorldScreen_GAME_MODES = $rt_wrapArray(jl_String, [$rt_s(918), $rt_s(1398), $rt_s(1399)]);
+    nmcgs_CreateWorldScreen_DIFFICULTIES = $rt_wrapArray(jl_String, [$rt_s(1400), $rt_s(1401), $rt_s(1301), $rt_s(1402)]);
+    nmcgs_CreateWorldScreen_WORLD_TYPES = $rt_wrapArray(jl_String, [$rt_s(1403), $rt_s(1404), $rt_s(1405), $rt_s(1406)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformAudio = $rt_classWithoutFields(),
@@ -36000,7 +37096,7 @@ nlevi_PlatformAudio__init = () => {
                 var$3 = nlevi_PlatformAudio_sampleRate;
                 var$4 = nlevi_PlatformAudio_audioWorkletAvailable;
                 var$5 = jl_StringBuilder__init_();
-                jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1333)), var$3), $rt_s(1334)), var$4), 41);
+                jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1407)), var$3), $rt_s(1408)), var$4), 41);
                 console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
                 break a;
             } catch ($$e) {
@@ -36015,7 +37111,7 @@ nlevi_PlatformAudio__init = () => {
         }
         var$5 = $t.$getMessage();
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1335)), var$5);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1409)), var$5);
         console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
         nlevi_PlatformAudio_initialized = 0;
     }
@@ -36146,7 +37242,7 @@ jur_UMultiLineEOLSet_hasConsumed = ($this, $matchResult) => {
     return $res;
 },
 jur_UMultiLineEOLSet_getName = $this => {
-    return $rt_s(1336);
+    return $rt_s(1410);
 };
 function nmc_Minecraft$_init_$lambda$_0_0() {
     jl_Object.call(this);
@@ -36362,16 +37458,16 @@ try {
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function cmbp_DisplayData() {
     let a = this; jl_Object.call(a);
-    a.$width4 = 0;
-    a.$height2 = 0;
+    a.$width6 = 0;
+    a.$height4 = 0;
     a.$fullscreenWidth = 0;
     a.$fullscreenHeight = 0;
     a.$isFullscreen = 0;
 }
 let cmbp_DisplayData__init_ = ($this, $width, $height, $fullscreenWidth, $fullscreenHeight, $isFullscreen) => {
     jl_Object__init_($this);
-    $this.$width4 = $width;
-    $this.$height2 = $height;
+    $this.$width6 = $width;
+    $this.$height4 = $height;
     $this.$fullscreenWidth = $fullscreenWidth === null ? 0 : $fullscreenWidth.$orElse(0);
     $this.$fullscreenHeight = $fullscreenHeight === null ? 0 : $fullscreenHeight.$orElse(0);
     $this.$isFullscreen = $isFullscreen;
@@ -36382,10 +37478,10 @@ cmbp_DisplayData__init_0 = (var_0, var_1, var_2, var_3, var_4) => {
     return var_5;
 },
 cmbp_DisplayData_getWidth = $this => {
-    return $this.$width4;
+    return $this.$width6;
 },
 cmbp_DisplayData_getHeight = $this => {
-    return $this.$height2;
+    return $this.$height4;
 };
 function nmc_Minecraft() {
     let a = this; jl_Object.call(a);
@@ -36430,13 +37526,13 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
             $this.$user0 = $gameConfig.$user === null ? nmc_Minecraft_createDefaultUser() : $gameConfig.$user.$user1;
             var$2 = $this.$user0.$getName();
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1337)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1411)), var$2);
             console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
-            $this.$window = cmbp_Window__init_0($this, null, $gameConfig.$display, $rt_s(1338));
+            $this.$window = cmbp_Window__init_0($this, null, $gameConfig.$display, $rt_s(1412));
             var$4 = $this.$window.$getWidth();
             var$5 = $this.$window.$getHeight();
             var$2 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1339)), var$4), 120), var$5);
+            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1413)), var$4), 120), var$5);
             console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
             $this.$window.$setGuiScale($this.$window.$calculateScale(2147483647, 0));
             var$4 = $this.$window.$getGuiScale();
@@ -36444,10 +37540,10 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
             var$5 = var$2.$getGuiScaledWidth();
             var$6 = $this.$window.$getGuiScaledHeight();
             var$2 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1340)), var$4), $rt_s(1341)), var$5), 120), var$6);
+            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1414)), var$4), $rt_s(1415)), var$5), 120), var$6);
             var$2 = jl_StringBuilder_toString(var$2);
             console.log($rt_ustr(var$2));
-            $this.$options7 = nmc_Options__init_0($this, ji_File__init_($rt_s(1042)));
+            $this.$options7 = nmc_Options__init_0($this, ji_File__init_($rt_s(1076)));
             console.log("[Minecraft] Options loaded");
             $this.$textureManager = nmcr_TextureManager__init_0();
             $this.$soundManager = nmcs_SoundManager__init_0();
@@ -36485,7 +37581,7 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
     }
     var$2 = $t.$getMessage();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1342)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1416)), var$2);
     console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
     $stack = $t.$getStackTrace();
     $i = 0;
@@ -36495,11 +37591,11 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
             break;
         var$2 = jl_StackTraceElement_toString(var$10[$i]);
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1034)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1068)), var$2);
         console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
         $i = $i + 1 | 0;
     }
-    $rt_throw(jl_RuntimeException__init_3($rt_s(1343), $t));
+    $rt_throw(jl_RuntimeException__init_3($rt_s(1417), $t));
 },
 nmc_Minecraft__init_0 = var_0 => {
     let var_1 = new nmc_Minecraft();
@@ -36512,7 +37608,7 @@ nmc_Minecraft_createDefaultUser = () => {
     var$2 = nlev_EaglerProfile_getUsername();
     var$3 = ju_UUID_randomUUID();
     var$4 = ju_Optional_empty();
-    nmc_User__init_(var$1, var$2, var$3, $rt_s(354), var$4, ju_Optional_empty());
+    nmc_User__init_(var$1, var$2, var$3, $rt_s(356), var$4, ju_Optional_empty());
     return var$1;
 },
 nmc_Minecraft_setInstance = $mc => {
@@ -36559,7 +37655,7 @@ nmc_Minecraft_tick = $this => {
                 $t = $$je;
                 var$1 = $t.$getMessage();
                 var$5 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1344)), var$1);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1418)), var$1);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$5)));
                 break a;
             } else {
@@ -36585,7 +37681,7 @@ nmc_Minecraft_render = ($this, $renderLevel) => {
                 $t = $$je;
                 var$2 = $t.$getMessage();
                 var$6 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1345)), var$2);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1419)), var$2);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
                 break a;
             } else {
@@ -36625,7 +37721,7 @@ nmc_Minecraft_syncCanvasSize = $this => {
                 return;
         }
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1346)), $drawableW), 120), $drawableH), $rt_s(1347)), $newScale), $rt_s(1348));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1420)), $drawableW), 120), $drawableH), $rt_s(1421)), $newScale), $rt_s(1422));
         console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         $this.$resizeDisplay();
         return;
@@ -36672,7 +37768,7 @@ nmc_Minecraft_getLevelRenderer = $this => {
 nmc_Minecraft_worldGameModeName = $levelName => {
     let $summary;
     $summary = nlev_WorldStorage_findWorld($levelName);
-    return $summary === null ? $rt_s(884) : $summary.$gameMode0;
+    return $summary === null ? $rt_s(918) : $summary.$gameMode0;
 },
 nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
     let var$2, $clientLevel, var$4, $creative, var$6, var$7, var$8, $t, $stack, $i, var$12, $$je;
@@ -36681,14 +37777,14 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
         return;
     }
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1349)), $levelName);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1423)), $levelName);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     a: {
         try {
-            $clientLevel = nmcm_ClientLevel__init_0($levelName, $rt_s(420));
+            $clientLevel = nmcm_ClientLevel__init_0($levelName, $rt_s(447));
             $this.$setLevel($clientLevel);
             var$4 = nmc_Minecraft_worldGameModeName($levelName);
-            $creative = jl_String_equals($rt_s(1325), var$4);
+            $creative = jl_String_equals($rt_s(1399), var$4);
             $this.$player = nmcp_LocalPlayer__init_0($this, $creative);
             var$2 = $this.$player;
             var$6 = $clientLevel.$getSpawnX();
@@ -36705,7 +37801,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
             var$7 = $this.$player.$y0;
             var$8 = $this.$player.$z;
             var$4 = jl_StringBuilder__init_();
-            jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1350)), var$2), $rt_s(1351)), var$6), 32), var$7), 32), var$8), 41);
+            jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1424)), var$2), $rt_s(1425)), var$6), 32), var$7), 32), var$8), 41);
             console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -36720,7 +37816,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
     }
     var$2 = $t.$getMessage();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1352)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1426)), var$2);
     console.error($rt_ustr(jl_StringBuilder_toString(var$4)));
     $stack = $t.$getStackTrace();
     $i = 0;
@@ -36730,11 +37826,11 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
             break;
         var$2 = jl_StackTraceElement_toString(var$12[$i]);
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1034)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1068)), var$2);
         console.error($rt_ustr(jl_StringBuilder_toString(var$4)));
         $i = $i + 1 | 0;
     }
-    $rt_throw(jl_RuntimeException__init_3($rt_s(1353), $t));
+    $rt_throw(jl_RuntimeException__init_3($rt_s(1427), $t));
 },
 nmc_Minecraft_setLevel = ($this, $clientLevel) => {
     $this.$level = $clientLevel;
@@ -36746,9 +37842,21 @@ nmc_Minecraft_isLevelLoaded = $this => {
     return $this.$level === null ? 0 : 1;
 },
 nmc_Minecraft_startUseItem = $this => {
-    let $blockId;
+    let $level, var$2, var$3, var$4, $target, $blockId;
     if ($this.$hitResultBlock !== null && $this.$level instanceof nmcm_ClientLevel) {
+        $level = $this.$level;
+        var$2 = $this.$hitResultBlock.$blockX;
+        var$3 = $this.$hitResultBlock.$blockY;
+        var$4 = $this.$hitResultBlock.$blockZ;
+        var$2 = $level.$getBlockState(var$2, var$3, var$4);
+        $target = nmwlb_Blocks_byId(var$2);
+        if (jl_String_equals($target.$name8, $rt_s(871))) {
+            $this.$setScreen(nmcgsi_CraftingTableScreen__init_0());
+            return;
+        }
         $blockId = $this.$inventory.$getSelectedBlock();
+        if (nmwi_Items_isItem($blockId))
+            return;
         $this.$gameMode.$useItemOn($this.$hitResultBlock, $blockId);
     }
 },
@@ -36885,7 +37993,7 @@ jur_EOLSet_hasConsumed = ($this, $matchResult) => {
     return $res;
 },
 jur_EOLSet_getName = $this => {
-    return $rt_s(416);
+    return $rt_s(443);
 },
 otr_StringInfo = $rt_classWithoutFields(otrr_ReflectionInfo);
 function jur_Lexer() {
@@ -37018,7 +38126,7 @@ jur_Lexer_movePointer = $this => {
                         $this.$lookAhead0 = var$2;
                         switch ($this.$lookAhead0) {
                             case -1:
-                                $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                                $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                             case 0:
                             case 1:
                             case 2:
@@ -37131,7 +38239,7 @@ jur_Lexer_movePointer = $this => {
                             case 111:
                             case 113:
                             case 121:
-                                $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                                $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                             case 68:
                             case 83:
                             case 87:
@@ -37163,7 +38271,7 @@ jur_Lexer_movePointer = $this => {
                                 break b;
                             case 99:
                                 if ($this.$index0 >= ($this.$pattern0.data.length - 2 | 0))
-                                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                                 $this.$lookAhead0 = $this.$pattern0.data[jur_Lexer_nextIndex($this)] & 31;
                                 break b;
                             case 101:
@@ -37203,7 +38311,7 @@ jur_Lexer_movePointer = $this => {
                     } catch ($$e) {
                         $$je = $rt_wrapException($$e);
                         if ($$je instanceof ju_MissingResourceException) {
-                            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                         } else {
                             throw $$e;
                         }
@@ -37270,7 +38378,7 @@ jur_Lexer_movePointer = $this => {
                                                     break d;
                                                 case 62:
                                                     if ($nameBuilder === null)
-                                                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                                                        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                                                     $this.$groupName = $nameBuilder.$toString();
                                                     jur_Lexer_nextIndex($this);
                                                     $nameBuilder = null;
@@ -37304,7 +38412,7 @@ jur_Lexer_movePointer = $this => {
                                         if ($nonCap > 57)
                                             break a;
                                         if ($nameBuilder === null) {
-                                            var$8 = jur_PatternSyntaxException__init_($rt_s(1354), $this.$toString(), $this.$index0);
+                                            var$8 = jur_PatternSyntaxException__init_($rt_s(1428), $this.$toString(), $this.$index0);
                                             $rt_throw(var$8);
                                         }
                                         $nameBuilder.$append0($nonCap);
@@ -37386,7 +38494,7 @@ jur_Lexer_movePointer = $this => {
         }
         return;
     }
-    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
 },
 jur_Lexer_parseCharClassName = $this => {
     let $sb, var$2, var$3, $ch, $res;
@@ -37395,7 +38503,7 @@ jur_Lexer_parseCharClassName = $this => {
         if ($this.$pattern0.data[$this.$index0] != 123) {
             var$2 = jl_String__init_0($this.$pattern0, jur_Lexer_nextIndex($this), 1);
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1355)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1429)), var$2);
             return jl_StringBuilder_toString(var$3);
         }
         jur_Lexer_nextIndex($this);
@@ -37409,22 +38517,22 @@ jur_Lexer_parseCharClassName = $this => {
             }
         }
         if ($ch != 125)
-            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     }
     if (!$sb.$length())
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     $res = $sb.$toString();
     if (jl_String_length($res) == 1) {
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1355)), $res);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1429)), $res);
         return jl_StringBuilder_toString(var$2);
     }
     b: {
         c: {
             if (jl_String_length($res) > 3) {
-                if (jl_String_startsWith($res, $rt_s(1355)))
+                if (jl_String_startsWith($res, $rt_s(1429)))
                     break c;
-                if (jl_String_startsWith($res, $rt_s(1356)))
+                if (jl_String_startsWith($res, $rt_s(1430)))
                     break c;
             }
             break b;
@@ -37460,10 +38568,10 @@ jur_Lexer_processQuantifier = ($this, $ch) => {
                 }
             $sb.$append0($ch & 65535);
         }
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     }
     if ($ch != 125)
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     if ($sb.$length() > 0)
         b: {
             try {
@@ -37475,16 +38583,16 @@ jur_Lexer_processQuantifier = ($this, $ch) => {
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
                 if ($$je instanceof jl_NumberFormatException) {
-                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                 } else {
                     throw $$e;
                 }
             }
         }
     else if ($min < 0)
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     if (($min | $max | ($max - $min | 0)) < 0)
-        $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+        $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
     $mod = $this.$index0 >= $this.$pattern0.data.length ? 42 : $this.$pattern0.data[$this.$index0];
     c: {
         switch ($mod) {
@@ -37554,7 +38662,7 @@ jur_Lexer_readHex = ($this, $max) => {
             }
             return var$5;
         }
-    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
 },
 jur_Lexer_readOctals = $this => {
     let $max, $i, $length, $res, var$5;
@@ -37585,7 +38693,7 @@ jur_Lexer_readOctals = $this => {
             }
             return $res;
     }
-    $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+    $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
 },
 jur_Lexer_readFlags = $this => {
     let $pos, $res, $ch;
@@ -37593,7 +38701,7 @@ jur_Lexer_readFlags = $this => {
     $res = $this.$flags1;
     a: while (true) {
         if ($this.$index0 >= $this.$pattern0.data.length)
-            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
         b: {
             c: {
                 $ch = $this.$pattern0.data[$this.$index0];
@@ -37603,7 +38711,7 @@ jur_Lexer_readFlags = $this => {
                         return $res | 256;
                     case 45:
                         if (!$pos)
-                            $rt_throw(jur_PatternSyntaxException__init_($rt_s(72), $this.$toString(), $this.$index0));
+                            $rt_throw(jur_PatternSyntaxException__init_($rt_s(74), $this.$toString(), $this.$index0));
                         $pos = 0;
                         break b;
                     case 58:
@@ -37750,7 +38858,7 @@ function nmcgs_PauseScreen() {
 }
 let nmcgs_PauseScreen__init_ = ($this, $showPauseMenu) => {
     nmcgs_Screen__init_($this);
-    $this.$title = !$showPauseMenu ? $rt_s(1357) : $rt_s(1358);
+    $this.$title = !$showPauseMenu ? $rt_s(1431) : $rt_s(1432);
 },
 nmcgs_PauseScreen__init_0 = var_0 => {
     let var_1 = new nmcgs_PauseScreen();
@@ -37767,29 +38875,29 @@ nmcgs_PauseScreen_init = $this => {
     $colR = ($colL + 98 | 0) + 4 | 0;
     var$7 = new nmcgc_Button;
     var$8 = $gy + 50 | 0;
-    nmcgc_Button__init_0(var$7, $colL, var$8, 204, 20, $rt_s(1359), nmcgs_PauseScreen$init$lambda$_1_0__init_0($this));
+    nmcgc_Button__init_0(var$7, $colL, var$8, 204, 20, $rt_s(1433), nmcgs_PauseScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget(var$7);
     $advancements = new nmcgc_Button;
     var$10 = var$8 + 24 | 0;
-    nmcgc_Button__init_0($advancements, $colL, var$10, 98, 20, $rt_s(1360), nmcgs_PauseScreen$init$lambda$_1_1__init_0());
+    nmcgc_Button__init_0($advancements, $colL, var$10, 98, 20, $rt_s(1434), nmcgs_PauseScreen$init$lambda$_1_1__init_0());
     $advancements.$setActive(0);
     $this.$addRenderableWidget($advancements);
-    $stats = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1361), nmcgs_PauseScreen$init$lambda$_1_2__init_0());
+    $stats = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1435), nmcgs_PauseScreen$init$lambda$_1_2__init_0());
     $stats.$setActive(0);
     $this.$addRenderableWidget($stats);
     var$12 = new nmcgc_Button;
     var$10 = var$8 + 48 | 0;
-    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(1362), nmcgs_PauseScreen$init$lambda$_1_3__init_0());
+    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(1436), nmcgs_PauseScreen$init$lambda$_1_3__init_0());
     $this.$addRenderableWidget(var$12);
-    $this.$addRenderableWidget(nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1363), nmcgs_PauseScreen$init$lambda$_1_4__init_0()));
+    $this.$addRenderableWidget(nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1437), nmcgs_PauseScreen$init$lambda$_1_4__init_0()));
     var$12 = new nmcgc_Button;
     var$10 = var$8 + 72 | 0;
-    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(439), nmcgs_PauseScreen$init$lambda$_1_5__init_0($this));
+    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(466), nmcgs_PauseScreen$init$lambda$_1_5__init_0($this));
     $this.$addRenderableWidget(var$12);
-    $openToLan = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1364), nmcgs_PauseScreen$init$lambda$_1_6__init_0());
+    $openToLan = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1438), nmcgs_PauseScreen$init$lambda$_1_6__init_0());
     $openToLan.$setActive(0);
     $this.$addRenderableWidget($openToLan);
-    $this.$addRenderableWidget(nmcgc_Button__init_($colL, var$8 + 96 | 0, 204, 20, $rt_s(1365), nmcgs_PauseScreen$init$lambda$_1_7__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($colL, var$8 + 96 | 0, 204, 20, $rt_s(1439), nmcgs_PauseScreen$init$lambda$_1_7__init_0($this)));
 },
 nmcgs_PauseScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
@@ -37827,10 +38935,10 @@ nmcgs_PauseScreen_lambda$init$5 = ($this, $button) => {
     }
 },
 nmcgs_PauseScreen_lambda$init$4 = $button => {
-    nlevi_PlatformInput_openURL($rt_s(1366), $rt_s(1197));
+    nlevi_PlatformInput_openURL($rt_s(1440), $rt_s(1271));
 },
 nmcgs_PauseScreen_lambda$init$3 = $button => {
-    nlevi_PlatformInput_openURL($rt_s(1367), $rt_s(1197));
+    nlevi_PlatformInput_openURL($rt_s(1441), $rt_s(1271));
 },
 nmcgs_PauseScreen_lambda$init$2 = $button => {
     return;
@@ -37853,7 +38961,7 @@ function ju_IllegalFormatFlagsException() {
 let ju_IllegalFormatFlagsException__init_0 = ($this, $flags) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1368)), $flags);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1442)), $flags);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$flags5 = $flags;
 },
@@ -37901,11 +39009,11 @@ nmcgs_SelectWorldScreen$WorldEntryWidget_render = ($this, $poseStack, $mouseX, $
     var$10 = $this.$summary.$name0;
     var$12 = nmcgs_SelectWorldScreen_formatDate($this.$summary.$lastPlayed);
     var$13 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$13, var$10), $rt_s(1369)), var$12), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$13, var$10), $rt_s(1443)), var$12), 41);
     nleva_EaglerGuiImpl_drawText(jl_StringBuilder_toString(var$13), var$11, ($this.$y + 2 | 0) + 12 | 0, (-8355712), 1);
     var$10 = $this.$summary.$version0;
     var$12 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$12, $rt_s(1370)), var$10);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$12, $rt_s(1444)), var$10);
     nleva_EaglerGuiImpl_drawText(jl_StringBuilder_toString(var$12), var$11, ($this.$y + 2 | 0) + 21 | 0, (-8355712), 1);
 },
 nmcgs_SelectWorldScreen$WorldEntryWidget_onClick = $this => {
@@ -37922,13 +39030,13 @@ nmcgs_SelectWorldScreen$WorldEntryWidget_onClick = $this => {
         $this.$this$0.$selectedEntry = $this;
         var$2 = $this.$summary.$name0;
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1371)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1445)), var$2);
         console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
     }
     nmcgs_SelectWorldScreen_updateButtonStatus($this.$this$0);
 },
 nmcgs_SelectWorldScreen$WorldEntryWidget_getTelemetryId = $this => {
-    return jl_String_replaceAll(jl_String_toLowerCase($this.$summary.$name0), $rt_s(885), $rt_s(72));
+    return jl_String_replaceAll(jl_String_toLowerCase($this.$summary.$name0), $rt_s(919), $rt_s(74));
 },
 otji_JSWrapper$Helper$_clinit_$lambda$_3_1 = $rt_classWithoutFields(),
 otji_JSWrapper$Helper$_clinit_$lambda$_3_1__init_ = var$0 => {
@@ -38052,7 +39160,7 @@ try {
     ju_Collections_reverseOrder = ju_Collections$_clinit_$lambda$_59_0__init_0();
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
-$rt_packages([-1, "java", 0, "util", 1, "regex", 0, "text", 0, "lang", -1, "org", 5, "teavm", 6, "classlib", 7, "impl", 8, "unicode", -1, "net", 10, "minecraft", 11, "world", 12, "level", 13, "block", 11, "client", 15, "gui", 16, "components", 16, "screens", 18, "options", 18, "inventory", 18, "multiplayer", 15, "multiplayer", 10, "lax1dude", 23, "eaglercraft", 24, "v2_6", 25, "internal"
+$rt_packages([-1, "java", 0, "util", 1, "regex", 0, "text", 0, "lang", -1, "org", 5, "teavm", 6, "classlib", 7, "impl", 8, "unicode", -1, "net", 10, "minecraft", 11, "world", 12, "item", 12, "level", 14, "block", 11, "client", 16, "gui", 17, "components", 17, "screens", 19, "options", 19, "inventory", 19, "multiplayer", 16, "multiplayer", 10, "lax1dude", 24, "eaglercraft", 25, "v2_6", 26, "internal"
 ]);
 $rt_metadata([jl_Object, "Object", 4, 0, [], 1, 0, 0, ["$isEmptyMonitor", $rt_wrapFunction0(jl_Object_isEmptyMonitor), "$getClass", $rt_wrapFunction0(jl_Object_getClass), "$equals", $rt_wrapFunction1(jl_Object_equals), "$toString", $rt_wrapFunction0(jl_Object_toString), "$identity", $rt_wrapFunction0(jl_Object_identity), "$clone0", $rt_wrapFunction0(jl_Object_clone)],
 cgcc_Multimap, 0, jl_Object, [], 1537, 0, 0, 0,
@@ -38084,30 +39192,30 @@ jl_Runnable, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_Thread, 0, jl_Object, [jl_Runnable], 1, 0, () => jl_Thread_$callClinit(), ["$_init_", $rt_wrapFunction1(jl_Thread__init_0), "$_init_7", $rt_wrapFunction2(jl_Thread__init_)],
 jur_AbstractCharClass$LazyAlpha, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyAlpha__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyAlpha_computeValue)],
 nmcgso_SoundOptionsScreen$VolumeSink, 0, jl_Object, [], 1536, 0, 0, 0,
-nmcgso_SoundOptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_0__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_0_accept)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_1__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_1_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_0__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_0_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_1__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_1_accept)],
 otj_JSObject, 0, jl_Object, [], 1537, 0, 0, 0,
 otjde_EventListener, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nlevi_PlatformInput$suppressContextMenu$lambda$_12_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$suppressContextMenu$lambda$_12_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$suppressContextMenu$lambda$_12_0_handleEvent)],
 jur_BackReferencedSingleSet, "BackReferencedSingleSet", 2, jur_SingleSet, [], 0, 0, 0, ["$_init_6", $rt_wrapFunction1(jur_BackReferencedSingleSet__init_), "$find", $rt_wrapFunction3(jur_BackReferencedSingleSet_find), "$findBack", $rt_wrapFunction4(jur_BackReferencedSingleSet_findBack), "$processBackRefReplacement", $rt_wrapFunction0(jur_BackReferencedSingleSet_processBackRefReplacement)],
-nmcp_LocalPlayer$Vec3, 0, jl_Object, [], 16, 0, 0, ["$_init_46", $rt_wrapFunction3(nmcp_LocalPlayer$Vec3__init_0)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_4, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_4__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_4_accept)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_5, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_5__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_5_accept)],
+nmcp_LocalPlayer$Vec3, 0, jl_Object, [], 16, 0, 0, ["$_init_47", $rt_wrapFunction3(nmcp_LocalPlayer$Vec3__init_0)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_4, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_4__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_4_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_5, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_5__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_5_accept)],
 nleva_EaglerShaderImpl, 0, jl_Object, [], 1, 0, () => nleva_EaglerShaderImpl_$callClinit(), 0,
 jur_AbstractCharClass$LazyWord, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyWord__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyWord_computeValue)],
 jur_AbstractCharClass$LazyNonWord, 0, jur_AbstractCharClass$LazyWord, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonWord__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonWord_computeValue)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_2, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_2__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_2_accept)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_3, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_3__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_3_accept)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_8, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_8__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_8_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_2, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_2__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_2_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_3, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_3__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_3_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_8, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_8__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_8_accept)],
 cgcc_Platform, 0, jl_Object, [], 16, 0, 0, 0,
-nmcgso_SoundOptionsScreen$init$lambda$_1_9, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_9__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_9_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_9, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_9__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_9_accept)],
 jur_LeafSet, 0, jur_AbstractSet, [], 1024, 0, 0, ["$_init_9", $rt_wrapFunction1(jur_LeafSet__init_0), "$_init_0", $rt_wrapFunction0(jur_LeafSet__init_), "$matches", $rt_wrapFunction3(jur_LeafSet_matches), "$charCount", $rt_wrapFunction0(jur_LeafSet_charCount), "$hasConsumed", $rt_wrapFunction1(jur_LeafSet_hasConsumed)],
-jur_CISequenceSet, "CISequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_72", $rt_wrapFunction1(jur_CISequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_CISequenceSet_accepts), "$getName", $rt_wrapFunction0(jur_CISequenceSet_getName)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_6, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6_accept)],
-cmbp_Window, 0, jl_Object, [], 1, 0, 0, ["$_init_141", $rt_wrapFunction4(cmbp_Window__init_), "$refreshCachedSize", $rt_wrapFunction0(cmbp_Window_refreshCachedSize), "$getWidth", $rt_wrapFunction0(cmbp_Window_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_Window_getHeight), "$getGuiScale", $rt_wrapFunction0(cmbp_Window_getGuiScale), "$setGuiScale", $rt_wrapFunction1(cmbp_Window_setGuiScale), "$calculateScale", $rt_wrapFunction2(cmbp_Window_calculateScale), "$getGuiScaledWidth", $rt_wrapFunction0(cmbp_Window_getGuiScaledWidth),
+jur_CISequenceSet, "CISequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_73", $rt_wrapFunction1(jur_CISequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_CISequenceSet_accepts), "$getName", $rt_wrapFunction0(jur_CISequenceSet_getName)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_6, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_6_accept)],
+cmbp_Window, 0, jl_Object, [], 1, 0, 0, ["$_init_143", $rt_wrapFunction4(cmbp_Window__init_), "$refreshCachedSize", $rt_wrapFunction0(cmbp_Window_refreshCachedSize), "$getWidth", $rt_wrapFunction0(cmbp_Window_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_Window_getHeight), "$getGuiScale", $rt_wrapFunction0(cmbp_Window_getGuiScale), "$setGuiScale", $rt_wrapFunction1(cmbp_Window_setGuiScale), "$calculateScale", $rt_wrapFunction2(cmbp_Window_calculateScale), "$getGuiScaledWidth", $rt_wrapFunction0(cmbp_Window_getGuiScaledWidth),
 "$getGuiScaledHeight", $rt_wrapFunction0(cmbp_Window_getGuiScaledHeight)]]);
 $rt_metadata([otciu_CLDRHelper, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgso_SoundOptionsScreen$init$lambda$_1_7, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7_accept)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_7, 0, jl_Object, [nmcgso_SoundOptionsScreen$VolumeSink], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7__init_), "$accept", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_7_accept)],
 jl_CharSequence, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_Map, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_SequencedMap, 0, jl_Object, [ju_Map], 1537, 0, 0, 0,
@@ -38137,13 +39245,13 @@ nlevit_ClientMain$TickFunctor, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nlevit_ClientMain$startGameLoop$lambda$_6_0, 0, jl_Object, [nlevit_ClientMain$TickFunctor], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$startGameLoop$lambda$_6_0__init_), "$tick", $rt_wrapFunction0(nlevit_ClientMain$startGameLoop$lambda$_6_0_tick)],
 jur_RandomGenerator, 0, jl_Object, [], 1537, 0, 0, 0,
 otrfm_AbstractInMemoryVirtualFile, 0, jl_Object, [], 1025, 0, 0, ["$_init_", $rt_wrapFunction1(otrfm_AbstractInMemoryVirtualFile__init_)],
-jur_LowHighSurrogateRangeSet, 0, jur_JointSet, [], 0, 0, 0, ["$_init_80", $rt_wrapFunction1(jur_LowHighSurrogateRangeSet__init_), "$setNext", $rt_wrapFunction1(jur_LowHighSurrogateRangeSet_setNext), "$matches", $rt_wrapFunction3(jur_LowHighSurrogateRangeSet_matches), "$getName", $rt_wrapFunction0(jur_LowHighSurrogateRangeSet_getName)],
+jur_LowHighSurrogateRangeSet, 0, jur_JointSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction1(jur_LowHighSurrogateRangeSet__init_), "$setNext", $rt_wrapFunction1(jur_LowHighSurrogateRangeSet_setNext), "$matches", $rt_wrapFunction3(jur_LowHighSurrogateRangeSet_matches), "$getName", $rt_wrapFunction0(jur_LowHighSurrogateRangeSet_getName)],
 jur_GroupQuantifierSet, "GroupQuantifierSet", 2, jur_QuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_GroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_GroupQuantifierSet_matches), "$getName", $rt_wrapFunction0(jur_GroupQuantifierSet_getName)],
 jur_ReluctantGroupQuantifierSet, "ReluctantGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_ReluctantGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantGroupQuantifierSet_matches)],
-nmcgso_KeyBindsScreen$Row, "KeyBindsScreen$Row", 19, jl_Object, [], 16, 0, 0, ["$_init_121", $rt_wrapFunction2(nmcgso_KeyBindsScreen$Row__init_2), "$_init_122", $rt_wrapFunction3(nmcgso_KeyBindsScreen$Row__init_0)],
+nmcgso_KeyBindsScreen$Row, "KeyBindsScreen$Row", 20, jl_Object, [], 16, 0, 0, ["$_init_123", $rt_wrapFunction2(nmcgso_KeyBindsScreen$Row__init_2), "$_init_124", $rt_wrapFunction3(nmcgso_KeyBindsScreen$Row__init_0)],
 nlevi_PlatformApplication$registerErrorListener$lambda$_5_1, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformApplication$registerErrorListener$lambda$_5_1__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformApplication$registerErrorListener$lambda$_5_1_handleEvent)],
 ju_Currency, 0, jl_Object, [ji_Serializable], 17, 0, 0, ["$getCurrencyCode", $rt_wrapFunction0(ju_Currency_getCurrencyCode), "$getSymbol", $rt_wrapFunction1(ju_Currency_getSymbol)],
-nmcp_KeyboardInput, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmcp_KeyboardInput__init_), "$tick", $rt_wrapFunction0(nmcp_KeyboardInput_tick)],
+nmcp_KeyboardInput, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcp_KeyboardInput__init_), "$tick", $rt_wrapFunction0(nmcp_KeyboardInput_tick)],
 oj_Matrix4fc, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_ClassCastException, "ClassCastException", 4, jl_RuntimeException, [], 1, 0, 0, 0,
 nlevi_PlatformApplication$registerErrorListener$lambda$_5_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformApplication$registerErrorListener$lambda$_5_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformApplication$registerErrorListener$lambda$_5_0_handleEvent)],
@@ -38153,7 +39261,7 @@ $rt_wrapFunction3(ju_HashMap_findNonNullKeyEntry), "$findNullKeyEntry", $rt_wrap
 "$size", $rt_wrapFunction0(ju_HashMap_size)],
 ju_LinkedHashMap, 0, ju_HashMap, [ju_SequencedMap], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_LinkedHashMap__init_0), "$newElementArray", $rt_wrapFunction1(ju_LinkedHashMap_newElementArray), "$put", $rt_wrapFunction2(ju_LinkedHashMap_put), "$putImpl0", $rt_wrapFunction4(ju_LinkedHashMap_putImpl), "$removeLinkedEntry", $rt_wrapFunction1(ju_LinkedHashMap_removeLinkedEntry), "$removeEldestEntry", $rt_wrapFunction1(ju_LinkedHashMap_removeEldestEntry)],
 jur_PosPlusGroupQuantifierSet, "PosPlusGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_PosPlusGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PosPlusGroupQuantifierSet_matches)],
-nmcg_Gui, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmcg_Gui__init_), "$render2", $rt_wrapFunction2(nmcg_Gui_render), "$tick", $rt_wrapFunction0(nmcg_Gui_tick), "$setMissTime", $rt_wrapFunction1(nmcg_Gui_setMissTime), "$getSelectedHotbarSlot", $rt_wrapFunction0(nmcg_Gui_getSelectedHotbarSlot), "$setSelectedHotbarSlot", $rt_wrapFunction1(nmcg_Gui_setSelectedHotbarSlot)],
+nmcg_Gui, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcg_Gui__init_), "$render2", $rt_wrapFunction2(nmcg_Gui_render), "$tick", $rt_wrapFunction0(nmcg_Gui_tick), "$setMissTime", $rt_wrapFunction1(nmcg_Gui_setMissTime), "$setSelectedHotbarSlot", $rt_wrapFunction1(nmcg_Gui_setSelectedHotbarSlot)],
 nlevi_PlatformNetworking$scheduleReconnect$lambda$_11_0, 0, jl_Object, [jl_Runnable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformNetworking$scheduleReconnect$lambda$_11_0__init_)],
 jl_AbstractStringBuilder, 0, jl_Object, [ji_Serializable, jl_CharSequence], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_AbstractStringBuilder__init_0), "$_init_5", $rt_wrapFunction1(jl_AbstractStringBuilder__init_), "$_init_", $rt_wrapFunction1(jl_AbstractStringBuilder__init_1), "$_init_17", $rt_wrapFunction1(jl_AbstractStringBuilder__init_2), "$append20", $rt_wrapFunction1(jl_AbstractStringBuilder_append7), "$append7", $rt_wrapFunction1(jl_AbstractStringBuilder_append1), "$insert0", $rt_wrapFunction2(jl_AbstractStringBuilder_insert1),
 "$append21", $rt_wrapFunction1(jl_AbstractStringBuilder_append5), "$append2", $rt_wrapFunction2(jl_AbstractStringBuilder_append11), "$insert1", $rt_wrapFunction3(jl_AbstractStringBuilder_insert8), "$append22", $rt_wrapFunction1(jl_AbstractStringBuilder_append10), "$insert2", $rt_wrapFunction2(jl_AbstractStringBuilder_insert6), "$insert3", $rt_wrapFunction3(jl_AbstractStringBuilder_insert9), "$append23", $rt_wrapFunction1(jl_AbstractStringBuilder_append9), "$insert4", $rt_wrapFunction2(jl_AbstractStringBuilder_insert7),
@@ -38168,7 +39276,7 @@ $rt_metadata([nlevi_PlatformInput$registerMouseListeners$lambda$_5_0, 0, jl_Obje
 jur_SpecialToken, 0, jl_Object, [], 1024, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_SpecialToken__init_)],
 jur_AbstractCharClass, 0, jur_SpecialToken, [], 1024, 0, () => jur_AbstractCharClass_$callClinit(), ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass__init_), "$getBits", $rt_wrapFunction0(jur_AbstractCharClass_getBits), "$getLowHighSurrogates", $rt_wrapFunction0(jur_AbstractCharClass_getLowHighSurrogates), "$hasLowHighSurrogates", $rt_wrapFunction0(jur_AbstractCharClass_hasLowHighSurrogates), "$mayContainSupplCodepoints", $rt_wrapFunction0(jur_AbstractCharClass_mayContainSupplCodepoints), "$getInstance",
 $rt_wrapFunction0(jur_AbstractCharClass_getInstance), "$getSurrogates", $rt_wrapFunction0(jur_AbstractCharClass_getSurrogates), "$getWithoutSurrogates", $rt_wrapFunction0(jur_AbstractCharClass_getWithoutSurrogates), "$hasUCI", $rt_wrapFunction0(jur_AbstractCharClass_hasUCI), "$setNegative", $rt_wrapFunction1(jur_AbstractCharClass_setNegative), "$isNegative", $rt_wrapFunction0(jur_AbstractCharClass_isNegative)],
-jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1, "AbstractCharClass$LazyJavaUnicodeIdentifierPart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_65", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1_contains)],
+jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1, "AbstractCharClass$LazyJavaUnicodeIdentifierPart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_66", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart$1_contains)],
 nlevi_PlatformInput$registerMouseListeners$lambda$_5_2, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$registerMouseListeners$lambda$_5_2__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$registerMouseListeners$lambda$_5_2_handleEvent0), "$handleEvent1", $rt_wrapFunction1(nlevi_PlatformInput$registerMouseListeners$lambda$_5_2_handleEvent)],
 jl_Enum, 0, jl_Object, [jl_Comparable, ji_Serializable], 1025, 0, 0, ["$_init_21", $rt_wrapFunction2(jl_Enum__init_), "$name", $rt_wrapFunction0(jl_Enum_name), "$ordinal", $rt_wrapFunction0(jl_Enum_ordinal)],
 nmwp_BlockHitResult$Type, 0, jl_Enum, [], 65553, 0, () => nmwp_BlockHitResult$Type_$callClinit(), 0,
@@ -38190,17 +39298,18 @@ jur_NegativeLookAhead, "NegativeLookAhead", 2, jur_AtomicJointSet, [], 0, 0, 0, 
 nmcgc_AbstractWidget, 0, jl_Object, [], 1025, 0, 0, ["$_init_28", $rt_wrapFunction4(nmcgc_AbstractWidget__init_), "$mouseClicked", $rt_wrapFunction3(nmcgc_AbstractWidget_mouseClicked), "$mouseReleased", $rt_wrapFunction3(nmcgc_AbstractWidget_mouseReleased), "$mouseMoved", $rt_wrapFunction2(nmcgc_AbstractWidget_mouseMoved), "$isInside", $rt_wrapFunction2(nmcgc_AbstractWidget_isInside), "$onClick", $rt_wrapFunction0(nmcgc_AbstractWidget_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgc_AbstractWidget_getTelemetryId),
 "$getX0", $rt_wrapFunction0(nmcgc_AbstractWidget_getX), "$getY0", $rt_wrapFunction0(nmcgc_AbstractWidget_getY), "$getWidth", $rt_wrapFunction0(nmcgc_AbstractWidget_getWidth), "$getHeight", $rt_wrapFunction0(nmcgc_AbstractWidget_getHeight), "$setPosition", $rt_wrapFunction2(nmcgc_AbstractWidget_setPosition), "$isVisible", $rt_wrapFunction0(nmcgc_AbstractWidget_isVisible), "$setVisible", $rt_wrapFunction1(nmcgc_AbstractWidget_setVisible), "$isActive", $rt_wrapFunction0(nmcgc_AbstractWidget_isActive), "$setActive",
 $rt_wrapFunction1(nmcgc_AbstractWidget_setActive)],
-nmcgs_CreateWorldScreen$TabButtonWidget, "CreateWorldScreen$TabButtonWidget", 18, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_138", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgs_CreateWorldScreen$TabButtonWidget__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$setSelected0", $rt_wrapFunction1(nmcgs_CreateWorldScreen$TabButtonWidget_setSelected), "$consumedClick", $rt_wrapFunction0(nmcgs_CreateWorldScreen$TabButtonWidget_consumedClick), "$clearConsumed", $rt_wrapFunction0(nmcgs_CreateWorldScreen$TabButtonWidget_clearConsumed),
+nmcgs_CreateWorldScreen$TabButtonWidget, "CreateWorldScreen$TabButtonWidget", 19, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_140", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgs_CreateWorldScreen$TabButtonWidget__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$setSelected0", $rt_wrapFunction1(nmcgs_CreateWorldScreen$TabButtonWidget_setSelected), "$consumedClick", $rt_wrapFunction0(nmcgs_CreateWorldScreen$TabButtonWidget_consumedClick), "$clearConsumed", $rt_wrapFunction0(nmcgs_CreateWorldScreen$TabButtonWidget_clearConsumed),
 "$render", $rt_wrapFunction4(nmcgs_CreateWorldScreen$TabButtonWidget_render), "$mouseClicked", $rt_wrapFunction3(nmcgs_CreateWorldScreen$TabButtonWidget_mouseClicked), "$getTelemetryId", $rt_wrapFunction0(nmcgs_CreateWorldScreen$TabButtonWidget_getTelemetryId)],
 otjt_ArrayBufferView, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 otjt_TypedArray, 0, otjt_ArrayBufferView, [], 1025, 0, 0, 0,
+nmwic_CraftingRecipes$Recipe, 0, jl_Object, [], 17, 0, 0, ["$_init_37", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmwic_CraftingRecipes$Recipe__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }],
 jlr_Array, 0, jl_Object, [], 17, 0, 0, 0,
 nlevi_PlatformNetworking$WebSocketErrorCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 otcit_DoubleAnalyzer$Result, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(otcit_DoubleAnalyzer$Result__init_0)],
 nmc_KeyMapping$Category, 0, jl_Enum, [], 65553, 0, () => nmc_KeyMapping$Category_$callClinit(), 0,
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6_onPress)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6_onPress)],
 jur_AbstractCharClass$LazyJavaDigit, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDigit_computeValue)],
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5_onPress)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5_onPress)],
 jl_Iterable, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_Collection, 0, jl_Object, [jl_Iterable], 1537, 0, 0, 0,
 ju_AbstractCollection, 0, jl_Object, [ju_Collection], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_AbstractCollection__init_), "$isEmpty", $rt_wrapFunction0(ju_AbstractCollection_isEmpty), "$contains", $rt_wrapFunction1(ju_AbstractCollection_contains), "$toArray", $rt_wrapFunction1(ju_AbstractCollection_toArray), "$addAll", $rt_wrapFunction1(ju_AbstractCollection_addAll)],
@@ -38213,17 +39322,17 @@ jur_PossessiveAltQuantifierSet, "PossessiveAltQuantifierSet", 2, jur_AltQuantifi
 nmcgs_Screen, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_Screen__init_), "$init0", $rt_wrapFunction3(nmcgs_Screen_init), "$addRenderableWidget", $rt_wrapFunction1(nmcgs_Screen_addRenderableWidget), "$clearWidgets", $rt_wrapFunction0(nmcgs_Screen_clearWidgets), "$children", $rt_wrapFunction0(nmcgs_Screen_children), "$resize0", $rt_wrapFunction3(nmcgs_Screen_resize), "$render", $rt_wrapFunction4(nmcgs_Screen_render), "$keyPressed", $rt_wrapFunction3(nmcgs_Screen_keyPressed), "$keyReleased",
 $rt_wrapFunction3(nmcgs_Screen_keyReleased), "$charTyped0", $rt_wrapFunction2(nmcgs_Screen_charTyped), "$mouseClicked", $rt_wrapFunction3(nmcgs_Screen_mouseClicked), "$mouseReleased", $rt_wrapFunction3(nmcgs_Screen_mouseReleased), "$mouseMoved", $rt_wrapFunction2(nmcgs_Screen_mouseMoved), "$mouseScrolled", $rt_wrapFunction3(nmcgs_Screen_mouseScrolled), "$tick", $rt_wrapFunction0(nmcgs_Screen_tick), "$shouldBlurBackground", $rt_wrapFunction0(nmcgs_Screen_shouldBlurBackground), "$shouldCloseOnEsc", $rt_wrapFunction0(nmcgs_Screen_shouldCloseOnEsc),
 "$removed", $rt_wrapFunction0(nmcgs_Screen_removed), "$onClose", $rt_wrapFunction0(nmcgs_Screen_onClose)],
-nmcgsm_DisconnectedScreen, "DisconnectedScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_99", $rt_wrapFunction3(nmcgsm_DisconnectedScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_init), "$render", $rt_wrapFunction4(nmcgsm_DisconnectedScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgsm_DisconnectedScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_isPauseScreen)],
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0_onPress)],
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2_onPress)],
+nmcgsm_DisconnectedScreen, "DisconnectedScreen", 22, nmcgs_Screen, [], 1, 0, 0, ["$_init_100", $rt_wrapFunction3(nmcgsm_DisconnectedScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_init), "$render", $rt_wrapFunction4(nmcgsm_DisconnectedScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgsm_DisconnectedScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_DisconnectedScreen_isPauseScreen)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_0_onPress)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2_onPress)],
 otjc_JSObjects, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1_onPress)],
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4_onPress)],
-nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3_onPress)]]);
-$rt_metadata([otji_JS, 0, jl_Object, [], 17, 0, 0, 0,
-jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1, "AbstractCharClass$LazyJavaUnicodeIdentifierStart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_83", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1_contains)],
-nmcgsm_DirectConnectScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_87", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_0_onPress)],
-nmcgsm_DirectConnectScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_87", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_1_onPress)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1_onPress)],
+nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4_onPress)]]);
+$rt_metadata([nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3_onPress)],
+otji_JS, 0, jl_Object, [], 17, 0, 0, 0,
+jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1, "AbstractCharClass$LazyJavaUnicodeIdentifierStart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_84", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart$1_contains)],
+nmcgsm_DirectConnectScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_88", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_0_onPress)],
+nmcgsm_DirectConnectScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_88", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_DirectConnectScreen$init$lambda$_1_1_onPress)],
 otciu_UnicodeHelper, 0, jl_Object, [], 17, 0, 0, 0,
 otp_PlatformRunnable, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_Object$monitorEnterWait$lambda$_6_0, 0, jl_Object, [otp_PlatformRunnable], 1, 0, 0, ["$_init_1", $rt_wrapFunction4(jl_Object$monitorEnterWait$lambda$_6_0__init_), "$run", $rt_wrapFunction0(jl_Object$monitorEnterWait$lambda$_6_0_run)],
@@ -38235,7 +39344,7 @@ jur_AbstractCharClass$LazyPrint, 0, jur_AbstractCharClass$LazyGraph, [], 0, 0, 0
 jur_AbstractCharClass$LazyJavaSpaceChar, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaSpaceChar__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaSpaceChar_computeValue)],
 otjc_JSUndefined, 0, jl_Object, [otj_JSObject], 1, 0, 0, 0,
 jur_PositiveLookBehind, "PositiveLookBehind", 2, jur_AtomicJointSet, [], 0, 0, 0, ["$_init_27", $rt_wrapFunction2(jur_PositiveLookBehind__init_), "$matches", $rt_wrapFunction3(jur_PositiveLookBehind_matches), "$hasConsumed", $rt_wrapFunction1(jur_PositiveLookBehind_hasConsumed), "$getName", $rt_wrapFunction0(jur_PositiveLookBehind_getName)],
-jur_SequenceSet, "SequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_72", $rt_wrapFunction1(jur_SequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_SequenceSet_accepts), "$find", $rt_wrapFunction3(jur_SequenceSet_find), "$findBack", $rt_wrapFunction4(jur_SequenceSet_findBack), "$getName", $rt_wrapFunction0(jur_SequenceSet_getName), "$first", $rt_wrapFunction1(jur_SequenceSet_first), "$indexOf1", $rt_wrapFunction3(jur_SequenceSet_indexOf), "$lastIndexOf0", $rt_wrapFunction3(jur_SequenceSet_lastIndexOf), "$startsWith0",
+jur_SequenceSet, "SequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_73", $rt_wrapFunction1(jur_SequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_SequenceSet_accepts), "$find", $rt_wrapFunction3(jur_SequenceSet_find), "$findBack", $rt_wrapFunction4(jur_SequenceSet_findBack), "$getName", $rt_wrapFunction0(jur_SequenceSet_getName), "$first", $rt_wrapFunction1(jur_SequenceSet_first), "$indexOf1", $rt_wrapFunction3(jur_SequenceSet_indexOf), "$lastIndexOf0", $rt_wrapFunction3(jur_SequenceSet_lastIndexOf), "$startsWith0",
 $rt_wrapFunction2(jur_SequenceSet_startsWith)],
 oj_Matrix3fc, 0, jl_Object, [], 1537, 0, 0, 0,
 oj_Matrix3f, 0, jl_Object, [oj_Matrix3fc], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(oj_Matrix3f__init_), "$identity0", $rt_wrapFunction0(oj_Matrix3f_identity)],
@@ -38244,25 +39353,26 @@ ju_SequencedCollection, 0, jl_Object, [ju_Collection], 1537, 0, 0, 0,
 jur_AltGroupQuantifierSet, "AltGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_AltGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_AltGroupQuantifierSet_matches), "$setNext", $rt_wrapFunction1(jur_AltGroupQuantifierSet_setNext)],
 nleva_WorldGlRenderer, 0, jl_Object, [], 17, 0, () => nleva_WorldGlRenderer_$callClinit(), 0,
 jur_MatchResult, 0, jl_Object, [], 1537, 0, 0, 0,
-jur_MatchResultImpl, 0, jl_Object, [jur_MatchResult], 0, 0, 0, ["$_init_119", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7) { jur_MatchResultImpl__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7); }, "$setConsumed", $rt_wrapFunction2(jur_MatchResultImpl_setConsumed), "$getConsumed", $rt_wrapFunction1(jur_MatchResultImpl_getConsumed), "$end0", $rt_wrapFunction0(jur_MatchResultImpl_end), "$end", $rt_wrapFunction1(jur_MatchResultImpl_end0), "$setStart", $rt_wrapFunction2(jur_MatchResultImpl_setStart),
+jur_MatchResultImpl, 0, jl_Object, [jur_MatchResult], 0, 0, 0, ["$_init_121", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7) { jur_MatchResultImpl__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7); }, "$setConsumed", $rt_wrapFunction2(jur_MatchResultImpl_setConsumed), "$getConsumed", $rt_wrapFunction1(jur_MatchResultImpl_getConsumed), "$end0", $rt_wrapFunction0(jur_MatchResultImpl_end), "$end", $rt_wrapFunction1(jur_MatchResultImpl_end0), "$setStart", $rt_wrapFunction2(jur_MatchResultImpl_setStart),
 "$setEnd", $rt_wrapFunction2(jur_MatchResultImpl_setEnd), "$getStart", $rt_wrapFunction1(jur_MatchResultImpl_getStart), "$getEnd", $rt_wrapFunction1(jur_MatchResultImpl_getEnd), "$group", $rt_wrapFunction1(jur_MatchResultImpl_group), "$getGroupNoCheck", $rt_wrapFunction1(jur_MatchResultImpl_getGroupNoCheck), "$start0", $rt_wrapFunction0(jur_MatchResultImpl_start0), "$start", $rt_wrapFunction1(jur_MatchResultImpl_start), "$finalizeMatch", $rt_wrapFunction0(jur_MatchResultImpl_finalizeMatch), "$getEnterCounter",
 $rt_wrapFunction1(jur_MatchResultImpl_getEnterCounter), "$setEnterCounter", $rt_wrapFunction2(jur_MatchResultImpl_setEnterCounter), "$setValid", $rt_wrapFunction0(jur_MatchResultImpl_setValid), "$isValid", $rt_wrapFunction0(jur_MatchResultImpl_isValid), "$reset", $rt_wrapFunction3(jur_MatchResultImpl_reset0), "$reset0", $rt_wrapFunction0(jur_MatchResultImpl_reset), "$setStartIndex", $rt_wrapFunction1(jur_MatchResultImpl_setStartIndex), "$getLeftBound", $rt_wrapFunction0(jur_MatchResultImpl_getLeftBound), "$getRightBound",
 $rt_wrapFunction0(jur_MatchResultImpl_getRightBound), "$setMode", $rt_wrapFunction1(jur_MatchResultImpl_setMode), "$mode", $rt_wrapFunction0(jur_MatchResultImpl_mode), "$useAnchoringBounds", $rt_wrapFunction1(jur_MatchResultImpl_useAnchoringBounds), "$hasAnchoringBounds", $rt_wrapFunction0(jur_MatchResultImpl_hasAnchoringBounds), "$hasTransparentBounds", $rt_wrapFunction0(jur_MatchResultImpl_hasTransparentBounds), "$getPreviousMatchEnd", $rt_wrapFunction0(jur_MatchResultImpl_getPreviousMatchEnd)],
-jur_UCIRangeSet, "UCIRangeSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_80", $rt_wrapFunction1(jur_UCIRangeSet__init_0), "$accepts", $rt_wrapFunction2(jur_UCIRangeSet_accepts), "$getName", $rt_wrapFunction0(jur_UCIRangeSet_getName)],
-nmcgs_ConfirmScreen, "ConfirmScreen", 18, nmcgs_Screen, [], 1, 0, 0, ["$_init_115", $rt_wrapFunction4(nmcgs_ConfirmScreen__init_), "$init", $rt_wrapFunction0(nmcgs_ConfirmScreen_init), "$render", $rt_wrapFunction4(nmcgs_ConfirmScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgs_ConfirmScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgs_ConfirmScreen_isPauseScreen)],
-jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1, "AbstractCharClass$LazyJavaJavaIdentifierPart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_40", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1_contains)],
-nmcgs_PauseScreen$init$lambda$_1_7, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_145", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_7__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_7_onPress)],
-nmcgso_OptionsScreen$DifficultyCycleButton, "OptionsScreen$DifficultyCycleButton", 19, nmcgc_AbstractWidget, [], 0, 0, () => nmcgso_OptionsScreen$DifficultyCycleButton_$callClinit(), ["$_init_56", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_OptionsScreen$DifficultyCycleButton__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$render", $rt_wrapFunction4(nmcgso_OptionsScreen$DifficultyCycleButton_render), "$onClick", $rt_wrapFunction0(nmcgso_OptionsScreen$DifficultyCycleButton_onClick), "$getTelemetryId",
+nmwic_CraftingRecipes, 0, jl_Object, [], 17, 0, () => nmwic_CraftingRecipes_$callClinit(), 0,
+jur_UCIRangeSet, "UCIRangeSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction1(jur_UCIRangeSet__init_0), "$accepts", $rt_wrapFunction2(jur_UCIRangeSet_accepts), "$getName", $rt_wrapFunction0(jur_UCIRangeSet_getName)],
+nmcgs_ConfirmScreen, "ConfirmScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_117", $rt_wrapFunction4(nmcgs_ConfirmScreen__init_), "$init", $rt_wrapFunction0(nmcgs_ConfirmScreen_init), "$render", $rt_wrapFunction4(nmcgs_ConfirmScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgs_ConfirmScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgs_ConfirmScreen_isPauseScreen)],
+jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1, "AbstractCharClass$LazyJavaJavaIdentifierPart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_41", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierPart$1_contains)],
+nmcgs_PauseScreen$init$lambda$_1_7, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_147", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_7__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_7_onPress)],
+nmcgso_OptionsScreen$DifficultyCycleButton, "OptionsScreen$DifficultyCycleButton", 20, nmcgc_AbstractWidget, [], 0, 0, () => nmcgso_OptionsScreen$DifficultyCycleButton_$callClinit(), ["$_init_57", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_OptionsScreen$DifficultyCycleButton__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$render", $rt_wrapFunction4(nmcgso_OptionsScreen$DifficultyCycleButton_render), "$onClick", $rt_wrapFunction0(nmcgso_OptionsScreen$DifficultyCycleButton_onClick), "$getTelemetryId",
 $rt_wrapFunction0(nmcgso_OptionsScreen$DifficultyCycleButton_getTelemetryId)],
 otp_Platform, 0, jl_Object, [], 17, 0, 0, 0,
-jl_Boolean, 0, jl_Object, [ji_Serializable, jl_Comparable], 1, 0, () => jl_Boolean_$callClinit(), ["$_init_38", $rt_wrapFunction1(jl_Boolean__init_0)],
+jl_Boolean, 0, jl_Object, [ji_Serializable, jl_Comparable], 1, 0, () => jl_Boolean_$callClinit(), ["$_init_39", $rt_wrapFunction1(jl_Boolean__init_0)],
 nleva_WorldTextures, 0, jl_Object, [], 17, 0, () => nleva_WorldTextures_$callClinit(), 0,
 nlevi_PlatformNetworking$WebSocketCloseCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 ju_NoSuchElementException, "NoSuchElementException", 1, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_NoSuchElementException__init_0)],
 oj_Matrix4f, 0, jl_Object, [oj_Matrix4fc], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(oj_Matrix4f__init_0), "$identity2", $rt_wrapFunction0(oj_Matrix4f_identity)],
-nmcgc_AbstractSliderButton, 0, nmcgc_AbstractWidget, [], 1025, 0, 0, ["$_init_39", function(var_1, var_2, var_3, var_4, var_5) { nmcgc_AbstractSliderButton__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$render", $rt_wrapFunction4(nmcgc_AbstractSliderButton_render), "$setValue", $rt_wrapFunction1(nmcgc_AbstractSliderButton_setValue), "$mouseClicked", $rt_wrapFunction3(nmcgc_AbstractSliderButton_mouseClicked), "$mouseReleased", $rt_wrapFunction3(nmcgc_AbstractSliderButton_mouseReleased), "$mouseMoved",
+nmcgc_AbstractSliderButton, 0, nmcgc_AbstractWidget, [], 1025, 0, 0, ["$_init_40", function(var_1, var_2, var_3, var_4, var_5) { nmcgc_AbstractSliderButton__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$render", $rt_wrapFunction4(nmcgc_AbstractSliderButton_render), "$setValue", $rt_wrapFunction1(nmcgc_AbstractSliderButton_setValue), "$mouseClicked", $rt_wrapFunction3(nmcgc_AbstractSliderButton_mouseClicked), "$mouseReleased", $rt_wrapFunction3(nmcgc_AbstractSliderButton_mouseReleased), "$mouseMoved",
 $rt_wrapFunction2(nmcgc_AbstractSliderButton_mouseMoved)],
-nmcgso_MouseSettingsScreen$SensitivitySlider, "MouseSettingsScreen$SensitivitySlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_55", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_MouseSettingsScreen$SensitivitySlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_getTelemetryId)],
+nmcgso_MouseSettingsScreen$SensitivitySlider, "MouseSettingsScreen$SensitivitySlider", 20, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_56", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_MouseSettingsScreen$SensitivitySlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$SensitivitySlider_getTelemetryId)],
 nlevit_EPKLoader$LoadErrorNativeCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 jlr_AnnotatedElement, 0, jl_Object, [], 1537, 0, 0, 0,
 jlr_GenericDeclaration, 0, jl_Object, [jlr_AnnotatedElement], 1537, 0, 0, 0,
@@ -38270,24 +39380,24 @@ nlevi_PlatformInput$KeyEventObserver, 0, jl_Object, [], 1537, 0, 0, 0,
 jt_DecimalFormat$Constants, 0, jl_Object, [], 0, 0, () => jt_DecimalFormat$Constants_$callClinit(), 0,
 jur_NegativeLookBehind, "NegativeLookBehind", 2, jur_AtomicJointSet, [], 0, 0, 0, ["$_init_27", $rt_wrapFunction2(jur_NegativeLookBehind__init_), "$matches", $rt_wrapFunction3(jur_NegativeLookBehind_matches), "$hasConsumed", $rt_wrapFunction1(jur_NegativeLookBehind_hasConsumed), "$getName", $rt_wrapFunction0(jur_NegativeLookBehind_getName)],
 jur_BackReferenceSet, "BackReferenceSet", 2, jur_CIBackReferenceSet, [], 0, 0, 0, ["$_init_4", $rt_wrapFunction2(jur_BackReferenceSet__init_), "$matches", $rt_wrapFunction3(jur_BackReferenceSet_matches), "$find", $rt_wrapFunction3(jur_BackReferenceSet_find), "$findBack", $rt_wrapFunction4(jur_BackReferenceSet_findBack), "$first", $rt_wrapFunction1(jur_BackReferenceSet_first), "$getName", $rt_wrapFunction0(jur_BackReferenceSet_getName)],
-jur_DotQuantifierSet, "DotQuantifierSet", 2, jur_QuantifierSet, [], 0, 0, 0, ["$_init_76", $rt_wrapFunction4(jur_DotQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_DotQuantifierSet_matches), "$find", $rt_wrapFunction3(jur_DotQuantifierSet_find), "$getName", $rt_wrapFunction0(jur_DotQuantifierSet_getName)],
+jur_DotQuantifierSet, "DotQuantifierSet", 2, jur_QuantifierSet, [], 0, 0, 0, ["$_init_77", $rt_wrapFunction4(jur_DotQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_DotQuantifierSet_matches), "$find", $rt_wrapFunction3(jur_DotQuantifierSet_find), "$getName", $rt_wrapFunction0(jur_DotQuantifierSet_getName)],
 jur_AbstractCharClass$LazyJavaJavaIdentifierPart, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaJavaIdentifierPart__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaJavaIdentifierPart_computeValue)],
 jl_IllegalArgumentException, "IllegalArgumentException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_IllegalArgumentException__init_1), "$_init_", $rt_wrapFunction1(jl_IllegalArgumentException__init_)],
-ju_IllegalFormatException, 0, jl_IllegalArgumentException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_IllegalFormatException__init_)],
-ju_UnknownFormatConversionException, "UnknownFormatConversionException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_UnknownFormatConversionException__init_0)],
+ju_IllegalFormatException, 0, jl_IllegalArgumentException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_IllegalFormatException__init_)]]);
+$rt_metadata([ju_UnknownFormatConversionException, "UnknownFormatConversionException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_UnknownFormatConversionException__init_0)],
 jt_NumberFormat, 0, jt_Format, [], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_NumberFormat__init_), "$getCurrency", $rt_wrapFunction0(jt_NumberFormat_getCurrency), "$format", $rt_wrapFunction3(jt_NumberFormat_format), "$getMaximumFractionDigits", $rt_wrapFunction0(jt_NumberFormat_getMaximumFractionDigits), "$getMaximumIntegerDigits", $rt_wrapFunction0(jt_NumberFormat_getMaximumIntegerDigits), "$getMinimumFractionDigits", $rt_wrapFunction0(jt_NumberFormat_getMinimumFractionDigits), "$getMinimumIntegerDigits",
 $rt_wrapFunction0(jt_NumberFormat_getMinimumIntegerDigits), "$isGroupingUsed", $rt_wrapFunction0(jt_NumberFormat_isGroupingUsed), "$setGroupingUsed", $rt_wrapFunction1(jt_NumberFormat_setGroupingUsed), "$setMaximumFractionDigits", $rt_wrapFunction1(jt_NumberFormat_setMaximumFractionDigits), "$setMaximumIntegerDigits", $rt_wrapFunction1(jt_NumberFormat_setMaximumIntegerDigits), "$setMinimumFractionDigits", $rt_wrapFunction1(jt_NumberFormat_setMinimumFractionDigits), "$setMinimumIntegerDigits", $rt_wrapFunction1(jt_NumberFormat_setMinimumIntegerDigits),
-"$getRoundingMode", $rt_wrapFunction0(jt_NumberFormat_getRoundingMode)]]);
-$rt_metadata([jt_DecimalFormat, 0, jt_NumberFormat, [], 1, 0, () => jt_DecimalFormat_$callClinit(), ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat__init_1), "$_init_", $rt_wrapFunction1(jt_DecimalFormat__init_0), "$_init_41", $rt_wrapFunction2(jt_DecimalFormat__init_), "$applyPattern", $rt_wrapFunction1(jt_DecimalFormat_applyPattern), "$setDecimalFormatSymbols", $rt_wrapFunction1(jt_DecimalFormat_setDecimalFormatSymbols), "$setPositivePrefix", $rt_wrapFunction1(jt_DecimalFormat_setPositivePrefix), "$setNegativePrefix",
-$rt_wrapFunction1(jt_DecimalFormat_setNegativePrefix), "$setNegativeSuffix", $rt_wrapFunction1(jt_DecimalFormat_setNegativeSuffix), "$setMultiplier", $rt_wrapFunction1(jt_DecimalFormat_setMultiplier), "$getGroupingSize", $rt_wrapFunction0(jt_DecimalFormat_getGroupingSize), "$setGroupingSize", $rt_wrapFunction1(jt_DecimalFormat_setGroupingSize), "$isDecimalSeparatorAlwaysShown", $rt_wrapFunction0(jt_DecimalFormat_isDecimalSeparatorAlwaysShown), "$setDecimalSeparatorAlwaysShown", $rt_wrapFunction1(jt_DecimalFormat_setDecimalSeparatorAlwaysShown),
-"$format", $rt_wrapFunction3(jt_DecimalFormat_format3), "$format1", $rt_wrapFunction3(jt_DecimalFormat_format2), "$format0", $rt_wrapFunction3(jt_DecimalFormat_format1)],
+"$getRoundingMode", $rt_wrapFunction0(jt_NumberFormat_getRoundingMode)],
+jt_DecimalFormat, 0, jt_NumberFormat, [], 1, 0, () => jt_DecimalFormat_$callClinit(), ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat__init_1), "$_init_", $rt_wrapFunction1(jt_DecimalFormat__init_0), "$_init_42", $rt_wrapFunction2(jt_DecimalFormat__init_), "$applyPattern", $rt_wrapFunction1(jt_DecimalFormat_applyPattern), "$setDecimalFormatSymbols", $rt_wrapFunction1(jt_DecimalFormat_setDecimalFormatSymbols), "$setPositivePrefix", $rt_wrapFunction1(jt_DecimalFormat_setPositivePrefix), "$setNegativePrefix", $rt_wrapFunction1(jt_DecimalFormat_setNegativePrefix),
+"$setNegativeSuffix", $rt_wrapFunction1(jt_DecimalFormat_setNegativeSuffix), "$setMultiplier", $rt_wrapFunction1(jt_DecimalFormat_setMultiplier), "$getGroupingSize", $rt_wrapFunction0(jt_DecimalFormat_getGroupingSize), "$setGroupingSize", $rt_wrapFunction1(jt_DecimalFormat_setGroupingSize), "$isDecimalSeparatorAlwaysShown", $rt_wrapFunction0(jt_DecimalFormat_isDecimalSeparatorAlwaysShown), "$setDecimalSeparatorAlwaysShown", $rt_wrapFunction1(jt_DecimalFormat_setDecimalSeparatorAlwaysShown), "$format", $rt_wrapFunction3(jt_DecimalFormat_format3),
+"$format1", $rt_wrapFunction3(jt_DecimalFormat_format2), "$format0", $rt_wrapFunction3(jt_DecimalFormat_format1)],
 otcit_FloatAnalyzer, 0, jl_Object, [], 17, 0, () => otcit_FloatAnalyzer_$callClinit(), 0,
 jt_DecimalFormat$FormatField, 0, jl_Object, [], 1536, 0, 0, 0,
 jt_DecimalFormat$PerMillField, "DecimalFormat$PerMillField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$PerMillField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$PerMillField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$PerMillField_equals)],
-nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_103", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0_onPress)],
-nmcp_LocalPlayer, 0, jl_Object, [], 1, 0, 0, ["$_init_144", $rt_wrapFunction2(nmcp_LocalPlayer__init_), "$absSnapTo", $rt_wrapFunction3(nmcp_LocalPlayer_absSnapTo), "$snapTo", function(var_1, var_2, var_3, var_4, var_5) { nmcp_LocalPlayer_snapTo(this, var_1, var_2, var_3, var_4, var_5); }, "$turn", $rt_wrapFunction2(nmcp_LocalPlayer_turn), "$getEyeY", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeY), "$getEyeX", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeX), "$getEyeZ", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeZ),
+nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_104", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0_onPress)],
+nmcp_LocalPlayer, 0, jl_Object, [], 1, 0, 0, ["$_init_146", $rt_wrapFunction2(nmcp_LocalPlayer__init_), "$absSnapTo", $rt_wrapFunction3(nmcp_LocalPlayer_absSnapTo), "$snapTo", function(var_1, var_2, var_3, var_4, var_5) { nmcp_LocalPlayer_snapTo(this, var_1, var_2, var_3, var_4, var_5); }, "$turn", $rt_wrapFunction2(nmcp_LocalPlayer_turn), "$getEyeY", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeY), "$getEyeX", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeX), "$getEyeZ", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeZ),
 "$setSprinting", $rt_wrapFunction1(nmcp_LocalPlayer_setSprinting), "$getMinX", $rt_wrapFunction0(nmcp_LocalPlayer_getMinX), "$getMaxX", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxX), "$getMinZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMinZ), "$getMaxZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxZ), "$getMinY", $rt_wrapFunction0(nmcp_LocalPlayer_getMinY), "$getMaxY", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxY), "$tick1", $rt_wrapFunction1(nmcp_LocalPlayer_tick), "$isWithinBlockInteractionRange", $rt_wrapFunction3(nmcp_LocalPlayer_isWithinBlockInteractionRange)],
-nmcgs_PauseScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_145", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5_onPress)],
+nmcgs_PauseScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_147", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5_onPress)],
 nmcgs_PauseScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_PauseScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_6_onPress)],
 nmcgs_TitleScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_6_onPress)],
 nmcgs_PauseScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_PauseScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_3_onPress)],
@@ -38296,47 +39406,47 @@ nmcgs_PauseScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 
 cgcc_ForwardingObject, 0, jl_Object, [], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(cgcc_ForwardingObject__init_)],
 cgcc_ForwardingMultimap, 0, cgcc_ForwardingObject, [cgcc_Multimap], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(cgcc_ForwardingMultimap__init_)],
 ju_IllegalFormatCodePointException, "IllegalFormatCodePointException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_5", $rt_wrapFunction1(ju_IllegalFormatCodePointException__init_)],
-nmcgs_TitleScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_52", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_4__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_4_onPress)],
+nmcgs_TitleScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_53", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_4__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_4_onPress)],
 nmcgs_PauseScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_PauseScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_1_onPress)],
 nmcgs_TitleScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_3_onPress)],
 nmcgs_PauseScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_PauseScreen$init$lambda$_1_2__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_2_onPress)],
 nmcgs_TitleScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen$init$lambda$_1_2__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_2_onPress)],
-nmcgs_TitleScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_52", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_1_onPress)],
-nmcgs_PauseScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_145", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_0_onPress)],
+nmcgs_TitleScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_53", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_1_onPress)],
+nmcgs_PauseScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_147", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_0_onPress)],
 nlevi_PlatformRuntime$SimpleCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-jur_UnifiedQuantifierSet, "UnifiedQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_UnifiedQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_UnifiedQuantifierSet_matches), "$find", $rt_wrapFunction3(jur_UnifiedQuantifierSet_find)],
-nmcgs_TitleScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_52", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_0_onPress)],
+jur_UnifiedQuantifierSet, "UnifiedQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_76", $rt_wrapFunction1(jur_UnifiedQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_UnifiedQuantifierSet_matches), "$find", $rt_wrapFunction3(jur_UnifiedQuantifierSet_find)],
+nmcgs_TitleScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_53", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_0_onPress)],
 jlr_Type, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_Class, 0, jl_Object, [jlr_GenericDeclaration, jlr_Type], 17, 0, 0, ["$toString", $rt_wrapFunction0(jl_Class_toString), "$getClassInfo", $rt_wrapFunction0(jl_Class_getClassInfo), "$isInstance", $rt_wrapFunction1(jl_Class_isInstance), "$isAssignableFrom", $rt_wrapFunction1(jl_Class_isAssignableFrom), "$getName", $rt_wrapFunction0(jl_Class_getName), "$getSimpleName", $rt_wrapFunction0(jl_Class_getSimpleName), "$isPrimitive", $rt_wrapFunction0(jl_Class_isPrimitive), "$isInterface", $rt_wrapFunction0(jl_Class_isInterface),
 "$getComponentType", $rt_wrapFunction0(jl_Class_getComponentType), "$getEnclosingClass", $rt_wrapFunction0(jl_Class_getEnclosingClass)],
 ju_BitSet, 0, jl_Object, [jl_Cloneable, ji_Serializable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_BitSet__init_0), "$_init_5", $rt_wrapFunction1(ju_BitSet__init_), "$set1", $rt_wrapFunction1(ju_BitSet_set0), "$set", $rt_wrapFunction2(ju_BitSet_set), "$clear0", $rt_wrapFunction1(ju_BitSet_clear0), "$clear1", $rt_wrapFunction2(ju_BitSet_clear), "$get2", $rt_wrapFunction1(ju_BitSet_get), "$nextSetBit", $rt_wrapFunction1(ju_BitSet_nextSetBit), "$nextClearBit", $rt_wrapFunction1(ju_BitSet_nextClearBit), "$intersects",
 $rt_wrapFunction1(ju_BitSet_intersects), "$and", $rt_wrapFunction1(ju_BitSet_and), "$andNot", $rt_wrapFunction1(ju_BitSet_andNot), "$or", $rt_wrapFunction1(ju_BitSet_or), "$xor", $rt_wrapFunction1(ju_BitSet_xor), "$isEmpty", $rt_wrapFunction0(ju_BitSet_isEmpty)],
-jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1, "AbstractCharClass$LazyJavaJavaIdentifierStart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_95", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1_contains)],
+jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1, "AbstractCharClass$LazyJavaJavaIdentifierStart$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_96", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaJavaIdentifierStart$1_contains)],
 nmcm_GameConfig$QuickPlayVariant, 0, jl_Enum, [], 65553, 0, () => nmcm_GameConfig$QuickPlayVariant_$callClinit(), 0,
 jl_Float, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Float_$callClinit(), 0,
 otjdx_Node, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 otjdx_Document, 0, jl_Object, [otjdx_Node], 1537, 0, 0, 0,
 ju_Arrays, 0, jl_Object, [], 1, 0, 0, 0,
-jur_CharSet, "CharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction1(jur_CharSet__init_0), "$charCount", $rt_wrapFunction0(jur_CharSet_charCount), "$accepts", $rt_wrapFunction2(jur_CharSet_accepts), "$find", $rt_wrapFunction3(jur_CharSet_find), "$findBack", $rt_wrapFunction4(jur_CharSet_findBack), "$getName", $rt_wrapFunction0(jur_CharSet_getName), "$getChar", $rt_wrapFunction0(jur_CharSet_getChar), "$first", $rt_wrapFunction1(jur_CharSet_first)],
-jur_CharClass$3, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction3(jur_CharClass$3__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$3_contains)],
-jur_CharClass$4, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$4__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$4_contains)],
-jur_CharClass$1, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction2(jur_CharClass$1__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$1_contains)],
-jur_CharClass$2, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction3(jur_CharClass$2__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$2_contains)],
-jur_CharClass$7, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction2(jur_CharClass$7__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$7_contains)],
-jur_CharClass$8, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$8__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$8_contains)],
-jur_CharClass$5, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$5__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$5_contains)],
-jur_CharClass$6, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction2(jur_CharClass$6__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$6_contains)],
+jur_CharSet, "CharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_CharSet__init_0), "$charCount", $rt_wrapFunction0(jur_CharSet_charCount), "$accepts", $rt_wrapFunction2(jur_CharSet_accepts), "$find", $rt_wrapFunction3(jur_CharSet_find), "$findBack", $rt_wrapFunction4(jur_CharSet_findBack), "$getName", $rt_wrapFunction0(jur_CharSet_getName), "$getChar", $rt_wrapFunction0(jur_CharSet_getChar), "$first", $rt_wrapFunction1(jur_CharSet_first)],
+jur_CharClass$3, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$3__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$3_contains)],
+jur_CharClass$4, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$4__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$4_contains)],
+jur_CharClass$1, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction2(jur_CharClass$1__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$1_contains)],
+jur_CharClass$2, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$2__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$2_contains)],
+jur_CharClass$7, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction2(jur_CharClass$7__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$7_contains)],
+jur_CharClass$8, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction3(jur_CharClass$8__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$8_contains)],
+jur_CharClass$5, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$5__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$5_contains)],
+jur_CharClass$6, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction2(jur_CharClass$6__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$6_contains)],
 ju_Iterator, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_ListIterator, 0, jl_Object, [ju_Iterator], 1537, 0, 0, 0,
 ju_Collections$5, 0, jl_Object, [ju_ListIterator], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$5__init_)],
-jm_BigDecimal, 0, jl_Number, [jl_Comparable, ji_Serializable], 1, 0, () => jm_BigDecimal_$callClinit(), ["$_init_43", $rt_wrapFunction1(jm_BigDecimal__init_2), "$_init_44", $rt_wrapFunction2(jm_BigDecimal__init_0), "$multiply0", $rt_wrapFunction1(jm_BigDecimal_multiply), "$signum", $rt_wrapFunction0(jm_BigDecimal_signum), "$scale", $rt_wrapFunction0(jm_BigDecimal_scale), "$precision", $rt_wrapFunction0(jm_BigDecimal_precision), "$unscaledValue", $rt_wrapFunction0(jm_BigDecimal_unscaledValue), "$compareTo", $rt_wrapFunction1(jm_BigDecimal_compareTo)],
-jur_DotSet, "DotSet", 2, jur_JointSet, [], 16, 0, 0, ["$_init_78", $rt_wrapFunction1(jur_DotSet__init_), "$matches", $rt_wrapFunction3(jur_DotSet_matches), "$getName", $rt_wrapFunction0(jur_DotSet_getName), "$setNext", $rt_wrapFunction1(jur_DotSet_setNext), "$getType", $rt_wrapFunction0(jur_DotSet_getType), "$hasConsumed", $rt_wrapFunction1(jur_DotSet_hasConsumed)],
-ju_List, 0, jl_Object, [ju_SequencedCollection], 1537, 0, 0, 0,
-ju_AbstractList, 0, ju_AbstractCollection, [ju_List], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_AbstractList__init_), "$iterator", $rt_wrapFunction0(ju_AbstractList_iterator)]]);
-$rt_metadata([ju_RandomAccess, 0, jl_Object, [], 1537, 0, 0, 0,
+jm_BigDecimal, 0, jl_Number, [jl_Comparable, ji_Serializable], 1, 0, () => jm_BigDecimal_$callClinit(), ["$_init_44", $rt_wrapFunction1(jm_BigDecimal__init_2), "$_init_45", $rt_wrapFunction2(jm_BigDecimal__init_0), "$multiply0", $rt_wrapFunction1(jm_BigDecimal_multiply), "$signum", $rt_wrapFunction0(jm_BigDecimal_signum), "$scale", $rt_wrapFunction0(jm_BigDecimal_scale), "$precision", $rt_wrapFunction0(jm_BigDecimal_precision), "$unscaledValue", $rt_wrapFunction0(jm_BigDecimal_unscaledValue), "$compareTo", $rt_wrapFunction1(jm_BigDecimal_compareTo)],
+jur_DotSet, "DotSet", 2, jur_JointSet, [], 16, 0, 0, ["$_init_79", $rt_wrapFunction1(jur_DotSet__init_), "$matches", $rt_wrapFunction3(jur_DotSet_matches), "$getName", $rt_wrapFunction0(jur_DotSet_getName), "$setNext", $rt_wrapFunction1(jur_DotSet_setNext), "$getType", $rt_wrapFunction0(jur_DotSet_getType), "$hasConsumed", $rt_wrapFunction1(jur_DotSet_hasConsumed)]]);
+$rt_metadata([ju_List, 0, jl_Object, [ju_SequencedCollection], 1537, 0, 0, 0,
+ju_AbstractList, 0, ju_AbstractCollection, [ju_List], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_AbstractList__init_), "$iterator", $rt_wrapFunction0(ju_AbstractList_iterator)],
+ju_RandomAccess, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_TemplateCollections$AbstractImmutableList, 0, ju_AbstractList, [ju_RandomAccess], 1024, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_TemplateCollections$AbstractImmutableList__init_)],
 ju_Collections$3, 0, ju_TemplateCollections$AbstractImmutableList, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$3__init_)],
-jur_CharClass$9, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$9__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$9_contains)],
+jur_CharClass$9, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction3(jur_CharClass$9__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$9_contains)],
 nlevi_PlatformInput$TouchUpdateCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 ju_Collections$4, 0, jl_Object, [ju_Iterator], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$4__init_)],
 jl_Character, 0, jl_Object, [jl_Comparable], 1, 0, () => jl_Character_$callClinit(), 0,
@@ -38344,81 +39454,83 @@ ju_Set, 0, jl_Object, [ju_Collection], 1537, 0, 0, 0,
 ju_AbstractSet, 0, ju_AbstractCollection, [ju_Set], 1025, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_AbstractSet__init_)],
 ju_TemplateCollections$AbstractImmutableSet, 0, ju_AbstractSet, [], 1024, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_TemplateCollections$AbstractImmutableSet__init_)],
 ju_Collections$1, 0, ju_TemplateCollections$AbstractImmutableSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$1__init_)],
-nlevi_PlatformApplication, "PlatformApplication", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformApplication_$callClinit(), 0,
-jur_CICharSet, "CICharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction1(jur_CICharSet__init_0), "$accepts", $rt_wrapFunction2(jur_CICharSet_accepts), "$getName", $rt_wrapFunction0(jur_CICharSet_getName)],
+nlevi_PlatformApplication, "PlatformApplication", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformApplication_$callClinit(), 0,
+jur_CICharSet, "CICharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_CICharSet__init_0), "$accepts", $rt_wrapFunction2(jur_CICharSet_accepts), "$getName", $rt_wrapFunction0(jur_CICharSet_getName)],
 ju_TemplateCollections$AbstractImmutableMap, 0, ju_AbstractMap, [], 1024, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_TemplateCollections$AbstractImmutableMap__init_), "$put", $rt_wrapFunction2(ju_TemplateCollections$AbstractImmutableMap_put)],
 ju_Collections$2, 0, ju_TemplateCollections$AbstractImmutableMap, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$2__init_)],
 jur_SupplCharSet, "SupplCharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_SupplCharSet__init_), "$accepts", $rt_wrapFunction2(jur_SupplCharSet_accepts), "$find", $rt_wrapFunction3(jur_SupplCharSet_find), "$findBack", $rt_wrapFunction4(jur_SupplCharSet_findBack), "$getName", $rt_wrapFunction0(jur_SupplCharSet_getName), "$getCodePoint", $rt_wrapFunction0(jur_SupplCharSet_getCodePoint), "$first", $rt_wrapFunction1(jur_SupplCharSet_first)],
-nlevi_PlatformRuntime, "PlatformRuntime", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformRuntime_$callClinit(), 0,
+nlevi_PlatformRuntime, "PlatformRuntime", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformRuntime_$callClinit(), 0,
 otrr_ReflectionInfo, 0, jl_Object, [], 1025, 0, 0, 0,
 otjc_JSNumber, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 jur_AbstractCharClass$LazyCategoryScope, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_23", $rt_wrapFunction2(jur_AbstractCharClass$LazyCategoryScope__init_1), "$_init_24", $rt_wrapFunction3(jur_AbstractCharClass$LazyCategoryScope__init_0), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyCategoryScope_computeValue)],
 jur_AbstractLineTerminator, 0, jl_Object, [], 1024, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator__init_)],
-jur_AbstractCharClass$LazyJavaTitleCase$1, "AbstractCharClass$LazyJavaTitleCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_117", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaTitleCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaTitleCase$1_contains)],
+jur_AbstractCharClass$LazyJavaTitleCase$1, "AbstractCharClass$LazyJavaTitleCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_119", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaTitleCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaTitleCase$1_contains)],
 ju_Collections$_clinit_$lambda$_59_0, 0, jl_Object, [ju_Comparator], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Collections$_clinit_$lambda$_59_0__init_)],
 cmbv_PoseStack$Pose, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(cmbv_PoseStack$Pose__init_)],
-jur_AbstractCharClass$LazyJavaMirrored$1, "AbstractCharClass$LazyJavaMirrored$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_128", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaMirrored$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaMirrored$1_contains)],
-jur_AbstractCharClass$LazyJavaISOControl$1, "AbstractCharClass$LazyJavaISOControl$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_129", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaISOControl$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaISOControl$1_contains)],
+jur_AbstractCharClass$LazyJavaMirrored$1, "AbstractCharClass$LazyJavaMirrored$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_130", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaMirrored$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaMirrored$1_contains)],
+jur_AbstractCharClass$LazyJavaISOControl$1, "AbstractCharClass$LazyJavaISOControl$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_131", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaISOControl$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaISOControl$1_contains)],
 jur_UEOLSet, "UEOLSet", 2, jur_AbstractSet, [], 16, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_UEOLSet__init_), "$matches", $rt_wrapFunction3(jur_UEOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_UEOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_UEOLSet_getName)],
-jur_UCICharSet, "UCICharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction1(jur_UCICharSet__init_), "$accepts", $rt_wrapFunction2(jur_UCICharSet_accepts), "$getName", $rt_wrapFunction0(jur_UCICharSet_getName)],
+jur_UCICharSet, "UCICharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_UCICharSet__init_), "$accepts", $rt_wrapFunction2(jur_UCICharSet_accepts), "$getName", $rt_wrapFunction0(jur_UCICharSet_getName)],
 jur_AtomicFSet, "AtomicFSet", 2, jur_FSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_AtomicFSet__init_), "$matches", $rt_wrapFunction3(jur_AtomicFSet_matches), "$getIndex", $rt_wrapFunction0(jur_AtomicFSet_getIndex), "$getName", $rt_wrapFunction0(jur_AtomicFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_AtomicFSet_hasConsumed)],
-jur_LowSurrogateCharSet, "LowSurrogateCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction1(jur_LowSurrogateCharSet__init_), "$setNext", $rt_wrapFunction1(jur_LowSurrogateCharSet_setNext), "$matches", $rt_wrapFunction3(jur_LowSurrogateCharSet_matches), "$find", $rt_wrapFunction3(jur_LowSurrogateCharSet_find), "$findBack", $rt_wrapFunction4(jur_LowSurrogateCharSet_findBack), "$getName", $rt_wrapFunction0(jur_LowSurrogateCharSet_getName), "$first", $rt_wrapFunction1(jur_LowSurrogateCharSet_first),
+jur_LowSurrogateCharSet, "LowSurrogateCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_LowSurrogateCharSet__init_), "$setNext", $rt_wrapFunction1(jur_LowSurrogateCharSet_setNext), "$matches", $rt_wrapFunction3(jur_LowSurrogateCharSet_matches), "$find", $rt_wrapFunction3(jur_LowSurrogateCharSet_find), "$findBack", $rt_wrapFunction4(jur_LowSurrogateCharSet_findBack), "$getName", $rt_wrapFunction0(jur_LowSurrogateCharSet_getName), "$first", $rt_wrapFunction1(jur_LowSurrogateCharSet_first),
 "$hasConsumed", $rt_wrapFunction1(jur_LowSurrogateCharSet_hasConsumed)],
 jl_Error, 0, jl_Throwable, [], 1, 0, 0, ["$_init_10", $rt_wrapFunction2(jl_Error__init_)],
-nmcm_ClientLevel, 0, jl_Object, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcm_ClientLevel__init_), "$getBlockState", $rt_wrapFunction3(nmcm_ClientLevel_getBlockState), "$generatedBlock", $rt_wrapFunction3(nmcm_ClientLevel_generatedBlock), "$setBlockState", $rt_wrapFunction4(nmcm_ClientLevel_setBlockState), "$pollDirtySection", $rt_wrapFunction0(nmcm_ClientLevel_pollDirtySection), "$markRangeDirty", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcm_ClientLevel_markRangeDirty(this, var_1, var_2, var_3,
+nmwic_Crafting, 0, jl_Object, [], 17, 0, 0, 0,
+nmcm_ClientLevel, 0, jl_Object, [], 1, 0, 0, ["$_init_61", $rt_wrapFunction2(nmcm_ClientLevel__init_), "$getBlockState", $rt_wrapFunction3(nmcm_ClientLevel_getBlockState), "$generatedBlock", $rt_wrapFunction3(nmcm_ClientLevel_generatedBlock), "$setBlockState", $rt_wrapFunction4(nmcm_ClientLevel_setBlockState), "$pollDirtySection", $rt_wrapFunction0(nmcm_ClientLevel_pollDirtySection), "$markRangeDirty", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcm_ClientLevel_markRangeDirty(this, var_1, var_2, var_3,
 var_4, var_5, var_6); }, "$saveEdits", $rt_wrapFunction0(nmcm_ClientLevel_saveEdits), "$editCount", $rt_wrapFunction0(nmcm_ClientLevel_editCount), "$saveDayTime", $rt_wrapFunction0(nmcm_ClientLevel_saveDayTime), "$noCollision", function(var_1, var_2, var_3, var_4, var_5, var_6) { return nmcm_ClientLevel_noCollision(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$clip", function(var_1, var_2, var_3, var_4, var_5, var_6) { return nmcm_ClientLevel_clip(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getBlockStateBelowForMovement",
 $rt_wrapFunction3(nmcm_ClientLevel_getBlockStateBelowForMovement), "$tick", $rt_wrapFunction0(nmcm_ClientLevel_tick), "$setDayTime", $rt_wrapFunction1(nmcm_ClientLevel_setDayTime), "$getLevelName", $rt_wrapFunction0(nmcm_ClientLevel_getLevelName), "$getDimensionId", $rt_wrapFunction0(nmcm_ClientLevel_getDimensionId), "$getGameTime", $rt_wrapFunction0(nmcm_ClientLevel_getGameTime), "$getDayTime", $rt_wrapFunction0(nmcm_ClientLevel_getDayTime), "$getDifficulty", $rt_wrapFunction0(nmcm_ClientLevel_getDifficulty),
 "$setDifficulty", $rt_wrapFunction1(nmcm_ClientLevel_setDifficulty), "$setGameMode", $rt_wrapFunction1(nmcm_ClientLevel_setGameMode), "$isCreative", $rt_wrapFunction0(nmcm_ClientLevel_isCreative), "$getSpawnX", $rt_wrapFunction0(nmcm_ClientLevel_getSpawnX), "$getSpawnY", $rt_wrapFunction0(nmcm_ClientLevel_getSpawnY), "$getSpawnZ", $rt_wrapFunction0(nmcm_ClientLevel_getSpawnZ), "$toString", $rt_wrapFunction0(nmcm_ClientLevel_toString)],
-ju_FormatFlagsConversionMismatchException, "FormatFlagsConversionMismatchException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_131", $rt_wrapFunction2(ju_FormatFlagsConversionMismatchException__init_)],
+ju_FormatFlagsConversionMismatchException, "FormatFlagsConversionMismatchException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_133", $rt_wrapFunction2(ju_FormatFlagsConversionMismatchException__init_)],
 jl_AssertionError, "AssertionError", 4, jl_Error, [], 1, 0, 0, ["$_init_10", $rt_wrapFunction2(jl_AssertionError__init_)],
-jur_CompositeGroupQuantifierSet, "CompositeGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_50", function(var_1, var_2, var_3, var_4, var_5) { jur_CompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_CompositeGroupQuantifierSet_matches), "$getName", $rt_wrapFunction0(jur_CompositeGroupQuantifierSet_getName)],
-jur_RelCompositeGroupQuantifierSet, "RelCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_50", function(var_1, var_2, var_3, var_4, var_5) { jur_RelCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_RelCompositeGroupQuantifierSet_matches)],
+jur_CompositeGroupQuantifierSet, "CompositeGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_51", function(var_1, var_2, var_3, var_4, var_5) { jur_CompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_CompositeGroupQuantifierSet_matches), "$getName", $rt_wrapFunction0(jur_CompositeGroupQuantifierSet_getName)],
+jur_RelCompositeGroupQuantifierSet, "RelCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_51", function(var_1, var_2, var_3, var_4, var_5) { jur_RelCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_RelCompositeGroupQuantifierSet_matches)],
 otcit_FloatSynthesizer, 0, jl_Object, [], 17, 0, () => otcit_FloatSynthesizer_$callClinit(), 0,
 ju_ArrayList, 0, ju_AbstractList, [jl_Cloneable, ji_Serializable, ju_RandomAccess], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_ArrayList__init_1), "$_init_5", $rt_wrapFunction1(ju_ArrayList__init_0), "$ensureCapacity", $rt_wrapFunction1(ju_ArrayList_ensureCapacity), "$get", $rt_wrapFunction1(ju_ArrayList_get), "$size", $rt_wrapFunction0(ju_ArrayList_size), "$set0", $rt_wrapFunction2(ju_ArrayList_set), "$add", $rt_wrapFunction1(ju_ArrayList_add0), "$add2", $rt_wrapFunction2(ju_ArrayList_add), "$remove0", $rt_wrapFunction1(ju_ArrayList_remove),
 "$clear", $rt_wrapFunction0(ju_ArrayList_clear)],
 otrf_VirtualFileSystem, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_IllegalMonitorStateException, "IllegalMonitorStateException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_IllegalMonitorStateException__init_)],
-jur_CompositeQuantifierSet, "CompositeQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_77", $rt_wrapFunction4(jur_CompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_CompositeQuantifierSet_matches), "$getName", $rt_wrapFunction0(jur_CompositeQuantifierSet_getName)],
+jur_CompositeQuantifierSet, "CompositeQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_78", $rt_wrapFunction4(jur_CompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_CompositeQuantifierSet_matches), "$getName", $rt_wrapFunction0(jur_CompositeQuantifierSet_getName)],
 jm_Division, 0, jl_Object, [], 0, 0, 0, 0,
 jm_BitLevel, 0, jl_Object, [], 0, 0, 0, 0,
-jur_SupplRangeSet, "SupplRangeSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_80", $rt_wrapFunction1(jur_SupplRangeSet__init_), "$matches", $rt_wrapFunction3(jur_SupplRangeSet_matches), "$getName", $rt_wrapFunction0(jur_SupplRangeSet_getName), "$contains1", $rt_wrapFunction1(jur_SupplRangeSet_contains), "$first", $rt_wrapFunction1(jur_SupplRangeSet_first), "$getChars", $rt_wrapFunction0(jur_SupplRangeSet_getChars), "$setNext", $rt_wrapFunction1(jur_SupplRangeSet_setNext), "$hasConsumed", $rt_wrapFunction1(jur_SupplRangeSet_hasConsumed)],
+jur_SupplRangeSet, "SupplRangeSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction1(jur_SupplRangeSet__init_), "$matches", $rt_wrapFunction3(jur_SupplRangeSet_matches), "$getName", $rt_wrapFunction0(jur_SupplRangeSet_getName), "$contains1", $rt_wrapFunction1(jur_SupplRangeSet_contains), "$first", $rt_wrapFunction1(jur_SupplRangeSet_first), "$getChars", $rt_wrapFunction0(jur_SupplRangeSet_getChars), "$setNext", $rt_wrapFunction1(jur_SupplRangeSet_setNext), "$hasConsumed", $rt_wrapFunction1(jur_SupplRangeSet_hasConsumed)],
 jur_RelAltGroupQuantifierSet, "RelAltGroupQuantifierSet", 2, jur_AltGroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_RelAltGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_RelAltGroupQuantifierSet_matches)],
 jl_String, "String", 4, jl_Object, [ji_Serializable, jl_Comparable, jl_CharSequence], 17, 0, () => jl_String_$callClinit(), ["$_init_0", $rt_wrapFunction0(jl_String__init_4), "$_init_30", $rt_wrapFunction1(jl_String__init_1), "$_init_2", $rt_wrapFunction1(jl_String__init_5), "$_init_18", $rt_wrapFunction3(jl_String__init_3), "$charAt", $rt_wrapFunction1(jl_String_charAt), "$length", $rt_wrapFunction0(jl_String_length), "$isEmpty", $rt_wrapFunction0(jl_String_isEmpty), "$startsWith1", $rt_wrapFunction2(jl_String_startsWith0),
 "$startsWith", $rt_wrapFunction1(jl_String_startsWith), "$regionMatches", function(var_1, var_2, var_3, var_4, var_5) { return jl_String_regionMatches(this, var_1, var_2, var_3, var_4, var_5); }, "$indexOf", $rt_wrapFunction2(jl_String_indexOf), "$indexOf0", $rt_wrapFunction1(jl_String_indexOf0), "$lastIndexOf2", $rt_wrapFunction2(jl_String_lastIndexOf), "$lastIndexOf", $rt_wrapFunction1(jl_String_lastIndexOf0), "$indexOf2", $rt_wrapFunction2(jl_String_indexOf1), "$lastIndexOf1", $rt_wrapFunction2(jl_String_lastIndexOf1),
 "$substring", $rt_wrapFunction2(jl_String_substring), "$substring0", $rt_wrapFunction1(jl_String_substring0), "$subSequence", $rt_wrapFunction2(jl_String_subSequence), "$replace0", $rt_wrapFunction2(jl_String_replace0), "$contains0", $rt_wrapFunction1(jl_String_contains), "$replace", $rt_wrapFunction2(jl_String_replace), "$trim", $rt_wrapFunction0(jl_String_trim), "$toString", $rt_wrapFunction0(jl_String_toString), "$toCharArray", $rt_wrapFunction0(jl_String_toCharArray), "$equals", $rt_wrapFunction1(jl_String_equals),
 "$hashCode0", $rt_wrapFunction0(jl_String_hashCode), "$toLowerCase0", $rt_wrapFunction0(jl_String_toLowerCase), "$toUpperCase1", $rt_wrapFunction0(jl_String_toUpperCase), "$split", $rt_wrapFunction1(jl_String_split), "$split2", $rt_wrapFunction2(jl_String_split0), "$replaceAll", $rt_wrapFunction2(jl_String_replaceAll)],
-nmcgs_TitleScreen, "TitleScreen", 18, nmcgs_Screen, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen__init_0), "$init", $rt_wrapFunction0(nmcgs_TitleScreen_init0), "$init0", $rt_wrapFunction3(nmcgs_TitleScreen_init), "$render", $rt_wrapFunction4(nmcgs_TitleScreen_render), "$isPauseScreen", $rt_wrapFunction0(nmcgs_TitleScreen_isPauseScreen), "$shouldBlurBackground", $rt_wrapFunction0(nmcgs_TitleScreen_shouldBlurBackground), "$tick", $rt_wrapFunction0(nmcgs_TitleScreen_tick), "$removed", $rt_wrapFunction0(nmcgs_TitleScreen_removed)],
-nmcgsm_EditServerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_85", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_0_onPress)],
-nmcgsm_EditServerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_85", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1_onPress)],
-jur_FSet$PossessiveFSet, "FSet$PossessiveFSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_FSet$PossessiveFSet__init_), "$matches", $rt_wrapFunction3(jur_FSet$PossessiveFSet_matches), "$getName", $rt_wrapFunction0(jur_FSet$PossessiveFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_FSet$PossessiveFSet_hasConsumed)]]);
-$rt_metadata([jur_PosCompositeGroupQuantifierSet, "PosCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_50", function(var_1, var_2, var_3, var_4, var_5) { jur_PosCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_PosCompositeGroupQuantifierSet_matches)],
-nmwlb_Blocks$Block, "Blocks$Block", 14, jl_Object, [], 17, 0, 0, ["$_init_68", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor)],
+nmcgs_TitleScreen, "TitleScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen__init_0), "$init", $rt_wrapFunction0(nmcgs_TitleScreen_init0), "$init0", $rt_wrapFunction3(nmcgs_TitleScreen_init), "$render", $rt_wrapFunction4(nmcgs_TitleScreen_render), "$isPauseScreen", $rt_wrapFunction0(nmcgs_TitleScreen_isPauseScreen), "$shouldBlurBackground", $rt_wrapFunction0(nmcgs_TitleScreen_shouldBlurBackground), "$tick", $rt_wrapFunction0(nmcgs_TitleScreen_tick), "$removed", $rt_wrapFunction0(nmcgs_TitleScreen_removed)]]);
+$rt_metadata([nmcgsm_EditServerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_86", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_0_onPress)],
+nmcgsm_EditServerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_86", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1_onPress)],
+jur_FSet$PossessiveFSet, "FSet$PossessiveFSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_FSet$PossessiveFSet__init_), "$matches", $rt_wrapFunction3(jur_FSet$PossessiveFSet_matches), "$getName", $rt_wrapFunction0(jur_FSet$PossessiveFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_FSet$PossessiveFSet_hasConsumed)],
+jur_PosCompositeGroupQuantifierSet, "PosCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_51", function(var_1, var_2, var_3, var_4, var_5) { jur_PosCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_PosCompositeGroupQuantifierSet_matches)],
+nmwlb_Blocks$Block, "Blocks$Block", 15, jl_Object, [], 17, 0, 0, ["$_init_69", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor)],
 jt_DecimalFormat$TextField, "DecimalFormat$TextField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_", $rt_wrapFunction1(jt_DecimalFormat$TextField__init_0), "$render0", $rt_wrapFunction2(jt_DecimalFormat$TextField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$TextField_equals)],
-nmcgso_OptionsScreen, "OptionsScreen", 19, nmcgs_Screen, [], 1, 0, () => nmcgso_OptionsScreen_$callClinit(), ["$_init_53", $rt_wrapFunction3(nmcgso_OptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_OptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_OptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_OptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_OptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_OptionsScreen_isPauseScreen)],
+nmcgso_OptionsScreen, "OptionsScreen", 20, nmcgs_Screen, [], 1, 0, () => nmcgso_OptionsScreen_$callClinit(), ["$_init_54", $rt_wrapFunction3(nmcgso_OptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_OptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_OptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_OptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_OptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_OptionsScreen_isPauseScreen)],
 nmcm_ServerList, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcm_ServerList__init_), "$load", $rt_wrapFunction0(nmcm_ServerList_load), "$save", $rt_wrapFunction0(nmcm_ServerList_save), "$size", $rt_wrapFunction0(nmcm_ServerList_size), "$get3", $rt_wrapFunction1(nmcm_ServerList_get), "$add5", $rt_wrapFunction1(nmcm_ServerList_add), "$remove3", $rt_wrapFunction1(nmcm_ServerList_remove), "$replace1", $rt_wrapFunction2(nmcm_ServerList_replace)],
 jur_MultiLineEOLSet, "MultiLineEOLSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_MultiLineEOLSet__init_), "$matches", $rt_wrapFunction3(jur_MultiLineEOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_MultiLineEOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_MultiLineEOLSet_getName)],
 cmbs_RenderSystem, 0, jl_Object, [], 1, 0, () => cmbs_RenderSystem_$callClinit(), 0,
-nmcgc_EditBox, "EditBox", 17, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_61", function(var_1, var_2, var_3, var_4, var_5) { nmcgc_EditBox__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getValue1", $rt_wrapFunction0(nmcgc_EditBox_getValue), "$setValue0", $rt_wrapFunction1(nmcgc_EditBox_setValue), "$setFocused", $rt_wrapFunction1(nmcgc_EditBox_setFocused), "$isFocused", $rt_wrapFunction0(nmcgc_EditBox_isFocused), "$mouseClicked", $rt_wrapFunction3(nmcgc_EditBox_mouseClicked), "$onClick", $rt_wrapFunction0(nmcgc_EditBox_onClick),
+nmcgc_EditBox, "EditBox", 18, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_62", function(var_1, var_2, var_3, var_4, var_5) { nmcgc_EditBox__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getValue1", $rt_wrapFunction0(nmcgc_EditBox_getValue), "$setValue0", $rt_wrapFunction1(nmcgc_EditBox_setValue), "$setFocused", $rt_wrapFunction1(nmcgc_EditBox_setFocused), "$isFocused", $rt_wrapFunction0(nmcgc_EditBox_isFocused), "$mouseClicked", $rt_wrapFunction3(nmcgc_EditBox_mouseClicked), "$onClick", $rt_wrapFunction0(nmcgc_EditBox_onClick),
 "$charTyped", $rt_wrapFunction1(nmcgc_EditBox_charTyped), "$keyPressed0", $rt_wrapFunction1(nmcgc_EditBox_keyPressed), "$render", $rt_wrapFunction4(nmcgc_EditBox_render)],
-nmcgsm_DirectConnectScreen$1, "DirectConnectScreen$1", 21, nmcgc_EditBox, [], 0, 0, 0, ["$_init_86", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_DirectConnectScreen$1__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_DirectConnectScreen$1_getTelemetryId)],
-nmcgsi_InventoryScreen, "InventoryScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgsi_InventoryScreen__init_), "$init", $rt_wrapFunction0(nmcgsi_InventoryScreen_init), "$render", $rt_wrapFunction4(nmcgsi_InventoryScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsi_InventoryScreen_mouseClicked), "$mouseMoved", $rt_wrapFunction2(nmcgsi_InventoryScreen_mouseMoved), "$keyPressed", $rt_wrapFunction3(nmcgsi_InventoryScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgsi_InventoryScreen_isPauseScreen)],
+nmcgsm_DirectConnectScreen$1, "DirectConnectScreen$1", 22, nmcgc_EditBox, [], 0, 0, 0, ["$_init_87", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_DirectConnectScreen$1__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_DirectConnectScreen$1_getTelemetryId)],
+nmcgsi_InventoryScreen, "InventoryScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgsi_InventoryScreen__init_), "$init", $rt_wrapFunction0(nmcgsi_InventoryScreen_init), "$getCraftingContainer", $rt_wrapFunction0(nmcgsi_InventoryScreen_getCraftingContainer), "$onClose", $rt_wrapFunction0(nmcgsi_InventoryScreen_onClose), "$render", $rt_wrapFunction4(nmcgsi_InventoryScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsi_InventoryScreen_mouseClicked), "$mouseMoved", $rt_wrapFunction2(nmcgsi_InventoryScreen_mouseMoved),
+"$keyPressed", $rt_wrapFunction3(nmcgsi_InventoryScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgsi_InventoryScreen_isPauseScreen)],
 ju_Queue, 0, jl_Object, [ju_Collection], 1537, 0, 0, 0,
 ju_Deque, 0, jl_Object, [ju_Queue, ju_SequencedCollection], 1537, 0, 0, 0,
 ju_ArrayDeque, 0, ju_AbstractCollection, [ju_Deque, jl_Cloneable, ji_Serializable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_ArrayDeque__init_0), "$_init_5", $rt_wrapFunction1(ju_ArrayDeque__init_), "$addFirst", $rt_wrapFunction1(ju_ArrayDeque_addFirst), "$addLast", $rt_wrapFunction1(ju_ArrayDeque_addLast), "$removeFirst", $rt_wrapFunction0(ju_ArrayDeque_removeFirst), "$pollFirst", $rt_wrapFunction0(ju_ArrayDeque_pollFirst), "$add", $rt_wrapFunction1(ju_ArrayDeque_add), "$remove", $rt_wrapFunction0(ju_ArrayDeque_remove),
 "$push", $rt_wrapFunction1(ju_ArrayDeque_push), "$size", $rt_wrapFunction0(ju_ArrayDeque_size), "$isEmpty", $rt_wrapFunction0(ju_ArrayDeque_isEmpty)],
 jur_AbstractCharClass$LazyJavaDigit$1, "AbstractCharClass$LazyJavaDigit$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_29", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDigit$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDigit$1_contains)],
-nmcm_GameConfig$UserData, 0, jl_Object, [], 1, 0, 0, ["$_init_108", $rt_wrapFunction2(nmcm_GameConfig$UserData__init_)],
+nmcm_GameConfig$UserData, 0, jl_Object, [], 1, 0, 0, ["$_init_109", $rt_wrapFunction2(nmcm_GameConfig$UserData__init_)],
 nmc_Direction, 0, jl_Object, [], 17, 0, () => nmc_Direction_$callClinit(), ["$getName", $rt_wrapFunction0(nmc_Direction_getName)],
-jt_DecimalFormatSymbols, 0, jl_Object, [jl_Cloneable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormatSymbols__init_1), "$_init_42", $rt_wrapFunction1(jt_DecimalFormatSymbols__init_0), "$getZeroDigit", $rt_wrapFunction0(jt_DecimalFormatSymbols_getZeroDigit), "$getGroupingSeparator", $rt_wrapFunction0(jt_DecimalFormatSymbols_getGroupingSeparator), "$getPerMill", $rt_wrapFunction0(jt_DecimalFormatSymbols_getPerMill), "$getPercent", $rt_wrapFunction0(jt_DecimalFormatSymbols_getPercent), "$getLocale", $rt_wrapFunction0(jt_DecimalFormatSymbols_getLocale),
+jt_DecimalFormatSymbols, 0, jl_Object, [jl_Cloneable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormatSymbols__init_1), "$_init_43", $rt_wrapFunction1(jt_DecimalFormatSymbols__init_0), "$getZeroDigit", $rt_wrapFunction0(jt_DecimalFormatSymbols_getZeroDigit), "$getGroupingSeparator", $rt_wrapFunction0(jt_DecimalFormatSymbols_getGroupingSeparator), "$getPerMill", $rt_wrapFunction0(jt_DecimalFormatSymbols_getPerMill), "$getPercent", $rt_wrapFunction0(jt_DecimalFormatSymbols_getPercent), "$getLocale", $rt_wrapFunction0(jt_DecimalFormatSymbols_getLocale),
 "$getDecimalSeparator", $rt_wrapFunction0(jt_DecimalFormatSymbols_getDecimalSeparator), "$getNaN", $rt_wrapFunction0(jt_DecimalFormatSymbols_getNaN), "$getInfinity", $rt_wrapFunction0(jt_DecimalFormatSymbols_getInfinity), "$getMinusSign", $rt_wrapFunction0(jt_DecimalFormatSymbols_getMinusSign), "$getExponentSeparator", $rt_wrapFunction0(jt_DecimalFormatSymbols_getExponentSeparator), "$clone0", $rt_wrapFunction0(jt_DecimalFormatSymbols_clone)],
 ju_HashMap$AbstractMapIterator, 0, jl_Object, [], 0, 0, 0, ["$_init_15", $rt_wrapFunction1(ju_HashMap$AbstractMapIterator__init_), "$hasNext", $rt_wrapFunction0(ju_HashMap$AbstractMapIterator_hasNext), "$checkConcurrentMod", $rt_wrapFunction0(ju_HashMap$AbstractMapIterator_checkConcurrentMod), "$makeNext", $rt_wrapFunction0(ju_HashMap$AbstractMapIterator_makeNext)],
-nmwep_Inventory, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmwep_Inventory__init_), "$addItem", $rt_wrapFunction1(nmwep_Inventory_addItem), "$getSelectedBlock", $rt_wrapFunction0(nmwep_Inventory_getSelectedBlock), "$consumeSelected", $rt_wrapFunction0(nmwep_Inventory_consumeSelected), "$consumeSlot", $rt_wrapFunction1(nmwep_Inventory_consumeSlot), "$getSelected", $rt_wrapFunction0(nmwep_Inventory_getSelected), "$setSelected", $rt_wrapFunction1(nmwep_Inventory_setSelected), "$getCount", $rt_wrapFunction1(nmwep_Inventory_getCount),
-"$getBlockId", $rt_wrapFunction1(nmwep_Inventory_getBlockId), "$setSlot", $rt_wrapFunction3(nmwep_Inventory_setSlot), "$getCarriedBlock", $rt_wrapFunction0(nmwep_Inventory_getCarriedBlock), "$getCarriedCount", $rt_wrapFunction0(nmwep_Inventory_getCarriedCount), "$setCarried", $rt_wrapFunction2(nmwep_Inventory_setCarried), "$clickSlot", $rt_wrapFunction2(nmwep_Inventory_clickSlot), "$quickMove", $rt_wrapFunction1(nmwep_Inventory_quickMove), "$creativePickup", $rt_wrapFunction2(nmwep_Inventory_creativePickup),
-"$telemetrySetSlot", $rt_wrapFunction3(nmwep_Inventory_telemetrySetSlot)],
+nmwep_Inventory, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmwep_Inventory__init_), "$addItem0", $rt_wrapFunction1(nmwep_Inventory_addItem), "$addItem", $rt_wrapFunction3(nmwep_Inventory_addItem0), "$getSelectedBlock", $rt_wrapFunction0(nmwep_Inventory_getSelectedBlock), "$consumeSelected", $rt_wrapFunction0(nmwep_Inventory_consumeSelected), "$consumeSlot", $rt_wrapFunction1(nmwep_Inventory_consumeSlot), "$swapPaint", $rt_wrapFunction1(nmwep_Inventory_swapPaint), "$getSelected", $rt_wrapFunction0(nmwep_Inventory_getSelected),
+"$setSelected", $rt_wrapFunction1(nmwep_Inventory_setSelected), "$getCount", $rt_wrapFunction1(nmwep_Inventory_getCount), "$getBlockId", $rt_wrapFunction1(nmwep_Inventory_getBlockId), "$setSlot", $rt_wrapFunction3(nmwep_Inventory_setSlot), "$getCarriedBlock", $rt_wrapFunction0(nmwep_Inventory_getCarriedBlock), "$getCarriedCount", $rt_wrapFunction0(nmwep_Inventory_getCarriedCount), "$setCarried", $rt_wrapFunction2(nmwep_Inventory_setCarried), "$clickSlot", $rt_wrapFunction2(nmwep_Inventory_clickSlot), "$quickMove",
+$rt_wrapFunction1(nmwep_Inventory_quickMove), "$creativePickup", $rt_wrapFunction2(nmwep_Inventory_creativePickup), "$telemetrySetSlot", $rt_wrapFunction3(nmwep_Inventory_telemetrySetSlot)],
 jl_NullPointerException, "NullPointerException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(jl_NullPointerException__init_2), "$_init_0", $rt_wrapFunction0(jl_NullPointerException__init_1)],
 jl_AutoCloseable, 0, jl_Object, [], 1537, 0, 0, 0,
 ji_Closeable, 0, jl_Object, [jl_AutoCloseable], 1537, 0, 0, 0,
-ju_Formatter, 0, jl_Object, [ji_Closeable, ji_Flushable], 17, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Formatter__init_1), "$_init_42", $rt_wrapFunction1(ju_Formatter__init_0), "$_init_63", $rt_wrapFunction2(ju_Formatter__init_), "$toString", $rt_wrapFunction0(ju_Formatter_toString), "$format4", $rt_wrapFunction2(ju_Formatter_format), "$format5", $rt_wrapFunction3(ju_Formatter_format0)],
+ju_Formatter, 0, jl_Object, [ji_Closeable, ji_Flushable], 17, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_Formatter__init_1), "$_init_43", $rt_wrapFunction1(ju_Formatter__init_0), "$_init_64", $rt_wrapFunction2(ju_Formatter__init_), "$toString", $rt_wrapFunction0(ju_Formatter_toString), "$format4", $rt_wrapFunction2(ju_Formatter_format), "$format5", $rt_wrapFunction3(ju_Formatter_format0)],
 jur_AbstractCharClass$LazyJavaSpaceChar$1, "AbstractCharClass$LazyJavaSpaceChar$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_36", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaSpaceChar$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaSpaceChar$1_contains)],
 ju_IllegalFormatPrecisionException, "IllegalFormatPrecisionException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_5", $rt_wrapFunction1(ju_IllegalFormatPrecisionException__init_)],
 cmap_PropertyMap, 0, cgcc_ForwardingMultimap, [], 1, 0, () => cmap_PropertyMap_$callClinit(), ["$_init_0", $rt_wrapFunction0(cmap_PropertyMap__init_)],
@@ -38427,9 +39539,9 @@ jl_Object$Monitor, 0, jl_Object, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_
 jl_Math, 0, jl_Object, [], 17, 0, 0, 0,
 otji_JSWrapper$Helper$FinalizationRegistryConsumer, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlevi_PlatformInput$WheelCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-nmc_User, 0, jl_Object, [], 1, 0, 0, ["$_init_107", function(var_1, var_2, var_3, var_4, var_5) { nmc_User__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getName", $rt_wrapFunction0(nmc_User_getName)],
+nmc_User, 0, jl_Object, [], 1, 0, 0, ["$_init_108", function(var_1, var_2, var_3, var_4, var_5) { nmc_User__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getName", $rt_wrapFunction0(nmc_User_getName)],
 jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierPart_computeValue)],
-jur_PatternSyntaxException, "PatternSyntaxException", 2, jl_IllegalArgumentException, [], 1, 0, 0, ["$_init_70", $rt_wrapFunction3(jur_PatternSyntaxException__init_0), "$getMessage", $rt_wrapFunction0(jur_PatternSyntaxException_getMessage)],
+jur_PatternSyntaxException, "PatternSyntaxException", 2, jl_IllegalArgumentException, [], 1, 0, 0, ["$_init_71", $rt_wrapFunction3(jur_PatternSyntaxException__init_0), "$getMessage", $rt_wrapFunction0(jur_PatternSyntaxException_getMessage)],
 nmwp_BlockHitResult, 0, jl_Object, [], 1, 0, 0, 0,
 jur_AbstractCharClass$LazyJavaDefined, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDefined__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaDefined_computeValue)],
 nmwlb_Blocks, 0, jl_Object, [], 17, 0, () => nmwlb_Blocks_$callClinit(), 0,
@@ -38439,41 +39551,41 @@ nleva_MenuBlurRenderer, 0, jl_Object, [], 17, 0, () => nleva_MenuBlurRenderer_$c
 otjde_EventTarget, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nmcgso_KeyBindsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_KeyBindsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_KeyBindsScreen$init$lambda$_1_0_onPress)],
 nlevi_PlatformRuntime$VisibilityChangeCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-nmcgso_KeyBindsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_120", $rt_wrapFunction1(nmcgso_KeyBindsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_KeyBindsScreen$init$lambda$_1_1_onPress)],
+nmcgso_KeyBindsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_122", $rt_wrapFunction1(nmcgso_KeyBindsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_KeyBindsScreen$init$lambda$_1_1_onPress)],
 ju_Formattable, 0, jl_Object, [], 1537, 0, 0, 0,
 jur_PosAltGroupQuantifierSet, "PosAltGroupQuantifierSet", 2, jur_AltGroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_PosAltGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PosAltGroupQuantifierSet_matches), "$setNext", $rt_wrapFunction1(jur_PosAltGroupQuantifierSet_setNext)],
-oj_Matrix4fStack, 0, oj_Matrix4f, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(oj_Matrix4fStack__init_)],
-ju_Collections$13, 0, ju_AbstractMap, [], 0, 0, 0, ["$_init_3", $rt_wrapFunction1(ju_Collections$13__init_)],
+oj_Matrix4fStack, 0, oj_Matrix4f, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(oj_Matrix4fStack__init_)]]);
+$rt_metadata([ju_Collections$13, 0, ju_AbstractMap, [], 0, 0, 0, ["$_init_3", $rt_wrapFunction1(ju_Collections$13__init_)],
 cmbv_PoseStack, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(cmbv_PoseStack__init_)],
-nmcgso_SoundOptionsScreen$VolumeSlider, "SoundOptionsScreen$VolumeSlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_100", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgso_SoundOptionsScreen$VolumeSlider__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$displayString", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_getTelemetryId)]]);
-$rt_metadata([jur_AbstractCharClass$LazyJavaLetterOrDigit, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit_computeValue)],
+nmcgso_SoundOptionsScreen$VolumeSlider, "SoundOptionsScreen$VolumeSlider", 20, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_101", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgso_SoundOptionsScreen$VolumeSlider__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$displayString", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$VolumeSlider_getTelemetryId)],
+jur_AbstractCharClass$LazyJavaLetterOrDigit, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLetterOrDigit_computeValue)],
 nmcgc_CycleButton$OnValueChange, 0, jl_Object, [], 1537, 0, 0, 0,
 otciu_UnicodeHelper$Range, "UnicodeHelper$Range", 9, jl_Object, [], 1, 0, 0, ["$_init_35", $rt_wrapFunction3(otciu_UnicodeHelper$Range__init_)],
 jur_AbstractLineTerminator$2, 0, jur_AbstractLineTerminator, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator$2__init_), "$isLineTerminator", $rt_wrapFunction1(jur_AbstractLineTerminator$2_isLineTerminator), "$isAfterLineTerminator", $rt_wrapFunction2(jur_AbstractLineTerminator$2_isAfterLineTerminator)],
 otciu_CharMapping, 0, jl_Object, [], 1, 0, 0, ["$_init_34", $rt_wrapFunction2(otciu_CharMapping__init_)],
 jur_AbstractLineTerminator$1, 0, jur_AbstractLineTerminator, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractLineTerminator$1__init_), "$isLineTerminator", $rt_wrapFunction1(jur_AbstractLineTerminator$1_isLineTerminator), "$isAfterLineTerminator", $rt_wrapFunction2(jur_AbstractLineTerminator$1_isAfterLineTerminator)],
 jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUnicodeIdentifierStart_computeValue)],
-nmcgsm_EditServerScreen, "EditServerScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_116", $rt_wrapFunction3(nmcgsm_EditServerScreen__init_0), "$init", $rt_wrapFunction0(nmcgsm_EditServerScreen_init), "$render", $rt_wrapFunction4(nmcgsm_EditServerScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_EditServerScreen_mouseClicked), "$charTyped0", $rt_wrapFunction2(nmcgsm_EditServerScreen_charTyped), "$keyPressed", $rt_wrapFunction3(nmcgsm_EditServerScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_EditServerScreen_onClose),
+nmcgsm_EditServerScreen, "EditServerScreen", 22, nmcgs_Screen, [], 1, 0, 0, ["$_init_118", $rt_wrapFunction3(nmcgsm_EditServerScreen__init_0), "$init", $rt_wrapFunction0(nmcgsm_EditServerScreen_init), "$render", $rt_wrapFunction4(nmcgsm_EditServerScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_EditServerScreen_mouseClicked), "$charTyped0", $rt_wrapFunction2(nmcgsm_EditServerScreen_charTyped), "$keyPressed", $rt_wrapFunction3(nmcgsm_EditServerScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_EditServerScreen_onClose),
 "$isPauseScreen", $rt_wrapFunction0(nmcgsm_EditServerScreen_isPauseScreen)],
-nmcgsm_DirectConnectScreen, "DirectConnectScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_54", $rt_wrapFunction1(nmcgsm_DirectConnectScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_DirectConnectScreen_init), "$render", $rt_wrapFunction4(nmcgsm_DirectConnectScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_DirectConnectScreen_mouseClicked), "$charTyped0", $rt_wrapFunction2(nmcgsm_DirectConnectScreen_charTyped), "$keyPressed", $rt_wrapFunction3(nmcgsm_DirectConnectScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_DirectConnectScreen_onClose),
+nmcgsm_DirectConnectScreen, "DirectConnectScreen", 22, nmcgs_Screen, [], 1, 0, 0, ["$_init_55", $rt_wrapFunction1(nmcgsm_DirectConnectScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_DirectConnectScreen_init), "$render", $rt_wrapFunction4(nmcgsm_DirectConnectScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_DirectConnectScreen_mouseClicked), "$charTyped0", $rt_wrapFunction2(nmcgsm_DirectConnectScreen_charTyped), "$keyPressed", $rt_wrapFunction3(nmcgsm_DirectConnectScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgsm_DirectConnectScreen_onClose),
 "$isPauseScreen", $rt_wrapFunction0(nmcgsm_DirectConnectScreen_isPauseScreen)],
 nlev_WorldStorage, 0, jl_Object, [], 17, 0, 0, 0,
 otjc_JSWeakRef, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 otci_CharFlow, 0, jl_Object, [], 1, 0, 0, ["$_init_30", $rt_wrapFunction1(otci_CharFlow__init_)],
-jur_RangeSet, "RangeSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_80", $rt_wrapFunction1(jur_RangeSet__init_), "$accepts", $rt_wrapFunction2(jur_RangeSet_accepts), "$getName", $rt_wrapFunction0(jur_RangeSet_getName), "$first", $rt_wrapFunction1(jur_RangeSet_first), "$getChars", $rt_wrapFunction0(jur_RangeSet_getChars)],
+jur_RangeSet, "RangeSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction1(jur_RangeSet__init_), "$accepts", $rt_wrapFunction2(jur_RangeSet_accepts), "$getName", $rt_wrapFunction0(jur_RangeSet_getName), "$first", $rt_wrapFunction1(jur_RangeSet_first), "$getChars", $rt_wrapFunction0(jur_RangeSet_getChars)],
 jur_UnicodeCategory, "UnicodeCategory", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_UnicodeCategory__init_), "$contains1", $rt_wrapFunction1(jur_UnicodeCategory_contains)],
 jur_UnicodeCategoryScope, "UnicodeCategoryScope", 2, jur_UnicodeCategory, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_UnicodeCategoryScope__init_), "$contains1", $rt_wrapFunction1(jur_UnicodeCategoryScope_contains)],
-nmcgc_Button, "Button", 17, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_32", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgc_Button__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$setIcon", $rt_wrapFunction1(nmcgc_Button_setIcon), "$render", $rt_wrapFunction4(nmcgc_Button_render), "$onClick", $rt_wrapFunction0(nmcgc_Button_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgc_Button_getTelemetryId)],
-nmcgc_CycleButton, "CycleButton", 17, nmcgc_Button, [], 1, 0, 0, ["$_init_102", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgc_CycleButton__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$getIndex", $rt_wrapFunction0(nmcgc_CycleButton_getIndex), "$getValue1", $rt_wrapFunction0(nmcgc_CycleButton_getValue), "$setIndex", $rt_wrapFunction1(nmcgc_CycleButton_setIndex), "$onClick", $rt_wrapFunction0(nmcgc_CycleButton_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgc_CycleButton_getTelemetryId)],
+nmcgc_Button, "Button", 18, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_32", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgc_Button__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$setIcon", $rt_wrapFunction1(nmcgc_Button_setIcon), "$render", $rt_wrapFunction4(nmcgc_Button_render), "$onClick", $rt_wrapFunction0(nmcgc_Button_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgc_Button_getTelemetryId)],
+nmcgc_CycleButton, "CycleButton", 18, nmcgc_Button, [], 1, 0, 0, ["$_init_103", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcgc_CycleButton__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }, "$getIndex", $rt_wrapFunction0(nmcgc_CycleButton_getIndex), "$getValue1", $rt_wrapFunction0(nmcgc_CycleButton_getValue), "$setIndex", $rt_wrapFunction1(nmcgc_CycleButton_setIndex), "$onClick", $rt_wrapFunction0(nmcgc_CycleButton_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgc_CycleButton_getTelemetryId)],
 nmcr_GameRenderer$Camera, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcr_GameRenderer$Camera__init_)],
 otjt_Float32Array, 0, otjt_TypedArray, [], 1, 0, 0, 0,
 nmcgso_KeyBindsScreen$1, 0, jl_Object, [], 32768, 0, () => nmcgso_KeyBindsScreen$1_$callClinit(), 0,
-nlevi_PlatformNetworking, "PlatformNetworking", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformNetworking_$callClinit(), 0,
-jur_CharClass, "CharClass", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_CharClass__init_2), "$_init_71", $rt_wrapFunction2(jur_CharClass__init_0), "$_init_79", $rt_wrapFunction3(jur_CharClass__init_1), "$add0", $rt_wrapFunction1(jur_CharClass_add), "$add4", $rt_wrapFunction1(jur_CharClass_add1), "$add1", $rt_wrapFunction2(jur_CharClass_add0), "$union", $rt_wrapFunction1(jur_CharClass_union), "$intersection", $rt_wrapFunction1(jur_CharClass_intersection), "$contains1", $rt_wrapFunction1(jur_CharClass_contains),
+nlevi_PlatformNetworking, "PlatformNetworking", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformNetworking_$callClinit(), 0,
+jur_CharClass, "CharClass", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_CharClass__init_2), "$_init_72", $rt_wrapFunction2(jur_CharClass__init_0), "$_init_80", $rt_wrapFunction3(jur_CharClass__init_1), "$add0", $rt_wrapFunction1(jur_CharClass_add), "$add4", $rt_wrapFunction1(jur_CharClass_add1), "$add1", $rt_wrapFunction2(jur_CharClass_add0), "$union", $rt_wrapFunction1(jur_CharClass_union), "$intersection", $rt_wrapFunction1(jur_CharClass_intersection), "$contains1", $rt_wrapFunction1(jur_CharClass_contains),
 "$getBits", $rt_wrapFunction0(jur_CharClass_getBits), "$getLowHighSurrogates", $rt_wrapFunction0(jur_CharClass_getLowHighSurrogates), "$getInstance", $rt_wrapFunction0(jur_CharClass_getInstance), "$toString", $rt_wrapFunction0(jur_CharClass_toString), "$hasUCI", $rt_wrapFunction0(jur_CharClass_hasUCI)],
-nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2_onChange)],
+nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_2_onChange)],
 cgcc_Maps, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1_onChange)],
+nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_1_onChange)],
 otcit_DoubleSynthesizer, 0, jl_Object, [], 17, 0, () => otcit_DoubleSynthesizer_$callClinit(), 0,
 nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0_onPress)],
 otcit_FloatAnalyzer$Result, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(otcit_FloatAnalyzer$Result__init_)],
@@ -38481,60 +39593,60 @@ jur_UCIDecomposedCharSet, "UCIDecomposedCharSet", 2, jur_DecomposedCharSet, [], 
 otrr_ClassInfo, 0, otrr_ReflectionInfo, [], 17, 0, 0, ["$newArrayInstance", $rt_wrapFunction1(otrr_ClassInfo_newArrayInstance)],
 otrfm_InMemoryVirtualFileSystem, 0, jl_Object, [otrf_VirtualFileSystem], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(otrfm_InMemoryVirtualFileSystem__init_), "$isWindows", $rt_wrapFunction0(otrfm_InMemoryVirtualFileSystem_isWindows)],
 nlevi_PlatformInput$updateTouchState$lambda$_61_0, 0, jl_Object, [nlevi_PlatformInput$TouchUpdateCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$updateTouchState$lambda$_61_0__init_), "$call", $rt_wrapFunction4(nlevi_PlatformInput$updateTouchState$lambda$_61_0_call)],
-nmc_KeyMapping, "KeyMapping", 15, jl_Object, [], 1, 0, () => nmc_KeyMapping_$callClinit(), ["$getKey0", $rt_wrapFunction0(nmc_KeyMapping_getKey), "$setKey", $rt_wrapFunction1(nmc_KeyMapping_setKey), "$reset0", $rt_wrapFunction0(nmc_KeyMapping_reset), "$isDown", $rt_wrapFunction0(nmc_KeyMapping_isDown), "$keyName0", $rt_wrapFunction0(nmc_KeyMapping_keyName)],
-nmcgso_OptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_57", $rt_wrapFunction1(nmcgso_OptionsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_OptionsScreen$init$lambda$_1_0_onPress)],
-jur_AbstractCharClass$LazyJavaWhitespace$1, "AbstractCharClass$LazyJavaWhitespace$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_125", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaWhitespace$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaWhitespace$1_contains)],
+nmc_KeyMapping, "KeyMapping", 16, jl_Object, [], 1, 0, () => nmc_KeyMapping_$callClinit(), ["$getKey0", $rt_wrapFunction0(nmc_KeyMapping_getKey), "$setKey", $rt_wrapFunction1(nmc_KeyMapping_setKey), "$reset0", $rt_wrapFunction0(nmc_KeyMapping_reset), "$isDown", $rt_wrapFunction0(nmc_KeyMapping_isDown), "$keyName0", $rt_wrapFunction0(nmc_KeyMapping_keyName)],
+nmcgso_OptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_58", $rt_wrapFunction1(nmcgso_OptionsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_OptionsScreen$init$lambda$_1_0_onPress)],
+jur_AbstractCharClass$LazyJavaWhitespace$1, "AbstractCharClass$LazyJavaWhitespace$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_127", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaWhitespace$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaWhitespace$1_contains)],
 jur_AbstractCharClass$LazyJavaJavaIdentifierStart, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaJavaIdentifierStart__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaJavaIdentifierStart_computeValue)],
-nmcgs_CreateWorldScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_0_onPress)],
+nmcgs_CreateWorldScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_0_onPress)],
 cmbs_SamplerCache, 0, jl_Object, [], 1, 0, () => cmbs_SamplerCache_$callClinit(), ["$_init_0", $rt_wrapFunction0(cmbs_SamplerCache__init_)],
-nmcgs_CreateWorldScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_1_onPress)],
+nmcgs_CreateWorldScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$init$lambda$_1_1_onPress)],
 nmcgc_CycleButton$_init_$lambda$_0_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgc_CycleButton$_init_$lambda$_0_0__init_), "$onPress", $rt_wrapFunction1(nmcgc_CycleButton$_init_$lambda$_0_0_onPress)],
-nmcm_GameConfig, 0, jl_Object, [], 1, 0, 0, ["$_init_111", function(var_1, var_2, var_3, var_4, var_5) { nmcm_GameConfig__init_(this, var_1, var_2, var_3, var_4, var_5); }],
+nmcm_GameConfig, 0, jl_Object, [], 1, 0, 0, ["$_init_112", function(var_1, var_2, var_3, var_4, var_5) { nmcm_GameConfig__init_(this, var_1, var_2, var_3, var_4, var_5); }],
 jl_CloneNotSupportedException, "CloneNotSupportedException", 4, jl_Exception, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_CloneNotSupportedException__init_)],
 otjt_Uint8Array, 0, otjt_TypedArray, [], 1, 0, 0, 0,
 otjdh_HTMLDocument, 0, jl_Object, [otjdx_Document, otjde_EventTarget], 1025, 0, 0, 0,
-jl_Long, "Long", 4, jl_Number, [jl_Comparable], 1, 0, () => jl_Long_$callClinit(), ["$_init_96", $rt_wrapFunction1(jl_Long__init_), "$intValue", $rt_wrapFunction0(jl_Long_intValue), "$longValue", $rt_wrapFunction0(jl_Long_longValue), "$doubleValue", $rt_wrapFunction0(jl_Long_doubleValue), "$toString", $rt_wrapFunction0(jl_Long_toString0), "$hashCode0", $rt_wrapFunction0(jl_Long_hashCode), "$equals", $rt_wrapFunction1(jl_Long_equals)],
-nmcm_MultiPlayerGameMode, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmcm_MultiPlayerGameMode__init_), "$tick", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_tick), "$isDestroying", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_isDestroying), "$getDestroyX", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyX), "$getDestroyY", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyY), "$getDestroyZ", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyZ), "$getDestroyStage", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyStage),
+jl_Long, "Long", 4, jl_Number, [jl_Comparable], 1, 0, () => jl_Long_$callClinit(), ["$_init_97", $rt_wrapFunction1(jl_Long__init_), "$intValue", $rt_wrapFunction0(jl_Long_intValue), "$longValue", $rt_wrapFunction0(jl_Long_longValue), "$doubleValue", $rt_wrapFunction0(jl_Long_doubleValue), "$toString", $rt_wrapFunction0(jl_Long_toString0), "$hashCode0", $rt_wrapFunction0(jl_Long_hashCode), "$equals", $rt_wrapFunction1(jl_Long_equals)],
+nmcm_MultiPlayerGameMode, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcm_MultiPlayerGameMode__init_), "$tick", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_tick), "$isDestroying", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_isDestroying), "$getDestroyX", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyX), "$getDestroyY", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyY), "$getDestroyZ", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyZ), "$getDestroyStage", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_getDestroyStage),
 "$startDestroyBlock", $rt_wrapFunction3(nmcm_MultiPlayerGameMode_startDestroyBlock), "$continueDestroyBlock", $rt_wrapFunction3(nmcm_MultiPlayerGameMode_continueDestroyBlock), "$stopDestroyBlock", $rt_wrapFunction3(nmcm_MultiPlayerGameMode_stopDestroyBlock), "$abortDestroyBlock", $rt_wrapFunction0(nmcm_MultiPlayerGameMode_abortDestroyBlock), "$useItemOn", $rt_wrapFunction2(nmcm_MultiPlayerGameMode_useItemOn)],
-jur_SequenceSet$IntHash, 0, jl_Object, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_SequenceSet$IntHash__init_), "$put0", $rt_wrapFunction2(jur_SequenceSet$IntHash_put), "$get1", $rt_wrapFunction1(jur_SequenceSet$IntHash_get)],
-jm_BigInteger, 0, jl_Number, [jl_Comparable, ji_Serializable], 1, 0, () => jm_BigInteger_$callClinit(), ["$_init_4", $rt_wrapFunction2(jm_BigInteger__init_4), "$_init_51", $rt_wrapFunction3(jm_BigInteger__init_1), "$_init_97", $rt_wrapFunction2(jm_BigInteger__init_3), "$_init_124", $rt_wrapFunction2(jm_BigInteger__init_5), "$abs3", $rt_wrapFunction0(jm_BigInteger_abs), "$negate", $rt_wrapFunction0(jm_BigInteger_negate), "$add3", $rt_wrapFunction1(jm_BigInteger_add), "$subtract", $rt_wrapFunction1(jm_BigInteger_subtract),
+jur_SequenceSet$IntHash, 0, jl_Object, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_SequenceSet$IntHash__init_), "$put0", $rt_wrapFunction2(jur_SequenceSet$IntHash_put), "$get1", $rt_wrapFunction1(jur_SequenceSet$IntHash_get)]]);
+$rt_metadata([jm_BigInteger, 0, jl_Number, [jl_Comparable, ji_Serializable], 1, 0, () => jm_BigInteger_$callClinit(), ["$_init_4", $rt_wrapFunction2(jm_BigInteger__init_4), "$_init_52", $rt_wrapFunction3(jm_BigInteger__init_1), "$_init_98", $rt_wrapFunction2(jm_BigInteger__init_3), "$_init_126", $rt_wrapFunction2(jm_BigInteger__init_5), "$abs3", $rt_wrapFunction0(jm_BigInteger_abs), "$negate", $rt_wrapFunction0(jm_BigInteger_negate), "$add3", $rt_wrapFunction1(jm_BigInteger_add), "$subtract", $rt_wrapFunction1(jm_BigInteger_subtract),
 "$signum", $rt_wrapFunction0(jm_BigInteger_signum), "$shiftRight1", $rt_wrapFunction1(jm_BigInteger_shiftRight), "$shiftLeft1", $rt_wrapFunction1(jm_BigInteger_shiftLeft), "$bitLength1", $rt_wrapFunction0(jm_BigInteger_bitLength), "$testBit", $rt_wrapFunction1(jm_BigInteger_testBit), "$intValue", $rt_wrapFunction0(jm_BigInteger_intValue), "$longValue", $rt_wrapFunction0(jm_BigInteger_longValue), "$doubleValue", $rt_wrapFunction0(jm_BigInteger_doubleValue), "$compareTo0", $rt_wrapFunction1(jm_BigInteger_compareTo),
 "$equals", $rt_wrapFunction1(jm_BigInteger_equals), "$equalsArrays", $rt_wrapFunction1(jm_BigInteger_equalsArrays), "$multiply1", $rt_wrapFunction1(jm_BigInteger_multiply), "$pow0", $rt_wrapFunction1(jm_BigInteger_pow), "$divideAndRemainder", $rt_wrapFunction1(jm_BigInteger_divideAndRemainder), "$divide", $rt_wrapFunction1(jm_BigInteger_divide), "$remainder", $rt_wrapFunction1(jm_BigInteger_remainder), "$cutOffLeadingZeroes", $rt_wrapFunction0(jm_BigInteger_cutOffLeadingZeroes), "$isOne", $rt_wrapFunction0(jm_BigInteger_isOne),
 "$getFirstNonzeroDigit", $rt_wrapFunction0(jm_BigInteger_getFirstNonzeroDigit)],
 jl_ArithmeticException, "ArithmeticException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(jl_ArithmeticException__init_0)],
-jur_AbstractCharClass$LazyNonDigit, 0, jur_AbstractCharClass$LazyDigit, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit_computeValue)]]);
-$rt_metadata([nlevit_EPKLoader, 0, jl_Object, [], 1, 0, () => nlevit_EPKLoader_$callClinit(), 0,
+jur_AbstractCharClass$LazyNonDigit, 0, jur_AbstractCharClass$LazyDigit, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonDigit_computeValue)],
+nlevit_EPKLoader, 0, jl_Object, [], 1, 0, () => nlevit_EPKLoader_$callClinit(), 0,
 jur_AbstractCharClass$1, "AbstractCharClass$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_19", $rt_wrapFunction2(jur_AbstractCharClass$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$1_contains)],
 jur_AbstractCharClass$2, "AbstractCharClass$2", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_20", $rt_wrapFunction3(jur_AbstractCharClass$2__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$2_contains)],
 jur_AbstractCharClass$LazyJavaLowerCase, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLowerCase__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaLowerCase_computeValue)],
 nlevit_EPKLoader$LoadCompleteNativeCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlevit_EPKLoader$loadEPK$lambda$_1_0, 0, jl_Object, [nlevit_EPKLoader$LoadCompleteNativeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_EPKLoader$loadEPK$lambda$_1_0__init_), "$call0", $rt_wrapFunction1(nlevit_EPKLoader$loadEPK$lambda$_1_0_call)],
 nleva_EaglerGuiImpl, 0, jl_Object, [], 17, 0, () => nleva_EaglerGuiImpl_$callClinit(), 0,
-jur_PossessiveCompositeQuantifierSet, "PossessiveCompositeQuantifierSet", 2, jur_CompositeQuantifierSet, [], 0, 0, 0, ["$_init_77", $rt_wrapFunction4(jur_PossessiveCompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveCompositeQuantifierSet_matches)],
+jur_PossessiveCompositeQuantifierSet, "PossessiveCompositeQuantifierSet", 2, jur_CompositeQuantifierSet, [], 0, 0, 0, ["$_init_78", $rt_wrapFunction4(jur_PossessiveCompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveCompositeQuantifierSet_matches)],
 jt_DecimalFormat$CurrencyField, "DecimalFormat$CurrencyField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$CurrencyField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$CurrencyField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$CurrencyField_equals)],
-jur_AbstractCharClass$LazyJavaLetterOrDigit$1, "AbstractCharClass$LazyJavaLetterOrDigit$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_82", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1_contains)],
-jur_CharClass$18, "CharClass$18", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction2(jur_CharClass$18__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$18_contains), "$toString", $rt_wrapFunction0(jur_CharClass$18_toString)],
+jur_AbstractCharClass$LazyJavaLetterOrDigit$1, "AbstractCharClass$LazyJavaLetterOrDigit$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_83", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetterOrDigit$1_contains)],
+jur_CharClass$18, "CharClass$18", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_94", $rt_wrapFunction2(jur_CharClass$18__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$18_contains), "$toString", $rt_wrapFunction0(jur_CharClass$18_toString)],
 jur_PossessiveGroupQuantifierSet, "PossessiveGroupQuantifierSet", 2, jur_GroupQuantifierSet, [], 0, 0, 0, ["$_init_11", $rt_wrapFunction3(jur_PossessiveGroupQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveGroupQuantifierSet_matches)],
 otcic_CurrencyHelper, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgs_CreateWorldScreen$AbstractWidgetWrapper, "CreateWorldScreen$AbstractWidgetWrapper", 18, jl_Object, [], 0, 0, 0, ["$_init_140", $rt_wrapFunction2(nmcgs_CreateWorldScreen$AbstractWidgetWrapper__init_)],
-nmcgsm_ConnectScreen, "ConnectScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_88", $rt_wrapFunction2(nmcgsm_ConnectScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_ConnectScreen_init), "$tick", $rt_wrapFunction0(nmcgsm_ConnectScreen_tick), "$render", $rt_wrapFunction4(nmcgsm_ConnectScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgsm_ConnectScreen_keyPressed), "$removed", $rt_wrapFunction0(nmcgsm_ConnectScreen_removed), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_ConnectScreen_isPauseScreen)],
-jur_CharClass$13, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction2(jur_CharClass$13__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$13_contains)],
-jur_CharClass$12, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction2(jur_CharClass$12__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$12_contains)],
-jur_CharClass$11, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$11__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$11_contains)],
+nmcgs_CreateWorldScreen$AbstractWidgetWrapper, "CreateWorldScreen$AbstractWidgetWrapper", 19, jl_Object, [], 0, 0, 0, ["$_init_142", $rt_wrapFunction2(nmcgs_CreateWorldScreen$AbstractWidgetWrapper__init_)],
+nmcgsm_ConnectScreen, "ConnectScreen", 22, nmcgs_Screen, [], 1, 0, 0, ["$_init_89", $rt_wrapFunction2(nmcgsm_ConnectScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_ConnectScreen_init), "$tick", $rt_wrapFunction0(nmcgsm_ConnectScreen_tick), "$render", $rt_wrapFunction4(nmcgsm_ConnectScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgsm_ConnectScreen_keyPressed), "$removed", $rt_wrapFunction0(nmcgsm_ConnectScreen_removed), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_ConnectScreen_isPauseScreen)],
+jur_CharClass$13, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction2(jur_CharClass$13__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$13_contains)],
+jur_CharClass$12, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_91", $rt_wrapFunction2(jur_CharClass$12__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$12_contains)],
+jur_CharClass$11, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$11__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$11_contains)],
 otci_Base46, 0, jl_Object, [], 17, 0, 0, 0,
-jur_CharClass$10, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$10__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$10_contains)],
-jur_CharClass$17, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$17__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$17_contains)],
-jur_UCISequenceSet, "UCISequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_72", $rt_wrapFunction1(jur_UCISequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_UCISequenceSet_accepts), "$getName", $rt_wrapFunction0(jur_UCISequenceSet_getName)],
-jur_CharClass$16, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_89", $rt_wrapFunction4(jur_CharClass$16__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$16_contains)],
+jur_CharClass$10, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$10__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$10_contains)],
+jur_CharClass$17, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$17__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$17_contains)],
+jur_UCISequenceSet, "UCISequenceSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_73", $rt_wrapFunction1(jur_UCISequenceSet__init_), "$accepts", $rt_wrapFunction2(jur_UCISequenceSet_accepts), "$getName", $rt_wrapFunction0(jur_UCISequenceSet_getName)],
+jur_CharClass$16, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_90", $rt_wrapFunction4(jur_CharClass$16__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$16_contains)],
 nlevi_PlatformInput$GamepadAxisCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlevi_PlatformInput$pollGamepad$lambda$_14_0, 0, jl_Object, [nlevi_PlatformInput$GamepadAxisCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$pollGamepad$lambda$_14_0__init_), "$call1", $rt_wrapFunction2(nlevi_PlatformInput$pollGamepad$lambda$_14_0_call)],
-jur_CharClass$15, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$15__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$15_contains)],
-cmbp_RenderTarget, 0, jl_Object, [], 1, 0, () => cmbp_RenderTarget_$callClinit(), ["$_init_143", $rt_wrapFunction4(cmbp_RenderTarget__init_), "$create0", $rt_wrapFunction4(cmbp_RenderTarget_create), "$destroyBuffers", $rt_wrapFunction0(cmbp_RenderTarget_destroyBuffers), "$resize", $rt_wrapFunction2(cmbp_RenderTarget_resize)],
-jur_AbstractCharClass$LazyJavaDefined$1, "AbstractCharClass$LazyJavaDefined$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_67", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDefined$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDefined$1_contains)],
-nmcgso_OptionsScreen$addGridButton$lambda$_2_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_58", $rt_wrapFunction2(nmcgso_OptionsScreen$addGridButton$lambda$_2_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_OptionsScreen$addGridButton$lambda$_2_0_onPress)],
+jur_CharClass$15, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction3(jur_CharClass$15__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$15_contains)],
+cmbp_RenderTarget, 0, jl_Object, [], 1, 0, () => cmbp_RenderTarget_$callClinit(), ["$_init_145", $rt_wrapFunction4(cmbp_RenderTarget__init_), "$create0", $rt_wrapFunction4(cmbp_RenderTarget_create), "$destroyBuffers", $rt_wrapFunction0(cmbp_RenderTarget_destroyBuffers), "$resize", $rt_wrapFunction2(cmbp_RenderTarget_resize)],
+jur_AbstractCharClass$LazyJavaDefined$1, "AbstractCharClass$LazyJavaDefined$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_68", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDefined$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaDefined$1_contains)],
+nmcgso_OptionsScreen$addGridButton$lambda$_2_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_OptionsScreen$addGridButton$lambda$_2_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_OptionsScreen$addGridButton$lambda$_2_0_onPress)],
 nlevi_PlatformInput$GamepadButtonCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlevi_PlatformInput$pollGamepad$lambda$_14_1, 0, jl_Object, [nlevi_PlatformInput$GamepadButtonCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$pollGamepad$lambda$_14_1__init_), "$call2", $rt_wrapFunction2(nlevi_PlatformInput$pollGamepad$lambda$_14_1_call)],
-jur_CharClass$14, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_92", $rt_wrapFunction3(jur_CharClass$14__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$14_contains)],
+jur_CharClass$14, 0, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_93", $rt_wrapFunction3(jur_CharClass$14__init_), "$contains1", $rt_wrapFunction1(jur_CharClass$14_contains)],
 jl_StringBuilder, 0, jl_AbstractStringBuilder, [jl_Appendable], 1, 0, 0, ["$_init_5", $rt_wrapFunction1(jl_StringBuilder__init_3), "$_init_0", $rt_wrapFunction0(jl_StringBuilder__init_4), "$_init_", $rt_wrapFunction1(jl_StringBuilder__init_2), "$append", $rt_wrapFunction1(jl_StringBuilder_append), "$append3", $rt_wrapFunction1(jl_StringBuilder_append7), "$append1", $rt_wrapFunction1(jl_StringBuilder_append0), "$append4", $rt_wrapFunction1(jl_StringBuilder_append2), "$append16", $rt_wrapFunction1(jl_StringBuilder_append5),
 "$append17", $rt_wrapFunction1(jl_StringBuilder_append4), "$append0", $rt_wrapFunction1(jl_StringBuilder_append1), "$append26", $rt_wrapFunction3(jl_StringBuilder_append8), "$append13", $rt_wrapFunction1(jl_StringBuilder_append13), "$append27", $rt_wrapFunction3(jl_StringBuilder_append12), "$append28", $rt_wrapFunction1(jl_StringBuilder_append11), "$append19", $rt_wrapFunction1(jl_StringBuilder_append3), "$insert21", $rt_wrapFunction2(jl_StringBuilder_insert0), "$insert20", $rt_wrapFunction2(jl_StringBuilder_insert14),
 "$insert19", $rt_wrapFunction2(jl_StringBuilder_insert2), "$insert15", $rt_wrapFunction4(jl_StringBuilder_insert8), "$insert14", $rt_wrapFunction4(jl_StringBuilder_insert12), "$insert17", $rt_wrapFunction2(jl_StringBuilder_insert15), "$insert16", $rt_wrapFunction2(jl_StringBuilder_insert9), "$insert18", $rt_wrapFunction2(jl_StringBuilder_insert10), "$delete0", $rt_wrapFunction2(jl_StringBuilder_delete), "$deleteCharAt", $rt_wrapFunction1(jl_StringBuilder_deleteCharAt), "$insert22", $rt_wrapFunction2(jl_StringBuilder_insert4),
@@ -38545,24 +39657,24 @@ otrfm_InMemoryVirtualDirectory, 0, otrfm_AbstractInMemoryVirtualFile, [], 1, 0, 
 nlevit_EPKLoader$loadEPK$lambda$_1_2, 0, jl_Object, [nlevit_EPKLoader$LoadErrorNativeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_EPKLoader$loadEPK$lambda$_1_2__init_), "$call3", $rt_wrapFunction1(nlevit_EPKLoader$loadEPK$lambda$_1_2_call)],
 nlevit_EPKLoader$LoadProgressNativeCallback, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlevit_EPKLoader$loadEPK$lambda$_1_1, 0, jl_Object, [nlevit_EPKLoader$LoadProgressNativeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_EPKLoader$loadEPK$lambda$_1_1__init_), "$call4", $rt_wrapFunction2(nlevit_EPKLoader$loadEPK$lambda$_1_1_call)],
-jur_CompositeRangeSet, "CompositeRangeSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction2(jur_CompositeRangeSet__init_0), "$matches", $rt_wrapFunction3(jur_CompositeRangeSet_matches), "$setNext", $rt_wrapFunction1(jur_CompositeRangeSet_setNext), "$getName", $rt_wrapFunction0(jur_CompositeRangeSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_CompositeRangeSet_hasConsumed), "$first", $rt_wrapFunction1(jur_CompositeRangeSet_first)],
+jur_CompositeRangeSet, "CompositeRangeSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_82", $rt_wrapFunction2(jur_CompositeRangeSet__init_0), "$matches", $rt_wrapFunction3(jur_CompositeRangeSet_matches), "$setNext", $rt_wrapFunction1(jur_CompositeRangeSet_setNext), "$getName", $rt_wrapFunction0(jur_CompositeRangeSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_CompositeRangeSet_hasConsumed), "$first", $rt_wrapFunction1(jur_CompositeRangeSet_first)],
 ju_ConcurrentModificationException, "ConcurrentModificationException", 1, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_ConcurrentModificationException__init_0)],
-nmcgso_SoundOptionsScreen, "SoundOptionsScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_SoundOptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_SoundOptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_SoundOptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_isPauseScreen)],
-nmcgso_ControlsScreen$init$lambda$_1_7, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_7__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_7_onChange)],
-nmcgso_ControlsScreen$init$lambda$_1_8, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_8__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_8_onPress)],
-nmcgso_ControlsScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_5__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_5_onChange)],
-nmcgso_ControlsScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_6__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_6_onChange)],
-nmcgso_ControlsScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_3__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_3_onChange)],
+nmcgso_SoundOptionsScreen, "SoundOptionsScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcgso_SoundOptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_SoundOptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_SoundOptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_SoundOptionsScreen_isPauseScreen)],
+nmcgso_ControlsScreen$init$lambda$_1_7, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_7__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_7_onChange)],
+nmcgso_ControlsScreen$init$lambda$_1_8, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_8__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_8_onPress)],
+nmcgso_ControlsScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_5__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_5_onChange)],
+nmcgso_ControlsScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_6__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_6_onChange)],
+nmcgso_ControlsScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_3__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_3_onChange)],
 jur_FinalSet, "FinalSet", 2, jur_FSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_FinalSet__init_), "$matches", $rt_wrapFunction3(jur_FinalSet_matches), "$getName", $rt_wrapFunction0(jur_FinalSet_getName)],
-nmcgso_AccessibilityOptionsScreen, "AccessibilityOptionsScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_AccessibilityOptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_AccessibilityOptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_AccessibilityOptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_isPauseScreen)],
-nmcgso_ControlsScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_4__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_4_onChange)],
-nmcgso_ControlsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_1_onPress)],
-nlevit_EPKLoader$LoadCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0]);
-$rt_metadata([nmcgso_ControlsScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_2__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_2_onChange)],
-nmcgso_ControlsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_136", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_0_onPress)],
+nmcgso_AccessibilityOptionsScreen, "AccessibilityOptionsScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcgso_AccessibilityOptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_AccessibilityOptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_AccessibilityOptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen_isPauseScreen)]]);
+$rt_metadata([nmcgso_ControlsScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_4__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_4_onChange)],
+nmcgso_ControlsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_1_onPress)],
+nlevit_EPKLoader$LoadCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
+nmcgso_ControlsScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_2__init_), "$onChange", $rt_wrapFunction2(nmcgso_ControlsScreen$init$lambda$_1_2_onChange)],
+nmcgso_ControlsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_138", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_ControlsScreen$init$lambda$_1_0_onPress)],
 nleva_EaglerFont, 0, jl_Object, [], 17, 0, () => nleva_EaglerFont_$callClinit(), 0,
 jur_EmptySet, "EmptySet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_9", $rt_wrapFunction1(jur_EmptySet__init_0), "$accepts", $rt_wrapFunction2(jur_EmptySet_accepts), "$find", $rt_wrapFunction3(jur_EmptySet_find), "$findBack", $rt_wrapFunction4(jur_EmptySet_findBack), "$getName", $rt_wrapFunction0(jur_EmptySet_getName), "$hasConsumed", $rt_wrapFunction1(jur_EmptySet_hasConsumed)],
-nmc_MouseHandler, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmc_MouseHandler__init_), "$handleMouseMove", $rt_wrapFunction3(nmc_MouseHandler_handleMouseMove), "$cursorPressed", $rt_wrapFunction4(nmc_MouseHandler_cursorPressed), "$onScroll", $rt_wrapFunction3(nmc_MouseHandler_onScroll), "$xhandleMouseMove", $rt_wrapFunction0(nmc_MouseHandler_xhandleMouseMove), "$grabMouse", $rt_wrapFunction0(nmc_MouseHandler_grabMouse), "$releaseMouse", $rt_wrapFunction0(nmc_MouseHandler_releaseMouse), "$isMouseGrabbed",
+nmc_MouseHandler, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmc_MouseHandler__init_), "$handleMouseMove", $rt_wrapFunction3(nmc_MouseHandler_handleMouseMove), "$cursorPressed", $rt_wrapFunction4(nmc_MouseHandler_cursorPressed), "$onScroll", $rt_wrapFunction3(nmc_MouseHandler_onScroll), "$xhandleMouseMove", $rt_wrapFunction0(nmc_MouseHandler_xhandleMouseMove), "$grabMouse", $rt_wrapFunction0(nmc_MouseHandler_grabMouse), "$releaseMouse", $rt_wrapFunction0(nmc_MouseHandler_releaseMouse), "$isMouseGrabbed",
 $rt_wrapFunction0(nmc_MouseHandler_isMouseGrabbed), "$isLeftPressed", $rt_wrapFunction0(nmc_MouseHandler_isLeftPressed), "$tick", $rt_wrapFunction0(nmc_MouseHandler_tick), "$xpos", $rt_wrapFunction0(nmc_MouseHandler_xpos), "$ypos", $rt_wrapFunction0(nmc_MouseHandler_ypos)],
 nlevi_PlatformInput$suppressDragDrop$lambda$_13_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$suppressDragDrop$lambda$_13_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$suppressDragDrop$lambda$_13_0_handleEvent)],
 nlevi_PlatformApplication$registerBeforeUnloadListener$lambda$_2_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformApplication$registerBeforeUnloadListener$lambda$_2_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformApplication$registerBeforeUnloadListener$lambda$_2_0_handleEvent)],
@@ -38570,160 +39682,166 @@ jl_StackTraceElement, 0, jl_Object, [ji_Serializable], 17, 0, 0, ["$toString", $
 nlevi_PlatformInput$suppressDragDrop$lambda$_13_1, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$suppressDragDrop$lambda$_13_1__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$suppressDragDrop$lambda$_13_1_handleEvent)],
 nlev_EaglerCraft$ThrowingRunnable, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 ju_Map$Entry, 0, jl_Object, [], 1537, 0, 0, 0,
-ju_MapEntry, 0, jl_Object, [ju_Map$Entry, jl_Cloneable], 0, 0, 0, ["$_init_104", $rt_wrapFunction2(ju_MapEntry__init_), "$getKey", $rt_wrapFunction0(ju_MapEntry_getKey), "$getValue0", $rt_wrapFunction0(ju_MapEntry_getValue)],
+ju_MapEntry, 0, jl_Object, [ju_Map$Entry, jl_Cloneable], 0, 0, 0, ["$_init_105", $rt_wrapFunction2(ju_MapEntry__init_), "$getKey", $rt_wrapFunction0(ju_MapEntry_getKey), "$getValue0", $rt_wrapFunction0(ju_MapEntry_getValue)],
 ju_HashMap$HashEntry, 0, ju_MapEntry, [], 0, 0, 0, ["$_init_16", $rt_wrapFunction2(ju_HashMap$HashEntry__init_)],
 ju_LinkedHashMap$LinkedHashMapEntry, 0, ju_HashMap$HashEntry, [], 16, 0, 0, ["$_init_16", $rt_wrapFunction2(ju_LinkedHashMap$LinkedHashMapEntry__init_)],
-nmcr_GameRenderer, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmcr_GameRenderer__init_), "$render4", $rt_wrapFunction3(nmcr_GameRenderer_render)],
+nmcr_GameRenderer, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcr_GameRenderer__init_), "$render4", $rt_wrapFunction3(nmcr_GameRenderer_render)],
 jur_AbstractCharClass$LazyASCII, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyASCII__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyASCII_computeValue)],
 ji_IOException, 0, jl_Exception, [], 1, 0, 0, 0,
-nmc_Options, 0, jl_Object, [], 1, 0, 0, ["$_init_142", $rt_wrapFunction2(nmc_Options__init_), "$load", $rt_wrapFunction0(nmc_Options_load), "$save", $rt_wrapFunction0(nmc_Options_save), "$getFov", $rt_wrapFunction0(nmc_Options_getFov), "$setFov", $rt_wrapFunction1(nmc_Options_setFov), "$setMasterVolume", $rt_wrapFunction1(nmc_Options_setMasterVolume)],
-ju_AbstractList$1, 0, jl_Object, [ju_Iterator], 0, 0, 0, ["$_init_49", $rt_wrapFunction1(ju_AbstractList$1__init_), "$hasNext", $rt_wrapFunction0(ju_AbstractList$1_hasNext), "$next", $rt_wrapFunction0(ju_AbstractList$1_next)],
+nmc_Options, 0, jl_Object, [], 1, 0, 0, ["$_init_144", $rt_wrapFunction2(nmc_Options__init_), "$load", $rt_wrapFunction0(nmc_Options_load), "$save", $rt_wrapFunction0(nmc_Options_save), "$getFov", $rt_wrapFunction0(nmc_Options_getFov), "$setFov", $rt_wrapFunction1(nmc_Options_setFov), "$setMasterVolume", $rt_wrapFunction1(nmc_Options_setMasterVolume)],
+ju_AbstractList$1, 0, jl_Object, [ju_Iterator], 0, 0, 0, ["$_init_50", $rt_wrapFunction1(ju_AbstractList$1__init_), "$hasNext", $rt_wrapFunction0(ju_AbstractList$1_hasNext), "$next", $rt_wrapFunction0(ju_AbstractList$1_next)],
 otjc_Crypto, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 nlev_EaglerCraft, 0, jl_Object, [], 1, 0, () => nlev_EaglerCraft_$callClinit(), 0,
 cgcb_Preconditions, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2_onChange)],
-nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0_onChange)],
-nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_139", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1_onChange)],
+nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2_onChange)],
+nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0_onChange)],
+nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_141", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_), "$onChange", $rt_wrapFunction2(nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1_onChange)],
 jur_Quantifier, "Quantifier", 2, jur_SpecialToken, [jl_Cloneable], 0, 0, 0, ["$_init_4", $rt_wrapFunction2(jur_Quantifier__init_), "$min2", $rt_wrapFunction0(jur_Quantifier_min), "$max3", $rt_wrapFunction0(jur_Quantifier_max), "$toString", $rt_wrapFunction0(jur_Quantifier_toString)],
-jur_AbstractCharClass$LazyJavaUpperCase$1, "AbstractCharClass$LazyJavaUpperCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_123", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUpperCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUpperCase$1_contains)],
-ju_Date, 0, jl_Object, [jl_Comparable], 1, 0, () => ju_Date_$callClinit(), ["$_init_96", $rt_wrapFunction1(ju_Date__init_), "$getYear", $rt_wrapFunction0(ju_Date_getYear), "$getMonth", $rt_wrapFunction0(ju_Date_getMonth), "$getDate", $rt_wrapFunction0(ju_Date_getDate)],
-nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0, 0, jl_Object, [nmcgs_ConfirmScreen$ConfirmHandler], 1, 0, 0, ["$_init_114", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_), "$onConfirm", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0_onConfirm)],
-nlevi_PlatformFilesystem, "PlatformFilesystem", 26, jl_Object, [], 1, [0,0,0], 0, 0,
+jur_AbstractCharClass$LazyJavaUpperCase$1, "AbstractCharClass$LazyJavaUpperCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_125", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUpperCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaUpperCase$1_contains)],
+nmwi_Items, 0, jl_Object, [], 17, 0, () => nmwi_Items_$callClinit(), 0,
+ju_Date, 0, jl_Object, [jl_Comparable], 1, 0, () => ju_Date_$callClinit(), ["$_init_97", $rt_wrapFunction1(ju_Date__init_), "$getYear", $rt_wrapFunction0(ju_Date_getYear), "$getMonth", $rt_wrapFunction0(ju_Date_getMonth), "$getDate", $rt_wrapFunction0(ju_Date_getDate)],
+nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0, 0, jl_Object, [nmcgs_ConfirmScreen$ConfirmHandler], 1, 0, 0, ["$_init_116", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_), "$onConfirm", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0_onConfirm)],
+nlevi_PlatformFilesystem, "PlatformFilesystem", 27, jl_Object, [], 1, [0,0,0], 0, 0,
 nmcgs_CreateWorldScreen$layoutMoreTab$lambda$_5_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_CreateWorldScreen$layoutMoreTab$lambda$_5_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_CreateWorldScreen$layoutMoreTab$lambda$_5_0_onPress)],
-ju_Random, 0, jl_Object, [jur_RandomGenerator, ji_Serializable], 1, 0, 0, ["$_init_96", $rt_wrapFunction1(ju_Random__init_), "$setSeed", $rt_wrapFunction1(ju_Random_setSeed), "$next1", $rt_wrapFunction1(ju_Random_next), "$nextFloat", $rt_wrapFunction0(ju_Random_nextFloat), "$nextDouble", $rt_wrapFunction0(ju_Random_nextDouble)],
+ju_Random, 0, jl_Object, [jur_RandomGenerator, ji_Serializable], 1, 0, 0, ["$_init_97", $rt_wrapFunction1(ju_Random__init_), "$setSeed", $rt_wrapFunction1(ju_Random_setSeed), "$next1", $rt_wrapFunction1(ju_Random_next), "$nextFloat", $rt_wrapFunction0(ju_Random_nextFloat), "$nextDouble", $rt_wrapFunction0(ju_Random_nextDouble)],
 nlevi_PlatformApplication$registerFullscreenChangeListener$lambda$_7_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformApplication$registerFullscreenChangeListener$lambda$_7_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformApplication$registerFullscreenChangeListener$lambda$_7_0_handleEvent)],
 otpp_ResourceAccessor, 0, jl_Object, [], 16, 0, 0, 0,
-nmcm_GameConfig$QuickPlayData, 0, jl_Object, [], 1, 0, 0, ["$_init_110", $rt_wrapFunction2(nmcm_GameConfig$QuickPlayData__init_)],
+nmcm_GameConfig$QuickPlayData, 0, jl_Object, [], 1, 0, 0, ["$_init_111", $rt_wrapFunction2(nmcm_GameConfig$QuickPlayData__init_)],
 jur_PossessiveQuantifierSet, "PossessiveQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_31", $rt_wrapFunction3(jur_PossessiveQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_PossessiveQuantifierSet_matches)],
-ju_Locale, 0, jl_Object, [jl_Cloneable, ji_Serializable], 17, 0, () => ju_Locale_$callClinit(), ["$_init_60", $rt_wrapFunction2(ju_Locale__init_1), "$_init_22", $rt_wrapFunction3(ju_Locale__init_0), "$getCountry", $rt_wrapFunction0(ju_Locale_getCountry), "$getLanguage", $rt_wrapFunction0(ju_Locale_getLanguage)],
+ju_Locale, 0, jl_Object, [jl_Cloneable, ji_Serializable], 17, 0, () => ju_Locale_$callClinit(), ["$_init_61", $rt_wrapFunction2(ju_Locale__init_1), "$_init_22", $rt_wrapFunction3(ju_Locale__init_0), "$getCountry", $rt_wrapFunction0(ju_Locale_getCountry), "$getLanguage", $rt_wrapFunction0(ju_Locale_getLanguage)],
 jl_Short, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Short_$callClinit(), 0,
-jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1, "AbstractCharClass$LazyJavaIdentifierIgnorable$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_137", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1_contains)],
+jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1, "AbstractCharClass$LazyJavaIdentifierIgnorable$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_139", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1_contains)],
 jl_Thread$UncaughtExceptionHandler, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_DefaultUncaughtExceptionHandler, 0, jl_Object, [jl_Thread$UncaughtExceptionHandler], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_DefaultUncaughtExceptionHandler__init_)],
 jt_DecimalFormat$1, 0, jl_Object, [], 32768, 0, () => jt_DecimalFormat$1_$callClinit(), 0,
 nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0, 0, jl_Object, [nlevi_PlatformRuntime$SimpleCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0__init_), "$call5", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call)],
 jur_AbstractCharClass$LazyJavaLetter$1, "AbstractCharClass$LazyJavaLetter$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_25", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1_contains)],
 jur_ReluctantQuantifierSet, "ReluctantQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_31", $rt_wrapFunction3(jur_ReluctantQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantQuantifierSet_matches)],
-nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0, 0, jl_Object, [nlevit_EPKLoader$LoadCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_), "$call0", $rt_wrapFunction1(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call)],
-nlevit_EPKLoader$ProgressCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
+nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0, 0, jl_Object, [nlevit_EPKLoader$LoadCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_), "$call0", $rt_wrapFunction1(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call)]]);
+$rt_metadata([nlevit_EPKLoader$ProgressCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
 nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1, 0, jl_Object, [nlevit_EPKLoader$ProgressCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1__init_), "$call4", $rt_wrapFunction2(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1_call)],
 ju_UUID, 0, jl_Object, [], 1, 0, 0, 0,
-nmcm_ServerList$ServerData, "ServerList$ServerData", 22, jl_Object, [], 17, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcm_ServerList$ServerData__init_)]]);
-$rt_metadata([jur_EOISet, "EOISet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_EOISet__init_), "$matches", $rt_wrapFunction3(jur_EOISet_matches), "$hasConsumed", $rt_wrapFunction1(jur_EOISet_hasConsumed), "$getName", $rt_wrapFunction0(jur_EOISet_getName)],
+nmcm_ServerList$ServerData, "ServerList$ServerData", 23, jl_Object, [], 17, 0, 0, ["$_init_61", $rt_wrapFunction2(nmcm_ServerList$ServerData__init_)],
+jur_EOISet, "EOISet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_EOISet__init_), "$matches", $rt_wrapFunction3(jur_EOISet_matches), "$hasConsumed", $rt_wrapFunction1(jur_EOISet_hasConsumed), "$getName", $rt_wrapFunction0(jur_EOISet_getName)],
 jur_AbstractCharClass$LazyUpper, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyUpper__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyUpper_computeValue)],
 ju_HashMap$KeyIterator, 0, ju_HashMap$AbstractMapIterator, [ju_Iterator], 0, 0, 0, ["$_init_15", $rt_wrapFunction1(ju_HashMap$KeyIterator__init_), "$next", $rt_wrapFunction0(ju_HashMap$KeyIterator_next)],
-nmcm_GameConfig$GameData, 0, jl_Object, [], 1, 0, 0, ["$_init_109", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcm_GameConfig$GameData__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }],
+nmcm_GameConfig$GameData, 0, jl_Object, [], 1, 0, 0, ["$_init_110", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8) { nmcm_GameConfig$GameData__init_(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8); }],
 otji_JSWrapper, 0, jl_Object, [], 17, 0, 0, 0,
 ju_OptionalInt, 0, jl_Object, [], 1, 0, 0, ["$orElse", $rt_wrapFunction1(ju_OptionalInt_orElse)],
 ju_HashSet, 0, ju_AbstractSet, [jl_Cloneable, ji_Serializable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_HashSet__init_0), "$_init_15", $rt_wrapFunction1(ju_HashSet__init_), "$add", $rt_wrapFunction1(ju_HashSet_add), "$contains", $rt_wrapFunction1(ju_HashSet_contains), "$isEmpty", $rt_wrapFunction0(ju_HashSet_isEmpty), "$iterator", $rt_wrapFunction0(ju_HashSet_iterator), "$remove2", $rt_wrapFunction1(ju_HashSet_remove)],
 nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0_onPress)],
 nlev_EaglerCraft$BlockQueryFn, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
 nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0, 0, jl_Object, [nlev_EaglerCraft$BlockQueryFn], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_), "$query", $rt_wrapFunction3(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0_query)],
-jur_MultiLineSOLSet, "MultiLineSOLSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_78", $rt_wrapFunction1(jur_MultiLineSOLSet__init_), "$matches", $rt_wrapFunction3(jur_MultiLineSOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_MultiLineSOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_MultiLineSOLSet_getName)],
-nmcgsm_JoinMultiplayerScreen, "JoinMultiplayerScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_54", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_init), "$render", $rt_wrapFunction4(nmcgsm_JoinMultiplayerScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseScrolled), "$keyPressed", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_keyPressed),
+jur_MultiLineSOLSet, "MultiLineSOLSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_79", $rt_wrapFunction1(jur_MultiLineSOLSet__init_), "$matches", $rt_wrapFunction3(jur_MultiLineSOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_MultiLineSOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_MultiLineSOLSet_getName)],
+nmcgsm_JoinMultiplayerScreen, "JoinMultiplayerScreen", 22, nmcgs_Screen, [], 1, 0, 0, ["$_init_55", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_init), "$render", $rt_wrapFunction4(nmcgsm_JoinMultiplayerScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseScrolled), "$keyPressed", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_keyPressed),
 "$onClose", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_isPauseScreen)],
 jur_AbstractCharClass$LazyLower, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyLower__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyLower_computeValue)],
 oti_AsyncCallback, 0, jl_Object, [], 1537, 0, 0, 0,
-ju_IllegalFormatConversionException, "IllegalFormatConversionException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_130", $rt_wrapFunction2(ju_IllegalFormatConversionException__init_0)],
+ju_IllegalFormatConversionException, "IllegalFormatConversionException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_132", $rt_wrapFunction2(ju_IllegalFormatConversionException__init_0)],
 jt_DecimalFormat$PercentField, "DecimalFormat$PercentField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$PercentField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$PercentField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$PercentField_equals)],
 jur_AbstractCharClass$LazyJavaTitleCase, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaTitleCase__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaTitleCase_computeValue)],
 jur_PreviousMatch, "PreviousMatch", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_PreviousMatch__init_), "$matches", $rt_wrapFunction3(jur_PreviousMatch_matches), "$hasConsumed", $rt_wrapFunction1(jur_PreviousMatch_hasConsumed), "$getName", $rt_wrapFunction0(jur_PreviousMatch_getName)],
 nlevit_MainClass, 0, jl_Object, [], 1, 0, () => nlevit_MainClass_$callClinit(), 0,
 jur_NonCapFSet, "NonCapFSet", 2, jur_FSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_NonCapFSet__init_), "$matches", $rt_wrapFunction3(jur_NonCapFSet_matches), "$getName", $rt_wrapFunction0(jur_NonCapFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_NonCapFSet_hasConsumed)],
-nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0, 0, jl_Object, [nlev_EaglerCraft$ThrowingRunnable], 1, 0, 0, ["$_init_112", $rt_wrapFunction1(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_), "$run", $rt_wrapFunction0(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0_run)],
+nmwi_Items$Item, "Items$Item", 13, jl_Object, [], 17, 0, 0, ["$_init_114", $rt_wrapFunction4(nmwi_Items$Item__init_)],
+nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0, 0, jl_Object, [nlev_EaglerCraft$ThrowingRunnable], 1, 0, 0, ["$_init_113", $rt_wrapFunction1(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_), "$run", $rt_wrapFunction0(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0_run)],
 jur_UCISupplCharSet, "UCISupplCharSet", 2, jur_LeafSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_UCISupplCharSet__init_), "$accepts", $rt_wrapFunction2(jur_UCISupplCharSet_accepts), "$getName", $rt_wrapFunction0(jur_UCISupplCharSet_getName)],
 jl_System, 0, jl_Object, [], 17, 0, 0, 0,
 jm_Conversion, 0, jl_Object, [], 0, 0, () => jm_Conversion_$callClinit(), 0,
-nmcgs_ConfirmScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_37", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_1_onPress)],
+nmcgs_ConfirmScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_38", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_1_onPress)],
 nlevi_PlatformRuntime$registerOrientationChangeListener$lambda$_57_0, 0, jl_Object, [nlevi_PlatformRuntime$SimpleCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerOrientationChangeListener$lambda$_57_0__init_), "$call5", $rt_wrapFunction0(nlevi_PlatformRuntime$registerOrientationChangeListener$lambda$_57_0_call)],
 jur_AbstractCharClass$LazyRange, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_4", $rt_wrapFunction2(jur_AbstractCharClass$LazyRange__init_0), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyRange_computeValue)],
 nlevi_PlatformInput$registerWheelListener$lambda$_7_0, 0, jl_Object, [nlevi_PlatformInput$WheelCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$registerWheelListener$lambda$_7_0__init_), "$call6", $rt_wrapFunction1(nlevi_PlatformInput$registerWheelListener$lambda$_7_0_call)],
 jur_AbstractCharClass$LazyXDigit, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyXDigit__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyXDigit_computeValue)],
 jur_Matcher, 0, jl_Object, [jur_MatchResult], 17, 0, 0, ["$appendReplacement", $rt_wrapFunction2(jur_Matcher_appendReplacement), "$reset1", $rt_wrapFunction0(jur_Matcher_reset), "$appendTail", $rt_wrapFunction1(jur_Matcher_appendTail), "$replaceAll0", $rt_wrapFunction1(jur_Matcher_replaceAll), "$group", $rt_wrapFunction1(jur_Matcher_group), "$find1", $rt_wrapFunction1(jur_Matcher_find), "$find0", $rt_wrapFunction0(jur_Matcher_find0), "$start", $rt_wrapFunction1(jur_Matcher_start0), "$end", $rt_wrapFunction1(jur_Matcher_end0),
-"$start0", $rt_wrapFunction0(jur_Matcher_start), "$end0", $rt_wrapFunction0(jur_Matcher_end), "$hasTransparentBounds", $rt_wrapFunction0(jur_Matcher_hasTransparentBounds), "$_init_69", $rt_wrapFunction2(jur_Matcher__init_)],
+"$start0", $rt_wrapFunction0(jur_Matcher_start), "$end0", $rt_wrapFunction0(jur_Matcher_end), "$hasTransparentBounds", $rt_wrapFunction0(jur_Matcher_hasTransparentBounds), "$_init_70", $rt_wrapFunction2(jur_Matcher__init_)],
 jur_DotAllSet, "DotAllSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_DotAllSet__init_), "$matches", $rt_wrapFunction3(jur_DotAllSet_matches), "$getName", $rt_wrapFunction0(jur_DotAllSet_getName), "$setNext", $rt_wrapFunction1(jur_DotAllSet_setNext), "$getType", $rt_wrapFunction0(jur_DotAllSet_getType), "$hasConsumed", $rt_wrapFunction1(jur_DotAllSet_hasConsumed)],
 jt_FieldPosition, 0, jl_Object, [], 1, 0, 0, ["$_init_5", $rt_wrapFunction1(jt_FieldPosition__init_)],
-jur_AbstractCharClass$LazyJavaLowerCase$1, "AbstractCharClass$LazyJavaLowerCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_98", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLowerCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLowerCase$1_contains)],
-nmcgs_ConfirmScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_37", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_0_onPress)],
-nmcgso_KeyBindsScreen, "KeyBindsScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_KeyBindsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_KeyBindsScreen_init), "$render", $rt_wrapFunction4(nmcgso_KeyBindsScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgso_KeyBindsScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgso_KeyBindsScreen_mouseScrolled), "$keyPressed", $rt_wrapFunction3(nmcgso_KeyBindsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_KeyBindsScreen_onClose),
+jur_AbstractCharClass$LazyJavaLowerCase$1, "AbstractCharClass$LazyJavaLowerCase$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_99", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLowerCase$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLowerCase$1_contains)],
+nmcgs_ConfirmScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_38", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_ConfirmScreen$init$lambda$_1_0_onPress)],
+nmcgso_KeyBindsScreen, "KeyBindsScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcgso_KeyBindsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_KeyBindsScreen_init), "$render", $rt_wrapFunction4(nmcgso_KeyBindsScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgso_KeyBindsScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgso_KeyBindsScreen_mouseScrolled), "$keyPressed", $rt_wrapFunction3(nmcgso_KeyBindsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_KeyBindsScreen_onClose),
 "$isPauseScreen", $rt_wrapFunction0(nmcgso_KeyBindsScreen_isPauseScreen)],
 jl_Object$monitorExit$lambda$_8_1, 0, jl_Object, [otp_PlatformRunnable], 1, 0, 0, ["$_init_2", $rt_wrapFunction1(jl_Object$monitorExit$lambda$_8_1__init_), "$run", $rt_wrapFunction0(jl_Object$monitorExit$lambda$_8_1_run)],
-jur_UCISupplRangeSet, "UCISupplRangeSet", 2, jur_SupplRangeSet, [], 0, 0, 0, ["$_init_80", $rt_wrapFunction1(jur_UCISupplRangeSet__init_), "$contains1", $rt_wrapFunction1(jur_UCISupplRangeSet_contains), "$getName", $rt_wrapFunction0(jur_UCISupplRangeSet_getName)],
+jur_UCISupplRangeSet, "UCISupplRangeSet", 2, jur_SupplRangeSet, [], 0, 0, 0, ["$_init_81", $rt_wrapFunction1(jur_UCISupplRangeSet__init_), "$contains1", $rt_wrapFunction1(jur_UCISupplRangeSet_contains), "$getName", $rt_wrapFunction0(jur_UCISupplRangeSet_getName)],
 jur_AbstractCharClass$LazyJavaUpperCase, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUpperCase__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaUpperCase_computeValue)],
 ju_DuplicateFormatFlagsException, "DuplicateFormatFlagsException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_DuplicateFormatFlagsException__init_)],
-jur_HangulDecomposedCharSet, "HangulDecomposedCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_73", $rt_wrapFunction2(jur_HangulDecomposedCharSet__init_), "$setNext", $rt_wrapFunction1(jur_HangulDecomposedCharSet_setNext), "$getName", $rt_wrapFunction0(jur_HangulDecomposedCharSet_getName), "$matches", $rt_wrapFunction3(jur_HangulDecomposedCharSet_matches), "$first", $rt_wrapFunction1(jur_HangulDecomposedCharSet_first), "$hasConsumed", $rt_wrapFunction1(jur_HangulDecomposedCharSet_hasConsumed)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_13, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_13__init_), "$onPress", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_13_onPress)],
+jur_HangulDecomposedCharSet, "HangulDecomposedCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction2(jur_HangulDecomposedCharSet__init_), "$setNext", $rt_wrapFunction1(jur_HangulDecomposedCharSet_setNext), "$getName", $rt_wrapFunction0(jur_HangulDecomposedCharSet_getName), "$matches", $rt_wrapFunction3(jur_HangulDecomposedCharSet_matches), "$first", $rt_wrapFunction1(jur_HangulDecomposedCharSet_first), "$hasConsumed", $rt_wrapFunction1(jur_HangulDecomposedCharSet_hasConsumed)],
+nmcgsi_CraftingTableScreen, "CraftingTableScreen", 21, nmcgs_Screen, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgsi_CraftingTableScreen__init_), "$init", $rt_wrapFunction0(nmcgsi_CraftingTableScreen_init), "$getCraftingContainer", $rt_wrapFunction0(nmcgsi_CraftingTableScreen_getCraftingContainer), "$onClose", $rt_wrapFunction0(nmcgsi_CraftingTableScreen_onClose), "$render", $rt_wrapFunction4(nmcgsi_CraftingTableScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsi_CraftingTableScreen_mouseClicked), "$mouseMoved",
+$rt_wrapFunction2(nmcgsi_CraftingTableScreen_mouseMoved), "$keyPressed", $rt_wrapFunction3(nmcgsi_CraftingTableScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgsi_CraftingTableScreen_isPauseScreen)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_13, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_13__init_), "$onPress", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_13_onPress)],
 jur_AbstractCharClass$LazyPunct, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyPunct__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyPunct_computeValue)],
 ju_MissingFormatWidthException, "MissingFormatWidthException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_MissingFormatWidthException__init_0)],
-nmcr_LevelRenderer, 0, jl_Object, [], 1, 0, () => nmcr_LevelRenderer_$callClinit(), ["$_init_45", $rt_wrapFunction1(nmcr_LevelRenderer__init_), "$renderLevel", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9) { nmcr_LevelRenderer_renderLevel(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9); }, "$renderDestroyProgress", function(var_1, var_2, var_3, var_4, var_5) { nmcr_LevelRenderer_renderDestroyProgress(this, var_1, var_2, var_3, var_4, var_5); }, "$renderHitOutline",
-$rt_wrapFunction4(nmcr_LevelRenderer_renderHitOutline)],
-nmcgso_SoundOptionsScreen$init$lambda$_1_12, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_12__init_), "$onChange", $rt_wrapFunction2(nmcgso_SoundOptionsScreen$init$lambda$_1_12_onChange)],
+nmcr_LevelRenderer, 0, jl_Object, [], 1, 0, () => nmcr_LevelRenderer_$callClinit(), ["$_init_46", $rt_wrapFunction1(nmcr_LevelRenderer__init_), "$renderLevel", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9) { nmcr_LevelRenderer_renderLevel(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9); }, "$renderDestroyProgress", function(var_1, var_2, var_3, var_4, var_5) { nmcr_LevelRenderer_renderDestroyProgress(this, var_1, var_2, var_3, var_4, var_5); }, "$renderHitOutline",
+$rt_wrapFunction4(nmcr_LevelRenderer_renderHitOutline)]]);
+$rt_metadata([nmcgso_SoundOptionsScreen$init$lambda$_1_12, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_12__init_), "$onChange", $rt_wrapFunction2(nmcgso_SoundOptionsScreen$init$lambda$_1_12_onChange)],
 nlevit_ClientMain, 0, jl_Object, [], 1, 0, () => nlevit_ClientMain_$callClinit(), 0,
-nmcgso_SoundOptionsScreen$init$lambda$_1_11, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_101", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_11__init_), "$onChange", $rt_wrapFunction2(nmcgso_SoundOptionsScreen$init$lambda$_1_11_onChange)],
+nmcgso_SoundOptionsScreen$init$lambda$_1_11, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_102", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_11__init_), "$onChange", $rt_wrapFunction2(nmcgso_SoundOptionsScreen$init$lambda$_1_11_onChange)],
 nmcgso_SoundOptionsScreen$init$lambda$_1_10, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$init$lambda$_1_10__init_), "$onPress", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$init$lambda$_1_10_onPress)],
 nlevi_PlatformNetworking$WebSocketMessageCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
-jm_Multiplication, 0, jl_Object, [], 0, 0, () => jm_Multiplication_$callClinit(), 0]);
-$rt_metadata([jur_WordBoundary, "WordBoundary", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_38", $rt_wrapFunction1(jur_WordBoundary__init_), "$matches", $rt_wrapFunction3(jur_WordBoundary_matches), "$hasConsumed", $rt_wrapFunction1(jur_WordBoundary_hasConsumed), "$getName", $rt_wrapFunction0(jur_WordBoundary_getName)],
+jm_Multiplication, 0, jl_Object, [], 0, 0, () => jm_Multiplication_$callClinit(), 0,
+jur_WordBoundary, "WordBoundary", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_39", $rt_wrapFunction1(jur_WordBoundary__init_), "$matches", $rt_wrapFunction3(jur_WordBoundary_matches), "$hasConsumed", $rt_wrapFunction1(jur_WordBoundary_hasConsumed), "$getName", $rt_wrapFunction0(jur_WordBoundary_getName)],
 jur_AbstractCharClass$LazySpace, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazySpace__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazySpace_computeValue)],
 otrf_VirtualFileSystemProvider, 0, jl_Object, [], 17, 0, 0, 0,
 ju_HashMap$1, 0, ju_AbstractSet, [], 0, 0, 0, ["$_init_15", $rt_wrapFunction1(ju_HashMap$1__init_), "$iterator", $rt_wrapFunction0(ju_HashMap$1_iterator)],
-nlevi_PlatformInput, "PlatformInput", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformInput_$callClinit(), 0,
-nmcgsi_CreativeModeInventoryScreen, "CreativeModeInventoryScreen", 20, nmcgs_Screen, [], 1, 0, () => nmcgsi_CreativeModeInventoryScreen_$callClinit(), ["$_init_0", $rt_wrapFunction0(nmcgsi_CreativeModeInventoryScreen__init_), "$init", $rt_wrapFunction0(nmcgsi_CreativeModeInventoryScreen_init), "$render", $rt_wrapFunction4(nmcgsi_CreativeModeInventoryScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsi_CreativeModeInventoryScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgsi_CreativeModeInventoryScreen_mouseScrolled),
+nlevi_PlatformInput, "PlatformInput", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformInput_$callClinit(), 0,
+nmcgsi_CreativeModeInventoryScreen, "CreativeModeInventoryScreen", 21, nmcgs_Screen, [], 1, 0, () => nmcgsi_CreativeModeInventoryScreen_$callClinit(), ["$_init_0", $rt_wrapFunction0(nmcgsi_CreativeModeInventoryScreen__init_), "$init", $rt_wrapFunction0(nmcgsi_CreativeModeInventoryScreen_init), "$render", $rt_wrapFunction4(nmcgsi_CreativeModeInventoryScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsi_CreativeModeInventoryScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgsi_CreativeModeInventoryScreen_mouseScrolled),
 "$mouseMoved", $rt_wrapFunction2(nmcgsi_CreativeModeInventoryScreen_mouseMoved), "$keyPressed", $rt_wrapFunction3(nmcgsi_CreativeModeInventoryScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgsi_CreativeModeInventoryScreen_isPauseScreen)],
 jl_Double, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Double_$callClinit(), 0,
 jm_Elementary, 0, jl_Object, [], 0, 0, 0, 0,
-nmcgs_SelectWorldScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_126", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_0_onPress)],
-nmcgs_SelectWorldScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_126", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_1_onPress)],
+nmcgs_SelectWorldScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_128", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_0_onPress)],
+nmcgs_SelectWorldScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_128", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_1_onPress)],
 nmcgs_SelectWorldScreen$init$lambda$_1_2, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_SelectWorldScreen$init$lambda$_1_2__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_2_onPress)],
-nmcgs_SelectWorldScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_126", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_3_onPress)],
+nmcgs_SelectWorldScreen$init$lambda$_1_3, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_128", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_3__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_3_onPress)],
 nmcgs_SelectWorldScreen$init$lambda$_1_4, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_SelectWorldScreen$init$lambda$_1_4__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_4_onPress)],
-nmcgs_SelectWorldScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_126", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_5_onPress)],
-nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider, "AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_55", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue),
+nmcgs_SelectWorldScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_128", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgs_SelectWorldScreen$init$lambda$_1_5_onPress)],
+nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider, "AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider", 20, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_56", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue),
 "$getTelemetryId", $rt_wrapFunction0(nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_getTelemetryId)],
 jur_IntHash, 0, jl_Object, [], 0, 0, 0, 0,
 nleva_PlatformWebService, 0, jl_Object, [], 17, 0, () => nleva_PlatformWebService_$callClinit(), 0,
 jur_ReluctantAltQuantifierSet, "ReluctantAltQuantifierSet", 2, jur_AltQuantifierSet, [], 0, 0, 0, ["$_init_31", $rt_wrapFunction3(jur_ReluctantAltQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantAltQuantifierSet_matches)],
 jl_NegativeArraySizeException, "NegativeArraySizeException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_NegativeArraySizeException__init_)],
 jur_AbstractCharClass$LazyJavaWhitespace, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaWhitespace__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaWhitespace_computeValue)],
-jur_Matcher$1, "Matcher$1", 2, jl_Object, [], 0, 0, 0, ["$_init_118", $rt_wrapFunction2(jur_Matcher$1__init_), "$toString", $rt_wrapFunction0(jur_Matcher$1_toString)],
+jur_Matcher$1, "Matcher$1", 2, jl_Object, [], 0, 0, 0, ["$_init_120", $rt_wrapFunction2(jur_Matcher$1__init_), "$toString", $rt_wrapFunction0(jur_Matcher$1_toString)],
 jl_UnsupportedOperationException, "UnsupportedOperationException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_UnsupportedOperationException__init_)],
-nmcgs_SelectWorldScreen, "SelectWorldScreen", 18, nmcgs_Screen, [], 1, 0, 0, ["$_init_54", $rt_wrapFunction1(nmcgs_SelectWorldScreen__init_), "$init", $rt_wrapFunction0(nmcgs_SelectWorldScreen_init), "$render", $rt_wrapFunction4(nmcgs_SelectWorldScreen_render), "$isPauseScreen", $rt_wrapFunction0(nmcgs_SelectWorldScreen_isPauseScreen)],
+nmcgs_SelectWorldScreen, "SelectWorldScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_55", $rt_wrapFunction1(nmcgs_SelectWorldScreen__init_), "$init", $rt_wrapFunction0(nmcgs_SelectWorldScreen_init), "$render", $rt_wrapFunction4(nmcgs_SelectWorldScreen_render), "$isPauseScreen", $rt_wrapFunction0(nmcgs_SelectWorldScreen_isPauseScreen)],
 jl_NumberFormatException, "NumberFormatException", 4, jl_IllegalArgumentException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_NumberFormatException__init_2), "$_init_", $rt_wrapFunction1(jl_NumberFormatException__init_0)],
 jl_IllegalStateException, "IllegalStateException", 4, jl_RuntimeException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_IllegalStateException__init_), "$_init_", $rt_wrapFunction1(jl_IllegalStateException__init_0)],
 ju_FormatterClosedException, "FormatterClosedException", 1, jl_IllegalStateException, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_FormatterClosedException__init_)],
-nmcgso_ControlsScreen$SprintWindowSlider, "ControlsScreen$SprintWindowSlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_55", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_ControlsScreen$SprintWindowSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_getTelemetryId)],
+nmcgso_ControlsScreen$SprintWindowSlider, "ControlsScreen$SprintWindowSlider", 20, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_56", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_ControlsScreen$SprintWindowSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_displayString), "$applyValue", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_applyValue), "$getTelemetryId", $rt_wrapFunction0(nmcgso_ControlsScreen$SprintWindowSlider_getTelemetryId)],
 ji_File, 0, jl_Object, [ji_Serializable, jl_Comparable], 1, 0, () => ji_File_$callClinit(), ["$_init_", $rt_wrapFunction1(ji_File__init_0)],
-nmcm_GameConfig$FolderData, 0, jl_Object, [], 1, 0, 0, ["$_init_105", $rt_wrapFunction4(nmcm_GameConfig$FolderData__init_)],
+nmcm_GameConfig$FolderData, 0, jl_Object, [], 1, 0, 0, ["$_init_106", $rt_wrapFunction4(nmcm_GameConfig$FolderData__init_)],
 jur_IntArrHash, 0, jl_Object, [], 0, 0, 0, 0,
-nmcgso_OptionsScreen$FovSlider, "OptionsScreen$FovSlider", 19, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_55", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_OptionsScreen$FovSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_displayString), "$getTelemetryId", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_getTelemetryId), "$applyValue", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_applyValue)],
+nmcgso_OptionsScreen$FovSlider, "OptionsScreen$FovSlider", 20, nmcgc_AbstractSliderButton, [], 0, 0, 0, ["$_init_56", function(var_1, var_2, var_3, var_4, var_5) { nmcgso_OptionsScreen$FovSlider__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$displayString", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_displayString), "$getTelemetryId", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_getTelemetryId), "$applyValue", $rt_wrapFunction0(nmcgso_OptionsScreen$FovSlider_applyValue)],
 nlev_WorldStorage$WorldSummary, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_WorldStorage$WorldSummary__init_0)],
 nlevi_PlatformRuntime$registerVisibilityChangeListener$lambda$_51_0, 0, jl_Object, [nlevi_PlatformRuntime$VisibilityChangeCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerVisibilityChangeListener$lambda$_51_0__init_), "$call7", $rt_wrapFunction1(nlevi_PlatformRuntime$registerVisibilityChangeListener$lambda$_51_0_call)],
 jur_AbstractCharClass$LazyJavaMirrored, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaMirrored__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaMirrored_computeValue)],
 jur_AbstractCharClass$LazyJavaISOControl, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaISOControl__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaISOControl_computeValue)],
-ju_Formatter$FormatWriter, 0, jl_Object, [], 0, 0, 0, ["$_init_64", function(var_1, var_2, var_3, var_4, var_5) { ju_Formatter$FormatWriter__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$write", $rt_wrapFunction0(ju_Formatter$FormatWriter_write)],
-jur_HighSurrogateCharSet, "HighSurrogateCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_74", $rt_wrapFunction1(jur_HighSurrogateCharSet__init_0), "$setNext", $rt_wrapFunction1(jur_HighSurrogateCharSet_setNext), "$matches", $rt_wrapFunction3(jur_HighSurrogateCharSet_matches), "$find", $rt_wrapFunction3(jur_HighSurrogateCharSet_find), "$findBack", $rt_wrapFunction4(jur_HighSurrogateCharSet_findBack), "$getName", $rt_wrapFunction0(jur_HighSurrogateCharSet_getName), "$first", $rt_wrapFunction1(jur_HighSurrogateCharSet_first),
+ju_Formatter$FormatWriter, 0, jl_Object, [], 0, 0, 0, ["$_init_65", function(var_1, var_2, var_3, var_4, var_5) { ju_Formatter$FormatWriter__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$write", $rt_wrapFunction0(ju_Formatter$FormatWriter_write)],
+jur_HighSurrogateCharSet, "HighSurrogateCharSet", 2, jur_JointSet, [], 0, 0, 0, ["$_init_75", $rt_wrapFunction1(jur_HighSurrogateCharSet__init_0), "$setNext", $rt_wrapFunction1(jur_HighSurrogateCharSet_setNext), "$matches", $rt_wrapFunction3(jur_HighSurrogateCharSet_matches), "$find", $rt_wrapFunction3(jur_HighSurrogateCharSet_find), "$findBack", $rt_wrapFunction4(jur_HighSurrogateCharSet_findBack), "$getName", $rt_wrapFunction0(jur_HighSurrogateCharSet_getName), "$first", $rt_wrapFunction1(jur_HighSurrogateCharSet_first),
 "$hasConsumed", $rt_wrapFunction1(jur_HighSurrogateCharSet_hasConsumed)],
-jur_ReluctantCompositeQuantifierSet, "ReluctantCompositeQuantifierSet", 2, jur_CompositeQuantifierSet, [], 0, 0, 0, ["$_init_77", $rt_wrapFunction4(jur_ReluctantCompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantCompositeQuantifierSet_matches)],
+jur_ReluctantCompositeQuantifierSet, "ReluctantCompositeQuantifierSet", 2, jur_CompositeQuantifierSet, [], 0, 0, 0, ["$_init_78", $rt_wrapFunction4(jur_ReluctantCompositeQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantCompositeQuantifierSet_matches)],
 nlevi_PlatformApplication$registerResizeListener$lambda$_18_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformApplication$registerResizeListener$lambda$_18_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformApplication$registerResizeListener$lambda$_18_0_handleEvent)],
-nmcgso_MouseSettingsScreen, "MouseSettingsScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_MouseSettingsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_init), "$render", $rt_wrapFunction4(nmcgso_MouseSettingsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_MouseSettingsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_isPauseScreen)],
+nmcgso_MouseSettingsScreen, "MouseSettingsScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcgso_MouseSettingsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_init), "$render", $rt_wrapFunction4(nmcgso_MouseSettingsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_MouseSettingsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_MouseSettingsScreen_isPauseScreen)],
 jur_SOLSet, "SOLSet", 2, jur_AbstractSet, [], 16, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_SOLSet__init_), "$matches", $rt_wrapFunction3(jur_SOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_SOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_SOLSet_getName)],
-otpp_AsyncCallbackWrapper, 0, jl_Object, [oti_AsyncCallback], 0, 0, 0, ["$_init_133", $rt_wrapFunction1(otpp_AsyncCallbackWrapper__init_), "$complete", $rt_wrapFunction1(otpp_AsyncCallbackWrapper_complete), "$error", $rt_wrapFunction1(otpp_AsyncCallbackWrapper_error)],
-nmcgsm_EditServerScreen$1, "EditServerScreen$1", 21, nmcgc_EditBox, [], 0, 0, 0, ["$_init_84", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_EditServerScreen$1__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_EditServerScreen$1_getTelemetryId)],
-nlevi_PlatformOpenGL, "PlatformOpenGL", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformOpenGL_$callClinit(), 0,
-nmcgsm_EditServerScreen$2, "EditServerScreen$2", 21, nmcgc_EditBox, [], 0, 0, 0, ["$_init_84", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_EditServerScreen$2__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_EditServerScreen$2_getTelemetryId)],
+otpp_AsyncCallbackWrapper, 0, jl_Object, [oti_AsyncCallback], 0, 0, 0, ["$_init_135", $rt_wrapFunction1(otpp_AsyncCallbackWrapper__init_), "$complete", $rt_wrapFunction1(otpp_AsyncCallbackWrapper_complete), "$error", $rt_wrapFunction1(otpp_AsyncCallbackWrapper_error)],
+nmcgsm_EditServerScreen$1, "EditServerScreen$1", 22, nmcgc_EditBox, [], 0, 0, 0, ["$_init_85", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_EditServerScreen$1__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_EditServerScreen$1_getTelemetryId)],
+nlevi_PlatformOpenGL, "PlatformOpenGL", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformOpenGL_$callClinit(), 0]);
+$rt_metadata([nmcgsm_EditServerScreen$2, "EditServerScreen$2", 22, nmcgc_EditBox, [], 0, 0, 0, ["$_init_85", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgsm_EditServerScreen$2__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$getTelemetryId", $rt_wrapFunction0(nmcgsm_EditServerScreen$2_getTelemetryId)],
 otjt_ArrayBuffer, 0, jl_Object, [otj_JSObject], 1, 0, 0, 0,
 ju_HashMap$HashMapEntrySet, 0, ju_AbstractSet, [], 0, 0, 0, ["$_init_15", $rt_wrapFunction1(ju_HashMap$HashMapEntrySet__init_), "$iterator", $rt_wrapFunction0(ju_HashMap$HashMapEntrySet_iterator)],
-jl_Byte, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Byte_$callClinit(), ["$_init_134", $rt_wrapFunction1(jl_Byte__init_)],
+jl_Byte, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Byte_$callClinit(), ["$_init_136", $rt_wrapFunction1(jl_Byte__init_)],
 jm_RoundingMode, 0, jl_Enum, [], 65553, 0, () => jm_RoundingMode_$callClinit(), 0,
-nmc_KeyboardHandler, 0, jl_Object, [], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmc_KeyboardHandler__init_), "$keyPress", function(var_1, var_2, var_3, var_4, var_5) { nmc_KeyboardHandler_keyPress(this, var_1, var_2, var_3, var_4, var_5); }, "$charTyped1", $rt_wrapFunction3(nmc_KeyboardHandler_charTyped), "$tick", $rt_wrapFunction0(nmc_KeyboardHandler_tick)]]);
-$rt_metadata([cgcc_CollectPreconditions, 0, jl_Object, [], 16, 0, 0, 0,
+nmc_KeyboardHandler, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmc_KeyboardHandler__init_), "$keyPress", function(var_1, var_2, var_3, var_4, var_5) { nmc_KeyboardHandler_keyPress(this, var_1, var_2, var_3, var_4, var_5); }, "$charTyped1", $rt_wrapFunction3(nmc_KeyboardHandler_charTyped), "$tick", $rt_wrapFunction0(nmc_KeyboardHandler_tick)],
+cgcc_CollectPreconditions, 0, jl_Object, [], 16, 0, 0, 0,
 nmcr_TextureManager, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcr_TextureManager__init_)],
+nmwi_CraftingContainer, 0, jl_Object, [], 1, 0, 0, ["$_init_4", $rt_wrapFunction2(nmwi_CraftingContainer__init_), "$getWidth", $rt_wrapFunction0(nmwi_CraftingContainer_getWidth), "$getSize", $rt_wrapFunction0(nmwi_CraftingContainer_getSize), "$getCellId", $rt_wrapFunction1(nmwi_CraftingContainer_getCellId), "$getCellCount", $rt_wrapFunction1(nmwi_CraftingContainer_getCellCount), "$getResultId", $rt_wrapFunction0(nmwi_CraftingContainer_getResultId), "$getResultCount", $rt_wrapFunction0(nmwi_CraftingContainer_getResultCount),
+"$recompute", $rt_wrapFunction0(nmwi_CraftingContainer_recompute), "$clickCell", $rt_wrapFunction3(nmwi_CraftingContainer_clickCell), "$clickResult", $rt_wrapFunction2(nmwi_CraftingContainer_clickResult), "$returnContents", $rt_wrapFunction1(nmwi_CraftingContainer_returnContents)],
 nmc_BlockPos, 0, jl_Object, [], 17, 0, 0, 0,
 nmcr_SkyTimeline, 0, jl_Object, [], 17, 0, () => nmcr_SkyTimeline_$callClinit(), 0,
-nmcgso_MouseSettingsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_132", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_1_onPress)],
-nmcgso_MouseSettingsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_132", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_), "$onChange", $rt_wrapFunction2(nmcgso_MouseSettingsScreen$init$lambda$_1_0_onChange)],
+nmcgso_MouseSettingsScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_134", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_1_onPress)],
+nmcgso_MouseSettingsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_CycleButton$OnValueChange], 1, 0, 0, ["$_init_134", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_), "$onChange", $rt_wrapFunction2(nmcgso_MouseSettingsScreen$init$lambda$_1_0_onChange)],
 ju_Optional, 0, jl_Object, [], 17, 0, 0, 0,
-nmcgso_ControlsScreen, "ControlsScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_59", $rt_wrapFunction2(nmcgso_ControlsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_ControlsScreen_init), "$render", $rt_wrapFunction4(nmcgso_ControlsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_ControlsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_ControlsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_ControlsScreen_isPauseScreen)],
+nmcgso_ControlsScreen, "ControlsScreen", 20, nmcgs_Screen, [], 1, 0, 0, ["$_init_60", $rt_wrapFunction2(nmcgso_ControlsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_ControlsScreen_init), "$render", $rt_wrapFunction4(nmcgso_ControlsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_ControlsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_ControlsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_ControlsScreen_isPauseScreen)],
 nmcr_LevelRenderer$Mesh, 0, jl_Object, [], 16, 0, 0, 0,
 nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_MouseSettingsScreen$disabledButton$lambda$_2_0_onPress)],
 nlevi_PlatformNetworking$WebSocketOpenCallback, 0, jl_Object, [otj_JSObject], 1537, 0, 0, 0,
@@ -38736,14 +39854,14 @@ nlevi_PlatformInput$registerKeyListeners$lambda$_4_1, 0, jl_Object, [otjde_Event
 jur_AbstractCharClass$LazyJavaIdentifierIgnorable, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaIdentifierIgnorable__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyJavaIdentifierIgnorable_computeValue)],
 nlevi_PlatformInput$registerKeyListeners$lambda$_4_0, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$registerKeyListeners$lambda$_4_0__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$registerKeyListeners$lambda$_4_0_handleEvent0), "$handleEvent2", $rt_wrapFunction1(nlevi_PlatformInput$registerKeyListeners$lambda$_4_0_handleEvent)],
 jt_DecimalFormat$MinusField, "DecimalFormat$MinusField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$MinusField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$MinusField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$MinusField_equals)],
-nmcgs_CreateWorldScreen, "CreateWorldScreen", 18, nmcgs_Screen, [], 1, 0, () => nmcgs_CreateWorldScreen_$callClinit(), ["$_init_54", $rt_wrapFunction1(nmcgs_CreateWorldScreen__init_), "$init", $rt_wrapFunction0(nmcgs_CreateWorldScreen_init), "$render", $rt_wrapFunction4(nmcgs_CreateWorldScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgs_CreateWorldScreen_mouseClicked), "$keyPressed", $rt_wrapFunction3(nmcgs_CreateWorldScreen_keyPressed), "$charTyped0", $rt_wrapFunction2(nmcgs_CreateWorldScreen_charTyped),
+nmcgs_CreateWorldScreen, "CreateWorldScreen", 19, nmcgs_Screen, [], 1, 0, () => nmcgs_CreateWorldScreen_$callClinit(), ["$_init_55", $rt_wrapFunction1(nmcgs_CreateWorldScreen__init_), "$init", $rt_wrapFunction0(nmcgs_CreateWorldScreen_init), "$render", $rt_wrapFunction4(nmcgs_CreateWorldScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgs_CreateWorldScreen_mouseClicked), "$keyPressed", $rt_wrapFunction3(nmcgs_CreateWorldScreen_keyPressed), "$charTyped0", $rt_wrapFunction2(nmcgs_CreateWorldScreen_charTyped),
 "$isPauseScreen", $rt_wrapFunction0(nmcgs_CreateWorldScreen_isPauseScreen)],
-nlevi_PlatformAudio, "PlatformAudio", 26, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformAudio_$callClinit(), 0,
+nlevi_PlatformAudio, "PlatformAudio", 27, jl_Object, [], 1, [0,0,0], () => nlevi_PlatformAudio_$callClinit(), 0,
 jur_UMultiLineEOLSet, "UMultiLineEOLSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_5", $rt_wrapFunction1(jur_UMultiLineEOLSet__init_), "$matches", $rt_wrapFunction3(jur_UMultiLineEOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_UMultiLineEOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_UMultiLineEOLSet_getName)],
-nmc_Minecraft$_init_$lambda$_0_0, 0, jl_Object, [nlevi_PlatformInput$KeyEventObserver], 1, 0, 0, ["$_init_45", $rt_wrapFunction1(nmc_Minecraft$_init_$lambda$_0_0__init_), "$onKeyEvent", $rt_wrapFunction3(nmc_Minecraft$_init_$lambda$_0_0_onKeyEvent)],
+nmc_Minecraft$_init_$lambda$_0_0, 0, jl_Object, [nlevi_PlatformInput$KeyEventObserver], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmc_Minecraft$_init_$lambda$_0_0__init_), "$onKeyEvent", $rt_wrapFunction3(nmc_Minecraft$_init_$lambda$_0_0_onKeyEvent)],
 otcit_DoubleAnalyzer, 0, jl_Object, [], 17, 0, () => otcit_DoubleAnalyzer_$callClinit(), 0,
-cmbp_DisplayData, 0, jl_Object, [], 1, 0, 0, ["$_init_106", function(var_1, var_2, var_3, var_4, var_5) { cmbp_DisplayData__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getWidth", $rt_wrapFunction0(cmbp_DisplayData_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_DisplayData_getHeight)],
-nmc_Minecraft, 0, jl_Object, [cmbp_WindowEventHandler], 1, 0, 0, ["$_init_112", $rt_wrapFunction1(nmc_Minecraft__init_), "$tick", $rt_wrapFunction0(nmc_Minecraft_tick), "$render3", $rt_wrapFunction1(nmc_Minecraft_render), "$resizeDisplay", $rt_wrapFunction0(nmc_Minecraft_resizeDisplay), "$getWindow", $rt_wrapFunction0(nmc_Minecraft_getWindow), "$getOptions", $rt_wrapFunction0(nmc_Minecraft_getOptions), "$setScreen", $rt_wrapFunction1(nmc_Minecraft_setScreen), "$disconnect", $rt_wrapFunction0(nmc_Minecraft_disconnect),
+cmbp_DisplayData, 0, jl_Object, [], 1, 0, 0, ["$_init_107", function(var_1, var_2, var_3, var_4, var_5) { cmbp_DisplayData__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$getWidth", $rt_wrapFunction0(cmbp_DisplayData_getWidth), "$getHeight", $rt_wrapFunction0(cmbp_DisplayData_getHeight)],
+nmc_Minecraft, 0, jl_Object, [cmbp_WindowEventHandler], 1, 0, 0, ["$_init_113", $rt_wrapFunction1(nmc_Minecraft__init_), "$tick", $rt_wrapFunction0(nmc_Minecraft_tick), "$render3", $rt_wrapFunction1(nmc_Minecraft_render), "$resizeDisplay", $rt_wrapFunction0(nmc_Minecraft_resizeDisplay), "$getWindow", $rt_wrapFunction0(nmc_Minecraft_getWindow), "$getOptions", $rt_wrapFunction0(nmc_Minecraft_getOptions), "$setScreen", $rt_wrapFunction1(nmc_Minecraft_setScreen), "$disconnect", $rt_wrapFunction0(nmc_Minecraft_disconnect),
 "$getScreen", $rt_wrapFunction0(nmc_Minecraft_getScreen), "$getLevelRenderer", $rt_wrapFunction0(nmc_Minecraft_getLevelRenderer), "$doWorldLoad", $rt_wrapFunction1(nmc_Minecraft_doWorldLoad), "$setLevel", $rt_wrapFunction1(nmc_Minecraft_setLevel), "$getLevel", $rt_wrapFunction0(nmc_Minecraft_getLevel), "$isLevelLoaded", $rt_wrapFunction0(nmc_Minecraft_isLevelLoaded), "$startUseItem", $rt_wrapFunction0(nmc_Minecraft_startUseItem), "$startAttack", $rt_wrapFunction0(nmc_Minecraft_startAttack), "$stopAttack", $rt_wrapFunction0(nmc_Minecraft_stopAttack),
 "$pickBlock", $rt_wrapFunction0(nmc_Minecraft_pickBlock), "$getPlayer", $rt_wrapFunction0(nmc_Minecraft_getPlayer), "$getInventory", $rt_wrapFunction0(nmc_Minecraft_getInventory), "$getGameMode", $rt_wrapFunction0(nmc_Minecraft_getGameMode), "$getHitResult", $rt_wrapFunction0(nmc_Minecraft_getHitResult), "$playerSelectedSlotChanged", $rt_wrapFunction0(nmc_Minecraft_playerSelectedSlotChanged), "$pickFromEye", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7) { nmc_Minecraft_pickFromEye(this, var_1, var_2,
 var_3, var_4, var_5, var_6, var_7); }, "$getMouseHandler", $rt_wrapFunction0(nmc_Minecraft_getMouseHandler), "$getGui", $rt_wrapFunction0(nmc_Minecraft_getGui)],
@@ -38753,10 +39871,10 @@ jur_Lexer, 0, jl_Object, [], 0, 0, 0, ["$_init_21", $rt_wrapFunction2(jur_Lexer_
 "$lookAhead", $rt_wrapFunction0(jur_Lexer_lookAhead), "$back", $rt_wrapFunction0(jur_Lexer_back), "$toString", $rt_wrapFunction0(jur_Lexer_toString), "$isEmpty", $rt_wrapFunction0(jur_Lexer_isEmpty), "$isLetter", $rt_wrapFunction0(jur_Lexer_isLetter0), "$isHighSurrogate0", $rt_wrapFunction0(jur_Lexer_isHighSurrogate0), "$isLowSurrogate0", $rt_wrapFunction0(jur_Lexer_isLowSurrogate0), "$getIndex", $rt_wrapFunction0(jur_Lexer_getIndex)],
 jur_AbstractCharClass$LazySpecialsBlock, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazySpecialsBlock__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazySpecialsBlock_computeValue)],
 jur_AbstractCharClass$LazyNonSpace, 0, jur_AbstractCharClass$LazySpace, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonSpace__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyNonSpace_computeValue)],
-nmcgs_PauseScreen, "PauseScreen", 18, nmcgs_Screen, [], 1, 0, 0, ["$_init_38", $rt_wrapFunction1(nmcgs_PauseScreen__init_), "$init", $rt_wrapFunction0(nmcgs_PauseScreen_init), "$render", $rt_wrapFunction4(nmcgs_PauseScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgs_PauseScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgs_PauseScreen_isPauseScreen)],
+nmcgs_PauseScreen, "PauseScreen", 19, nmcgs_Screen, [], 1, 0, 0, ["$_init_39", $rt_wrapFunction1(nmcgs_PauseScreen__init_), "$init", $rt_wrapFunction0(nmcgs_PauseScreen_init), "$render", $rt_wrapFunction4(nmcgs_PauseScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgs_PauseScreen_keyPressed), "$isPauseScreen", $rt_wrapFunction0(nmcgs_PauseScreen_isPauseScreen)],
 otjt_Int32Array, 0, otjt_TypedArray, [], 1, 0, 0, 0,
 ju_IllegalFormatFlagsException, "IllegalFormatFlagsException", 1, ju_IllegalFormatException, [], 1, 0, 0, ["$_init_", $rt_wrapFunction1(ju_IllegalFormatFlagsException__init_0)],
-nmcgs_SelectWorldScreen$WorldEntryWidget, "SelectWorldScreen$WorldEntryWidget", 18, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_127", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgs_SelectWorldScreen$WorldEntryWidget__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$render", $rt_wrapFunction4(nmcgs_SelectWorldScreen$WorldEntryWidget_render), "$onClick", $rt_wrapFunction0(nmcgs_SelectWorldScreen$WorldEntryWidget_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgs_SelectWorldScreen$WorldEntryWidget_getTelemetryId)],
+nmcgs_SelectWorldScreen$WorldEntryWidget, "SelectWorldScreen$WorldEntryWidget", 19, nmcgc_AbstractWidget, [], 1, 0, 0, ["$_init_129", function(var_1, var_2, var_3, var_4, var_5, var_6) { nmcgs_SelectWorldScreen$WorldEntryWidget__init_(this, var_1, var_2, var_3, var_4, var_5, var_6); }, "$render", $rt_wrapFunction4(nmcgs_SelectWorldScreen$WorldEntryWidget_render), "$onClick", $rt_wrapFunction0(nmcgs_SelectWorldScreen$WorldEntryWidget_onClick), "$getTelemetryId", $rt_wrapFunction0(nmcgs_SelectWorldScreen$WorldEntryWidget_getTelemetryId)],
 otji_JSWrapper$Helper$_clinit_$lambda$_3_1, 0, jl_Object, [otji_JSWrapper$Helper$FinalizationRegistryConsumer], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(otji_JSWrapper$Helper$_clinit_$lambda$_3_1__init_), "$accept0", $rt_wrapFunction1(otji_JSWrapper$Helper$_clinit_$lambda$_3_1_accept)],
 otji_JSWrapper$Helper$_clinit_$lambda$_3_0, 0, jl_Object, [otji_JSWrapper$Helper$FinalizationRegistryConsumer], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(otji_JSWrapper$Helper$_clinit_$lambda$_3_0__init_), "$accept0", $rt_wrapFunction1(otji_JSWrapper$Helper$_clinit_$lambda$_3_0_accept)],
 nlevi_PlatformInput$registerKeyListeners$lambda$_4_4, 0, jl_Object, [otjde_EventListener], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformInput$registerKeyListeners$lambda$_4_4__init_), "$handleEvent", $rt_wrapFunction1(nlevi_PlatformInput$registerKeyListeners$lambda$_4_4_handleEvent)],
@@ -38772,11 +39890,12 @@ $rt_intArrayCls = $rt_arraycls($rt_intcls),
 $rt_longArrayCls = $rt_arraycls($rt_longcls),
 $rt_floatArrayCls = $rt_arraycls($rt_floatcls);
 $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expectedValuesPerKey", "widget/button", "widget/button_highlighted", "widget/button_disabled", "widget/text_field", "widget/text_field_highlighted", "widget/tab", "widget/tab_highlighted", "widget/tab_selected", "widget/tab_selected_highlighted", "widget/scroller", "widget/scroller_background", "widget/slider", "widget/slider_highlighted", "widget/slider_handle", "widget/slider_handle_highlighted", "hud/crosshair", "hud/hotbar", "hud/hotbar_selection",
-"misc/unknown_server", "icon/language", "icon/accessibility", "container/inventory", "container/creative_inventory/tab_items", "container/creative_inventory/tab_inventory", "container/creative_inventory/tab_item_search", "container/creative_inventory/tab_top_selected_", "container/creative_inventory/tab_top_unselected_", "container/creative_inventory/scroller", "block/", "gui/menu_background", "gui/menu_list_background", "gui/header_separator", "gui/footer_separator", "title/background/panorama_0", "title/background/panorama_1",
-"title/background/panorama_2", "title/background/panorama_3", "title/background/panorama_4", "title/background/panorama_5", "assets/gui/sprites/", ".png", "[GuiSprites] requested ", " vanilla sprite PNGs", "[GuiSprites] failed to load sprite \'", "title/background/panorama_", "[GuiSprites] texture upload failed for \'", "\': ", "profile.", "username", "skinModel", "skinURL", "renderDist", "fov", "masterVol", "musicVol", "sfxVol", "ambientVol", "fancyGfx", "smoothLt", "vsync", "lang", "showFPS", "heldItemTooltips",
-"mipmapLevels", "[EaglerProfile] Profile loaded: ", " (skin=", ", renderDist=", ", fov=", "[EaglerProfile] Corrupted profile data, using defaults: ", "[EaglerProfile] Failed to load profile: ", "", "[EaglerProfile] Failed to save profile: ", "Player", "en_US", "String is null", "String is empty", "String contains invalid digits: ", "String contains digits out of radix ", ": ", "The value is too big for int type: ", "The value is too big for integer type", "Illegal radix: ", "JointSet", "main", "[EaglerShaderImpl] Failed to create shader object for: ",
-"[EaglerShaderImpl] Compiled shader: ", "[EaglerShaderImpl] Shader compilation failed: ", "[EaglerShaderImpl] Info log: ", "\n", "[EaglerShaderImpl] Source preview (", " lines total):", "  ", "  ... (", " more lines)", "[EaglerShaderImpl] Failed to create program object: ", "[EaglerShaderImpl] Linked program: ", "[EaglerShaderImpl] Program link failed: ", "[EaglerShaderImpl] Cannot link program with null shader: ", ".vsh", ".fsh", "#version 300 es", "precision highp float;\nprecision highp int;\n", "precision highp float;\nprecision highp int;\nprecision highp sampler2D;\n",
-"#version", "#extension GL_ARB_", "#extension GL_EXT_", "varying", "in", "attribute", "out", "texture2D", "textureCube", "gl_FragColor", "eagler_FragColor", "out vec4 eagler_FragColor;\n", "\\b", "\\s*\\(", "texture(", "Shaders compiled: ", " (failed: ", "), Programs linked: ", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nout vec2 v_uv;\nvoid main() {\n  v_uv = a_pos * 0.5 + 0.5;\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n}\n", "#version 300 es\nprecision highp float;\nin vec2 v_uv;\nuniform vec2 u_resolution;\nuniform float u_time;\nout vec4 fragColor;\nvoid main() {\n  vec2 uv = v_uv;\n  float horizon = 0.35;\n  // Sky gradient (MC overworld sky colors)\n  vec3 skyTop = vec3(0.38, 0.62, 0.95);\n  vec3 skyHorizon = vec3(0.75, 0.87, 1.0);\n  vec3 groundFar = vec3(0.55, 0.73, 0.35);\n  vec3 groundNear = vec3(0.38, 0.55, 0.22);\n  vec3 col;\n  if (uv.y > horizon) {\n    float t = (uv.y - horizon) / (1.0 - horizon);\n    col = mix(skyHorizon, skyTop, "
+"misc/unknown_server", "icon/language", "icon/accessibility", "container/inventory", "container/crafting_table", "container/creative_inventory/tab_items", "container/creative_inventory/tab_inventory", "container/creative_inventory/tab_item_search", "container/creative_inventory/tab_top_selected_", "container/creative_inventory/tab_top_unselected_", "container/creative_inventory/scroller", "block/", "item/", "gui/menu_background", "gui/menu_list_background", "gui/header_separator", "gui/footer_separator", "title/background/panorama_0",
+"title/background/panorama_1", "title/background/panorama_2", "title/background/panorama_3", "title/background/panorama_4", "title/background/panorama_5", "assets/gui/sprites/", ".png", "[GuiSprites] requested ", " vanilla sprite PNGs", "[GuiSprites] failed to load sprite \'", "title/background/panorama_", "[GuiSprites] texture upload failed for \'", "\': ", "profile.", "username", "skinModel", "skinURL", "renderDist", "fov", "masterVol", "musicVol", "sfxVol", "ambientVol", "fancyGfx", "smoothLt", "vsync", "lang",
+"showFPS", "heldItemTooltips", "mipmapLevels", "[EaglerProfile] Profile loaded: ", " (skin=", ", renderDist=", ", fov=", "[EaglerProfile] Corrupted profile data, using defaults: ", "[EaglerProfile] Failed to load profile: ", "", "[EaglerProfile] Failed to save profile: ", "Player", "en_US", "String is null", "String is empty", "String contains invalid digits: ", "String contains digits out of radix ", ": ", "The value is too big for int type: ", "The value is too big for integer type", "Illegal radix: ", "JointSet",
+"main", "[EaglerShaderImpl] Failed to create shader object for: ", "[EaglerShaderImpl] Compiled shader: ", "[EaglerShaderImpl] Shader compilation failed: ", "[EaglerShaderImpl] Info log: ", "\n", "[EaglerShaderImpl] Source preview (", " lines total):", "  ", "  ... (", " more lines)", "[EaglerShaderImpl] Failed to create program object: ", "[EaglerShaderImpl] Linked program: ", "[EaglerShaderImpl] Program link failed: ", "[EaglerShaderImpl] Cannot link program with null shader: ", ".vsh", ".fsh", "#version 300 es",
+"precision highp float;\nprecision highp int;\n", "precision highp float;\nprecision highp int;\nprecision highp sampler2D;\n", "#version", "#extension GL_ARB_", "#extension GL_EXT_", "varying", "in", "attribute", "out", "texture2D", "textureCube", "gl_FragColor", "eagler_FragColor", "out vec4 eagler_FragColor;\n", "\\b", "\\s*\\(", "texture(", "Shaders compiled: ", " (failed: ", "), Programs linked: ", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nout vec2 v_uv;\nvoid main() {\n  v_uv = a_pos * 0.5 + 0.5;\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n}\n",
+"#version 300 es\nprecision highp float;\nin vec2 v_uv;\nuniform vec2 u_resolution;\nuniform float u_time;\nout vec4 fragColor;\nvoid main() {\n  vec2 uv = v_uv;\n  float horizon = 0.35;\n  // Sky gradient (MC overworld sky colors)\n  vec3 skyTop = vec3(0.38, 0.62, 0.95);\n  vec3 skyHorizon = vec3(0.75, 0.87, 1.0);\n  vec3 groundFar = vec3(0.55, 0.73, 0.35);\n  vec3 groundNear = vec3(0.38, 0.55, 0.22);\n  vec3 col;\n  if (uv.y > horizon) {\n    float t = (uv.y - horizon) / (1.0 - horizon);\n    col = mix(skyHorizon, skyTop, "
 + "t);\n    // Subtle clouds\n    float cloud = smoothstep(0.48, 0.52, sin(uv.x * 8.0 + u_time * 0.15) * 0.5 + 0.5);\n    col = mix(col, vec3(1.0), cloud * 0.3 * smoothstep(0.0, 0.3, t));\n  } else {\n    float t = uv.y / horizon;\n    col = mix(groundNear, groundFar, t);\n  }\n  // Vignette effect\n  vec2 vc = uv - 0.5;\n  float vig = 1.0 - dot(vc, vc) * 0.8;\n  col *= vig;\n  fragColor = vec4(col, 1.0);\n}\n", "title_screen", "u_resolution", "u_time", "a_pos", "CI sequence: ", "CI back reference: ", "UCI back reference: ",
 "<DotAllQuant>", "fSet", "BehindFSet", " ", "^ ", "range:", "<GroupQuant>", "Currency not found: ", " | ", " | tick ", "null", "false", "true", "MISS", "BLOCK", "Lower", "Upper", "ASCII", "Alpha", "Digit", "Alnum", "Punct", "Graph", "Print", "Blank", "Cntrl", "XDigit", "javaLowerCase", "javaUpperCase", "javaWhitespace", "javaMirrored", "javaDefined", "javaDigit", "javaIdentifierIgnorable", "javaISOControl", "javaJavaIdentifierPart", "javaJavaIdentifierStart", "javaLetter", "javaLetterOrDigit", "javaSpaceChar",
 "javaTitleCase", "javaUnicodeIdentifierPart", "javaUnicodeIdentifierStart", "Space", "w", "W", "s", "S", "d", "D", "BasicLatin", "Latin-1Supplement", "LatinExtended-A", "LatinExtended-B", "IPAExtensions", "SpacingModifierLetters", "CombiningDiacriticalMarks", "Greek", "Cyrillic", "CyrillicSupplement", "Armenian", "Hebrew", "Arabic", "Syriac", "ArabicSupplement", "Thaana", "Devanagari", "Bengali", "Gurmukhi", "Gujarati", "Oriya", "Tamil", "Telugu", "Kannada", "Malayalam", "Sinhala", "Thai", "Lao", "Tibetan",
@@ -38785,11 +39904,13 @@ $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expec
 "SupplementalPunctuation", "CJKRadicalsSupplement", "KangxiRadicals", "IdeographicDescriptionCharacters", "CJKSymbolsandPunctuation", "Hiragana", "Katakana", "Bopomofo", "HangulCompatibilityJamo", "Kanbun", "BopomofoExtended", "CJKStrokes", "KatakanaPhoneticExtensions", "EnclosedCJKLettersandMonths", "CJKCompatibility", "CJKUnifiedIdeographsExtensionA", "YijingHexagramSymbols", "CJKUnifiedIdeographs", "YiSyllables", "YiRadicals", "ModifierToneLetters", "SylotiNagri", "HangulSyllables", "HighSurrogates", "HighPrivateUseSurrogates",
 "LowSurrogates", "PrivateUseArea", "CJKCompatibilityIdeographs", "AlphabeticPresentationForms", "ArabicPresentationForms-A", "VariationSelectors", "VerticalForms", "CombiningHalfMarks", "CJKCompatibilityForms", "SmallFormVariants", "ArabicPresentationForms-B", "HalfwidthandFullwidthForms", "all", "Specials", "Cn", "IsL", "Lu", "Ll", "Lt", "Lm", "Lo", "IsM", "Mn", "Me", "Mc", "N", "Nd", "Nl", "No", "IsZ", "Zs", "Zl", "Zp", "IsC", "Cc", "Cf", "Co", "Cs", "IsP", "Pd", "Ps", "Pe", "Pc", "Po", "IsS", "Sm", "Sc",
 "Sk", "So", "Pi", "Pf", "decomposed char:", "AheadFSet", "NonCapJointSet", "PosLookaheadJointSet", "NegLookaheadJointSet", "tab_", "MOVEMENT", "GAMEPLAY", "INVENTORY", "INTERFACE", "CREATIVE", "MULTIPLAYER", "MISC", "0", "<Quant>", "Disconnected", "Back", "PosBehindJointSet", "sequence: ", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec2 a_uv;layout(location=2) in float a_layer;layout(location=3) in vec4 a_color;uniform mat4 u_mvp;out vec2 v_uv;out float v_layer;out vec4 v_color;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_uv = a_uv;  v_layer = a_layer;  v_color = a_color;}",
-"[WorldGl] vsh: ", "#version 300 es\nprecision highp float;precision highp sampler2DArray;uniform sampler2DArray u_tex;uniform vec3 u_skyLight;in vec2 v_uv;in float v_layer;in vec4 v_color;out vec4 frag;void main() {  vec4 c = texture(u_tex, vec3(v_uv, v_layer));  if (c.a < 0.5) discard;  frag = vec4(c.rgb * v_color.rgb * u_skyLight, c.a * v_color.a);}", "[WorldGl] fsh: ", "[WorldGl] link: ", "u_mvp", "u_tex", "u_skyLight", "[WorldGl] program init failed: ", "UCI range:", "Yes", "difficultycycle", "Difficulty: Peaceful",
+"[WorldGl] vsh: ", "#version 300 es\nprecision highp float;precision highp sampler2DArray;uniform sampler2DArray u_tex;uniform vec3 u_skyLight;in vec2 v_uv;in float v_layer;in vec4 v_color;out vec4 frag;void main() {  vec4 c = texture(u_tex, vec3(v_uv, v_layer));  if (c.a < 0.5) discard;  frag = vec4(c.rgb * v_color.rgb * u_skyLight, c.a * v_color.a);}", "[WorldGl] fsh: ", "[WorldGl] link: ", "u_mvp", "u_tex", "u_skyLight", "[WorldGl] program init failed: ", "data/minecraft/recipe/oak_planks.json", "data/minecraft/recipe/spruce_planks.json",
+"data/minecraft/recipe/birch_planks.json", "data/minecraft/recipe/jungle_planks.json", "data/minecraft/recipe/acacia_planks.json", "data/minecraft/recipe/dark_oak_planks.json", "data/minecraft/recipe/mangrove_planks.json", "data/minecraft/recipe/cherry_planks.json", "data/minecraft/recipe/stick.json", "data/minecraft/recipe/crafting_table.json", "data/minecraft/recipe/wooden_pickaxe.json", "data/minecraft/recipe/wooden_axe.json", "data/minecraft/recipe/wooden_shovel.json", "data/minecraft/recipe/wooden_sword.json",
+"data/minecraft/recipe/wooden_hoe.json", "data/minecraft/recipe/stone_pickaxe.json", "data/minecraft/recipe/stone_axe.json", "data/minecraft/recipe/stone_shovel.json", "data/minecraft/recipe/stone_sword.json", "data/minecraft/recipe/stone_hoe.json", "data/minecraft/recipe/iron_pickaxe.json", "data/minecraft/recipe/iron_axe.json", "data/minecraft/recipe/iron_shovel.json", "data/minecraft/recipe/iron_sword.json", "data/minecraft/recipe/iron_hoe.json", "UCI range:", "Yes", "difficultycycle", "Difficulty: Peaceful",
 "Difficulty: Easy", "Difficulty: Normal", "Difficulty: Hard", "destroy_stage_", "assets/world/textures/", "[WorldTextures] requested ", " block texture PNGs", "[WorldTextures] failed to load \'", "\' - layer stays blank", "[WorldTextures] block texture array ready (", " layers)", "Yaw Speed: *yawn*", "HYPERSPEED!!!", "Sensitivity: ", "sensitivity", "NegBehindJointSet", "back reference: ", "<DotQuant>", "Unknown format conversion: ", "-", "Can\'t avoid rounding", "Can\'t convert code point ", " to char", "interface ",
 "class ", "[L", "[]", "DISABLED", "SINGLEPLAYER", "REALMS", "Infinity", "NaN", "Overflow", "Underflow", ".", "EaglerCraftX 26.1.2", "[PlatformApplication] Unhandled promise rejection: ", "[PlatformApplication] Uncaught error: ", " at ", "[PlatformApplication] Stack: ", "CI ", "[PlatformRuntime] Runtime initialized (namespace: ", "eaglercraft", "<EOL>", "UCI ", "AtomicFSet", "New World", "minecraft:overworld", "eaglercraft.world.blocks.", "[ClientLevel] restored ", " block edits for ", "[ClientLevel] edit restore failed: ",
 "[ClientLevel] saved ", " block edits", "eaglercraft.world.time.", "[ClientLevel] restored day time ", "[ClientLevel] bad day time \'", "ClientLevel[", " in ", ", gameTime=", ", edits=", "Illegal format flags ", " for conversion ", "Singleplayer", "Multiplayer", "Realms", "Options...", "Quit Game", "posFSet", "Done", "Accessibility...", "Controls...", "Sound Settings...", "Options", "Skin Customization", "Video Settings", "Language...", "Resource Packs", "Telemetry", "Chat Settings...", "Credits & Attribution",
-"serverlist", "\u0001", "<MultiLine $>", "WebGL2 (EaglerCraft)", "directaddress", "Crafting", "Inventory", "[InventoryScreen] slot ", " button ", "[InventoryScreen] closed with key ", "up", "north", "south", "west", "east", "down", "This exception should not been thrown", "Illegal precision: ", "#version 300 es\nprecision highp float;\nin vec3 a_position;\nuniform mat4 u_projMat;\nuniform mat4 u_modelViewMat;\nout vec3 v_dir;\nvoid main() {\n  gl_Position = u_projMat * u_modelViewMat * vec4(a_position, 1.0);\n  v_dir = a_position;\n}\n",
+"serverlist", "\u0001", "<MultiLine $>", "WebGL2 (EaglerCraft)", "directaddress", "Crafting", "Inventory", "take", "craft-all", "[InventoryScreen] result ", "[InventoryScreen] craft cell ", " button ", "[InventoryScreen] closed with key ", "up", "north", "south", "west", "east", "down", "This exception should not been thrown", "Illegal precision: ", "#version 300 es\nprecision highp float;\nin vec3 a_position;\nuniform mat4 u_projMat;\nuniform mat4 u_modelViewMat;\nout vec3 v_dir;\nvoid main() {\n  gl_Position = u_projMat * u_modelViewMat * vec4(a_position, 1.0);\n  v_dir = a_position;\n}\n",
 "#version 300 es\nprecision highp float;\nin vec3 v_dir;\nuniform samplerCube u_panorama;\nout vec4 fragColor;\nvoid main() {\n  fragColor = texture(u_panorama, v_dir);\n}\n", "panorama_cubemap", "u_projMat", "u_modelViewMat", "a_position", "[PanoramaRenderer] cubemap built from 6 faces (", "[PanoramaRenderer] cubemap face size mismatch on \'", "\' (", " vs ", "[PanoramaRenderer] face \'", "\' failed to load - keeping the flat stub background", "1", "3", "5", "4", "2", ", ", "air", "Air", "stone", "Stone", "cobblestone",
 "Cobblestone", "grass_block", "Grass Block", "grass_block_top", "grass_block_side", "dirt", "Dirt", "oak_planks", "Oak Planks", "bedrock", "Bedrock", "smooth_stone", "Smooth Stone", "stone_bricks", "Stone Bricks", "mossy_stone_bricks", "Mossy Stone Bricks", "cracked_stone_bricks", "Cracked Stone Bricks", "coarse_dirt", "Coarse Dirt", "podzol", "Podzol", "podzol_top", "podzol_side", "rooted_dirt", "Rooted Dirt", "mud", "Mud", "spruce_planks", "Spruce Planks", "birch_planks", "Birch Planks", "jungle_planks", "Jungle Planks",
 "acacia_planks", "Acacia Planks", "dark_oak_planks", "Dark Oak Planks", "mangrove_planks", "Mangrove Planks", "cherry_planks", "Cherry Planks", "bamboo_planks", "Bamboo Planks", "iron_ore", "Iron Ore", "deepslate_iron_ore", "Deepslate Iron Ore", "copper_ore", "Copper Ore", "deepslate_copper_ore", "Deepslate Copper Ore", "gold_ore", "Gold Ore", "deepslate_gold_ore", "Deepslate Gold Ore", "redstone_ore", "Redstone Ore", "deepslate_redstone_ore", "Deepslate Redstone Ore", "emerald_ore", "Emerald Ore", "deepslate_emerald_ore",
@@ -38802,8 +39923,8 @@ $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expec
 "pink_terracotta", "Pink Terracotta", "gray_terracotta", "Gray Terracotta", "light_gray_terracotta", "Light Gray Terracotta", "cyan_terracotta", "Cyan Terracotta", "purple_terracotta", "Purple Terracotta", "blue_terracotta", "Blue Terracotta", "brown_terracotta", "Brown Terracotta", "green_terracotta", "Green Terracotta", "red_terracotta", "Red Terracotta", "black_terracotta", "Black Terracotta", "sand", "Sand", "red_sand", "Red Sand", "gravel", "Gravel", "clay", "Clay", "snow_block", "Snow Block", "snow", "moss_block",
 "Moss Block", "oak_log", "Oak Log", "oak_log_top", "spruce_log", "Spruce Log", "spruce_log_top", "birch_log", "Birch Log", "birch_log_top", "jungle_log", "Jungle Log", "jungle_log_top", "acacia_log", "Acacia Log", "acacia_log_top", "dark_oak_log", "Dark Oak Log", "dark_oak_log_top", "mangrove_log", "Mangrove Log", "mangrove_log_top", "cherry_log", "Cherry Log", "cherry_log_top", "oak_leaves", "Oak Leaves", "spruce_leaves", "Spruce Leaves", "birch_leaves", "Birch Leaves", "jungle_leaves", "Jungle Leaves", "acacia_leaves",
 "Acacia Leaves", "dark_oak_leaves", "Dark Oak Leaves", "mangrove_leaves", "Mangrove Leaves", "cherry_leaves", "Cherry Leaves", "azalea_leaves", "Azalea Leaves", "ancient_debris", "Ancient Debris", "ancient_debris_top", "ancient_debris_side", "hay_block", "Hay Bale", "hay_block_top", "hay_block_side", "dried_kelp_block", "Dried Kelp Block", "dried_kelp_top", "dried_kelp_side", "pumpkin", "Pumpkin", "pumpkin_top", "pumpkin_side", "melon", "Melon", "melon_top", "melon_side", "cactus", "Cactus", "cactus_top", "cactus_side",
-"cactus_bottom", "mushroom_stem", "Mushroom Stem", "Positive number pattern not found in ", "Expected \';\' at ", "Prefix contains special character at ", "Quote opened at ", " was not closed in ", "Two group separators at ", "Unexpected \'#\' at non-optional digit part at ", "Pattern does not specify integer digits at ", "Group separator at the end of number at ", "Group separator found at fractional part at ", "Unexpected second decimal separator at ", "Unexpected \'0\' at optional digit part at ", "Unexpected char at exponent at ",
-"Pattern does not specify exponent digits at ", "Patter is null", "\\Q", "\\E", "\\\\E\\Q", "[MenuBlurRenderer] targets ready (", "[MenuBlurRenderer] framebuffer incomplete: A=", " B=", " - blur disabled", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nin vec2 a_uv;\nout vec2 texCoord;\nvoid main() {\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n  texCoord = a_uv;\n}\n", "#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nuniform vec2 u_blurDir;\nuniform float u_radius;\nuniform vec2 u_inSize;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  vec2 oneTexel = 1.0 / u_inSize;\n  vec2 sampleStep = oneTexel * u_blurDir;\n  vec4 blurred = vec4(0.0);\n  float actualRadius = u_radius >= 0.5 ? floor(u_radius + 0.5) : 5.0;\n  for (float a = -actualRadius + 0.5; a <= actualRadius; a += 2.0) {\n    blurred += texture(InSampler, texCoord + sampleStep * a);\n  }\n  blurred +="
+"cactus_bottom", "mushroom_stem", "Mushroom Stem", "crafting_table", "Crafting Table", "crafting_table_top", "crafting_table_front", "Positive number pattern not found in ", "Expected \';\' at ", "Prefix contains special character at ", "Quote opened at ", " was not closed in ", "Two group separators at ", "Unexpected \'#\' at non-optional digit part at ", "Pattern does not specify integer digits at ", "Group separator at the end of number at ", "Group separator found at fractional part at ", "Unexpected second decimal separator at ",
+"Unexpected \'0\' at optional digit part at ", "Unexpected char at exponent at ", "Pattern does not specify exponent digits at ", "Patter is null", "\\Q", "\\E", "\\\\E\\Q", "[MenuBlurRenderer] targets ready (", "[MenuBlurRenderer] framebuffer incomplete: A=", " B=", " - blur disabled", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nin vec2 a_uv;\nout vec2 texCoord;\nvoid main() {\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n  texCoord = a_uv;\n}\n", "#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nuniform vec2 u_blurDir;\nuniform float u_radius;\nuniform vec2 u_inSize;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  vec2 oneTexel = 1.0 / u_inSize;\n  vec2 sampleStep = oneTexel * u_blurDir;\n  vec4 blurred = vec4(0.0);\n  float actualRadius = u_radius >= 0.5 ? floor(u_radius + 0.5) : 5.0;\n  for (float a = -actualRadius + 0.5; a <= actualRadius; a += 2.0) {\n    blurred += texture(InSampler, texCoord + sampleStep * a);\n  }\n  blurred +="
 + " texture(InSampler, texCoord + sampleStep * actualRadius) / 2.0;\n  fragColor = blurred / (actualRadius + 0.5);\n}\n", "#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  fragColor = texture(InSampler, texCoord);\n}\n", "menu_box_blur", "menu_blit", "InSampler", "u_blurDir", "u_radius", "u_inSize", "a_uv", ": OFF", "Cancel", "Minecraft Server", "Add Server", "Edit Server Info", "Server Name", "Server Address", "Join Server", "Direct Connection",
 "eaglercraft.worlds", "eaglercraft.worlds.seeded", "Survival", "[^a-z0-9]+", "[PlatformNetworking] Failed to connect: ", "[PlatformNetworking] Reconnecting in ", "ms (attempt ", "[PlatformNetworking] Connection error: ", "[PlatformNetworking] Disconnected (code=", ", reason=", "[PlatformNetworking] Connected to ", " (compression=", "expectedSize", "/", "options.keybinds", "[KeyMapping] Saved ", " binds", ";", "[KeyMapping] Loaded ", "???", "Tab", "Q", "E", "T", "Left Ctrl", "A", "Left Shift", "\\", "F2", "F5",
 "F11", "Key #", "Esc", "key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory", "key.drop", "key.hotbar.1", "key.hotbar.2", "key.hotbar.3", "key.hotbar.4", "key.hotbar.5", "key.hotbar.6", "key.hotbar.7", "key.hotbar.8", "key.hotbar.9", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.fullscreen", "The value is too big for long type: ", "The value is too big for long type", "Negative bit address", "Negative exponent", "BigInteger divide by zero",
@@ -38813,20 +39934,21 @@ $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expec
 "Accessibility Settings", "<Empty set>", "Unknown Source", ")", "[GameRenderer] render error: ", "options.gamma", "options.clouds", "options.chatScale", "options.chatWidth", "options.mainHand", "options.menuBackgroundBlurriness", "options.sensitivity", "options.invertMouseY", "options.toggleCrouch", "options.toggleSprint", "options.toggleAttack", "options.toggleUse", "options.autoJump", "options.sprintWindow", "options.showSubtitles", "options.directionalAudio", "[Options] Failed to load: ", "options.recordVolume",
 "options.weatherVolume", "options.blockVolume", "options.hostileVolume", "options.neutralVolume", "options.playerVolume", "options.voiceVolume", "[Options] Failed to save: ", "%08x-0000-3000-8000-%012x", "[EaglerCraft] Already initialized or in progress (state=", "[EaglerCraft] ", "EaglerCraft initialization failed!\n\n", "  at ", "[EaglerCraft] Rendering pipeline configured (viewport: ", "[EaglerCraft] WebGL2 Version: ", "[EaglerCraft] GL Vendor: ", "[EaglerCraft] GL Renderer: ", "[EaglerCraft] Applying audio settings: master=",
 ", music=", ", sfx=", "/eaglercraft", "/eaglercraft/resourcepacks", "/eaglercraft/assets", "26.1.2", "EaglerCraftX", "[EaglerCraft] Constructing Minecraft(", ")...", "[EaglerCraft] MC constructor failed, using stub: ", "[EaglerCraft] Minecraft init failed: ", "[EaglerCraft] JS stack: ", "[EaglerCraft] Caused by: ", "[EaglerCraft] MC tick error: ", "EaglerCraftX/26.1.2", "Protocol 775", "none", "in-game", "{\"creative\":", ",\"edits\":", ",\"spawn\":[", ",\"player\":{\"x\":", ",\"y\":", ",\"z\":", ",\"yaw\":",
-",\"pitch\":", ",\"onGround\":", ",\"flying\":", ",\"crouching\":", ",\"hotbar\":{\"selected\":", ",\"slots\":[", ",\"main\":[", ",\"carried\":[", ",\"carried\":null", ",\"hit\":{\"x\":", ",\"face\":\"", ",\"hit\":null", ",\"destroy\":null", ",\"destroy\":{\"stage\":", ",\"x\":", ",\"dayTime\":", ",\"sky\":{\"dayTime\":", ",\"skyColor\":", ",\"fogColor\":", ",\"sunAngle\":", ",\"starBrightness\":", ",\"moonPhase\":", ",\"skyLight\":", "[EaglerCraft] setDayTime(", ") via telemetry bridge", "[", ",", "{\"id\":\"",
-"\"", ",\"label\":\"", ",\"active\":", ",\"w\":", ",\"h\":", "}", "]", "en", "CA", "fr", "zh", "CN", "FR", "de", "DE", "it", "IT", "ja", "JP", "ko", "KR", "TW", "GB", "US", "EOI", "object", "function", "string", "number", "undefined", "^", "Edit", "Delete", "Refresh", "\" will be lost forever! (A long time!)", "Are you sure you want to delete this server?", "Play Multiplayer", "No servers added - use \"Add Server\" below", "Can\'t format argument of ", " using ", " conversion", "PreviousMatch", "NonCapFSet",
-"Either src or dest is null", "DotAll", "Reset All...", "Attack", "Use", "Pick Block", "Gameplay", "Interface", "Creative Mode", "Miscellaneous", "Movement", "Walk Forwards", "Strafe Left", "Walk Backwards", "Strafe Right", "Jump", "Sneak", "Sprint", "Open/Close Inventory", "Drop Selected Item", "Hotbar Slot 1", "Hotbar Slot 2", "Hotbar Slot 3", "Hotbar Slot 4", "Hotbar Slot 5", "Hotbar Slot 6", "Hotbar Slot 7", "Hotbar Slot 8", "Hotbar Slot 9", "Chat", "Player List", "Take Screenshot", "Toggle Perspective",
-"Toggle Fullscreen", "Button 1", "Button 2", "Button 3", "Key Binds", "> ??? <", "Duplicate format flags: ", "decomposed Hangul syllable:", "Missing format with for specifier ", "[ClientMain] Canvas created. WebGL2: ", "WebGL2 is not supported by your browser!\n\nEaglerCraft 26.1.2 requires WebGL2.\nPlease use a modern browser (Chrome 56+, Firefox 51+, Edge 79+, Safari 15+).", "[ClientMain] CRASH: ", "Failed to initialize EaglerCraft 26.1.2!\n\n", "game_frame", "assets.epk", "[ClientMain] Asset bundle load could not start: ",
-"[ClientMain] Asset bundle: ", " / ", " MiB", "[ClientMain] Asset bundle ready: ", "power of ten too big", "WordBoundary", "Canvas is null during PlatformInput init!", "F12", "KeyR", "KeyI", "KeyJ", "KeyC", "_blank", "[PlatformInput] Gamepad disconnected: index=", "[PlatformInput] Gamepad connected: index=", "unselected_", "selected_", "container/creative_inventory/tab_top_", "[CreativeScreen] tab -> ", "[CreativeScreen] closed with key ", "Building Blocks", "Colored Blocks", "Natural Blocks", "Menu Background Blurriness: ",
-"menubackgroundblurriness", "[PlatformWebService] Rendering:  ", "[PlatformWebService] Runtime:     ", "[PlatformWebService] Audio:       ", "[PlatformWebService] Networking:  ", "[PlatformWebService] Input:       ", "[PlatformWebService] Application: ", "[PlatformWebService] Filesystem:  ", "Play Selected World", "Create New World", "Re-Create", "[SelectWorldScreen] Delete pressed -> world \'", "[SelectWorldScreen] Play pressed -> loading world \'", "Select World", "Search...", "Sprint Window: ", " Ticks",
-"sprintwindow", "Normal", "Quake Pro", "FOV: ", "fovslider", "%", "(", "+", "+ ", "0-", "0x", "--#+ 0,(<", "Invert Mouse Y", "Discrete Scrolling: OFF", "Scrolling Smoothness: OFF", "Raw Input: ON", "Mouse Settings", "<SOL>", "servername", "WebGL2 context is null during PlatformOpenGL init!", "[PlatformOpenGL] WebGL2 initialized: ", "[PlatformOpenGL] Vendor: ", ", Renderer: ", "serveraddress", "UP", "DOWN", "CEILING", "FLOOR", "HALF_UP", "HALF_DOWN", "HALF_EVEN", "UNNECESSARY", " cannot be negative but was: ",
-"Mouse Settings...", "Key Binds...", "Hold", "Toggle", "Toggle Crouch", "Toggle Sprint", "Toggle Attack", "Toggle Use", "Auto-Jump", "Operator Items Tab", "Controls", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;out float v_sph;out float v_cyl;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_sph = length(a_pos);  v_cyl = max(length(a_pos.xz), abs(a_pos.y));}", "#version 300 es\nprecision highp float;in float v_sph;in float v_cyl;uniform vec3 u_color;uniform vec3 u_fogColor;out vec4 fragColor;float lin(float d, float s, float e) {  return d <= s ? 0.0 : (d >= e ? 1.0 : (d - s) / (e - s));}void main() {  float fog = max(lin(v_sph, 0.0, 512.0), v_cyl >= 512.0 ? 1.0 : 0.0);  fragColor = vec4(mix(u_color, u_fogColor, fog), 1.0);}",
-"sky_disc", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec4 a_color;uniform mat4 u_mvp;out vec4 v_color;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_color = a_color;}", "#version 300 es\nprecision highp float;in vec4 v_color;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = v_color * u_color;}", "sky_tint", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec2 a_uv;uniform mat4 u_mvp;out vec2 v_uv;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_uv = a_uv;}",
-"#version 300 es\nprecision highp float;in vec2 v_uv;uniform sampler2D u_tex;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = texture(u_tex, v_uv) * u_color;}", "sky_celestial", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);}", "#version 300 es\nprecision highp float;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = u_color;}", "sky_stars", "u_color", "u_fogColor", "[SkyRenderer] ",
-" vsh: ", " fsh: ", " link: ", " init failed: ", " star vertices from 1500 seeds", "moon_", "assets/world/environment/moon/", "[SkyRenderer] moon texture \'", "\' failed", "full_moon", "waning_gibbous", "third_quarter", "waning_crescent", "new_moon", "waxing_crescent", "first_quarter", "waxing_gibbous", "World Name", "Game Mode", "Difficulty", "Allow Cheats", "World Type", "Customize", "Leave blank for a random seed", "Game Rules", "Experiments", "Data Packs", "[CreateWorldScreen] Create pressed -> world \'",
-"\' (mode=", ", difficulty=", ", cheats=", ", type=", ", seed=", "Generate Structures", "Bonus Chest", "Seed for the world generator", "Game", "World", "More", "Hardcore", "Creative", "Peaceful", "Easy", "Hard", "Default", "Superflat", "Large Biomes", "AMPLIFIED", "[PlatformAudio] Audio initialized (sampleRate=", ", worklet=", "[PlatformAudio] Audio init failed (non-fatal): ", "<Unix MultiLine $>", "[Minecraft] User: ", "EaglerCraft 26.1.2", "[Minecraft] Window: ", "[Minecraft] GUI scale: ", " -> ", "[Minecraft] Construction failed: ",
-"Minecraft construction failed", "[Minecraft] tick() error: ", "[Minecraft] render() error: ", "[Minecraft] Canvas settled at ", ", GUI scale ", " -> re-initializing screens", "[Minecraft] Loading world: ", "[Minecraft] World loaded: ", " (HUD active, player at ", "[Minecraft] World load failed: ", "World load failed", "Name capturing group should start with letter", "Is", "In", "Paused", "Game Menu", "Back to Game", "Advancements", "Statistics", "Send Feedback", "Report Bugs", "Open to LAN", "Save and Quit to Title",
-"https://bugs.mojang.com", "https://feedback.minecraft.net", "Illegal format flags: ", " (", "Version: ", "[SelectWorldScreen] world entry selected: "]);
+",\"pitch\":", ",\"onGround\":", ",\"flying\":", ",\"crouching\":", ",\"hotbar\":{\"selected\":", ",\"slots\":[", ",\"main\":[", ",\"carried\":[", ",\"carried\":null", ",\"craft\":{\"w\":", ",\"grid\":[", "],\"result\":", ",\"hit\":{\"x\":", ",\"face\":\"", ",\"hit\":null", ",\"destroy\":null", ",\"destroy\":{\"stage\":", ",\"x\":", ",\"dayTime\":", ",\"sky\":{\"dayTime\":", ",\"skyColor\":", ",\"fogColor\":", ",\"sunAngle\":", ",\"starBrightness\":", ",\"moonPhase\":", ",\"skyLight\":", "[EaglerCraft] setDayTime(",
+") via telemetry bridge", "[", ",", "{\"id\":\"", "\"", ",\"label\":\"", ",\"active\":", ",\"w\":", ",\"h\":", "}", "]", "stick", "Stick", "wooden_pickaxe", "Wooden Pickaxe", "wooden_axe", "Wooden Axe", "wooden_shovel", "Wooden Shovel", "wooden_sword", "Wooden Sword", "wooden_hoe", "Wooden Hoe", "stone_pickaxe", "Stone Pickaxe", "stone_axe", "Stone Axe", "stone_shovel", "Stone Shovel", "stone_sword", "Stone Sword", "stone_hoe", "Stone Hoe", "iron_ingot", "Iron Ingot", "iron_pickaxe", "Iron Pickaxe", "iron_axe",
+"Iron Axe", "iron_shovel", "Iron Shovel", "iron_sword", "Iron Sword", "iron_hoe", "Iron Hoe", "en", "CA", "fr", "zh", "CN", "FR", "de", "DE", "it", "IT", "ja", "JP", "ko", "KR", "TW", "GB", "US", "EOI", "object", "function", "string", "number", "undefined", "^", "Edit", "Delete", "Refresh", "\" will be lost forever! (A long time!)", "Are you sure you want to delete this server?", "Play Multiplayer", "No servers added - use \"Add Server\" below", "Can\'t format argument of ", " using ", " conversion", "PreviousMatch",
+"NonCapFSet", "Either src or dest is null", "DotAll", "Reset All...", "Attack", "Use", "Pick Block", "Gameplay", "Interface", "Creative Mode", "Miscellaneous", "Movement", "Walk Forwards", "Strafe Left", "Walk Backwards", "Strafe Right", "Jump", "Sneak", "Sprint", "Open/Close Inventory", "Drop Selected Item", "Hotbar Slot 1", "Hotbar Slot 2", "Hotbar Slot 3", "Hotbar Slot 4", "Hotbar Slot 5", "Hotbar Slot 6", "Hotbar Slot 7", "Hotbar Slot 8", "Hotbar Slot 9", "Chat", "Player List", "Take Screenshot", "Toggle Perspective",
+"Toggle Fullscreen", "Button 1", "Button 2", "Button 3", "Key Binds", "> ??? <", "Duplicate format flags: ", "decomposed Hangul syllable:", "[CraftingTableScreen] craft cell ", "[CraftingTableScreen] result ", "[CraftingTableScreen] closed with key ", "Missing format with for specifier ", "[ClientMain] Canvas created. WebGL2: ", "WebGL2 is not supported by your browser!\n\nEaglerCraft 26.1.2 requires WebGL2.\nPlease use a modern browser (Chrome 56+, Firefox 51+, Edge 79+, Safari 15+).", "[ClientMain] CRASH: ",
+"Failed to initialize EaglerCraft 26.1.2!\n\n", "game_frame", "assets.epk", "[ClientMain] Asset bundle load could not start: ", "[ClientMain] Asset bundle: ", " / ", " MiB", "[ClientMain] Asset bundle ready: ", "power of ten too big", "WordBoundary", "Canvas is null during PlatformInput init!", "F12", "KeyR", "KeyI", "KeyJ", "KeyC", "_blank", "[PlatformInput] Gamepad disconnected: index=", "[PlatformInput] Gamepad connected: index=", "unselected_", "selected_", "container/creative_inventory/tab_top_", "[CreativeScreen] tab -> ",
+"[CreativeScreen] closed with key ", "Building Blocks", "Colored Blocks", "Natural Blocks", "Menu Background Blurriness: ", "menubackgroundblurriness", "[PlatformWebService] Rendering:  ", "[PlatformWebService] Runtime:     ", "[PlatformWebService] Audio:       ", "[PlatformWebService] Networking:  ", "[PlatformWebService] Input:       ", "[PlatformWebService] Application: ", "[PlatformWebService] Filesystem:  ", "Play Selected World", "Create New World", "Re-Create", "[SelectWorldScreen] Delete pressed -> world \'",
+"[SelectWorldScreen] Play pressed -> loading world \'", "Select World", "Search...", "Sprint Window: ", " Ticks", "sprintwindow", "Normal", "Quake Pro", "FOV: ", "fovslider", "%", "(", "+", "+ ", "0-", "0x", "--#+ 0,(<", "Invert Mouse Y", "Discrete Scrolling: OFF", "Scrolling Smoothness: OFF", "Raw Input: ON", "Mouse Settings", "<SOL>", "servername", "WebGL2 context is null during PlatformOpenGL init!", "[PlatformOpenGL] WebGL2 initialized: ", "[PlatformOpenGL] Vendor: ", ", Renderer: ", "serveraddress", "UP",
+"DOWN", "CEILING", "FLOOR", "HALF_UP", "HALF_DOWN", "HALF_EVEN", "UNNECESSARY", " cannot be negative but was: ", "Mouse Settings...", "Key Binds...", "Hold", "Toggle", "Toggle Crouch", "Toggle Sprint", "Toggle Attack", "Toggle Use", "Auto-Jump", "Operator Items Tab", "Controls", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;out float v_sph;out float v_cyl;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_sph = length(a_pos);  v_cyl = max(length(a_pos.xz), abs(a_pos.y));}",
+"#version 300 es\nprecision highp float;in float v_sph;in float v_cyl;uniform vec3 u_color;uniform vec3 u_fogColor;out vec4 fragColor;float lin(float d, float s, float e) {  return d <= s ? 0.0 : (d >= e ? 1.0 : (d - s) / (e - s));}void main() {  float fog = max(lin(v_sph, 0.0, 512.0), v_cyl >= 512.0 ? 1.0 : 0.0);  fragColor = vec4(mix(u_color, u_fogColor, fog), 1.0);}", "sky_disc", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec4 a_color;uniform mat4 u_mvp;out vec4 v_color;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_color = a_color;}",
+"#version 300 es\nprecision highp float;in vec4 v_color;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = v_color * u_color;}", "sky_tint", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec2 a_uv;uniform mat4 u_mvp;out vec2 v_uv;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_uv = a_uv;}", "#version 300 es\nprecision highp float;in vec2 v_uv;uniform sampler2D u_tex;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = texture(u_tex, v_uv) * u_color;}",
+"sky_celestial", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);}", "#version 300 es\nprecision highp float;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = u_color;}", "sky_stars", "u_color", "u_fogColor", "[SkyRenderer] ", " vsh: ", " fsh: ", " link: ", " init failed: ", " star vertices from 1500 seeds", "moon_", "assets/world/environment/moon/", "[SkyRenderer] moon texture \'", "\' failed",
+"full_moon", "waning_gibbous", "third_quarter", "waning_crescent", "new_moon", "waxing_crescent", "first_quarter", "waxing_gibbous", "World Name", "Game Mode", "Difficulty", "Allow Cheats", "World Type", "Customize", "Leave blank for a random seed", "Game Rules", "Experiments", "Data Packs", "[CreateWorldScreen] Create pressed -> world \'", "\' (mode=", ", difficulty=", ", cheats=", ", type=", ", seed=", "Generate Structures", "Bonus Chest", "Seed for the world generator", "Game", "World", "More", "Hardcore",
+"Creative", "Peaceful", "Easy", "Hard", "Default", "Superflat", "Large Biomes", "AMPLIFIED", "[PlatformAudio] Audio initialized (sampleRate=", ", worklet=", "[PlatformAudio] Audio init failed (non-fatal): ", "<Unix MultiLine $>", "[Minecraft] User: ", "EaglerCraft 26.1.2", "[Minecraft] Window: ", "[Minecraft] GUI scale: ", " -> ", "[Minecraft] Construction failed: ", "Minecraft construction failed", "[Minecraft] tick() error: ", "[Minecraft] render() error: ", "[Minecraft] Canvas settled at ", ", GUI scale ",
+" -> re-initializing screens", "[Minecraft] Loading world: ", "[Minecraft] World loaded: ", " (HUD active, player at ", "[Minecraft] World load failed: ", "World load failed", "Name capturing group should start with letter", "Is", "In", "Paused", "Game Menu", "Back to Game", "Advancements", "Statistics", "Send Feedback", "Report Bugs", "Open to LAN", "Save and Quit to Title", "https://bugs.mojang.com", "https://feedback.minecraft.net", "Illegal format flags: ", " (", "Version: ", "[SelectWorldScreen] world entry selected: "]);
 jl_String.prototype.toString = function() {
     return $rt_ustr(this);
 };

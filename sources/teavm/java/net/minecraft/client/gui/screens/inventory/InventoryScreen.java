@@ -9,6 +9,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.CraftingContainer;
 
 /**
  * EaglerCraft 26.1.2 browser override for the MC survival
@@ -35,6 +36,14 @@ import net.minecraft.world.entity.player.Inventory;
  * and hovering a populated slot shows its vanilla tooltip. E and ESC
  * both close (vanilla keyPressed checks key.inventory first, then
  * shouldCloseOnEsc).</p>
+ *
+ * <p>The 2x2 crafting grid and its result slot are live
+ * (vanilla InventoryMenu craft slots at (97,17)/(115,17)/(97,35)/(115,35),
+ * result at (153,27)): grid cells use the shared doClick through
+ * {@link CraftingContainer#clickCell}, the result slot takes one craft
+ * (left) or crafts all into the inventory (shift), and closing returns
+ * the grid contents to the inventory (vanilla
+ * AbstractContainerMenu.removed).</p>
  */
 public class InventoryScreen extends Screen {
 
@@ -61,8 +70,12 @@ public class InventoryScreen extends Screen {
         private int leftPos;
         private int topPos;
 
-        /** Hovered interactive slot (-1 = none); main 0..26, hotbar 27..35. */
+        /** Hovered interactive slot (-1 = none); main 0..26, hotbar 27..35,
+         * crafting grid 40..43, result 50. */
         private int hoveredSlot = -1;
+
+        /** The transient 2x2 crafting grid (vanilla InventoryMenu.craftSlots). */
+        private final CraftingContainer craft = new CraftingContainer(2, 2);
 
         public InventoryScreen() {
         }
@@ -71,12 +84,48 @@ public class InventoryScreen extends Screen {
         protected void init() {
                 this.leftPos = (this.width - PANEL_W) / 2;
                 this.topPos = (this.height - PANEL_H) / 2;
+                this.craft.recompute();
+        }
+
+        /** The open crafting grid (telemetry bridge + tests). */
+        public CraftingContainer getCraftingContainer() {
+                return craft;
+        }
+
+        @Override
+        public void onClose() {
+                // vanilla AbstractContainerMenu.removed: the crafting grid
+                // and the carried stack go back to the player inventory
+                // before the screen closes
+                Inventory inventory = this.minecraft.getInventory();
+                this.craft.returnContents(inventory);
+                if (inventory.getCarriedCount() > 0) {
+                        inventory.addItem(inventory.getCarriedBlock(),
+                                        inventory.getCarriedCount(),
+                                        net.minecraft.world.item.crafting.Crafting
+                                                .maxStack(inventory.getCarriedBlock()));
+                        inventory.setCarried(0, 0);
+                }
+                super.onClose();
         }
 
         /** Maps a screen-space point to the hovered interactive slot. */
         private int slotAt(double mouseX, double mouseY) {
                 int mx = (int) mouseX - leftPos;
                 int my = (int) mouseY - topPos;
+                // crafting 2x2 (codes 40..43, row-major)
+                int ccol = (mx - CRAFT_X) / 18;
+                int crow = (my - CRAFT_Y) / 18;
+                if (ccol >= 0 && ccol < 2 && crow >= 0 && crow < 2
+                                && cellContains(mx, my,
+                                                CRAFT_X + ccol * 18,
+                                                CRAFT_Y + crow * 18)) {
+                        return 40 + crow * 2 + ccol;
+                }
+                // crafting result (code 50)
+                if (cellContains(mx, my, RESULT_X, RESULT_Y)) {
+                        return 50;
+                }
                 // main 27 (interactive range 0..26)
                 int col = (mx - MAIN_X) / 18;
                 int row = (my - MAIN_Y) / 18;
@@ -129,12 +178,29 @@ public class InventoryScreen extends Screen {
                         if (hoveredSlot < 27) {
                                 hx = leftPos + MAIN_X + (hoveredSlot % 9) * 18;
                                 hy = topPos + MAIN_Y + (hoveredSlot / 9) * 18;
-                        } else {
+                        } else if (hoveredSlot < 40) {
                                 hx = leftPos + MAIN_X + (hoveredSlot - 27) * 18;
                                 hy = topPos + HOTBAR_Y;
+                        } else if (hoveredSlot < 50) {
+                                hx = leftPos + CRAFT_X
+                                                + ((hoveredSlot - 40) % 2) * 18;
+                                hy = topPos + CRAFT_Y
+                                                + ((hoveredSlot - 40) / 2) * 18;
+                        } else {
+                                hx = leftPos + RESULT_X;
+                                hy = topPos + RESULT_Y;
                         }
                         EaglerGuiImpl.fillRect(hx, hy, 16, 16, 0x80FFFFFF);
                 }
+
+                // crafting 2x2 + computed result
+                for (int i = 0; i < 4; i++) {
+                        Gui.drawItem(craft.getCellId(i), craft.getCellCount(i),
+                                        leftPos + CRAFT_X + (i % 2) * 18 + 1,
+                                        topPos + CRAFT_Y + (i / 2) * 18 + 1);
+                }
+                Gui.drawItem(craft.getResultId(), craft.getResultCount(),
+                                leftPos + RESULT_X + 1, topPos + RESULT_Y + 1);
 
                 // main 27 + hotbar 9 (items over the highlight)
                 for (int i = 0; i < 27; i++) {
@@ -154,8 +220,16 @@ public class InventoryScreen extends Screen {
 
                 // tooltip for the hovered slot
                 if (hoveredSlot >= 0 && inventory.getCarriedCount() == 0) {
-                        int inv = inventorySlot(hoveredSlot);
-                        String name = Gui.blockName(inventory.getBlockId(inv));
+                        String name = null;
+                        if (hoveredSlot == 50) {
+                                name = Gui.blockName(craft.getResultId());
+                        } else if (hoveredSlot >= 40) {
+                                name = Gui.blockName(
+                                                craft.getCellId(hoveredSlot - 40));
+                        } else {
+                                int inv = inventorySlot(hoveredSlot);
+                                name = Gui.blockName(inventory.getBlockId(inv));
+                        }
                         if (name != null) {
                                 Gui.drawTooltip(name, mouseX, mouseY,
                                                 this.width, this.height);
@@ -168,13 +242,25 @@ public class InventoryScreen extends Screen {
                 int slot = slotAt(mouseX, mouseY);
                 if (slot >= 0 && this.minecraft != null) {
                         Inventory inventory = this.minecraft.getInventory();
-                        if (PlatformInput.isKeyDown(KeyMapping.SCAN_LSHIFT)) {
+                        if (slot == 50) {
+                                // vanilla result slot: take one / craft all
+                                boolean shift = PlatformInput
+                                                .isKeyDown(KeyMapping.SCAN_LSHIFT);
+                                this.craft.clickResult(shift, inventory);
+                                ClientMain.log("[InventoryScreen] result "
+                                                + (shift ? "craft-all" : "take"));
+                        } else if (slot >= 40) {
+                                this.craft.clickCell(slot - 40, button,
+                                                inventory);
+                                ClientMain.log("[InventoryScreen] craft cell "
+                                                + (slot - 40) + " button "
+                                                + button);
+                        } else if (PlatformInput
+                                        .isKeyDown(KeyMapping.SCAN_LSHIFT)) {
                                 inventory.quickMove(inventorySlot(slot));
                         } else {
                                 inventory.clickSlot(inventorySlot(slot), button);
                         }
-                        ClientMain.log("[InventoryScreen] slot " + slot + " button "
-                                        + button);
                         return true;
                 }
                 return super.mouseClicked(mouseX, mouseY, button);

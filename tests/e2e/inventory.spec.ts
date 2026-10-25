@@ -52,6 +52,12 @@ async function readGuiSize(page: Page): Promise<{ w: number; h: number }> {
 }
 
 /** Clicks a panel-relative GUI coordinate (left or right button). */
+/**
+ * Clicks a panel-relative GUI coordinate. The game's input path is a
+ * per-frame 1-element latch per button, so the click waits for two rAF
+ * callbacks (proof the consuming frame completed) before returning -
+ * otherwise the next same-button click can overwrite the pending latch.
+ */
 async function clickPanel(
   page: Page,
   gui: { w: number; h: number },
@@ -67,8 +73,15 @@ async function clickPanel(
     Math.round(gui.h / 2 - panelH / 2) + py,
   );
   await page.mouse.move(coords.cssX, coords.cssY);
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(120);
   await page.mouse.click(coords.cssX, coords.cssY, { button });
+  await Promise.race([
+    page.evaluate(
+      () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+    ),
+    page.waitForTimeout(5000),
+  ]);
+  await page.waitForTimeout(80);
 }
 
 /** The survival container panel size (InventoryScreen). */

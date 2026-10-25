@@ -924,6 +924,40 @@ public class EaglerCraft {
                 } else {
                         sb.append(",\"carried\":null");
                 }
+                // crafting grid (2x2 inventory / 3x3 crafting table)
+                net.minecraft.world.inventory.CraftingContainer craft = null;
+                if (mc.getScreen() instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen) {
+                        craft = ((net.minecraft.client.gui.screens.inventory.InventoryScreen)
+                                        mc.getScreen()).getCraftingContainer();
+                } else if (mc.getScreen() instanceof net.minecraft.client.gui.screens.inventory.CraftingTableScreen) {
+                        craft = ((net.minecraft.client.gui.screens.inventory.CraftingTableScreen)
+                                        mc.getScreen()).getCraftingContainer();
+                }
+                if (craft != null) {
+                        sb.append(",\"craft\":{\"w\":").append(craft.getWidth())
+                                .append(",\"grid\":[");
+                        for (int i = 0; i < craft.getSize(); i++) {
+                                if (i > 0) sb.append(',');
+                                int id = craft.getCellId(i);
+                                int count = craft.getCellCount(i);
+                                if (count > 0 && id != 0) {
+                                        sb.append('[').append(id).append(',')
+                                                .append(count).append(']');
+                                } else {
+                                        sb.append("null");
+                                }
+                        }
+                        sb.append("],\"result\":");
+                        if (craft.getResultCount() > 0
+                                        && craft.getResultId() != 0) {
+                                sb.append('[').append(craft.getResultId())
+                                        .append(',').append(craft.getResultCount())
+                                        .append(']');
+                        } else {
+                                sb.append("null");
+                        }
+                        sb.append('}');
+                }
                 net.minecraft.world.phys.BlockHitResult hit = mc.getHitResult();
                 if (hit != null && hit.type == net.minecraft.world.phys.BlockHitResult.Type.BLOCK) {
                         sb.append(",\"hit\":{\"x\":").append(hit.blockX)
@@ -1002,11 +1036,16 @@ public class EaglerCraft {
                 clearHotbarReq();
                 net.minecraft.world.entity.player.Inventory inv = mc.getInventory();
                 if (slot >= 0 && slot < net.minecraft.world.entity.player.Inventory.HOTBAR_SIZE) {
-                        inv.setSelected(slot);
                         if (id >= 0) {
+                                // fill request: change the slot's stack only
+                                // (selecting it as a side effect made the
+                                // next placement consume an unrelated slot)
                                 inv.telemetrySetSlot(slot, id, Math.max(0, Math.min(64, count)));
+                        } else {
+                                // select-only request: the digit-key/scroll stand-in
+                                inv.setSelected(slot);
+                                mc.playerSelectedSlotChanged();
                         }
-                        mc.playerSelectedSlotChanged();
                 }
         }
 

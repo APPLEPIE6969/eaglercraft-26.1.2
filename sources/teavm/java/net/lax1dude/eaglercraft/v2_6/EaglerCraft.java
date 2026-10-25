@@ -836,6 +836,7 @@ public class EaglerCraft {
                                         (net.minecraft.client.Minecraft) minecraftInstance;
                         consumeHotbarTelemetryRequests(mc);
                         consumeLookRequest(mc);
+                        consumeTimeRequest(mc);
                         gameplayJson = buildGameplayJson(mc);
                 }
                 try {
@@ -855,6 +856,9 @@ public class EaglerCraft {
          * e2e asserts on. Structure (all coordinates in world units):
          * <pre>{ "creative":bool, "edits":n,
          *   "spawn":[x,y,z],
+         *   "dayTime":n, "sky":{"dayTime":n,"skyColor":0xRRGGBB,
+         *     "fogColor":0xRRGGBB,"sunAngle":deg,"starBrightness":f,
+         *     "moonPhase":0..7,"skyLight":0xRRGGBB},
          *   "player":{"x":..,"y":..,"z":..,"yaw":..,"pitch":..,
          *             "onGround":bool,"flying":bool,"crouching":bool},
          *   "hotbar":{"selected":n,"slots":[[id,count]|null,...]},
@@ -942,6 +946,17 @@ public class EaglerCraft {
                 } else {
                         sb.append(",\"destroy\":null");
                 }
+                // Day/night sky state (the timeline sample the renderer used
+                // for its last frame) - the sky e2e asserts on this
+                sb.append(",\"dayTime\":").append(level.getDayTime());
+                sb.append(",\"sky\":{\"dayTime\":").append(level.getDayTime());
+                sb.append(",\"skyColor\":").append(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.skyColorRgb());
+                sb.append(",\"fogColor\":").append(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.fogColorRgb());
+                sb.append(",\"sunAngle\":").append(fmt(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.sunAngleDeg()));
+                sb.append(",\"starBrightness\":").append(fmt(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.starBrightness()));
+                sb.append(",\"moonPhase\":").append(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.moonPhase());
+                sb.append(",\"skyLight\":").append(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.skyLightRgb());
+                sb.append('}');
                 sb.append('}');
                 return sb.toString();
         }
@@ -1045,6 +1060,33 @@ public class EaglerCraft {
         private static native void clearLookRequest();
 
         /**
+         * Consumes a queued {@code setDayTime(t)} bridge request - the
+         * /time set equivalent the sky e2e uses to pin the day cycle at
+         * deterministic points (applied to the live level's clock).
+         */
+        private static void consumeTimeRequest(net.minecraft.client.Minecraft mc) {
+                if (!hasTimeRequest() || mc.getLevel() == null) {
+                        return;
+                }
+                double t = readTimeRequest();
+                clearTimeRequest();
+                if (mc.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
+                        level.setDayTime((long) t);
+                        ClientMain.log("[EaglerCraft] setDayTime(" + (long) t + ") via telemetry bridge");
+                }
+        }
+
+        @JSBody(script = "return window.__eaglercraftTimeReq != null;")
+        private static native boolean hasTimeRequest();
+
+        @JSBody(script = "var r = window.__eaglercraftTimeReq;"
+                        + " return typeof r === 'number' ? r : 0;")
+        private static native double readTimeRequest();
+
+        @JSBody(script = "window.__eaglercraftTimeReq = null;")
+        private static native void clearTimeRequest();
+
+        /**
          * The raw menuBackgroundBlurriness option (0..10, default 5) - the
          * value the Accessibility screen's slider edits and localStorage
          * persists, independent of whether the current screen applies it.
@@ -1127,6 +1169,7 @@ public class EaglerCraft {
                 + " gameplay: JSON.parse(gameplayJson),"
                 + " enterWorld: function() { window.__eaglercraftWorldEntryRequested = true; },"
                 + " queryBlock: function(x,y,z) { return queryBlockFn(x,y,z); },"
+                + " setDayTime: function(t) { window.__eaglercraftTimeReq = t; },"
                 + " setHotbarSlot: function(s,i,c) { window.__eaglercraftHotbarReq = {s:s,i:i,c:c}; },"
                 + " selectSlot: function(s) { window.__eaglercraftHotbarReq = {s:s,i:-1,c:0}; },"
                 + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; }"

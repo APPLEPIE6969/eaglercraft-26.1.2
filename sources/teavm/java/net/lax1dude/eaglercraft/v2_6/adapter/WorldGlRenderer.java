@@ -45,7 +45,20 @@ public final class WorldGlRenderer {
         private static JSObject program = null;
         private static JSObject uMvp = null;
         private static JSObject uTex = null;
+        private static JSObject uSkyLight = null;
         private static JSObject vao = null;
+
+        /**
+         * The timeline sky-light dimming (SKY_LIGHT_COLOR x
+         * SKY_LIGHT_FACTOR merged), applied to every world-stratum
+         * fragment. Day = (1,1,1); night = the vanilla moonlight tint
+         * (#7a7aff) x 0.24 factor. Static because the whole world dims
+         * together, exactly like vanilla's lightmap sky contribution for
+         * a world with no per-vertex sky/block light split yet.
+         */
+        private static float skyLightR = 1.0f;
+        private static float skyLightG = 1.0f;
+        private static float skyLightB = 1.0f;
 
         /** Interleaved: 3 floats pos, 2 floats uv, 1 float layer, 4 bytes color = 28 bytes. */
         public static final int VERTEX_BYTES = 28;
@@ -79,6 +92,7 @@ public final class WorldGlRenderer {
                 + "precision highp float;"
                 + "precision highp sampler2DArray;"
                 + "uniform sampler2DArray u_tex;"
+                + "uniform vec3 u_skyLight;"
                 + "in vec2 v_uv;"
                 + "in float v_layer;"
                 + "in vec4 v_color;"
@@ -86,7 +100,7 @@ public final class WorldGlRenderer {
                 + "void main() {"
                 + "  vec4 c = texture(u_tex, vec3(v_uv, v_layer));"
                 + "  if (c.a < 0.5) discard;"
-                + "  frag = c * v_color;"
+                + "  frag = vec4(c.rgb * v_color.rgb * u_skyLight, c.a * v_color.a);"
                 + "}";
 
         /** Compiles the world program once. Returns false while unavailable. */
@@ -119,6 +133,7 @@ public final class WorldGlRenderer {
                         }
                         uMvp = PlatformOpenGL._wglGetUniformLocation(program, "u_mvp");
                         uTex = PlatformOpenGL._wglGetUniformLocation(program, "u_tex");
+                        uSkyLight = PlatformOpenGL._wglGetUniformLocation(program, "u_skyLight");
                         vao = PlatformOpenGL._wglCreateVertexArray();
                         PlatformOpenGL._wglBindVertexArray(vao);
                         PlatformOpenGL._wglEnableVertexAttribArray(0);
@@ -253,6 +268,13 @@ public final class WorldGlRenderer {
                 multiply(MVP, PROJ, VIEW);
         }
 
+        /** Sets the frame's sky-light dimming (from {@code SkyRenderer}). */
+        public static void setSkyLight(float r, float g, float b) {
+                skyLightR = r;
+                skyLightG = g;
+                skyLightB = b;
+        }
+
         /** Binds the world program + VAO and uploads the MVP uniform. */
         public static void bindState(WebGL2RenderingContext gl) {
                 if (!programReady) return;
@@ -261,6 +283,7 @@ public final class WorldGlRenderer {
                 Float32Array mvpBuf = pack(MVP);
                 PlatformOpenGL._wglUniformMatrix4fv(uMvp, false, mvpBuf);
                 PlatformOpenGL._wglUniform1i(uTex, 0);
+                PlatformOpenGL._wglUniform3f(uSkyLight, skyLightR, skyLightG, skyLightB);
                 PlatformOpenGL._wglActiveTexture(WebGL2RenderingContext.TEXTURE0);
         }
         /**

@@ -89,6 +89,7 @@ public class ClientLevel {
                 this.storageKey = "eaglercraft.world.blocks."
                         + sanitize(this.levelName);
                 loadEdits();
+                loadDayTime();
                 this.dirtySections.add(sectionKey(0, sectionIndex(this.MIN_Y), 0));
         }
 
@@ -346,6 +347,32 @@ public class ClientLevel {
                 return edits.size();
         }
 
+        // ========== Day-time persistence (vanilla level.dat Data.day) ==========
+
+        private String timeKey() {
+                return "eaglercraft.world.time." + sanitize(levelName);
+        }
+
+        /** Restores the persisted day time; 1000 (dawn, day 0) for fresh worlds. */
+        private void loadDayTime() {
+                String raw = PlatformRuntime.localStorageGet(timeKey());
+                if (raw == null || raw.isEmpty()) {
+                        return;
+                }
+                try {
+                        long t = Long.parseLong(raw.trim());
+                        this.dayTime = Math.max(0L, t);
+                        ClientMain.log("[ClientLevel] restored day time " + this.dayTime);
+                } catch (NumberFormatException nfe) {
+                        ClientMain.warn("[ClientLevel] bad day time '" + raw + "'");
+                }
+        }
+
+        /** Persists the day time (called with the edit save on save-and-quit). */
+        public void saveDayTime() {
+                PlatformRuntime.localStorageSet(timeKey(), Long.toString(dayTime));
+        }
+
         // ========== Collision (vanilla Shapes.collide for full cubes) ==========
 
         /**
@@ -513,14 +540,23 @@ public class ClientLevel {
 
         /**
          * Advances the world clock one tick (1/20 s). Called from
-         * {@code Minecraft.tick()}.
+         * {@code Minecraft.tick()}. The counter runs FREE like vanilla's
+         * level.dat Data.day (never wraps): the timeline samples
+         * {@code dayTime % 24000} for the time of day and
+         * {@code dayTime / 24000} for the day count (moon phase).
          */
         public void tick() {
                 this.gameTime++;
                 this.dayTime++;
-                if (this.dayTime >= 24000L) {
-                        this.dayTime -= 24000L;
-                }
+        }
+
+        /**
+         * Vanilla /time set equivalent (the telemetry bridge's setDayTime).
+         * Accepts the full counter value: {@code setDayTime(30000)} is
+         * day 1, time-of-day 6000 (noon, waning-gibbous day count).
+         */
+        public void setDayTime(long t) {
+                this.dayTime = Math.max(0L, t);
         }
 
         // ========== Accessors ==========

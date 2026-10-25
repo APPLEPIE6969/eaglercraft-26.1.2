@@ -7,6 +7,7 @@ import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerGuiImpl;
 import net.lax1dude.eaglercraft.v2_6.adapter.MenuBlurRenderer;
 import net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer;
+import net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer;
 import net.lax1dude.eaglercraft.v2_6.adapter.WorldGlRenderer;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
@@ -69,8 +70,22 @@ public class GameRenderer {
                 PlatformOpenGL._wglViewport(0, 0, pxWidth, pxHeight);
 
                 try {
-                        // Clear to the vanilla overworld sky color
-                        PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);
+                        // Vanilla clears to the fog color; with the day/night
+                        // timeline live the fog color IS the sky-fog horizon
+                        // color the disc blends into. Menus keep the classic
+                        // constant (the panorama covers the screen anyway).
+                        net.minecraft.client.multiplayer.ClientLevel skyLevel =
+                                        minecraft.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel l
+                                                        && minecraft.isLevelLoaded() ? l : null;
+                        if (skyLevel != null) {
+                                net.minecraft.client.player.LocalPlayer skyPlayer = minecraft.getPlayer();
+                                SkyRenderer.updateState(skyLevel.getDayTime(), partialTick,
+                                                skyPlayer != null ? skyPlayer.getEyeY() : 0.0D);
+                                PlatformOpenGL._wglClearColor(SkyRenderer.fogR(), SkyRenderer.fogG(),
+                                                SkyRenderer.fogB(), 1.0f);
+                        } else {
+                                PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);
+                        }
                         PlatformOpenGL._wglClear(
                                 WebGL2RenderingContext.COLOR_BUFFER_BIT
                                 | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
@@ -134,13 +149,30 @@ public class GameRenderer {
                                 }
                         }
 
-                        // The 3D world (vanilla renderLevel): block meshes with
-                        // the camera view, then the crosshair pick, then the
-                        // hit outline + destroy overlay
+                        // The 3D world (vanilla renderLevel): sky pass first
+                        // (vanilla addSkyPass - disc, sunrise fan, sun/moon/
+                        // stars, dark disc; rotation-only view, no depth
+                        // writes), then the block meshes with the camera view,
+                        // then the crosshair pick, then the hit outline +
+                        // destroy overlay
                         if (minecraft.isLevelLoaded()) {
                                 net.minecraft.client.player.LocalPlayer player = minecraft.getPlayer();
                                 net.minecraft.client.multiplayer.ClientLevel level = minecraft.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel l ? l : null;
                                 if (player != null && level != null) {
+                                        float aspect = pxHeight > 0 ? (float) pxWidth / (float) pxHeight : 1.0f;
+                                        // Close the (still empty) GUI batch - the sky
+                                        // pass switches programs and attribute
+                                        // pointers, and the next GUI draw must
+                                        // re-open the batch and re-set its state
+                                        // (the same contract the panorama honors)
+                                        EaglerGuiImpl.flush(gl);
+                                        SkyRenderer.renderFrame(gl, pxWidth, pxHeight,
+                                                        minecraft.getOptions().fov, aspect,
+                                                        player.yRot, player.xRot);
+                                        WorldGlRenderer.setSkyLight(
+                                                        (SkyRenderer.skyLightRgb() >> 16 & 0xFF) / 255.0f,
+                                                        (SkyRenderer.skyLightRgb() >> 8 & 0xFF) / 255.0f,
+                                                        (SkyRenderer.skyLightRgb() & 0xFF) / 255.0f);
                                         // Vanilla pick: from the eye along the view
                                         // vector, BLOCK_INTERACTION_RANGE long
                                         double eyeX = player.getEyeX();

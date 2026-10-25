@@ -556,6 +556,7 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 // Persist block edits (vanilla saves the level on unload)
                 if (this.level instanceof ClientLevel clientLevel) {
                         clientLevel.saveEdits();
+                        clientLevel.saveDayTime();
                 }
                 this.level = null;
                 this.player = null;

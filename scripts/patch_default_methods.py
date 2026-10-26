@@ -831,6 +831,18 @@ def patch_classes_js(input_path, output_path):
     with open(input_path, 'r', encoding='utf-8') as f:
         data = f.read()
 
+    # Idempotency guard: re-running on an already-patched bundle double-
+    # applies the textual passes and corrupts the Long helpers (observed
+    # as a BigInt "Division by zero" at boot). The __safe helper plus a
+    # hardened Long helper means this file was patched already.
+    if '__safe null-guard helper' in data[:6000] and \
+                    'Long_div = (a, b) => __safeAsIntN(64, __toBigInt(a)' in data:
+        print("Already-patched classes.js detected - copying through unchanged")
+        if input_path != output_path:
+            import shutil
+            shutil.copyfile(input_path, output_path)
+        return
+
     # __safe is referenced by many patches below — always define it first.
     print("\nEnsuring __safe null-guard helper is defined...")
     data = ensure_safe_helper(data)

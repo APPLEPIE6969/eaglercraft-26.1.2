@@ -84,6 +84,11 @@ public class MultiPlayerGameMode {
         /**
          * Vanilla START_DESTROY_BLOCK. Returns true when the block broke
          * immediately (creative / insta-mine).
+         *
+         * <p>Multiplayer: the same client-side checks run, but the break
+         * is the server's - Player Action START_DIGGING goes out (creative
+         * also sends FINISH right away) and the Block Update comes back
+         * as the authoritative change.</p>
          */
         public boolean startDestroyBlock(int x, int y, int z) {
                 LocalPlayer player = minecraft.getPlayer();
@@ -98,6 +103,33 @@ public class MultiPlayerGameMode {
                 }
                 int state = level.getBlockState(x, y, z);
                 if (state == Blocks.AIR) {
+                        return false;
+                }
+                net.minecraft.client.multiplayer.ClientPacketListener connection =
+                                minecraft.getConnection();
+                if (connection != null) {
+                        // Network mode: the server owns the break
+                        Blocks.Block netBlock = Blocks.byId(state);
+                        if (netBlock.destroySpeed < 0.0F) {
+                                return false; // unbreakable (bedrock)
+                        }
+                        connection.sendSwing();
+                        connection.sendPlayerAction(
+                                        net.minecraft.network.Connection.ACTION_START_DIGGING,
+                                        x, y, z, hitFace(x, y, z));
+                        if (level.isCreative()) {
+                                connection.sendPlayerAction(
+                                                net.minecraft.network.Connection.ACTION_FINISH_DIGGING,
+                                                x, y, z, hitFace(x, y, z));
+                                return true;
+                        }
+                        this.destroyProgressStart = this.gameTicks;
+                        this.isDestroyingBlock = true;
+                        this.destroyPos = x;
+                        this.destroyPosY = y;
+                        this.destroyPosZ = z;
+                        float progress = getDestroyProgress(level, netBlock);
+                        this.destroyStage = (int) (progress * 10.0F);
                         return false;
                 }
                 if (level.isCreative()) {
@@ -138,6 +170,7 @@ public class MultiPlayerGameMode {
                         return;
                 }
                 if (level == null || level.getBlockState(x, y, z) == Blocks.AIR) {
+                        // The server's Block Update beat the progress bar
                         abortDestroyBlock();
                         return;
                 }
@@ -150,7 +183,11 @@ public class MultiPlayerGameMode {
                 this.destroyStage = (int) (progress * 10.0F);
                 if (progress >= 1.0F) {
                         // vanilla delayed-destroy completion
-                        destroyBlock(x, y, z);
+                        if (minecraft.getConnection() != null) {
+                                finishNetworkDigging(x, y, z);
+                        } else {
+                                destroyBlock(x, y, z);
+                        }
                         this.isDestroyingBlock = false;
                         this.destroyStage = -1;
                 }
@@ -174,7 +211,15 @@ public class MultiPlayerGameMode {
                                 float destroyProgress = getDestroyProgress(level, block)
                                         * (ticksSpentDestroying + 1);
                                 if (destroyProgress >= 0.7F) {
-                                        destroyBlock(x, y, z);
+                                        if (minecraft.getConnection() != null) {
+                                                finishNetworkDigging(x, y, z);
+                                        } else {
+                                                destroyBlock(x, y, z);
+                                        }
+                                } else if (minecraft.getConnection() != null) {
+                                        minecraft.getConnection().sendPlayerAction(
+                                                        net.minecraft.network.Connection.ACTION_ABORT_DIGGING,
+                                                        x, y, z, hitFace(x, y, z));
                                 }
                         }
                 }
@@ -184,8 +229,41 @@ public class MultiPlayerGameMode {
 
         /** Vanilla ABORT_DESTROY_BLOCK. */
         public void abortDestroyBlock() {
+                if (this.isDestroyingBlock && minecraft.getConnection() != null) {
+                        minecraft.getConnection().sendPlayerAction(
+                                        net.minecraft.network.Connection.ACTION_ABORT_DIGGING,
+                                        this.destroyPos, this.destroyPosY, this.destroyPosZ,
+                                        hitFace(this.destroyPos, this.destroyPosY, this.destroyPosZ));
+                }
                 this.isDestroyingBlock = false;
                 this.destroyStage = -1;
+        }
+
+        /** Sends FINISH_DIGGING in network mode (the break is the server's). */
+        private void finishNetworkDigging(int x, int y, int z) {
+                net.minecraft.client.multiplayer.ClientPacketListener connection =
+                                minecraft.getConnection();
+                if (connection != null) {
+                        connection.sendPlayerAction(
+                                        net.minecraft.network.Connection.ACTION_FINISH_DIGGING,
+                                        x, y, z, hitFace(x, y, z));
+                }
+        }
+
+        /**
+         * The face the client is digging/placing through - the crosshair
+         * hit result's direction when it still points at this block,
+         * otherwise UP (the server uses it only for placement targeting;
+         * digging ignores it).
+         */
+        private int hitFace(int x, int y, int z) {
+                BlockHitResult hit = minecraft.getBlockHit();
+                if (hit != null && hit.blockX == x && hit.blockY == y
+                                && hit.blockZ == z
+                                && hit.type == BlockHitResult.Type.BLOCK) {
+                        return hit.direction.ordinal;
+                }
+                return net.minecraft.network.Connection.FACE_UP;
         }
 
         /** The per-tick survival progress: destroySpeed/hardness/modifier. */
@@ -254,6 +332,17 @@ public class MultiPlayerGameMode {
                         && player.getMinZ() < nz + 1.0D && player.getMaxZ() > (double) nz;
                 if (overlapsPlayer) {
                         return false;
+                }
+                net.minecraft.client.multiplayer.ClientPacketListener connection =
+                                minecraft.getConnection();
+                if (connection != null) {
+                        // Network mode: the server validates and places -
+                        // its Block Update + Set Container Slot apply the
+                        // change and consume the stock
+                        connection.sendSwing();
+                        connection.sendUseItemOn(hit.blockX, hit.blockY,
+                                        hit.blockZ, hit.direction.ordinal);
+                        return true;
                 }
                 level.setBlockState(nx, ny, nz, blockId);
                 if (!level.isCreative()) {

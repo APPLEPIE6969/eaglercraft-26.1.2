@@ -61,24 +61,42 @@ public class ClientLevel {
         /** Vanilla GameType: 0=survival, 1=creative, 3=spectator. */
         private int gameMode = 0;
 
-        private final double spawnX;
-        private final double spawnY;
-        private final double spawnZ;
+        private double spawnX;
+        private double spawnY;
+        private double spawnZ;
 
         /** Allocated sections: packed section coord -> 4096 block ids. */
         private final Map<Long, byte[]> sections = new HashMap<Long, byte[]>();
 
-        /** Player edits over the generated base: packed BlockPos -> block id. */
+        /** Player edits over the generated base: packed BlockPos -> block id.
+         * In remote (multiplayer) mode this overlay carries the entire
+         * server-fed world instead: the mesher and collision read through
+         * getBlockState, so edits give full block-id range where the byte
+         * sections would truncate ids > 255. */
         private final Map<Long, Integer> edits = new HashMap<Long, Integer>();
+
+        /** Remote mode: packed column key (chunkX, 0, chunkZ) -> the packed
+         * voxel keys this column's streamed sections contributed. Unload
+         * Chunk (S→C 0x1F) drains the list to forget the column. */
+        private final Map<Long, List<Long>> columnEdits = new HashMap<Long, List<Long>>();
 
         /** Sections whose mesh needs a rebuild (consumed by LevelRenderer). */
         private final Set<Long> dirtySections = new HashSet<Long>();
 
         private final String storageKey;
 
+        /** True for server-fed (multiplayer) worlds: no generated base, no
+         * localStorage persistence, missing chunks read as air. */
+        private final boolean remote;
+
         public ClientLevel(String levelName, String dimensionId) {
+                this(levelName, dimensionId, false);
+        }
+
+        private ClientLevel(String levelName, String dimensionId, boolean remote) {
                 this.levelName = levelName != null ? levelName : "New World";
                 this.dimensionId = dimensionId != null ? dimensionId : "minecraft:overworld";
+                this.remote = remote;
                 this.gameTime = 0L;
                 this.dayTime = 1000L; // dawn, like a fresh vanilla world
                 // Spawn on the flat preset's grass surface (y=-61 top face),
@@ -86,11 +104,49 @@ public class ClientLevel {
                 this.spawnX = 0.5D;
                 this.spawnY = flatTopY() + 1.0D;
                 this.spawnZ = 0.5D;
-                this.storageKey = "eaglercraft.world.blocks."
-                        + sanitize(this.levelName);
-                loadEdits();
-                loadDayTime();
+                this.storageKey = remote ? null
+                        : "eaglercraft.world.blocks."
+                                + sanitize(this.levelName);
+                if (!remote) {
+                        loadEdits();
+                        loadDayTime();
+                }
                 this.dirtySections.add(sectionKey(0, sectionIndex(this.MIN_Y), 0));
+        }
+
+        /**
+         * A server-fed multiplayer world (the real gateway protocol's
+         * play phase): no generated base and no persistence - every
+         * voxel comes from Level Chunk packets and dies with the
+         * session. The spawn point arrives with the play Login packet
+         * ({@link #setSpawn}).
+         */
+        public static ClientLevel createRemote(String host) {
+                return new ClientLevel("Server: " + host,
+                                "minecraft:overworld", true);
+        }
+
+        /** True when the world's blocks are server-authoritative. */
+        public boolean isRemote() {
+                return this.remote;
+        }
+
+        /**
+         * Remote worlds: whether any server geometry has landed yet. The
+         * client holds the player's physics (vanilla's "Loading terrain"
+         * hold) until the first streamed chunk applies, so a slow frame
+         * between the play Login and the chunk burst can't drop the
+         * player into the void.
+         */
+        public boolean hasServerChunks() {
+                return !this.sections.isEmpty() || !this.edits.isEmpty();
+        }
+
+        /** Remote worlds: the gateway's spawn point (play Login packet). */
+        public void setSpawn(double x, double y, double z) {
+                this.spawnX = x;
+                this.spawnY = y;
+                this.spawnZ = z;
         }
 
         /** Highest solid y of the flat preset (-61, the grass layer). */
@@ -178,7 +234,8 @@ public class ClientLevel {
                 if (section != null) {
                         return section[indexInSection(x, y, z)] & 0xFF;
                 }
-                return generatedBlock(x, y, z);
+                // Remote worlds have no generated base: unloaded space is air
+                return this.remote ? Blocks.AIR : generatedBlock(x, y, z);
         }
 
         /** The vanilla flat preset base (FlatLevelGeneratorSettings.getDefault). */
@@ -317,6 +374,9 @@ public class ClientLevel {
 
         /** Writes the edit overlay back to localStorage (called on save-and-quit). */
         public void saveEdits() {
+                if (this.remote || storageKey == null) {
+                        return; // server-authoritative worlds are never persisted
+                }
                 if (edits.isEmpty()) {
                         PlatformRuntime.localStorageSet(storageKey, "");
                         return;
@@ -370,7 +430,182 @@ public class ClientLevel {
 
         /** Persists the day time (called with the edit save on save-and-quit). */
         public void saveDayTime() {
+                if (this.remote || storageKey == null) {
+                        return;
+                }
                 PlatformRuntime.localStorageSet(timeKey(), Long.toString(dayTime));
+        }
+
+        // ========== Server-fed world state (the real gateway protocol) ==========
+
+        private List<Long> columnList(int chunkX, int chunkZ) {
+                Long columnKey = BlockPos.asLong(chunkX, 0, chunkZ);
+                List<Long> list = columnEdits.get(columnKey);
+                if (list == null) {
+                        list = new java.util.ArrayList<Long>();
+                        columnEdits.put(columnKey, list);
+                }
+                return list;
+        }
+
+        /**
+         * Applies one streamed server section (the gateway's Level Chunk
+         * pinned layout): {@code voxels[i]} indexes {@code palette}, one
+         * byte per voxel in vanilla YZX order
+         * {@code i = ((y&15)<<8) | ((z&15)<<4) | (x&15)}. Non-air voxels
+         * enter the edit overlay (full block-id range) and their sections
+         * (plus the horizontal neighbors, for face culling) are marked
+         * dirty for meshing.
+         */
+        public void applyServerSection(int chunkX, int sectionY, int chunkZ,
+                        int[] palette, byte[] voxels) {
+                // Palettes entirely within the byte range (the superflat
+                // base: bedrock/dirt/grass) store natively in the section
+                // array - 4 KiB flat bytes instead of thousands of boxed
+                // edit entries. Palettes carrying high ids (oak logs 351,
+                // leaves 359) keep the edit-overlay path.
+                boolean overId = false;
+                for (int id : palette) {
+                        if (id > 255) {
+                                overId = true;
+                                break;
+                        }
+                }
+                if (!overId) {
+                        byte[] section = sectionFor(sectionKey(chunkX, sectionY, chunkZ));
+                        boolean any = false;
+                        for (int i = 0; i < 4096; i++) {
+                                int idx = voxels[i] & 0xFF;
+                                int id = idx < palette.length ? palette[idx] : Blocks.AIR;
+                                if (id != Blocks.AIR) {
+                                        any = true;
+                                }
+                                section[i] = (byte) id;
+                        }
+                        if (any) {
+                                markServerSectionRows(chunkX, sectionY, chunkZ, voxels, palette);
+                        }
+                        return;
+                }
+                int baseY = this.MIN_Y + (sectionY << SECTION_SHIFT);
+                boolean any = false;
+                for (int i = 0; i < 4096; i++) {
+                        int idx = voxels[i] & 0xFF;
+                        if (idx >= palette.length) {
+                                continue;
+                        }
+                        int id = palette[idx];
+                        if (id == Blocks.AIR) {
+                                continue;
+                        }
+                        int x = (chunkX << SECTION_SHIFT) + (i & 15);
+                        int y = baseY + ((i >> 8) & 15);
+                        int z = (chunkZ << SECTION_SHIFT) + ((i >> 4) & 15);
+                        Long key = BlockPos.asLong(x, y, z);
+                        edits.put(key, Integer.valueOf(id));
+                        columnList(chunkX, chunkZ).add(key);
+                        any = true;
+                }
+                if (!any) {
+                        return;
+                }
+                markServerSectionRows(chunkX, sectionIndex(baseY), chunkZ, voxels, palette);
+        }
+
+        /** Marks the section rows that carry blocks, plus their horizontal
+         * neighbors (face culling across chunk borders). */
+        private void markServerSectionRows(int chunkX, int sy, int chunkZ,
+                        byte[] voxels, int[] palette) {
+                for (int row = 0; row < 4096; row += 256) {
+                        boolean rowHas = false;
+                        for (int i = row; i < row + 256; i++) {
+                                int p = voxels[i] & 0xFF;
+                                if (p < palette.length && palette[p] != Blocks.AIR) {
+                                        rowHas = true;
+                                        break;
+                                }
+                        }
+                        if (rowHas) {
+                                int ry = sy + (row >> 8);
+                                markDirty(chunkX, ry, chunkZ);
+                                markDirty(chunkX - 1, ry, chunkZ);
+                                markDirty(chunkX + 1, ry, chunkZ);
+                                markDirty(chunkX, ry, chunkZ - 1);
+                                markDirty(chunkX, ry, chunkZ + 1);
+                        }
+                }
+        }
+
+        /**
+         * A server-authoritative single block change (Block Update,
+         * S→C 0x05): edits the overlay and marks the owning section and
+         * its border neighbors dirty - the same neighbor rule the local
+         * edit path uses.
+         */
+        public void applyServerBlockUpdate(int x, int y, int z, int blockId) {
+                if (y < this.MIN_Y || y > this.MAX_Y) {
+                        return;
+                }
+                Long key = BlockPos.asLong(x, y, z);
+                int secX = x >> SECTION_SHIFT;
+                int secY = sectionIndex(y);
+                int secZ = z >> SECTION_SHIFT;
+                long secKey = sectionKey(secX, secY, secZ);
+                int idx = indexInSection(x, y, z);
+                if (blockId == Blocks.AIR) {
+                        edits.remove(key); // the server's air overrides the overlay
+                        byte[] section = sections.get(secKey);
+                        if (section != null) {
+                                section[idx] = 0;
+                        }
+                } else if (blockId <= 255) {
+                        edits.remove(key); // section bytes win where no edit exists
+                        sectionFor(secKey)[idx] = (byte) blockId;
+                } else {
+                        edits.put(key, Integer.valueOf(blockId));
+                        columnList(x >> SECTION_SHIFT, z >> SECTION_SHIFT).add(key);
+                }
+
+                markDirty(secX, secY, secZ);
+                int lx = x & 15;
+                int ly = y & 15;
+                int lz = z & 15;
+                if (lx == 0) markDirty(secX - 1, secY, secZ);
+                if (lx == 15) markDirty(secX + 1, secY, secZ);
+                if (ly == 0) markDirty(secX, secY - 1, secZ);
+                if (ly == 15) markDirty(secX, secY + 1, secZ);
+                if (lz == 0) markDirty(secX, secY, secZ - 1);
+                if (lz == 15) markDirty(secX, secY, secZ + 1);
+        }
+
+        /**
+         * Forgets a streamed column (Unload Chunk, S→C 0x1F): drops the
+         * column's server-fed voxels from the overlay and re-meshes.
+         */
+        public void unloadServerColumn(int chunkX, int chunkZ) {
+                List<Long> column = columnEdits.remove(
+                                BlockPos.asLong(chunkX, 0, chunkZ));
+                boolean any = column != null && !column.isEmpty();
+                if (column != null) {
+                        for (Long key : column) {
+                                if (edits.remove(key) != null) {
+                                        any = true;
+                                }
+                        }
+                }
+                // drop the column's native sections as well
+                for (int sy = 0; sy < (this.MAX_Y - this.MIN_Y + 1) >> SECTION_SHIFT; sy++) {
+                        if (sections.remove(sectionKey(chunkX, sy, chunkZ)) != null) {
+                                any = true;
+                        }
+                }
+                if (any) {
+                        markRangeDirty(chunkX << SECTION_SHIFT, this.MIN_Y,
+                                        chunkZ << SECTION_SHIFT,
+                                        (chunkX << SECTION_SHIFT) + 15,
+                                        this.MAX_Y,
+                                        (chunkZ << SECTION_SHIFT) + 15);
+                }
         }
 
         // ========== Collision (vanilla Shapes.collide for full cubes) ==========

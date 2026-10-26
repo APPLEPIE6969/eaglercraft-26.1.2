@@ -118,12 +118,17 @@ public class PauseScreen extends Screen {
                 openToLan.setActive(false);
                 this.addRenderableWidget(openToLan);
 
-                // Row 4: Save and Quit to Title, colspan 2 (vanilla
-                // disconnectButtonLabel for a local world)
+                // Row 4: Save and Quit to Title (local worlds) / Disconnect
+                // (multiplayer) - vanilla disconnectButtonLabel, colspan 2.
+                // Both paths run Minecraft.disconnect, which closes the
+                // gateway connection first and never persists remote worlds.
+                boolean remote = this.minecraft != null && this.minecraft.isMultiplayer();
                 this.addRenderableWidget(new Button(colL, gy + MENU_PADDING_TOP
                                 + 4 * (Button.HEIGHT + CELL_GAP), BUTTON_WIDTH_FULL, Button.HEIGHT,
-                                "Save and Quit to Title", button -> {
-                                        ClientMain.log("[PauseScreen] Save and Quit to Title");
+                                remote ? "Disconnect" : "Save and Quit to Title", button -> {
+                                        ClientMain.log(remote
+                                                        ? "[PauseScreen] Disconnect"
+                                                        : "[PauseScreen] Save and Quit to Title");
                                         if (this.minecraft != null) {
                                                 this.minecraft.disconnect();
                                         }

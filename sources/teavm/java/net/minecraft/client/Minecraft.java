@@ -20,8 +20,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.DisconnectedScreen;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -86,7 +88,8 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
         // ========== Level/World State ==========
         private Object level; // ClientLevel
         private Object cameraEntity; // Entity
-        private Object connection; // ClientPacketListener
+        /** The multiplayer gateway connection (null in singleplayer). */
+        private ClientPacketListener connection;
         private Object singleplayerServer; // IntegratedServer stub
 
         /** The local player (movement physics + camera anchor). */
@@ -272,12 +275,41 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
                         // Tick the loaded world (advances the game clock)
                         if (this.level instanceof ClientLevel clientLevel) {
+                                // Multiplayer: drain queued packets first so
+                                // chunk/block/position data lands before the
+                                // player physics tick reads the world
+                                if (this.connection != null) {
+                                        net.minecraft.network.Connection gateway =
+                                                        this.connection.getConnection();
+                                        gateway.tick();
+                                        if (gateway.pollDisconnect() instanceof String reason) {
+                                                ClientMain.log("[Minecraft] gateway disconnected: " + reason);
+                                                ClientPacketListener dead = this.connection;
+                                                this.leaveWorldQuietly();
+                                                dead.disconnect(reason);
+                                                this.setScreen(new DisconnectedScreen(
+                                                                "Connection Lost", reason, new TitleScreen()));
+                                                return;
+                                        }
+                                }
                                 clientLevel.tick();
                                 // Vanilla LocalPlayer tick order: the player's
                                 // aiStep runs after the level's, then the game
-                                // mode's destroy state machine advances
-                                if (this.player != null) {
+                                // mode's destroy state machine advances. Remote
+                                // worlds hold the physics until the first
+                                // streamed chunk lands (vanilla's "Loading
+                                // terrain" hold) so a slow frame between the
+                                // play Login and the chunk burst can't drop
+                                // the player into the void.
+                                boolean holdRemotePhysics =
+                                                clientLevel.isRemote() && !clientLevel.hasServerChunks();
+                                if (this.player != null && !holdRemotePhysics) {
                                         this.player.tick(clientLevel);
+                                }
+                                // Multiplayer: the vanilla move-packet pump
+                                // runs after the player tick (fresh transform)
+                                if (this.connection != null) {
+                                        this.connection.tickMovement();
                                 }
                                 this.gameMode.tick();
                                 // Held attack: vanilla continues the destroy on
@@ -482,14 +514,6 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
         // ========== Connection / Server ==========
 
-        public Object getConnection() {
-                return this.connection;
-        }
-
-        public void setConnection(Object connection) {
-                this.connection = connection;
-        }
-
         public Object getSingleplayerServer() {
                 return this.singleplayerServer;
         }
@@ -550,9 +574,16 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
          * screen (the "Save and Quit to Title" button). The level is
          * dropped - the localStorage world list keeps its metadata so the
          * Select World screen can rejoin it.
+         *
+         * <p>Multiplayer: the gateway connection closes first and the
+         * server-fed world is never persisted (vanilla Disconnect).</p>
          */
         public void disconnect() {
                 ClientMain.log("[Minecraft] disconnect -> title screen");
+                if (this.connection != null) {
+                        this.connection.disconnect("disconnect.quitting");
+                        this.connection = null;
+                }
                 // Persist block edits (vanilla saves the level on unload)
                 if (this.level instanceof ClientLevel clientLevel) {
                         clientLevel.saveEdits();
@@ -563,6 +594,25 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
                 this.hitResultBlock = null;
                 this.missTime = 0;
                 this.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+        }
+
+        /** Drops a world without saving or screens - the socket-death path. */
+        private void leaveWorldQuietly() {
+                this.level = null;
+                this.player = null;
+                this.hitResultBlock = null;
+                this.connection = null;
+                this.missTime = 0;
+        }
+
+        /** The multiplayer gateway connection (null in singleplayer). */
+        public ClientPacketListener getConnection() {
+                return this.connection;
+        }
+
+        /** The current block the crosshair targets (vanilla hitResult). */
+        public BlockHitResult getBlockHit() {
+                return this.hitResultBlock;
         }
 
         public Screen getScreen() {
@@ -771,6 +821,46 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
 
         public void setLevel(Object clientLevel) {
                 this.level = clientLevel;
+        }
+
+        /**
+         * Enters a multiplayer world the ConnectScreen flow lands in: the
+         * gateway's play Login packet carries the authoritative spawn,
+         * game mode and clocks; the remote {@link ClientLevel} is fed
+         * by Level Chunk / Block Update packets for the life of the
+         * session and is never persisted.
+         */
+        public void doMultiplayerJoin(ClientPacketListener connection,
+                        String serverAddress, int entityId, int gameMode,
+                        String dimension, int difficulty, boolean hardcore,
+                        long dayTime, long gameTime,
+                        double spawnX, double spawnY, double spawnZ) {
+                if (this.isLevelLoaded()) {
+                        ClientMain.log("[Minecraft] doMultiplayerJoin ignored: already in a world");
+                        return;
+                }
+                ClientMain.log("[Minecraft] joining multiplayer world on " + serverAddress
+                                + " (entity " + entityId + ", gamemode " + gameMode + ")");
+                this.connection = connection;
+                ClientLevel clientLevel = ClientLevel.createRemote(serverAddress);
+                clientLevel.setSpawn(spawnX, spawnY, spawnZ);
+                clientLevel.setGameMode(gameMode);
+                clientLevel.setDifficulty(difficulty);
+                clientLevel.setDayTime(dayTime);
+                this.setLevel(clientLevel);
+                boolean creative = gameMode == 1;
+                this.player = new LocalPlayer(this, creative);
+                // Vanilla join: snap to the server's spawn, yaw 0 (+Z)
+                this.player.snapTo(spawnX, spawnY, spawnZ, 0.0F, 0.0F);
+                this.hitResultBlock = null;
+                this.missTime = 0;
+                this.setScreen(null); // in-game: the HUD renders
+                ClientMain.log("[Minecraft] multiplayer world joined: " + clientLevel);
+        }
+
+        /** True while a gateway session is attached to the loaded world. */
+        public boolean isMultiplayer() {
+                return this.connection != null;
         }
 
         public Object getLevel() {

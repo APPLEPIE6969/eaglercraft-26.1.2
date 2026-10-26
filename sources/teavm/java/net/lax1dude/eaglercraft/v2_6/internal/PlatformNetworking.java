@@ -65,6 +65,22 @@ public class PlatformNetworking {
         private static long bytesReceived = 0;
         private static long connectTime = 0;
 
+        // ========== Inbound message listener ==========
+        /**
+         * The protocol layer's inbound hook ({@code Connection}). The
+         * WebSocket callback hands every binary frame to it; the game
+         * thread drains the protocol queue from tick().
+         */
+        private static volatile WebSocketMessageCallback messageListener = null;
+
+        /**
+         * Sets (or clears with null) the binary-frame listener.
+         * Used by the gateway protocol layer only.
+         */
+        public static void setMessageListener(WebSocketMessageCallback listener) {
+                messageListener = listener;
+        }
+
         // ========== Message Buffer ==========
         private static final int MAX_INCOMING_SIZE = 0x100000; // 1MB max incoming message
         private static final int MAX_OUTGOING_SIZE = 0x100000; // 1MB max outgoing message
@@ -171,12 +187,14 @@ public class PlatformNetworking {
         }
 
         /**
-         * Called when a binary message is received from the server.
-         * Override or connect to the game's packet handler.
+         * Called when a binary message is received from the server:
+         * forwards the frame to the protocol layer's listener.
          */
         private static void __onMessage(ArrayBuffer data) {
-                // This would be connected to the game's packet processing pipeline
-                // For now, it's a callback point
+                WebSocketMessageCallback listener = messageListener;
+                if (listener != null) {
+                        listener.call(data);
+                }
         }
 
         /**
@@ -458,15 +476,15 @@ public class PlatformNetworking {
         private static native void setOnOpen(JSObject ws, WebSocketOpenCallback callback);
 
         @JSBody(params = { "ws", "callback" }, script = ""
-                        + "ws.onmessage = function(e) { if (e.data instanceof ArrayBuffer) callback.call(e.data); };")
+                        + "ws.onmessage = function(e) { if (e.data instanceof ArrayBuffer) callback(e.data); };")
         private static native void setOnMessage(JSObject ws, WebSocketMessageCallback callback);
 
         @JSBody(params = { "ws", "callback" }, script = ""
-                        + "ws.onclose = function(e) { callback.call(e.code, e.reason || ''); };")
+                        + "ws.onclose = function(e) { callback(e.code, e.reason || ''); };")
         private static native void setOnClose(JSObject ws, WebSocketCloseCallback callback);
 
         @JSBody(params = { "ws", "callback" }, script = ""
-                        + "ws.onerror = function(e) { callback.call(e.message || 'Unknown error'); };")
+                        + "ws.onerror = function(e) { callback(e.message || 'Unknown error'); };")
         private static native void setOnError(JSObject ws, WebSocketErrorCallback callback);
 
         @JSBody(params = { "ws", "data" }, script = "ws.send(data);")

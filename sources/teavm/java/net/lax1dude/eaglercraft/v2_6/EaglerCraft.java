@@ -487,6 +487,7 @@ public class EaglerCraft {
                         if (!paused) {
                                 paused = true;
                                 gameState = STATE_PAUSED;
+                                ClientMain.warn("[EaglerCraft] auto-paused: page visibility lost");
                         }
                         return;
                 } else if (paused) {
@@ -494,6 +495,7 @@ public class EaglerCraft {
                         gameState = STATE_RUNNING;
                         lastTickTime = currentTime;
                         tickAccumulator = 0;
+                        ClientMain.warn("[EaglerCraft] auto-resumed: page visible again");
                         return;
                 }
 
@@ -636,8 +638,14 @@ public class EaglerCraft {
                 }
                 totalTicks++;
 
-                // Refresh the telemetry bridge once per game tick (20 TPS)
-                pushGameTelemetry();
+                // Refresh the telemetry bridge once per game tick (20 TPS).
+                // Guarded: a telemetry build failure must never kill the rAF
+                // loop (the schedule happens after this call).
+                try {
+                        pushGameTelemetry();
+                } catch (Throwable t) {
+                        ClientMain.warn("[EaglerCraft] telemetry push failed: " + t);
+                }
         }
 
         /**

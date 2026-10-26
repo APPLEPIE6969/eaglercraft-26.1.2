@@ -511,7 +511,46 @@ eaglercraftXOpts.singleplayer = {
 
 ### Overview
 
-EaglerCraftX 26.1.2 requires a WebSocket-to-TCP proxy to connect browser clients to standard Minecraft Java Edition servers. Two proxy options are available:
+EaglerCraftX 26.1.2 speaks the real gateway protocol end to end
+(docs/PROTOCOL.md, "Minecraft 26.1.2 Protocol 775"): the browser
+client drives the vanilla handshake -> login -> configuration -> play
+state machine over WebSocket binary frames, and the bundled
+PlaceholderServer gateway answers with a playable superflat world -
+chunk streaming, server-authoritative digging and placing, inventory
+drops and chat. Punch a tree, mine the log into your hotbar, craft
+with it.
+
+```
+Browser Client ──(WebSocket, protocol 775)──► Gateway (PlaceholderServer)
+```
+
+**Run the gateway:**
+
+```bash
+./gradlew :PlaceholderServer:shadowJar
+java -jar gateway/PlaceholderServer/build/libs/PlaceholderServer-1.0.0.jar \
+    --port 8081 --motd "EaglerCraft 26.1.2 gateway - punch a tree!"
+```
+
+Then in the client: **Multiplayer -> Direct Connection -> 127.0.0.1:8081
+-> Join Server**. The client enters the server's world at its spawn,
+streams a 4-chunk radius, and digs/places are validated server-side
+(reach, bedrock, placement overlap) with the world change coming back
+as a Block Update and the drop as a Set Container Slot.
+
+**Protocol conformance** is exercised twice by the e2e suite:
+a wire-level walk (`scripts/gw_real_smoke.mjs` - status ping/MOTD,
+login, the configuration sequence, 81-column chunk stream, dig, place,
+chat, the invalid-username kick) and the full browser join through the
+real Multiplayer UI (`tests/e2e/gateway-protocol.spec.ts`).
+
+The EaglercraftXBungee / EaglercraftXVelocity modules remain the
+session-registry layer for proxy deployments (see
+gateway/*/src - their relay-to-backend milestone predates this one);
+the PlaceholderServer is the standalone play endpoint the client
+targets today.
+
+### Legacy proxy layout (BungeeCord / Velocity)
 
 ```
 Browser Client ──(WebSocket)──► EaglercraftX Proxy ──(TCP)──► Backend Server

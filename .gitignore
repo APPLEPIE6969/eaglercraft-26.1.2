@@ -106,4 +106,5 @@ scripts/*
 !scripts/patch_teavm_asm.py
 !scripts/gen_block_palette.py
 !scripts/local_build.sh
+!scripts/gw_real_smoke.mjs
 dfu-classes

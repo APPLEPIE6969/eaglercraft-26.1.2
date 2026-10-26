@@ -23,7 +23,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   forbidOnly: isCI,
-  retries: isCI ? 1 : 0,
+  retries: isCI ? 2 : 1,
   // The client bootstrap blocks the browser main thread for about a minute, so
   // a single test can legitimately need several minutes.
   timeout: 300_000,

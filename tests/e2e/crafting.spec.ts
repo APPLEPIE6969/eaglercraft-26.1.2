@@ -259,6 +259,19 @@ async function bootSurvival(
     });
   });
 
+  // The canvas settles (DPR/gui-scale re-init) within the first seconds
+  // of a session; a boot with a slower TeaVM evaluation shifts the settle
+  // window, so require two consecutive equal scale readings before the
+  // panel coordinates are cached - otherwise clicks drift by a cell.
+  let previous: number | null = null;
+  for (let i = 0; i < 20; i++) {
+    const { w, h } = await readGuiSize(page);
+    if (previous !== null && previous === w && w > 0 && h > 0) {
+      return { gui: { w, h } };
+    }
+    previous = w;
+    await page.waitForTimeout(500);
+  }
   return { gui: await readGuiSize(page) };
 }
 

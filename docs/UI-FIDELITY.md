@@ -517,3 +517,28 @@ at generation time; skips logged in the generated header).
 - The bridge's `setHotbarSlot` no longer selects the slot it fills, and
   PlatformInput's per-button input latch counts presses instead of
   overwriting (rapid clicks queue instead of vanishing on slow frames).
+
+## 15. Multiplayer / the real gateway protocol (26.1.2)
+
+| Element | Fidelity | Notes |
+|---------|----------|-------|
+| Connection state machine | exact (Handshake -> Login -> Configuration -> Play per docs/PROTOCOL.md, protocol 775) | WebSocket binary frames; permessage-deflate optional (the browser falls back when the gateway doesn't negotiate it) |
+| ConnectScreen join flow | exact (vanilla status line at height/2-50, 10s join guard) | real handshake + Login Hello; "Logging in..." during configuration; the play Login packet enters the world |
+| DirectConnectScreen / JoinMultiplayerScreen | exact layouts (previous milestone) | Direct Connection feeds the real protocol now - no more "does not support multiplayer yet" |
+| Play phase | server-authoritative | Level Chunk streaming (section-palette form, 4-chunk view / 6-chunk unload radius), Block Update dig/place, Set Container Slot drops, Player Position teleports (confirmed), keep-alives every 15s (0x2C S->C / 0x11 C->S) |
+| MultiPlayerGameMode | vanilla dig lifecycle over the wire | START/ABORT/FINISH Player Actions drive the server; the client keeps the crack-overlay state machine; Use Item On for placement; the local edit path stays singleplayer-only |
+| Remote world storage | vanilla-equivalent reads | base chunks natively in section bytes; high-id palettes (oak logs/leaves) in the edit overlay; physics held until the first chunk lands (vanilla's "Loading terrain" hold) |
+| PauseScreen quit | exact (vanilla disconnectButtonLabel) | "Disconnect" for multiplayer worlds (connection closes, nothing persists), "Save and Quit to Title" for local ones |
+| Known gaps | - | no entity spawn/rendering (no other players visible), no chat HUD (chat logs to console), no server-list pinging (the STATUS state exists and is smoke-tested), Bungee/Velocity still on the session-registry protocol |
+
+### Multiplayer implementation notes
+
+- TeaVM interop: `java.util.UUID` loses its methods across call
+  boundaries (the handshake rides two longs); JSFunctor callbacks must
+  be invoked as plain JS functions (`callback(e.data)`, not
+  `callback.call(...)`); the Connection's pre-open send burst queues
+  until onopen; the 0x02 id doubles as Login Success AND Configuration
+  Finish - only the state discriminates them.
+- The patcher (`scripts/patch_default_methods.py`) is now idempotent:
+  re-running it on an already-patched bundle used to corrupt the Long
+  helpers (a BigInt "Division by zero" at boot).

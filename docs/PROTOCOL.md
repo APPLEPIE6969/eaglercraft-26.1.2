@@ -140,32 +140,30 @@ Server → Client: Login Success (0x02)
 
 ### Step 3: Configuration Phase
 
-After Login Success, the connection enters the Configuration state:
+After Login Success, the connection enters the Configuration state
+(packet IDs per the tables below):
 
 ```
-Server → Client: Plugin Message (Config 0x01)
+Server → Client: Plugin Message (Config 0x00)
   - Channel: "minecraft:brand"
   - Data: UTF-8 string (server brand name)
 
-Server → Client: Registry Data (Config 0x07)
+Server → Client: Registry Data (Config 0x06)
   - Dynamic registry entries (biomes, dimensions, etc.)
 
-Server → Client: Feature Flags (Config 0x06)
+Server → Client: Feature Flags (Config 0x07)
   - Feature flag identifiers
 
-Server → Client: Known Packs (Config 0x0E)
+Server → Client: Known Packs (Config 0x08)
   - Resource pack sync offers
 
-Client → Server: Known Packs (Config 0x07)
+Client → Server: Known Packs (Config 0x05)
   - Client acknowledges known packs
 
-Server → Client: Update Enabled Features (Config 0x06)
-  - Final feature flag list
-
-Server → Client: Finish Configuration (Config 0x03)
+Server → Client: Finish Configuration (Config 0x02)
   - Signals end of configuration
 
-Client → Server: Acknowledge Finish Configuration (Config 0x03)
+Client → Server: Acknowledge Finish Configuration (Config 0x02)
   - Client acknowledges, transitions to Play
 ```
 
@@ -632,3 +630,132 @@ Server                          Client
   │── Keep Alive (0x2C) ────────►│
   │◄── Keep Alive (0x11) ───────│
 ```
+
+---
+
+## Gateway Field Reference (26.1.2, pinned)
+
+> The exact field layouts the 26.1.2 browser client and the Java
+> gateway (`gateway/PlaceholderServer`) both implement. Where a
+> packet above is only named, this section pins its bytes. Anything
+> not listed here is not used by the 26.1.2 gateway. Reference
+> implementations: the client's `net.minecraft.network` package and
+> the gateway's `net.lax1dude.eaglercraft.v2_6.placeholder_server`
+> package - the two must stay byte-compatible.
+
+### Conventions
+
+| Rule | Value |
+|------|-------|
+| Frame | one WebSocket binary message = one packet: `[VarInt packetId][payload]` |
+| Byte order | big-endian (network order) |
+| Strings | `VarInt` UTF-8 **byte** length + UTF-8 bytes, max 131072 chars |
+| Position | 8-byte Long: x 26 bits, z 26 bits, y 12 bits (`((x&0x3FFFFFF)<<38) \| ((z&0x3FFFFFF)<<12) \| (y&0xFFF)`) |
+| Compression | permessage-deflate is **optional**; servers without it answer with plain frames (the browser falls back automatically) |
+| UUID | two Longs: most-significant first |
+
+### Handshake (C→S 0x00)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| protocol | VarInt | `775` for 26.1.2 |
+| addr | String | hostname (no scheme) |
+| port | UShort | explicit port, else 80 (ws://) / 443 (wss://) |
+| next state | VarInt | 1 = Status, 2 = Login |
+
+A mismatched protocol version is answered with Login Disconnect
+`{"translate":"multiplayer.disconnect.outdated_client","with":["775"]}`.
+
+### Status Response (S→C 0x00)
+
+A UTF-8 JSON object with the vanilla shape:
+`{"version":{"name":"26.1.2","protocol":775},"players":{"online":n,"max":m},"description":{"text":"MOTD"}}`.
+Ping (C→S 0x01) / Pong (S→C 0x01) carry one Long, echoed verbatim;
+the server closes after the pong.
+
+### Login
+
+| Packet | Fields |
+|--------|--------|
+| Login Hello (C→S 0x00) | UUID, String name, VarInt property count (=0; each property: key, value, has-sig, [sig]) |
+| Login Acknowledge (S→C 0x01) | empty - informational, sent before Login Success |
+| Login Success (S→C 0x02) | UUID, String name, VarInt property count. Both sides enter CONFIGURATION after this packet |
+| Login Disconnect (S→C 0x03) | String JSON chat component |
+
+Usernames must match `[A-Za-z0-9_]{1,16}`. The gateway issues the
+offline-mode UUID (`nameUUIDFromBytes("OfflinePlayer:<name>")`).
+
+### Configuration
+
+| Packet | Fields |
+|--------|--------|
+| Client Information (C→S 0x00) | String locale, Byte view distance, VarInt chat mode, Boolean chat colors, UByte skin parts, VarInt main hand, Boolean text filtering, Boolean allow server listings |
+| Plugin Message (both, 0x00 / C 0x01) | String channel + raw bytes. `minecraft:brand` payload = String brand |
+| Registry Data (S→C 0x06) | VarInt registry count; per registry: String id, VarInt entry count, per entry: String id |
+| Feature Flags (S→C 0x07) | VarInt count + String flags |
+| Known Packs (S→C 0x08 / C→S 0x05) | VarInt count; per pack: String namespace, String id, String version |
+| Keep Alive (S 0x03 / C 0x03) | Long token, echoed |
+| Ping / Pong (S 0x04 / C 0x04) | Long token, echoed |
+| Finish Configuration (S→C 0x02) | empty |
+| Acknowledge Finish Configuration (C→S 0x02) | empty - both sides enter PLAY |
+
+### Play - server → client
+
+| Packet | Fields |
+|--------|--------|
+| Login (Play) (0x2A) | Int entity id, UByte game mode (0 survival, 1 creative), String dimension (`minecraft:overworld`), Long hashed seed, UByte difficulty, Boolean hardcore, String level type (`flat`), VarInt view distance, Long day time, Long game time, Double spawn x/y/z |
+| Level Chunk with Light (0x2E) | Int chunk x, Int chunk z, VarInt section count; per section: Byte **absolute section y** (`(y+64)>>4`), VarInt palette length, VarInt palette ids (client runtime ids; index 0 is air), then **4096 bytes** - one palette index per voxel in YZX order `i = ((y&15)<<8) \| ((z&15)<<4) \| (x&15)` |
+| Block Update (0x05) | Position, VarInt block id |
+| Set Container Slot (0x0E) | UByte window (0 = player inventory), Short slot (0-8 hotbar, 9-35 main), VarInt item id (client id space), VarInt count |
+| Unload Chunk (0x1F) | Int chunk x, Int chunk z |
+| Player Position (0x38) | Double x/y/z, Float yaw/pitch, Byte flags (bit0 +x, bit1 +y, bit2 +z, bit3 +yaw, bit4 +pitch relative), VarInt teleport id. Client confirms with Teleport Confirm (C→S 0x00, VarInt id) |
+| Keep Alive (0x2C) | Long token; client echoes on C→S 0x11. Server sends every 15s, times out after 30s |
+| System Chat (0x4F) | String JSON chat component (gateway sends `{"text": ...}`) |
+| Disconnect (0x1A) | String JSON chat component |
+
+### Play - client → server
+
+| Packet | Fields |
+|--------|--------|
+| Teleport Confirm (0x00) | VarInt teleport id |
+| Chat Message (0x07) | String (max 256 chars) |
+| Keep Alive (0x11) | Long token (echo) |
+| Move Player Pos (0x13) | Double x/y/z, Boolean on ground |
+| Move Player Pos Rot (0x14) | Double x/y/z, Float yaw/pitch, Boolean on ground |
+| Move Player Rot (0x15) | Float yaw/pitch, Boolean on ground |
+| Move Player Status Only (0x16) | Boolean on ground |
+| Player Action (0x1C) | VarInt status (0 start, 1 abort, 2 finish digging), Position, Byte face |
+| Set Carried Item (0x22) | Short slot (0-8) |
+| Swing (0x26) | VarInt hand (0 = main) |
+| Use Item On (0x2A) | Position (the clicked block), Byte face |
+
+Block faces use the vanilla 3D ids: 0 down (-Y), 1 up (+Y), 2 north
+(-Z), 3 south (+Z), 4 west (-X), 5 east (+X). Use Item On targets the
+face's neighbor cube.
+
+### Movement rule
+
+The client sends exactly one movement packet per tick following the
+vanilla choice rule: Pos Rot when moved and turned, Pos when moved
+only, Rot when turned only, Status Only when only the on-ground flag
+changed, nothing when nothing changed (a full Pos Rot always follows
+a teleport snap).
+
+### The 26.1.2 gateway world
+
+| Constant | Value |
+|----------|-------|
+| Base terrain | vanilla superflat preset: bedrock y=-64, dirt y=-63/-62, grass y=-61, air above |
+| Trees | deterministic oak ring (trunks at fixed offsets from spawn, 4 logs + vanilla leaf shape) |
+| Spawn | (0.5, -60, 0.5) - feet on the grass layer |
+| View distance | 4 chunks (streamed on join + on chunk-boundary crossings) |
+| Unload distance | 6 chunks |
+| Reach | 7 blocks (eye position to block center, vanilla dig/place validation) |
+| Drops | grass → dirt, stone → cobblestone, leaves → nothing, others → themselves |
+| Block ids | the client's runtime id space verbatim (`Blocks.java`); the id table lives there |
+
+Block digging is server-authoritative: the client's START/ABORT/FINISH
+Player Actions drive it, the world change comes back as a Block Update
+and the drop as a Set Container Slot. Placement is Use Item On; the
+server validates reach, target face, empty destination and player
+overlap, places, and syncs the carried slot.

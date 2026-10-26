@@ -1022,7 +1022,10 @@ public final class SkyRenderer {
 
         // ===== Matrix helpers (column-major, GL layout) =====
 
-        /** Camera rotation-only view: Rx(pitch) * Ry(yaw), no translation. */
+        /** Camera rotation-only view: Rx(pitch) * Ry(yaw + 180), no
+         * translation - the same +180 convention as WorldGlRenderer.makeView
+         * (vanilla GameRenderer.renderLevel pose order), so the sun rises
+         * where the physics yaw says it must. */
         private static void camRotation(float[] m, float yawDeg, float pitchDeg) {
                 float yaw = yawDeg * (float) (Math.PI / 180.0F);
                 float pitch = pitchDeg * (float) (Math.PI / 180.0F);
@@ -1031,14 +1034,15 @@ public final class SkyRenderer {
                 float cp = (float) Math.cos(pitch);
                 float sp = (float) Math.sin(pitch);
                 identity(m);
-                m[0] = cy;
-                m[2] = sy;
-                m[4] = sp * sy;
+                m[0] = -cy;
+                m[1] = -sp * sy;
+                m[2] = cp * sy;
+                m[4] = 0.0F;
                 m[5] = cp;
-                m[6] = -sp * cy;
-                m[8] = -cp * sy;
-                m[9] = sp;
-                m[10] = cp * cy;
+                m[6] = sp;
+                m[8] = -sy;
+                m[9] = sp * cy;
+                m[10] = -cp * cy;
         }
 
         private static void identity(float[] m) {

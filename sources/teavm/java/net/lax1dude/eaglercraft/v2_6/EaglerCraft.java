@@ -845,6 +845,7 @@ public class EaglerCraft {
                         consumeHotbarTelemetryRequests(mc);
                         consumeLookRequest(mc);
                         consumeTimeRequest(mc);
+                        consumeSceneRequest(mc);
                         gameplayJson = buildGameplayJson(mc);
                 }
                 try {
@@ -1134,6 +1135,80 @@ public class EaglerCraft {
         private static native void clearTimeRequest();
 
         /**
+         * Consumes a queued {@code setScene({blocks, fov, hideHud})} dev
+         * request - the world-sculpting hook shared by the e2e input spec
+         * and the panorama face generator: {@code blocks} apply once through
+         * the same {@link net.minecraft.client.multiplayer.ClientLevel#setBlockState}
+         * path the server's Block Updates use; {@code fov} (1..179) and
+         * {@code hideHud} are sticky overrides while a request carries them.
+         */
+        private static void consumeSceneRequest(net.minecraft.client.Minecraft mc) {
+                if (!hasSceneRequest()) {
+                        return;
+                }
+                int fov = readSceneFov();
+                if (fov > 0 && mc.getOptions() != null) {
+                        mc.getOptions().fov = fov;
+                }
+                int hud = readSceneHideHud();
+                if (hud >= 0) {
+                        hudHidden = hud == 1;
+                }
+                if (mc.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
+                        int n = sceneBlockCount();
+                        for (int i = 0; i < n; i++) {
+                                level.setBlockState(sceneBlockX(i), sceneBlockY(i),
+                                                sceneBlockZ(i), sceneBlockId(i));
+                        }
+                        if (n > 0) {
+                                ClientMain.log("[EaglerCraft] setScene: applied " + n
+                                                + " block(s) via telemetry bridge");
+                        }
+                }
+                clearSceneRequest();
+        }
+
+        /** The sticky dev HUD override (panorama face rendering). */
+        private static boolean hudHidden;
+
+        /** True when a dev {@code setScene({hideHud:true})} request hid the
+         * in-world HUD stratum (crosshair, hotbar) - panorama faces must
+         * capture the world alone. */
+        public static boolean isHudHidden() {
+                return hudHidden;
+        }
+
+        @JSBody(script = "return typeof window !== 'undefined' && window.__eaglercraftSceneReq != null;")
+        private static native boolean hasSceneRequest();
+
+        @JSBody(script = "var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;"
+                        + " return r && typeof r.fov === 'number' ? Math.round(r.fov) : -1;")
+        private static native int readSceneFov();
+
+        @JSBody(script = "var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;"
+                        + " return r && typeof r.hideHud === 'boolean' ? (r.hideHud ? 1 : 0) : -1;")
+        private static native int readSceneHideHud();
+
+        @JSBody(script = "var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;"
+                        + " return r && r.blocks && r.blocks.length ? r.blocks.length : 0;")
+        private static native int sceneBlockCount();
+
+        @JSBody(params = { "i" }, script = "return window.__eaglercraftSceneReq.blocks[i][0];")
+        private static native int sceneBlockX(int i);
+
+        @JSBody(params = { "i" }, script = "return window.__eaglercraftSceneReq.blocks[i][1];")
+        private static native int sceneBlockY(int i);
+
+        @JSBody(params = { "i" }, script = "return window.__eaglercraftSceneReq.blocks[i][2];")
+        private static native int sceneBlockZ(int i);
+
+        @JSBody(params = { "i" }, script = "return window.__eaglercraftSceneReq.blocks[i][3];")
+        private static native int sceneBlockId(int i);
+
+        @JSBody(script = "window.__eaglercraftSceneReq = null;")
+        private static native void clearSceneRequest();
+
+        /**
          * The raw menuBackgroundBlurriness option (0..10, default 5) - the
          * value the Accessibility screen's slider edits and localStorage
          * persists, independent of whether the current screen applies it.
@@ -1219,7 +1294,8 @@ public class EaglerCraft {
                 + " setDayTime: function(t) { window.__eaglercraftTimeReq = t; },"
                 + " setHotbarSlot: function(s,i,c) { window.__eaglercraftHotbarReq = {s:s,i:i,c:c}; },"
                 + " selectSlot: function(s) { window.__eaglercraftHotbarReq = {s:s,i:-1,c:0}; },"
-                + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; }"
+                + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; },"
+                + " setScene: function(o) { window.__eaglercraftSceneReq = o; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,

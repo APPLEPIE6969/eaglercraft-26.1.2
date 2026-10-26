@@ -195,8 +195,12 @@ public class GameRenderer {
                                                 minecraft.getOptions().fov);
 
                                         // Vanilla renderHitOutline + destroy stage
+                                        // (hidden with the HUD by the dev
+                                        // setScene override - the straight-down
+                                        // panorama face must stay clean)
                                         BlockHitResult hit = minecraft.getHitResult();
-                                        if (hit != null && hit.type == BlockHitResult.Type.BLOCK) {
+                                        if (hit != null && hit.type == BlockHitResult.Type.BLOCK
+                                                        && !net.lax1dude.eaglercraft.v2_6.EaglerCraft.isHudHidden()) {
                                                 minecraft.getLevelRenderer().renderHitOutline(gl,
                                                         hit.blockX, hit.blockY, hit.blockZ);
                                                 int stage = minecraft.getGameMode().getDestroyStage();
@@ -210,8 +214,11 @@ public class GameRenderer {
                         }
 
                         // HUD overlay (crosshair + hotbar) when inside a world;
-                        // flushed now so any screen below draws over it
-                        if (minecraft.isLevelLoaded()) {
+                        // flushed now so any screen below draws over it. The dev
+                        // setScene({hideHud:true}) override (panorama face
+                        // capture) hides this stratum.
+                        if (minecraft.isLevelLoaded()
+                                        && !net.lax1dude.eaglercraft.v2_6.EaglerCraft.isHudHidden()) {
                                 minecraft.getGui().render(new PoseStack(), partialTick);
                         }
                         EaglerGuiImpl.flush(gl);

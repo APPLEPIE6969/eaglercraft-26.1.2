@@ -331,7 +331,15 @@ public class LevelRenderer {
                 return vi;
         }
 
-        private static final int[] QUAD_INDEX_ORDER = { 0, 1, 2, 2, 3, 0 };
+        // (0,2,1)(0,3,2): each triangle is the REVERSE of the previous
+        // (0,1,2)(2,3,0) order. The face corner arrays wind their
+        // triangles CW as seen from outside (the FACE_UP quad's
+        // cross product points (0,-1,0)), so the reversed order is
+        // what makes them GL-CCW front faces for CULL_FACE BACK -
+        // the unreversed order culled every top face and rendered
+        // the world inside-out (the dark ground = bedrock bottoms
+        // seen through the culled grass).
+        private static final int[] QUAD_INDEX_ORDER = { 0, 2, 1, 0, 3, 2 };
         private static final float[] FACE_QUAD = new float[20];
 
         private static final int FACE_UP = 0;
@@ -358,7 +366,7 @@ public class LevelRenderer {
                 }
                 float colorF = Float.intBitsToFloat(colorPacked);
                 // (0,1,2) (2,3,0) - vanilla's quad index diagonal split
-                int[] order = { 0, 1, 2, 2, 3, 0 };
+                int[] order = { 0, 2, 1, 0, 3, 2 }; // reversed: see QUAD_INDEX_ORDER
                 for (int k = 0; k < order.length; k++) {
                         float[] v = c[order[k]];
                         out[vi++] = v[0];

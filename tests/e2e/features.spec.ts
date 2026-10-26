@@ -293,10 +293,41 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     });
     expect(canvas, 'the game canvas must exist').toBeTruthy();
     await page.mouse.click(canvas!.x, canvas!.y);
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(700);
+    // Pointer-lock discipline (the crafting/gateway-spec rule): the async
+    // lock grant can land one position-jump delta that whips the camera, so
+    // re-snap and re-verify the aim before the hold.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await page.evaluate(() => {
+        const game = (
+          self as unknown as {
+            __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
+          }
+        ).__eaglercraftGame;
+        game?.setLook?.(0, 90);
+      });
+      const aimed = await waitForTelemetry(page, 6_000, (t) => {
+        const gp = t.gameplay as Gameplay | null | undefined;
+        const hit = gp?.hit;
+        return !!hit && hit.x === 0 && hit.y === -61 && hit.z === 0 && hit.face === 'up';
+      });
+      if (aimed) break;
+    }
 
     // ── Hold left mouse: survival destroy progress must advance ──
     await page.mouse.down();
+    // The lock grant / press itself can land one pointer-jump delta that
+    // whips the camera; the dig follows the crosshair, so re-snap once the
+    // hold is live and the destroy re-targets the grass under spawn.
+    await page.waitForTimeout(200);
+    await page.evaluate(() => {
+      const game = (
+        self as unknown as {
+          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
+        }
+      ).__eaglercraftGame;
+      game?.setLook?.(0, 90);
+    });
     let sawDestroyStage = false;
     let broke = false;
     const destroyDeadline = Date.now() + 20_000;

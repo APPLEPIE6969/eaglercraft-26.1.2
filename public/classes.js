@@ -8831,14 +8831,15 @@ nleva_WorldGlRenderer_makeView = ($m, $x, $y, $z, $yawDeg, $pitchDeg) => {
     $cp = jl_Math_cos(var$10);
     $sp = jl_Math_sin(var$10);
     nleva_WorldGlRenderer_identity($m);
-    var$7[0] = $cy;
-    var$7[2] = $sy;
-    var$7[4] = $sp * $sy;
+    var$7[0] =  -$cy;
+    var$7[1] =  -$sp * $sy;
+    var$7[2] = $cp * $sy;
+    var$7[4] = 0.0;
     var$7[5] = $cp;
-    var$7[6] =  -$sp * $cy;
-    var$7[8] =  -$cp * $sy;
-    var$7[9] = $sp;
-    var$7[10] = $cp * $cy;
+    var$7[6] = $sp;
+    var$7[8] =  -$sy;
+    var$7[9] = $sp * $cy;
+    var$7[10] =  -$cp * $cy;
     var$7[12] =  -(var$7[0] * $x + var$7[4] * $y + var$7[8] * $z);
     var$7[13] =  -(var$7[1] * $x + var$7[5] * $y + var$7[9] * $z);
     var$7[14] =  -(var$7[2] * $x + var$7[6] * $y + var$7[10] * $z);
@@ -9761,7 +9762,7 @@ nleva_WorldTextures_buildTints = () => {
                     break a;
                 var$5 = (__safe($tints).data||[]);
                 $b = var$4.$next();
-                var$5[$i] = nmwlb_Blocks$Block_tintFor($b, $tex);
+                var$5[$i] = nmwlb_Blocks$Block_tintForTexture($b, $tex);
                 if (var$5[$i])
                     break;
             }
@@ -9774,7 +9775,7 @@ nleva_WorldTextures_buildTints = () => {
                     if (!var$7.$hasNext())
                         break b;
                     $b = var$7.$next();
-                    var$5[$i] = nmwlb_Blocks$Block_tintFor($b, $tex);
+                    var$5[$i] = nmwlb_Blocks$Block_tintForTexture($b, $tex);
                     if (var$5[$i])
                         break;
                 }
@@ -9787,7 +9788,7 @@ nleva_WorldTextures_buildTints = () => {
                     if (!var$7.$hasNext())
                         break c;
                     $b = var$7.$next();
-                    var$5[$i] = nmwlb_Blocks$Block_tintFor($b, $tex);
+                    var$5[$i] = nmwlb_Blocks$Block_tintForTexture($b, $tex);
                     if (var$5[$i])
                         break;
                 }
@@ -9936,8 +9937,7 @@ nleva_WorldTextures_buildArray = $gl => {
         nlevi_PlatformOpenGL__wglTexSubImage3D(35866, 0, 0, 0, $i, 16, 16, 1, 6408, 5121, $px);
         $i = $i + 1 | 0;
     }
-    nlevi_PlatformOpenGL__wglGenerateMipmap(35866);
-    nlevi_PlatformOpenGL__wglTexParameteri(35866, 10241, 9986);
+    nlevi_PlatformOpenGL__wglTexParameteri(35866, 10241, 9728);
     nlevi_PlatformOpenGL__wglTexParameteri(35866, 10240, 9728);
     nlevi_PlatformOpenGL__wglTexParameteri(35866, 10242, 10497);
     nlevi_PlatformOpenGL__wglTexParameteri(35866, 10243, 10497);
@@ -11473,8 +11473,8 @@ nmcp_LocalPlayer_clampPitch = $pitch => {
 nmcp_LocalPlayer_turn = ($this, $xo, $yo) => {
     $this.$yRotO = $this.$yRot;
     $this.$xRotO = $this.$xRot;
-    $this.$yRot = $this.$yRot + $yo * 0.15000000596046448;
-    $this.$xRot = nmcp_LocalPlayer_clampPitch($this.$xRot - $xo * 0.15000000596046448);
+    $this.$yRot = $this.$yRot + $xo * 0.15000000596046448;
+    $this.$xRot = nmcp_LocalPlayer_clampPitch($this.$xRot + $yo * 0.15000000596046448);
 },
 nmcp_LocalPlayer_getEyeY = $this => {
     return $this.$y0 + (!$this.$crouching ? 1.62 : 1.27);
@@ -17881,6 +17881,25 @@ nmwlb_Blocks$Block_tintFor = ($this, $texture) => {
     if ($this.$allTint)
         return $this.$allTint;
     return $this.$topTint && jl_String_equals($this.$topTexture, $texture) ? $this.$topTint : 0;
+},
+nmwlb_Blocks$Block_tintForTexture = ($this, $texture) => {
+    let var$2, $uses;
+    a: {
+        if (!jl_String_equals($this.$topTexture, $texture)) {
+            var$2 = $this.$sideTexture;
+            if (!jl_String_equals(var$2, $texture)) {
+                var$2 = $this.$bottomTexture;
+                if (!jl_String_equals(var$2, $texture)) {
+                    $uses = 0;
+                    break a;
+                }
+            }
+        }
+        $uses = 1;
+    }
+    if ($uses)
+        return nmwlb_Blocks$Block_tintFor($this, $texture);
+    return 0;
 };
 function jt_DecimalFormat$TextField() {
     jl_Object.call(this);
@@ -18495,9 +18514,9 @@ nmcgc_EditBox_scrollToShowCursor = $this => {
     return $this.$displayPos;
 },
 nmcgsm_DirectConnectScreen$1 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_DirectConnectScreen$1__init_ = ($this, $this$0, $x, $y, $width, $height, $hint) => {
+nmcgsm_DirectConnectScreen$1__init_ = ($this, $this$0, $arg0, $arg1, $arg2, $arg3, $arg4) => {
     ju_Objects_requireNonNull($this$0);
-    nmcgc_EditBox__init_($this, $x, $y, $width, $height, $hint);
+    nmcgc_EditBox__init_($this, $arg0, $arg1, $arg2, $arg3, $arg4);
 },
 nmcgsm_DirectConnectScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_DirectConnectScreen$1();
@@ -24760,6 +24779,7 @@ function nmcm_MultiPlayerGameMode() {
     a.$destroyPosZ = 0;
     a.$destroyProgressStart = 0;
     a.$gameTicks = 0;
+    a.$destroyDelay = 0;
     a.$destroyStage = 0;
 }
 let nmcm_MultiPlayerGameMode__init_ = ($this, $minecraft) => {
@@ -24848,8 +24868,14 @@ nmcm_MultiPlayerGameMode_startDestroyBlock = ($this, $x, $y, $z) => {
 },
 nmcm_MultiPlayerGameMode_continueDestroyBlock = ($this, $x, $y, $z) => {
     let var$4, $level, $block, $progress;
-    if (!$this.$isDestroyingBlock)
+    if (!$this.$isDestroyingBlock) {
+        if ($this.$destroyDelay <= 0) {
+            $this.$startDestroyBlock($x, $y, $z);
+            return;
+        }
+        $this.$destroyDelay = $this.$destroyDelay - 1 | 0;
         return;
+    }
     if ($x == $this.$destroyPos && $y == $this.$destroyPosY && $z == $this.$destroyPosZ) {
         var$4 = $this.$minecraft2.$getLevel();
         if (!(var$4 instanceof nmcm_ClientLevel))
@@ -24868,6 +24894,7 @@ nmcm_MultiPlayerGameMode_continueDestroyBlock = ($this, $x, $y, $z) => {
                     nmcm_MultiPlayerGameMode_finishNetworkDigging($this, $x, $y, $z);
                 $this.$isDestroyingBlock = 0;
                 $this.$destroyStage = (-1);
+                $this.$destroyDelay = 5;
             }
             return;
         }
@@ -24894,6 +24921,7 @@ nmcm_MultiPlayerGameMode_stopDestroyBlock = ($this, $x, $y, $z) => {
                     nmcm_MultiPlayerGameMode_destroyBlock($this, $x, $y, $z);
                 else
                     nmcm_MultiPlayerGameMode_finishNetworkDigging($this, $x, $y, $z);
+                $this.$destroyDelay = 5;
             } else if ($this.$minecraft2.$getConnection() !== null) {
                 var$5 = $this.$minecraft2.$getConnection();
                 var$9 = nmcm_MultiPlayerGameMode_hitFace($this, $x, $y, $z);
@@ -28145,7 +28173,7 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                             if ($hit !== null) {
                                 var$9 = $hit.$type;
                                 nmwp_BlockHitResult$Type_$callClinit();
-                                if (var$9 === nmwp_BlockHitResult$Type_BLOCK) {
+                                if (var$9 === nmwp_BlockHitResult$Type_BLOCK && !nlev_EaglerCraft_isHudHidden()) {
                                     ($this.$minecraft1.$getLevelRenderer()).$renderHitOutline($gl, $hit.$blockX, $hit.$blockY, $hit.$blockZ);
                                     $stage = ($this.$minecraft1.$getGameMode()).$getDestroyStage();
                                     if ($stage >= 0)
@@ -28155,7 +28183,7 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                             nleva_WorldGlRenderer_endFrame($gl);
                         }
                     }
-                    if ($this.$minecraft1.$isLevelLoaded())
+                    if ($this.$minecraft1.$isLevelLoaded() && !nlev_EaglerCraft_isHudHidden())
                         ($this.$minecraft1.$getGui()).$render2(cmbv_PoseStack__init_0(), $partialTick);
                     nleva_EaglerGuiImpl_flush($gl);
                     if ($this.$minecraft1.$isLevelLoaded() && $this.$minecraft1.$screen !== null) {
@@ -28612,6 +28640,7 @@ nlev_EaglerCraft_minecraftInstance = null,
 nlev_EaglerCraft_mcTickSucceeded = 0,
 nlev_EaglerCraft_lastMouseX = 0,
 nlev_EaglerCraft_lastMouseY = 0,
+nlev_EaglerCraft_hudHidden = 0,
 nlev_EaglerCraft_$callClinit = () => {
     nlev_EaglerCraft_$callClinit = $rt_eraseClinit(nlev_EaglerCraft);
     nlev_EaglerCraft__clinit_();
@@ -28781,7 +28810,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
             console.log("[EaglerCraft] May take several minutes on slow devices...");
             b: {
                 try {
-                    nlev_EaglerCraft_runWithJsStackCapture$js_body$_48(otji_JS_function(otji_JSWrapper_unwrap(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_0($gameConfig)), "run"));
+                    nlev_EaglerCraft_runWithJsStackCapture$js_body$_59(otji_JS_function(otji_JSWrapper_unwrap(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_0($gameConfig)), "run"));
                     console.log("[EaglerCraft] Minecraft instance created!");
                     break b;
                 } catch ($$e) {
@@ -28808,7 +28837,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                 var$18 = jl_StringBuilder__init_();
                 jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1122)), var$8), $rt_s(82)), var$10);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$18)));
-                $jsStack = $rt_str(nlev_EaglerCraft_getJsErrorStack$js_body$_47());
+                $jsStack = $rt_str(nlev_EaglerCraft_getJsErrorStack$js_body$_58());
                 if ($jsStack !== null && !jl_String_isEmpty($jsStack)) {
                     var$8 = jl_StringBuilder__init_();
                     jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1123)), $jsStack);
@@ -28922,7 +28951,7 @@ nlev_EaglerCraft_processInput = () => {
 nlev_EaglerCraft_gameLogicTick = () => {
     let $mc, var$2, $t, var$4, $$je;
     nlev_EaglerCraft_$callClinit();
-    if ((nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_42() ? 1 : 0) && nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
+    if ((nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_53() ? 1 : 0) && nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
         $mc = nlev_EaglerCraft_minecraftInstance;
         if (!$mc.$isLevelLoaded()) {
             console.log("[EaglerCraft] enterWorld() requested via telemetry bridge");
@@ -29024,6 +29053,7 @@ nlev_EaglerCraft_pushGameTelemetry = () => {
         nlev_EaglerCraft_consumeHotbarTelemetryRequests($mc);
         nlev_EaglerCraft_consumeLookRequest($mc);
         nlev_EaglerCraft_consumeTimeRequest($mc);
+        nlev_EaglerCraft_consumeSceneRequest($mc);
         $gameplayJson = nlev_EaglerCraft_buildGameplayJson($mc);
     }
     a: {
@@ -29037,7 +29067,7 @@ nlev_EaglerCraft_pushGameTelemetry = () => {
             var$13 = nlev_EaglerCraft_menuBackgroundBlurRadius();
             var$14 = nlev_EaglerCraft_menuBackgroundBlurrinessOption();
             var$15 = nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_0();
-            nlev_EaglerCraft_pushGameTelemetry0$js_body$_41(!!var$7, var$8, $rt_ustr($screen), !!$inWorld, var$10, $guiScale, $rt_ustr($buttonsJson), !!var$11, var$12, var$13, var$14, $rt_ustr($gameplayJson), otji_JS_function(otji_JSWrapper_unwrap(var$15), "query"));
+            nlev_EaglerCraft_pushGameTelemetry0$js_body$_52(!!var$7, var$8, $rt_ustr($screen), !!$inWorld, var$10, $guiScale, $rt_ustr($buttonsJson), !!var$11, var$12, var$13, var$14, $rt_ustr($gameplayJson), otji_JS_function(otji_JSWrapper_unwrap(var$15), "query"));
             break a;
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -29249,6 +29279,42 @@ nlev_EaglerCraft_consumeTimeRequest = $mc => {
         return;
     }
 },
+nlev_EaglerCraft_consumeSceneRequest = $mc => {
+    let $fov, $hud, var$4, $level, $n, $i, var$8, var$9, var$10, var$11;
+    nlev_EaglerCraft_$callClinit();
+    if (!(typeof window !== 'undefined' && window.__eaglercraftSceneReq != null ? 1 : 0))
+        return;
+    $fov = nlev_EaglerCraft_readSceneFov$js_body$_41();
+    if ($fov > 0 && $mc.$getOptions() !== null)
+        ($mc.$getOptions()).$fov = $fov;
+    $hud = nlev_EaglerCraft_readSceneHideHud$js_body$_42();
+    if ($hud >= 0)
+        nlev_EaglerCraft_hudHidden = $hud != 1 ? 0 : 1;
+    var$4 = $mc.$getLevel();
+    if (var$4 instanceof nmcm_ClientLevel) {
+        $level = var$4;
+        $n = nlev_EaglerCraft_sceneBlockCount$js_body$_43();
+        $i = 0;
+        while ($i < $n) {
+            var$8 = window.__eaglercraftSceneReq.blocks[$i][0];
+            var$9 = window.__eaglercraftSceneReq.blocks[$i][1];
+            var$10 = window.__eaglercraftSceneReq.blocks[$i][2];
+            var$11 = window.__eaglercraftSceneReq.blocks[$i][3];
+            $level.$setBlockState(var$8, var$9, var$10, var$11);
+            $i = $i + 1 | 0;
+        }
+        if ($n > 0) {
+            var$4 = jl_StringBuilder__init_();
+            jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1166)), $n), $rt_s(1167));
+            console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
+        }
+    }
+    window.__eaglercraftSceneReq = null;
+},
+nlev_EaglerCraft_isHudHidden = () => {
+    nlev_EaglerCraft_$callClinit();
+    return nlev_EaglerCraft_hudHidden;
+},
 nlev_EaglerCraft_menuBackgroundBlurrinessOption = () => {
     let var$1, var$2;
     nlev_EaglerCraft_$callClinit();
@@ -29274,7 +29340,7 @@ nlev_EaglerCraft_buildButtonsJson = $mc => {
     $screen = $mc.$getScreen();
     if ($screen === null)
         return $rt_s(426);
-    $sb = jl_StringBuilder__init_1($rt_s(1166));
+    $sb = jl_StringBuilder__init_1($rt_s(1168));
     $first = 1;
     var$5 = ($screen.$children()).$iterator();
     while (var$5.$hasNext()) {
@@ -29285,18 +29351,18 @@ nlev_EaglerCraft_buildButtonsJson = $mc => {
         if (jl_String_isEmpty($id))
             continue;
         if (!$first)
-            $sb.$append3($rt_s(1167));
+            $sb.$append3($rt_s(1169));
         $first = 0;
-        var$8 = (($sb.$append3($rt_s(1168))).$append3($id)).$append3($rt_s(1169));
-        var$8 = ((var$8.$append3($rt_s(1170))).$append3($id)).$append3($rt_s(1169));
-        var$8 = (var$8.$append3($rt_s(1171))).$append19($widget.$isActive());
+        var$8 = (($sb.$append3($rt_s(1170))).$append3($id)).$append3($rt_s(1171));
+        var$8 = ((var$8.$append3($rt_s(1172))).$append3($id)).$append3($rt_s(1171));
+        var$8 = (var$8.$append3($rt_s(1173))).$append19($widget.$isActive());
         var$8 = (var$8.$append3($rt_s(1155))).$append1($widget.$getX0());
         var$8 = (var$8.$append3($rt_s(1135))).$append1($widget.$getY0());
-        var$8 = (var$8.$append3($rt_s(1172))).$append1($widget.$getWidth());
-        var$8 = (var$8.$append3($rt_s(1173))).$append1($widget.$getHeight());
-        var$8.$append3($rt_s(1174));
+        var$8 = (var$8.$append3($rt_s(1174))).$append1($widget.$getWidth());
+        var$8 = (var$8.$append3($rt_s(1175))).$append1($widget.$getHeight());
+        var$8.$append3($rt_s(1176));
     }
-    $sb.$append3($rt_s(1175));
+    $sb.$append3($rt_s(1177));
     return $sb.$toString();
 },
 nlev_EaglerCraft_lambda$pushGameTelemetry$0 = ($x, $y, $z) => {
@@ -29337,8 +29403,8 @@ nlev_EaglerCraft_peekHotbarReqId$js_body$_26 = () => {
 nlev_EaglerCraft_peekHotbarReqCount$js_body$_27 = () => {
     var r = window.__eaglercraftHotbarReq;
     return r ? r.c | 0 : 0;
-},
-nlev_EaglerCraft_readLookYaw$js_body$_31 = () => {
+};
+let nlev_EaglerCraft_readLookYaw$js_body$_31 = () => {
     var r = window.__eaglercraftLookReq;
     return r ? r.yaw : 0;
 },
@@ -29349,8 +29415,20 @@ nlev_EaglerCraft_readLookPitch$js_body$_32 = () => {
 nlev_EaglerCraft_readTimeRequest$js_body$_36 = () => {
     var r = window.__eaglercraftTimeReq;
     return typeof r === 'number' ? r : 0;
-};
-let nlev_EaglerCraft_pushGameTelemetry0$js_body$_41 = (var$1, var$2, var$3, var$4, var$5, var$6, var$7, var$8, var$9, var$10, var$11, var$12, var$13) => {
+},
+nlev_EaglerCraft_readSceneFov$js_body$_41 = () => {
+    var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
+    return r && typeof r.fov === 'number' ? Math.round(r.fov) :  -1;
+},
+nlev_EaglerCraft_readSceneHideHud$js_body$_42 = () => {
+    var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
+    return r && typeof r.hideHud === 'boolean' ? (r.hideHud ? 1 : 0) :  -1;
+},
+nlev_EaglerCraft_sceneBlockCount$js_body$_43 = () => {
+    var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
+    return r && r.blocks && r.blocks.length ? r.blocks.length : 0;
+},
+nlev_EaglerCraft_pushGameTelemetry0$js_body$_52 = (var$1, var$2, var$3, var$4, var$5, var$6, var$7, var$8, var$9, var$10, var$11, var$12, var$13) => {
     if (typeof window !== 'undefined') {
         window.__eaglercraftGame = { canEnterWorld : var$1, gameState : var$2, screen : var$3, inWorld : var$4, ticks : var$5, guiScale : var$6, buttons : JSON.parse(var$7), panoramaReady : var$8, panoramaSpin : var$9, panoramaBlur : var$10, menuBackgroundBlurriness : var$11, gameplay : JSON.parse(var$12), enterWorld : function() {
             window.__eaglercraftWorldEntryRequested = true;
@@ -29364,24 +29442,26 @@ let nlev_EaglerCraft_pushGameTelemetry0$js_body$_41 = (var$1, var$2, var$3, var$
             window.__eaglercraftHotbarReq = { s : s, i :  -1, c : 0 };
         }, setLook : function(yaw, pitch) {
             window.__eaglercraftLookReq = { yaw : yaw, pitch : pitch };
+        }, setScene : function(o) {
+            window.__eaglercraftSceneReq = o;
         } };
     }
 },
-nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_42 = () => {
+nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_53 = () => {
     if (typeof window !== 'undefined' && window.__eaglercraftWorldEntryRequested === true) {
         window.__eaglercraftWorldEntryRequested = false;
         return true;
     }
     return false;
 },
-nlev_EaglerCraft_getJsErrorStack$js_body$_47 = () => {
+nlev_EaglerCraft_getJsErrorStack$js_body$_58 = () => {
     try {
         throw new Error('stack trace');
     } catch (e){
         return e.stack || '';
     }
 },
-nlev_EaglerCraft_runWithJsStackCapture$js_body$_48 = var$1 => {
+nlev_EaglerCraft_runWithJsStackCapture$js_body$_59 = var$1 => {
     try {
         var$1();
     } catch (e){
@@ -29556,23 +29636,23 @@ try {
 
     nmwi_Items_REGISTRY = ju_ArrayList__init_();
     nmwi_Items_byId = $rt_createArray(nmwi_Items$Item, 4224);
-    nmwi_Items_STICK = nmwi_Items_register(4096, $rt_s(1176), $rt_s(1177), 64);
-    nmwi_Items_WOODEN_PICKAXE = nmwi_Items_register(4097, $rt_s(1178), $rt_s(1179), 1);
-    nmwi_Items_WOODEN_AXE = nmwi_Items_register(4098, $rt_s(1180), $rt_s(1181), 1);
-    nmwi_Items_WOODEN_SHOVEL = nmwi_Items_register(4099, $rt_s(1182), $rt_s(1183), 1);
-    nmwi_Items_WOODEN_SWORD = nmwi_Items_register(4100, $rt_s(1184), $rt_s(1185), 1);
-    nmwi_Items_WOODEN_HOE = nmwi_Items_register(4101, $rt_s(1186), $rt_s(1187), 1);
-    nmwi_Items_STONE_PICKAXE = nmwi_Items_register(4102, $rt_s(1188), $rt_s(1189), 1);
-    nmwi_Items_STONE_AXE = nmwi_Items_register(4103, $rt_s(1190), $rt_s(1191), 1);
-    nmwi_Items_STONE_SHOVEL = nmwi_Items_register(4104, $rt_s(1192), $rt_s(1193), 1);
-    nmwi_Items_STONE_SWORD = nmwi_Items_register(4105, $rt_s(1194), $rt_s(1195), 1);
-    nmwi_Items_STONE_HOE = nmwi_Items_register(4106, $rt_s(1196), $rt_s(1197), 1);
-    nmwi_Items_IRON_INGOT = nmwi_Items_register(4107, $rt_s(1198), $rt_s(1199), 64);
-    nmwi_Items_IRON_PICKAXE = nmwi_Items_register(4108, $rt_s(1200), $rt_s(1201), 1);
-    nmwi_Items_IRON_AXE = nmwi_Items_register(4109, $rt_s(1202), $rt_s(1203), 1);
-    nmwi_Items_IRON_SHOVEL = nmwi_Items_register(4110, $rt_s(1204), $rt_s(1205), 1);
-    nmwi_Items_IRON_SWORD = nmwi_Items_register(4111, $rt_s(1206), $rt_s(1207), 1);
-    nmwi_Items_IRON_HOE = nmwi_Items_register(4112, $rt_s(1208), $rt_s(1209), 1);
+    nmwi_Items_STICK = nmwi_Items_register(4096, $rt_s(1178), $rt_s(1179), 64);
+    nmwi_Items_WOODEN_PICKAXE = nmwi_Items_register(4097, $rt_s(1180), $rt_s(1181), 1);
+    nmwi_Items_WOODEN_AXE = nmwi_Items_register(4098, $rt_s(1182), $rt_s(1183), 1);
+    nmwi_Items_WOODEN_SHOVEL = nmwi_Items_register(4099, $rt_s(1184), $rt_s(1185), 1);
+    nmwi_Items_WOODEN_SWORD = nmwi_Items_register(4100, $rt_s(1186), $rt_s(1187), 1);
+    nmwi_Items_WOODEN_HOE = nmwi_Items_register(4101, $rt_s(1188), $rt_s(1189), 1);
+    nmwi_Items_STONE_PICKAXE = nmwi_Items_register(4102, $rt_s(1190), $rt_s(1191), 1);
+    nmwi_Items_STONE_AXE = nmwi_Items_register(4103, $rt_s(1192), $rt_s(1193), 1);
+    nmwi_Items_STONE_SHOVEL = nmwi_Items_register(4104, $rt_s(1194), $rt_s(1195), 1);
+    nmwi_Items_STONE_SWORD = nmwi_Items_register(4105, $rt_s(1196), $rt_s(1197), 1);
+    nmwi_Items_STONE_HOE = nmwi_Items_register(4106, $rt_s(1198), $rt_s(1199), 1);
+    nmwi_Items_IRON_INGOT = nmwi_Items_register(4107, $rt_s(1200), $rt_s(1201), 64);
+    nmwi_Items_IRON_PICKAXE = nmwi_Items_register(4108, $rt_s(1202), $rt_s(1203), 1);
+    nmwi_Items_IRON_AXE = nmwi_Items_register(4109, $rt_s(1204), $rt_s(1205), 1);
+    nmwi_Items_IRON_SHOVEL = nmwi_Items_register(4110, $rt_s(1206), $rt_s(1207), 1);
+    nmwi_Items_IRON_SWORD = nmwi_Items_register(4111, $rt_s(1208), $rt_s(1209), 1);
+    nmwi_Items_IRON_HOE = nmwi_Items_register(4112, $rt_s(1210), $rt_s(1211), 1);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function ju_Date() {
@@ -29811,27 +29891,27 @@ ju_Locale__clinit_ = () => {
 try {
 
     let $localeName, $countryIndex;
-    ju_Locale_CANADA = ju_Locale__init_($rt_s(1210), $rt_s(1211));
-    ju_Locale_CANADA_FRENCH = ju_Locale__init_($rt_s(1212), $rt_s(1211));
-    ju_Locale_CHINA = ju_Locale__init_($rt_s(1213), $rt_s(1214));
-    ju_Locale_CHINESE = ju_Locale__init_($rt_s(1213), $rt_s(74));
-    ju_Locale_ENGLISH = ju_Locale__init_($rt_s(1210), $rt_s(74));
-    ju_Locale_FRANCE = ju_Locale__init_($rt_s(1212), $rt_s(1215));
-    ju_Locale_FRENCH = ju_Locale__init_($rt_s(1212), $rt_s(74));
-    ju_Locale_GERMAN = ju_Locale__init_($rt_s(1216), $rt_s(74));
-    ju_Locale_GERMANY = ju_Locale__init_($rt_s(1216), $rt_s(1217));
-    ju_Locale_ITALIAN = ju_Locale__init_($rt_s(1218), $rt_s(74));
-    ju_Locale_ITALY = ju_Locale__init_($rt_s(1218), $rt_s(1219));
-    ju_Locale_JAPAN = ju_Locale__init_($rt_s(1220), $rt_s(1221));
-    ju_Locale_JAPANESE = ju_Locale__init_($rt_s(1220), $rt_s(74));
-    ju_Locale_KOREA = ju_Locale__init_($rt_s(1222), $rt_s(1223));
-    ju_Locale_KOREAN = ju_Locale__init_($rt_s(1222), $rt_s(74));
-    ju_Locale_PRC = ju_Locale__init_($rt_s(1213), $rt_s(1214));
-    ju_Locale_SIMPLIFIED_CHINESE = ju_Locale__init_($rt_s(1213), $rt_s(1214));
-    ju_Locale_TAIWAN = ju_Locale__init_($rt_s(1213), $rt_s(1224));
-    ju_Locale_TRADITIONAL_CHINESE = ju_Locale__init_($rt_s(1213), $rt_s(1224));
-    ju_Locale_UK = ju_Locale__init_($rt_s(1210), $rt_s(1225));
-    ju_Locale_US = ju_Locale__init_($rt_s(1210), $rt_s(1226));
+    ju_Locale_CANADA = ju_Locale__init_($rt_s(1212), $rt_s(1213));
+    ju_Locale_CANADA_FRENCH = ju_Locale__init_($rt_s(1214), $rt_s(1213));
+    ju_Locale_CHINA = ju_Locale__init_($rt_s(1215), $rt_s(1216));
+    ju_Locale_CHINESE = ju_Locale__init_($rt_s(1215), $rt_s(74));
+    ju_Locale_ENGLISH = ju_Locale__init_($rt_s(1212), $rt_s(74));
+    ju_Locale_FRANCE = ju_Locale__init_($rt_s(1214), $rt_s(1217));
+    ju_Locale_FRENCH = ju_Locale__init_($rt_s(1214), $rt_s(74));
+    ju_Locale_GERMAN = ju_Locale__init_($rt_s(1218), $rt_s(74));
+    ju_Locale_GERMANY = ju_Locale__init_($rt_s(1218), $rt_s(1219));
+    ju_Locale_ITALIAN = ju_Locale__init_($rt_s(1220), $rt_s(74));
+    ju_Locale_ITALY = ju_Locale__init_($rt_s(1220), $rt_s(1221));
+    ju_Locale_JAPAN = ju_Locale__init_($rt_s(1222), $rt_s(1223));
+    ju_Locale_JAPANESE = ju_Locale__init_($rt_s(1222), $rt_s(74));
+    ju_Locale_KOREA = ju_Locale__init_($rt_s(1224), $rt_s(1225));
+    ju_Locale_KOREAN = ju_Locale__init_($rt_s(1224), $rt_s(74));
+    ju_Locale_PRC = ju_Locale__init_($rt_s(1215), $rt_s(1216));
+    ju_Locale_SIMPLIFIED_CHINESE = ju_Locale__init_($rt_s(1215), $rt_s(1216));
+    ju_Locale_TAIWAN = ju_Locale__init_($rt_s(1215), $rt_s(1226));
+    ju_Locale_TRADITIONAL_CHINESE = ju_Locale__init_($rt_s(1215), $rt_s(1226));
+    ju_Locale_UK = ju_Locale__init_($rt_s(1212), $rt_s(1227));
+    ju_Locale_US = ju_Locale__init_($rt_s(1212), $rt_s(1228));
     ju_Locale_ROOT = ju_Locale__init_($rt_s(74), $rt_s(74));
     $localeName = ((otciu_CLDRHelper_getDefaultLocale()).value !== null ? $rt_str((otciu_CLDRHelper_getDefaultLocale()).value) : null);
     $countryIndex = jl_String_indexOf0($localeName, 95);
@@ -30058,7 +30138,7 @@ jur_EOISet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_EOISet_getName = $this => {
-    return $rt_s(1227);
+    return $rt_s(1229);
 },
 jur_AbstractCharClass$LazyUpper = $rt_classWithoutFields(jur_AbstractCharClass$LazyCharClass),
 jur_AbstractCharClass$LazyUpper__init_ = $this => {
@@ -30130,7 +30210,7 @@ otji_JSWrapper_wrap = $o => {
     if ($o === null)
         return null;
     $type = $rt_str(typeof $o);
-    $isObject = !jl_String_equals($type, $rt_s(1228)) && !jl_String_equals($type, $rt_s(1229)) ? 0 : 1;
+    $isObject = !jl_String_equals($type, $rt_s(1230)) && !jl_String_equals($type, $rt_s(1231)) ? 0 : 1;
     otji_JSWrapper$Helper_$callClinit();
     $wrappers = otji_JSWrapper$Helper_wrappers;
     if ($wrappers !== null) {
@@ -30143,7 +30223,7 @@ otji_JSWrapper_wrap = $o => {
             $wrappers.set($o, new WeakRef($wrapper));
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1230))) {
+        if (jl_String_equals($type, $rt_s(1232))) {
             $jsString = $o;
             $stringWrappers = otji_JSWrapper$Helper_stringWrappers;
             $stringFinalizationRegistry = otji_JSWrapper$Helper_stringFinalizationRegistry;
@@ -30157,7 +30237,7 @@ otji_JSWrapper_wrap = $o => {
             $stringFinalizationRegistry.register($wrapperAsJs, $jsString);
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1231))) {
+        if (jl_String_equals($type, $rt_s(1233))) {
             $jsNumber = $o;
             $numberWrappers = otji_JSWrapper$Helper_numberWrappers;
             $numberFinalizationRegistry = otji_JSWrapper$Helper_numberFinalizationRegistry;
@@ -30171,7 +30251,7 @@ otji_JSWrapper_wrap = $o => {
             $numberFinalizationRegistry.register($wrapperAsJs, $jsNumber);
             return $wrapper;
         }
-        if (jl_String_equals($type, $rt_s(1232))) {
+        if (jl_String_equals($type, $rt_s(1234))) {
             $existingRef = otji_JSWrapper$Helper_undefinedWrapper;
             $existing = $existingRef === null ? void 0 : $existingRef.deref();
             if (!(typeof $existing == 'undefined' ? 1 : 0))
@@ -30320,7 +30400,7 @@ jur_MultiLineSOLSet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_MultiLineSOLSet_getName = $this => {
-    return $rt_s(1233);
+    return $rt_s(1235);
 };
 function nmcgsm_JoinMultiplayerScreen() {
     let a = this; nmcgs_Screen.call(a);
@@ -30359,13 +30439,13 @@ nmcgsm_JoinMultiplayerScreen_init = $this => {
     $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 50 | 0, $footer1Y, 100, 20, $rt_s(951), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_1__init_0($this)));
     $this.$addRenderableWidget(nmcgc_Button__init_(($centerX + 50 | 0) + 10 | 0, $footer1Y, 100, 20, $rt_s(946), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_2__init_0($this)));
     $row2X = $centerX - 163 | 0;
-    $edit = nmcgc_Button__init_($row2X, $footer2Y, 74, 20, $rt_s(1234), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_0($this));
+    $edit = nmcgc_Button__init_($row2X, $footer2Y, 74, 20, $rt_s(1236), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_3__init_0($this));
     $edit.$setActive($this.$selected < 0 ? 0 : 1);
     $this.$addRenderableWidget($edit);
-    $delete = nmcgc_Button__init_(($row2X + 74 | 0) + 10 | 0, $footer2Y, 74, 20, $rt_s(1235), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_0($this));
+    $delete = nmcgc_Button__init_(($row2X + 74 | 0) + 10 | 0, $footer2Y, 74, 20, $rt_s(1237), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_4__init_0($this));
     $delete.$setActive($this.$selected < 0 ? 0 : 1);
     $this.$addRenderableWidget($delete);
-    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 168 | 0, $footer2Y, 74, 20, $rt_s(1236), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 168 | 0, $footer2Y, 74, 20, $rt_s(1238), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_5__init_0($this)));
     $this.$addRenderableWidget(nmcgc_Button__init_($row2X + 252 | 0, $footer2Y, 74, 20, $rt_s(944), nmcgsm_JoinMultiplayerScreen$init$lambda$_1_6__init_0($this)));
 },
 nmcgsm_JoinMultiplayerScreen_joinSelected = $this => {
@@ -30388,8 +30468,8 @@ nmcgsm_JoinMultiplayerScreen_confirmDelete = $this => {
         var$3 = new nmcgs_ConfirmScreen;
         var$4 = $data.$name1;
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append1(var$5, 34), var$4), $rt_s(1237));
-        nmcgs_ConfirmScreen__init_(var$3, $this, $rt_s(1238), jl_StringBuilder_toString(var$5), nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_0($this));
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append1(var$5, 34), var$4), $rt_s(1239));
+        nmcgs_ConfirmScreen__init_(var$3, $this, $rt_s(1240), jl_StringBuilder_toString(var$5), nmcgsm_JoinMultiplayerScreen$confirmDelete$lambda$_3_0__init_0($this));
         var$2.$setScreen(var$3);
         return;
     }
@@ -30403,13 +30483,13 @@ nmcgsm_JoinMultiplayerScreen_render = ($this, $poseStack, $mouseX, $mouseY, $par
     let $titleWidth, $rowX, $rowW, $hint, $hintWidth, $i, $screenY, var$12, $hovered, $isSelected, $data, var$16, var$17, var$18, var$19;
     a: {
         nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-        $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1239));
-        nleva_EaglerGuiImpl_drawText($rt_s(1239), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+        $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1241));
+        nleva_EaglerGuiImpl_drawText($rt_s(1241), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
         $rowX = jl_Math_max(10, ($this.$width / 2 | 0) - 245 | 0);
         $rowW = jl_Math_min(480, $this.$width - 20 | 0);
         $this.$hoveredRow = (-1);
         if (!$this.$serverList.$size()) {
-            $hint = $rt_s(1240);
+            $hint = $rt_s(1242);
             $hintWidth = nleva_EaglerGuiImpl_widthOf($hint);
             nleva_EaglerGuiImpl_drawText($hint, ($this.$width / 2 | 0) - $hintWidth / 2.0, $this.$listTop0 + 14 | 0, (-6250336), 1);
         } else {
@@ -30547,7 +30627,7 @@ let ju_IllegalFormatConversionException__init_0 = ($this, $conversion, $argument
     let var$3, var$4;
     var$3 = jl_String_valueOf2($argumentClass);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1241)), var$3), $rt_s(1242)), $conversion), $rt_s(1243));
+    jl_StringBuilder_append(jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1243)), var$3), $rt_s(1244)), $conversion), $rt_s(1245));
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$4));
     $this.$conversion = $conversion;
     $this.$argumentClass = $argumentClass;
@@ -30602,7 +30682,7 @@ jur_PreviousMatch_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_PreviousMatch_getName = $this => {
-    return $rt_s(1244);
+    return $rt_s(1246);
 },
 nlevit_MainClass = $rt_classWithoutFields(),
 nlevit_MainClass_$callClinit = () => {
@@ -30635,7 +30715,7 @@ jur_NonCapFSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $this.$next3.$matches($stringIndex, $testString, $matchResult);
 },
 jur_NonCapFSet_getName = $this => {
-    return $rt_s(1245);
+    return $rt_s(1247);
 },
 jur_NonCapFSet_hasConsumed = ($this, $mr) => {
     return 0;
@@ -30757,7 +30837,7 @@ jl_System_arraycopy = ($src, $srcPos, $dest, $destPos, $length) => {
         }
         $rt_throw(jl_IndexOutOfBoundsException__init_());
     }
-    $rt_throw(jl_NullPointerException__init_0($rt_s(1246)));
+    $rt_throw(jl_NullPointerException__init_0($rt_s(1248)));
 },
 jl_System_fastArraycopy = ($src, $srcPos, $dest, $destPos, $length) => {
     let var$6;
@@ -31154,7 +31234,7 @@ jur_DotAllSet_matches = ($this, $stringIndex, $testString, $matchResult) => {
     return $this.$next3.$matches(var$5, $testString, $matchResult);
 },
 jur_DotAllSet_getName = $this => {
-    return $rt_s(1247);
+    return $rt_s(1249);
 },
 jur_DotAllSet_setNext = ($this, $next) => {
     $this.$next3 = $next;
@@ -31239,7 +31319,7 @@ nmcgso_KeyBindsScreen_init = $this => {
     $this.$scrollAmount = 0.0;
     $this.$listening = null;
     $centerX = $this.$width / 2 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(1248), nmcgso_KeyBindsScreen$init$lambda$_1_0__init_0()));
+    $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 155 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(1250), nmcgso_KeyBindsScreen$init$lambda$_1_0__init_0()));
     $this.$addRenderableWidget(nmcgc_Button__init_($centerX + 5 | 0, ($this.$height - 33 | 0) + 6 | 0, 150, 20, $rt_s(490), nmcgso_KeyBindsScreen$init$lambda$_1_1__init_0($this)));
 },
 nmcgso_KeyBindsScreen_rebuildRows = $this => {
@@ -31277,9 +31357,9 @@ nmcgso_KeyBindsScreen_rebuildRows = $this => {
     }
 },
 nmcgso_KeyBindsScreen_addMouseRows = ($this, $category) => {
-    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1249), 1));
-    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1250), 1));
     $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1251), 1));
+    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1252), 1));
+    $this.$rows.$add(nmcgso_KeyBindsScreen$Row__init_(null, $rt_s(1253), 1));
 },
 nmcgso_KeyBindsScreen_categoryName = $category => {
     nmcgso_KeyBindsScreen$1_$callClinit();
@@ -31287,21 +31367,21 @@ nmcgso_KeyBindsScreen_categoryName = $category => {
         case 1:
             break;
         case 2:
-            return $rt_s(1252);
+            return $rt_s(1254);
         case 3:
             return $rt_s(508);
         case 4:
-            return $rt_s(1253);
+            return $rt_s(1255);
         case 5:
-            return $rt_s(1254);
+            return $rt_s(1256);
         case 6:
             return $rt_s(485);
         case 7:
-            return $rt_s(1255);
+            return $rt_s(1257);
         default:
             return jl_Enum_name($category);
     }
-    return $rt_s(1256);
+    return $rt_s(1258);
 },
 nmcgso_KeyBindsScreen_bindName = $name => {
     let var$2;
@@ -31428,51 +31508,51 @@ nmcgso_KeyBindsScreen_bindName = $name => {
     }
     switch (var$2) {
         case 0:
-            return $rt_s(1257);
-        case 1:
-            return $rt_s(1258);
-        case 2:
             return $rt_s(1259);
-        case 3:
+        case 1:
             return $rt_s(1260);
-        case 4:
+        case 2:
             return $rt_s(1261);
-        case 5:
+        case 3:
             return $rt_s(1262);
-        case 6:
+        case 4:
             return $rt_s(1263);
-        case 7:
+        case 5:
             return $rt_s(1264);
-        case 8:
+        case 6:
             return $rt_s(1265);
-        case 9:
+        case 7:
             return $rt_s(1266);
-        case 10:
+        case 8:
             return $rt_s(1267);
-        case 11:
+        case 9:
             return $rt_s(1268);
-        case 12:
+        case 10:
             return $rt_s(1269);
-        case 13:
+        case 11:
             return $rt_s(1270);
-        case 14:
+        case 12:
             return $rt_s(1271);
-        case 15:
+        case 13:
             return $rt_s(1272);
-        case 16:
+        case 14:
             return $rt_s(1273);
-        case 17:
+        case 15:
             return $rt_s(1274);
-        case 18:
+        case 16:
             return $rt_s(1275);
-        case 19:
+        case 17:
             return $rt_s(1276);
-        case 20:
+        case 18:
             return $rt_s(1277);
-        case 21:
+        case 19:
             return $rt_s(1278);
-        case 22:
+        case 20:
             return $rt_s(1279);
+        case 21:
+            return $rt_s(1280);
+        case 22:
+            return $rt_s(1281);
         default:
     }
     return $name;
@@ -31483,17 +31563,17 @@ nmcgso_KeyBindsScreen_mouseBindLabel = $label => {
         var$2 = (-1);
         switch (jl_String_hashCode($label)) {
             case -1446778930:
-                if (!jl_String_equals($label, $rt_s(1251)))
+                if (!jl_String_equals($label, $rt_s(1253)))
                     break a;
                 var$2 = 2;
                 break a;
             case 85351:
-                if (!jl_String_equals($label, $rt_s(1250)))
+                if (!jl_String_equals($label, $rt_s(1252)))
                     break a;
                 var$2 = 1;
                 break a;
             case 1971575400:
-                if (!jl_String_equals($label, $rt_s(1249)))
+                if (!jl_String_equals($label, $rt_s(1251)))
                     break a;
                 var$2 = 0;
                 break a;
@@ -31502,11 +31582,11 @@ nmcgso_KeyBindsScreen_mouseBindLabel = $label => {
     }
     switch (var$2) {
         case 0:
-            return $rt_s(1280);
-        case 1:
-            return $rt_s(1281);
-        case 2:
             return $rt_s(1282);
+        case 1:
+            return $rt_s(1283);
+        case 2:
+            return $rt_s(1284);
         default:
     }
     return $label;
@@ -31520,8 +31600,8 @@ nmcgso_KeyBindsScreen_maxScroll = $this => {
 nmcgso_KeyBindsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth, $rowX, $rowW, $keyButtonX, $i, $screenY, var$11, $row, var$13, var$14, var$15, $key, var$17, $keyWidth, $mapping, $isListening, $hovered, var$22;
     nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1283));
-    nleva_EaglerGuiImpl_drawText($rt_s(1283), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1285));
+    nleva_EaglerGuiImpl_drawText($rt_s(1285), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     $rowX = jl_Math_max(10, ($this.$width / 2 | 0) - 245 | 0);
     $rowW = jl_Math_min(480, $this.$width - 20 | 0);
     $keyButtonX = (($rowX + $rowW | 0) - 50 | 0) - 2 | 0;
@@ -31550,7 +31630,7 @@ nmcgso_KeyBindsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTic
                 var$14 = $rowX;
                 var$17 = $screenY + 6 | 0;
                 nleva_EaglerGuiImpl_drawText(var$13, var$14, var$17, (-5197648), 1);
-                $key = !$isListening ? $mapping.$keyName0() : $rt_s(1284);
+                $key = !$isListening ? $mapping.$keyName0() : $rt_s(1286);
                 $keyWidth = nleva_EaglerGuiImpl_widthOf($key);
                 $hovered = $mouseX >= $keyButtonX && $mouseX < ($keyButtonX + 50 | 0) && $mouseY >= $screenY && $mouseY < (var$11 - 2 | 0) ? 1 : 0;
                 var$14 = $keyButtonX;
@@ -31685,7 +31765,7 @@ function ju_DuplicateFormatFlagsException() {
 let ju_DuplicateFormatFlagsException__init_ = ($this, $flags) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1285)), $flags);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1287)), $flags);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$flags3 = $flags;
 },
@@ -31722,7 +31802,7 @@ jur_HangulDecomposedCharSet_getName = $this => {
     let var$1, var$2;
     var$1 = jur_HangulDecomposedCharSet_getDecomposedChar($this);
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1286)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1288)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 jur_HangulDecomposedCharSet_matches = ($this, $strIndex, $testString, $matchResult) => {
@@ -31948,7 +32028,7 @@ nmcgsi_CraftingTableScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => 
             } else {
                 $this.$craft.$clickCell($slot, $button, $inventory);
                 var$6 = jl_StringBuilder__init_();
-                jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(1287)), $slot), $rt_s(513)), $button);
+                jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$6, $rt_s(1289)), $slot), $rt_s(513)), $button);
                 console.log($rt_ustr(jl_StringBuilder_toString(var$6)));
             }
         } else {
@@ -31956,7 +32036,7 @@ nmcgsi_CraftingTableScreen_mouseClicked = ($this, $mouseX, $mouseY, $button) => 
             $this.$craft.$clickResult($shift, $inventory);
             var$6 = !$shift ? $rt_s(509) : $rt_s(510);
             var$8 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1288)), var$6);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1290)), var$6);
             var$6 = jl_StringBuilder_toString(var$8);
             console.log($rt_ustr(var$6));
         }
@@ -31974,7 +32054,7 @@ nmcgsi_CraftingTableScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers)
     if ($keyCode != nmc_KeyMapping_INVENTORY.$getKey0() && !($keyCode == 1 && $this.$shouldCloseOnEsc()))
         return nmcgs_Screen_keyPressed($this, $keyCode, $scanCode, $modifiers);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1289)), $keyCode);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1291)), $keyCode);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     $this.$onClose();
     return 1;
@@ -32017,7 +32097,7 @@ function ju_MissingFormatWidthException() {
 let ju_MissingFormatWidthException__init_0 = ($this, $formatSpecifier) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1290)), $formatSpecifier);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1292)), $formatSpecifier);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$formatSpecifier = $formatSpecifier;
 },
@@ -32385,11 +32465,11 @@ nmcr_LevelRenderer_pushQuadCorners = ($out, $vi, $c, $layer, $shade) => {
     $order = $rt_createIntArray(6);
     var$10 = (__safe($order).data||[]);
     var$10[0] = 0;
-    var$10[1] = 1;
-    var$10[2] = 2;
-    var$10[3] = 2;
+    var$10[1] = 2;
+    var$10[2] = 1;
+    var$10[3] = 0;
     var$10[4] = 3;
-    var$10[5] = 0;
+    var$10[5] = 2;
     $k = 0;
     while ($k < var$10.length) {
         var$12 = (__safe($c).data||[]);
@@ -32579,7 +32659,7 @@ nmcr_LevelRenderer_pushCrossY = ($out, $vi, $ya, $yb, $x, $z, $t, $xFar, $layer,
 nmcr_LevelRenderer__clinit_ = () => {
 try {
 
-    nmcr_LevelRenderer_QUAD_INDEX_ORDER = $rt_createIntArrayFromData([0, 1, 2, 2, 3, 0]);
+    nmcr_LevelRenderer_QUAD_INDEX_ORDER = $rt_createIntArrayFromData([0, 2, 1, 0, 3, 2]);
     nmcr_LevelRenderer_FACE_QUAD = $rt_createFloatArray(20);
     nmcr_LevelRenderer_QC = $rt_createFloatMultiArray([5, 4]);
 
@@ -32644,7 +32724,7 @@ nlevit_ClientMain__main = () => {
                     nlevit_ClientMain_createCanvasAndContext();
                 var$1 = nlevit_ClientMain_webgl === null ? 0 : 1;
                 var$2 = jl_StringBuilder__init_();
-                jl_StringBuilder_append3(jl_StringBuilder_append(var$2, $rt_s(1291)), var$1);
+                jl_StringBuilder_append3(jl_StringBuilder_append(var$2, $rt_s(1293)), var$1);
                 var$2 = jl_StringBuilder_toString(var$2);
             } catch ($$e) {
                 $$je = $rt_wrapException($$e);
@@ -32660,7 +32740,7 @@ nlevit_ClientMain__main = () => {
                     console.log($rt_ustr(var$2));
                     if (nlevit_ClientMain_webgl !== null)
                         break c;
-                    nlevit_ClientMain_showCrashScreen($rt_s(1292));
+                    nlevit_ClientMain_showCrashScreen($rt_s(1294));
                 } catch ($$e) {
                     $$je = $rt_wrapException($$e);
                     if ($$je instanceof jl_Throwable) {
@@ -32702,11 +32782,11 @@ nlevit_ClientMain__main = () => {
         var$2 = jl_Class_getName(jl_Object_getClass($t));
         var$4 = $t.$getMessage();
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1293)), var$2), $rt_s(82)), var$4);
+        jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1295)), var$2), $rt_s(82)), var$4);
         console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
         var$2 = $t.$getMessage();
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1294)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1296)), var$2);
         nlevit_ClientMain_showCrashScreen(jl_StringBuilder_toString(var$4));
     }
 },
@@ -32727,7 +32807,7 @@ nlevit_ClientMain_detectBrowserFeatures = () => {
 nlevit_ClientMain_createCanvasAndContext = () => {
     let $containerId, $container, $containerIsCanvas, var$4, var$5;
     nlevit_ClientMain_$callClinit();
-    $containerId = $rt_s(1295);
+    $containerId = $rt_s(1297);
     if (nlevit_ClientMain_config !== null && $rt_str(nlevit_ClientMain_config.container) !== null)
         $containerId = $rt_str(nlevit_ClientMain_config.container);
     $container = nlevit_ClientMain_document.getElementById($rt_ustr($containerId));
@@ -32783,7 +32863,7 @@ nlevit_ClientMain_beginAssetBundleLoad = () => {
             console.log("[ClientMain] Requesting asset bundle (assets.epk)...");
             var$1 = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_0();
             var$2 = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1__init_0();
-            nlevit_EPKLoader_loadEPK($rt_s(1296), otji_JSWrapper_unwrap(var$1), otji_JSWrapper_unwrap(var$2));
+            nlevit_EPKLoader_loadEPK($rt_s(1298), otji_JSWrapper_unwrap(var$1), otji_JSWrapper_unwrap(var$2));
             break a;
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -32791,7 +32871,7 @@ nlevit_ClientMain_beginAssetBundleLoad = () => {
                 $t = $$je;
                 var$3 = jl_String_valueOf2($t);
                 var$1 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$1, $rt_s(1297)), var$3);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$1, $rt_s(1299)), var$3);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$1)));
                 break a;
             } else {
@@ -32824,7 +32904,7 @@ nlevit_ClientMain_lambda$beginAssetBundleLoad$1 = ($loaded, $total) => {
         var$3 = $loaded >> 20;
         var$4 = $total >> 20;
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1298)), var$3), $rt_s(1299)), var$4), $rt_s(1300));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1300)), var$3), $rt_s(1301)), var$4), $rt_s(1302));
         console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
     }
 },
@@ -32833,7 +32913,7 @@ nlevit_ClientMain_lambda$beginAssetBundleLoad$0 = $data => {
     nlevit_ClientMain_$callClinit();
     var$2 = $data.byteLength;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1301)), var$2), $rt_s(958));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1303)), var$2), $rt_s(958));
     var$3 = jl_StringBuilder_toString(var$3);
     console.log($rt_ustr(var$3));
 },
@@ -33133,7 +33213,7 @@ jm_Multiplication_powerOf10 = $exp => {
         return ((__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0($intExp)).$shiftLeft1($intExp);
     $byteArraySize = Long_add(Long_fromInt(1), Long_fromNumber(Long_toNumber($exp) / 2.4082399653118496));
     if (Long_gt($byteArraySize, Long_fromInt(1000000)))
-        $rt_throw(jl_ArithmeticException__init_($rt_s(1302)));
+        $rt_throw(jl_ArithmeticException__init_($rt_s(1304)));
     if (Long_le($exp, Long_fromInt(2147483647)))
         return ((__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0($intExp)).$shiftLeft1($intExp);
     $powerOfFive = (__safe(jm_Multiplication_bigFivePows).data||[])[1].$pow0(2147483647);
@@ -33210,7 +33290,7 @@ jur_WordBoundary_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_WordBoundary_getName = $this => {
-    return $rt_s(1303);
+    return $rt_s(1305);
 },
 jur_WordBoundary_isSpace = ($this, $ch, $index, $leftBound, $testString) => {
     let var$5;
@@ -33314,7 +33394,7 @@ nlevi_PlatformInput__init = () => {
     nlevi_PlatformInput_$callClinit();
     nlevi_PlatformInput_canvas = nlevit_ClientMain_getCanvas();
     if (nlevi_PlatformInput_canvas === null)
-        $rt_throw(jl_RuntimeException__init_1($rt_s(1304)));
+        $rt_throw(jl_RuntimeException__init_1($rt_s(1306)));
     nlevi_PlatformInput_registerKeyListeners();
     nlevi_PlatformInput_registerMouseListeners();
     nlevi_PlatformInput_registerTouchListeners();
@@ -33329,13 +33409,13 @@ nlevi_PlatformInput_isBrowserShortcut = $event => {
     let $code, $ctrlOrCmd;
     nlevi_PlatformInput_$callClinit();
     $code = $rt_str($event.code);
-    if (jl_String_equals($rt_s(1305), $code))
+    if (jl_String_equals($rt_s(1307), $code))
         return 1;
     $ctrlOrCmd = !($event.ctrlKey ? 1 : 0) && !($event.metaKey ? 1 : 0) ? 0 : 1;
-    if ($ctrlOrCmd && jl_String_equals($rt_s(1306), $code))
+    if ($ctrlOrCmd && jl_String_equals($rt_s(1308), $code))
         return 1;
     if (($event.ctrlKey ? 1 : 0) && ($event.shiftKey ? 1 : 0))
-        return !jl_String_equals($rt_s(1307), $code) && !jl_String_equals($rt_s(1308), $code) && !jl_String_equals($rt_s(1309), $code) ? 0 : 1;
+        return !jl_String_equals($rt_s(1309), $code) && !jl_String_equals($rt_s(1310), $code) && !jl_String_equals($rt_s(1311), $code) ? 0 : 1;
     return 0;
 },
 nlevi_PlatformInput_setKeyEventObserver = $observer => {
@@ -33533,7 +33613,7 @@ nlevi_PlatformInput_enqueueKeyEvent = ($keyCode, $keyStr, $code) => {
 nlevi_PlatformInput_openURL = ($url, $target) => {
     nlevi_PlatformInput_$callClinit();
     if ($target === null)
-        $target = $rt_s(1310);
+        $target = $rt_s(1312);
     window.open($rt_ustr($url), $rt_ustr($target));
 },
 nlevi_PlatformInput_updateTouchState = $event => {
@@ -33627,7 +33707,7 @@ nlevi_PlatformInput_lambda$registerGamepadListeners$1 = $event => {
         }
     }
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1311)), $index);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1313)), $index);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
 },
 nlevi_PlatformInput_lambda$registerGamepadListeners$0 = $event => {
@@ -33638,7 +33718,7 @@ nlevi_PlatformInput_lambda$registerGamepadListeners$0 = $event => {
         nlevi_PlatformInput_activeGamepadIndex = $index;
     nlevi_PlatformInput_gamepadConnected = 1;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1312)), $index);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1314)), $index);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformInput_lambda$registerPointerLockListener$0 = $event => {
@@ -34024,10 +34104,10 @@ nmcgsi_CreativeModeInventoryScreen_render = ($this, $poseStack, $mouseX, $mouseY
     $i = 0;
     while ($i < (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_LABELS).data||[]).length) {
         $selected = $i != $this.$tabIndex ? 0 : 1;
-        var$9 = !$selected ? $rt_s(1313) : $rt_s(1314);
+        var$9 = !$selected ? $rt_s(1315) : $rt_s(1316);
         var$10 = (__safe($widths).data||[]);
         var$11 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$11, $rt_s(1315)), var$9), 50);
+        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$11, $rt_s(1317)), var$9), 50);
         $sprite = jl_StringBuilder_toString(var$11);
         var$13 = $tx;
         nleva_EaglerGuiImpl_drawSprite9Slices($sprite, var$13, $this.$topPos - 28 | 0, var$10[$i], 32.0, 2, 2, 2, 0);
@@ -34099,7 +34179,7 @@ nmcgsi_CreativeModeInventoryScreen_mouseClicked = ($this, $mouseX, $mouseY, $but
     if ($tab >= 0 && $tab != $this.$tabIndex) {
         var$6 = (__safe(nmcgsi_CreativeModeInventoryScreen_TAB_LABELS).data||[])[$tab];
         var$7 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1316)), var$6);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1318)), var$6);
         console.log($rt_ustr(jl_StringBuilder_toString(var$7)));
         $this.$tabIndex = $tab;
         $this.$scrollRow = 0;
@@ -34151,7 +34231,7 @@ nmcgsi_CreativeModeInventoryScreen_keyPressed = ($this, $keyCode, $scanCode, $mo
     if ($keyCode != nmc_KeyMapping_INVENTORY.$getKey0() && !($keyCode == 1 && $this.$shouldCloseOnEsc()))
         return nmcgs_Screen_keyPressed($this, $keyCode, $scanCode, $modifiers);
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1317)), $keyCode);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1319)), $keyCode);
     console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
     $this.$onClose();
     return 1;
@@ -34163,7 +34243,7 @@ nmcgsi_CreativeModeInventoryScreen__clinit_ = () => {
 try {
 
     nmcgsi_CreativeModeInventoryScreen_TAB_KEYS = $rt_createIntArrayFromData([1, 2, 3]);
-    nmcgsi_CreativeModeInventoryScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1318), $rt_s(1319), $rt_s(1320)]);
+    nmcgsi_CreativeModeInventoryScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1320), $rt_s(1321), $rt_s(1322)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 jl_Double = $rt_classWithoutFields(jl_Number),
@@ -34593,7 +34673,7 @@ nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_displayString =
     let var$1, var$2;
     var$1 = $this.$options5.$menuBackgroundBlurriness;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1321)), var$1);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1323)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue = $this => {
@@ -34605,7 +34685,7 @@ nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_applyValue = $t
     }
 },
 nmcgso_AccessibilityOptionsScreen$MenuBackgroundBlurrinessSlider_getTelemetryId = $this => {
-    return $rt_s(1322);
+    return $rt_s(1324);
 },
 jur_IntHash = $rt_classWithoutFields(),
 nleva_PlatformWebService = $rt_classWithoutFields(),
@@ -34622,31 +34702,31 @@ nleva_PlatformWebService_init = () => {
     console.log("[PlatformWebService] Initializing service locator...");
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformOpenGL));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1323)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1325)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformRuntime));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1324)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1326)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformAudio));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1325)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1327)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformNetworking));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1326)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1328)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformInput));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1327)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1329)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformApplication));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1328)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1330)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = jl_Class_getSimpleName($rt_cls(nlevi_PlatformFilesystem));
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1329)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1331)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     nleva_PlatformWebService_initialized = 1;
     console.log("[PlatformWebService] Service locator initialized");
@@ -34747,21 +34827,21 @@ nmcgs_SelectWorldScreen_init = $this => {
     $gridX = $centerX - 154 | 0;
     $row1Y = ($this.$height - 60 | 0) + 8 | 0;
     $row2Y = ($row1Y + 20 | 0) + 4 | 0;
-    $this.$playWorldButton = nmcgc_Button__init_($gridX, $row1Y, 150, 20, $rt_s(1330), nmcgs_SelectWorldScreen$init$lambda$_1_0__init_0($this));
+    $this.$playWorldButton = nmcgc_Button__init_($gridX, $row1Y, 150, 20, $rt_s(1332), nmcgs_SelectWorldScreen$init$lambda$_1_0__init_0($this));
     $this.$playWorldButton.$setActive(0);
     $this.$addRenderableWidget($this.$playWorldButton);
     $create = new nmcgc_Button;
     var$6 = $gridX + 158 | 0;
-    nmcgc_Button__init_0($create, var$6, $row1Y, 150, 20, $rt_s(1331), nmcgs_SelectWorldScreen$init$lambda$_1_1__init_0($this));
+    nmcgc_Button__init_0($create, var$6, $row1Y, 150, 20, $rt_s(1333), nmcgs_SelectWorldScreen$init$lambda$_1_1__init_0($this));
     $this.$addRenderableWidget($create);
-    $edit = nmcgc_Button__init_($gridX, $row2Y, 71, 20, $rt_s(1234), nmcgs_SelectWorldScreen$init$lambda$_1_2__init_0());
+    $edit = nmcgc_Button__init_($gridX, $row2Y, 71, 20, $rt_s(1236), nmcgs_SelectWorldScreen$init$lambda$_1_2__init_0());
     $edit.$setActive(0);
     $this.$addRenderableWidget($edit);
-    $delete = nmcgc_Button__init_($gridX + 79 | 0, $row2Y, 71, 20, $rt_s(1235), nmcgs_SelectWorldScreen$init$lambda$_1_3__init_0($this));
+    $delete = nmcgc_Button__init_($gridX + 79 | 0, $row2Y, 71, 20, $rt_s(1237), nmcgs_SelectWorldScreen$init$lambda$_1_3__init_0($this));
     $delete.$setActive(0);
     $this.$deleteButton = $delete;
     $this.$addRenderableWidget($delete);
-    $recreate = nmcgc_Button__init_(var$6, $row2Y, 71, 20, $rt_s(1332), nmcgs_SelectWorldScreen$init$lambda$_1_4__init_0());
+    $recreate = nmcgc_Button__init_(var$6, $row2Y, 71, 20, $rt_s(1334), nmcgs_SelectWorldScreen$init$lambda$_1_4__init_0());
     $recreate.$setActive(0);
     $this.$addRenderableWidget($recreate);
     $this.$addRenderableWidget(nmcgc_Button__init_($gridX + 237 | 0, $row2Y, 71, 20, $rt_s(359), nmcgs_SelectWorldScreen$init$lambda$_1_5__init_0($this)));
@@ -34794,7 +34874,7 @@ nmcgs_SelectWorldScreen_deleteSelectedWorld = $this => {
     if ($this.$minecraft !== null && $this.$selectedEntry !== null) {
         $name = $this.$selectedEntry.$summary.$name0;
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1333)), $name), 39);
+        jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1335)), $name), 39);
         console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
         nlev_WorldStorage_deleteWorld($name);
         $this.$init0($this.$minecraft, $this.$width, $this.$height);
@@ -34807,7 +34887,7 @@ nmcgs_SelectWorldScreen_joinSelectedWorld = $this => {
         return;
     $name = $this.$selectedEntry === null ? $rt_s(466) : $this.$selectedEntry.$summary.$name0;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1334)), $name), 39);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1336)), $name), 39);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     $this.$minecraft.$doWorldLoad($name);
 },
@@ -34823,15 +34903,15 @@ nmcgs_SelectWorldScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialT
         nleva_EaglerGuiImpl_drawSprite($rt_s(35), 0.0, 47.0, $this.$width, 2.0);
         nleva_EaglerGuiImpl_drawSprite($rt_s(36), 0.0, $listBottom, $this.$width, 2.0);
     }
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1335));
-    nleva_EaglerGuiImpl_drawText($rt_s(1335), nmcgs_SelectWorldScreen_centerX($this) - $titleWidth / 2.0, 8.0, (-1), 1);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1337));
+    nleva_EaglerGuiImpl_drawText($rt_s(1337), nmcgs_SelectWorldScreen_centerX($this) - $titleWidth / 2.0, 8.0, (-1), 1);
     $searchX = nmcgs_SelectWorldScreen_centerX($this) - 100 | 0;
     var$10 = $searchX;
     if (!nleva_EaglerGuiImpl_drawSprite($rt_s(5), var$10, 22.0, 200.0, 20.0)) {
         nleva_EaglerGuiImpl_fillRect(var$10, 22.0, 200.0, 20.0, (-16777216));
         nleva_EaglerGuiImpl_fillRect($searchX + 1 | 0, 23.0, 198.0, 18.0, (-7631989));
     }
-    nleva_EaglerGuiImpl_drawText($rt_s(1336), $searchX + 4 | 0, 28.0, (-6250336), 0);
+    nleva_EaglerGuiImpl_drawText($rt_s(1338), $searchX + 4 | 0, 28.0, (-6250336), 0);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgs_SelectWorldScreen_centerX = $this => {
@@ -34940,7 +35020,7 @@ nmcgso_ControlsScreen$SprintWindowSlider_displayString = $this => {
     let var$1, var$2;
     var$1 = $this.$options2.$sprintWindow;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1337)), var$1), $rt_s(1338));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1339)), var$1), $rt_s(1340));
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_ControlsScreen$SprintWindowSlider_applyValue = $this => {
@@ -34952,7 +35032,7 @@ nmcgso_ControlsScreen$SprintWindowSlider_applyValue = $this => {
     }
 },
 nmcgso_ControlsScreen$SprintWindowSlider_getTelemetryId = $this => {
-    return $rt_s(1339);
+    return $rt_s(1341);
 };
 function ji_File() {
     jl_Object.call(this);
@@ -35081,20 +35161,20 @@ nmcgso_OptionsScreen$FovSlider_toNormalized = $fov => {
 },
 nmcgso_OptionsScreen$FovSlider_fovLabel = $fov => {
     if ($fov == 70)
-        return $rt_s(1340);
+        return $rt_s(1342);
     if ($fov != 110)
         return jl_String_valueOf($fov);
-    return $rt_s(1341);
+    return $rt_s(1343);
 },
 nmcgso_OptionsScreen$FovSlider_displayString = $this => {
     let var$1, var$2;
     var$1 = nmcgso_OptionsScreen$FovSlider_fovLabel($this.$options6.$getFov());
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1342)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1344)), var$1);
     return jl_StringBuilder_toString(var$2);
 },
 nmcgso_OptionsScreen$FovSlider_getTelemetryId = $this => {
-    return $rt_s(1343);
+    return $rt_s(1345);
 },
 nmcgso_OptionsScreen$FovSlider_applyValue = $this => {
     let $fov;
@@ -35211,7 +35291,7 @@ ju_Formatter$FormatWriter_formatValue = ($this, $specifier) => {
     a: {
         switch ($specifier) {
             case 37:
-                $this.$out.$append30($rt_s(1344));
+                $this.$out.$append30($rt_s(1346));
                 break a;
             case 66:
                 break;
@@ -35291,11 +35371,11 @@ ju_Formatter$FormatWriter_formatFloat = ($this, $specifier, $upperCase) => {
     $format.$setMinimumFractionDigits($this.$precision0);
     $format.$setGroupingUsed(!($this.$flags & 64) ? 0 : 1);
     if ($this.$flags & 128) {
-        $format.$setNegativePrefix($rt_s(1345));
+        $format.$setNegativePrefix($rt_s(1347));
         $format.$setNegativeSuffix($rt_s(1075));
     }
     if ($this.$flags & 8)
-        $format.$setPositivePrefix($rt_s(1346));
+        $format.$setPositivePrefix($rt_s(1348));
     else if ($this.$flags & 16)
         $format.$setPositivePrefix($rt_s(137));
     $str = jt_Format_format($format, $arg);
@@ -35318,9 +35398,9 @@ ju_Formatter$FormatWriter_predictDecimalSize = ($this, $negative, $format) => {
 },
 ju_Formatter$FormatWriter_verifyFloatFlags = $this => {
     if ($this.$flags & 8 && $this.$flags & 16)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1347)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1349)));
     if ($this.$flags & 32 && $this.$flags & 1)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1348)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1350)));
     if ($this.$flags & 1 && $this.$width1 < 0)
         $rt_throw(ju_MissingFormatWidthException__init_(jl_String_substring($this.$format8, $this.$formatSpecifierStart, $this.$index1)));
 },
@@ -35463,7 +35543,7 @@ ju_Formatter$FormatWriter_formatRadixInt = ($this, $specifier, $radixLog2, $uppe
     }
     $sb = jl_StringBuilder__init_();
     if ($this.$flags & 4) {
-        $prefix = $radixLog2 != 4 ? $rt_s(356) : $rt_s(1349);
+        $prefix = $radixLog2 != 4 ? $rt_s(356) : $rt_s(1351);
         var$8 = jl_StringBuilder__init_();
         jl_StringBuilder_append(jl_StringBuilder_append(var$8, $prefix), $str);
         $str = jl_StringBuilder_toString(var$8);
@@ -35484,9 +35564,9 @@ ju_Formatter$FormatWriter_formatRadixInt = ($this, $specifier, $radixLog2, $uppe
 },
 ju_Formatter$FormatWriter_verifyIntFlags = $this => {
     if ($this.$flags & 8 && $this.$flags & 16)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1347)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1349)));
     if ($this.$flags & 32 && $this.$flags & 1)
-        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1348)));
+        $rt_throw(ju_IllegalFormatFlagsException__init_($rt_s(1350)));
     if ($this.$precision0 >= 0)
         $rt_throw(ju_IllegalFormatPrecisionException__init_0($this.$precision0));
     if ($this.$flags & 1 && $this.$width1 < 0)
@@ -35516,7 +35596,7 @@ ju_Formatter$FormatWriter_verifyFlags = ($this, $conversion, $mask) => {
 ju_Formatter$FormatWriter_flagsToString = ($this, $flags) => {
     let $flagIndex;
     $flagIndex = jl_Integer_numberOfTrailingZeros($flags);
-    return jl_String_valueOf3(jl_String_charAt($rt_s(1350), $flagIndex));
+    return jl_String_valueOf3(jl_String_charAt($rt_s(1352), $flagIndex));
 },
 ju_Formatter$FormatWriter_mayBeAppendSpaces = ($this, $str) => {
     let $diff, $sb, $i;
@@ -35851,12 +35931,12 @@ nmcgso_MouseSettingsScreen_init = $this => {
     $this.$addRenderableWidget(nmcgso_MouseSettingsScreen$SensitivitySlider__init_0($gridX, $rowY, 150, 20, $this.$options1));
     var$5 = new nmcgc_CycleButton;
     var$6 = $rt_wrapArray(jl_String, [$rt_s(1064), $rt_s(1065)]);
-    nmcgc_CycleButton__init_(var$5, $rightX, $rowY, 150, 20, $rt_s(1351), var$6, !$this.$options1.$invertMouseY ? 0 : 1, nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_0($this));
+    nmcgc_CycleButton__init_(var$5, $rightX, $rowY, 150, 20, $rt_s(1353), var$6, !$this.$options1.$invertMouseY ? 0 : 1, nmcgso_MouseSettingsScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget(var$5);
     $row2Y = 58;
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, $row2Y, $rt_s(1352)));
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $rightX, $row2Y, $rt_s(1353)));
-    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, 82, $rt_s(1354)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, $row2Y, $rt_s(1354)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $rightX, $row2Y, $rt_s(1355)));
+    $this.$addRenderableWidget(nmcgso_MouseSettingsScreen_disabledButton($this, $gridX, 82, $rt_s(1356)));
     $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(490), nmcgso_MouseSettingsScreen$init$lambda$_1_1__init_0($this)));
 },
 nmcgso_MouseSettingsScreen_disabledButton = ($this, $x, $y, $label) => {
@@ -35868,8 +35948,8 @@ nmcgso_MouseSettingsScreen_disabledButton = ($this, $x, $y, $label) => {
 nmcgso_MouseSettingsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
     nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1355));
-    nleva_EaglerGuiImpl_drawText($rt_s(1355), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1357));
+    nleva_EaglerGuiImpl_drawText($rt_s(1357), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_MouseSettingsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -35914,7 +35994,7 @@ jur_SOLSet_hasConsumed = ($this, $matchResult) => {
     return 0;
 },
 jur_SOLSet_getName = $this => {
-    return $rt_s(1356);
+    return $rt_s(1358);
 };
 function otpp_AsyncCallbackWrapper() {
     jl_Object.call(this);
@@ -35939,9 +36019,9 @@ otpp_AsyncCallbackWrapper_error = ($this, $e) => {
     $this.$realAsyncCallback.$error($e);
 },
 nmcgsm_EditServerScreen$1 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_EditServerScreen$1__init_ = ($this, $this$0, $x, $y, $width, $height, $hint) => {
+nmcgsm_EditServerScreen$1__init_ = ($this, $this$0, $arg0, $arg1, $arg2, $arg3, $arg4) => {
     ju_Objects_requireNonNull($this$0);
-    nmcgc_EditBox__init_($this, $x, $y, $width, $height, $hint);
+    nmcgc_EditBox__init_($this, $arg0, $arg1, $arg2, $arg3, $arg4);
 },
 nmcgsm_EditServerScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_EditServerScreen$1();
@@ -35949,7 +36029,7 @@ nmcgsm_EditServerScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) =
     return var_6;
 },
 nmcgsm_EditServerScreen$1_getTelemetryId = $this => {
-    return $rt_s(1357);
+    return $rt_s(1359);
 },
 nlevi_PlatformOpenGL = $rt_classWithoutFields(),
 nlevi_PlatformOpenGL_gl = null,
@@ -35969,7 +36049,7 @@ nlevi_PlatformOpenGL__init = () => {
     nlevi_PlatformOpenGL_$callClinit();
     nlevi_PlatformOpenGL_gl = nlevit_ClientMain_getWebGL2();
     if (nlevi_PlatformOpenGL_gl === null)
-        $rt_throw(jl_RuntimeException__init_1($rt_s(1358)));
+        $rt_throw(jl_RuntimeException__init_1($rt_s(1360)));
     nlevi_PlatformOpenGL_extColorBufferFloat = nlevi_PlatformOpenGL_gl.getExtension("EXT_color_buffer_float");
     nlevi_PlatformOpenGL_extTextureFloatLinear = nlevi_PlatformOpenGL_gl.getExtension("OES_texture_float_linear");
     nlevi_PlatformOpenGL_extMultiDraw = nlevi_PlatformOpenGL_gl.getExtension("WEBGL_multi_draw");
@@ -35982,12 +36062,12 @@ nlevi_PlatformOpenGL__init = () => {
     nlevi_PlatformOpenGL_glRenderer = nlevi_PlatformOpenGL_getParameterString(7937);
     var$1 = nlevi_PlatformOpenGL_glVersion;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1359)), var$1);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1361)), var$1);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     var$1 = nlevi_PlatformOpenGL_glVendor;
     var$2 = nlevi_PlatformOpenGL_glRenderer;
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1360)), var$1), $rt_s(1361)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1362)), var$1), $rt_s(1363)), var$2);
     console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
 },
 nlevi_PlatformOpenGL_getParameterString = $pname => {
@@ -36269,9 +36349,9 @@ nlevi_PlatformOpenGL_getParameterString$js_body$_2 = (var$1, var$2) => {
     return r ? '' + r : '';
 },
 nmcgsm_EditServerScreen$2 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_EditServerScreen$2__init_ = ($this, var$1, var$2, $y, $width, $height, $hint) => {
+nmcgsm_EditServerScreen$2__init_ = ($this, var$1, var$2, $arg1, $arg2, $arg3, $arg4) => {
     ju_Objects_requireNonNull(var$1);
-    nmcgc_EditBox__init_($this, var$2, $y, $width, $height, $hint);
+    nmcgc_EditBox__init_($this, var$2, $arg1, $arg2, $arg3, $arg4);
 },
 nmcgsm_EditServerScreen$2__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_EditServerScreen$2();
@@ -36279,7 +36359,7 @@ nmcgsm_EditServerScreen$2__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) =
     return var_6;
 },
 nmcgsm_EditServerScreen$2_getTelemetryId = $this => {
-    return $rt_s(1362);
+    return $rt_s(1364);
 },
 otjt_ArrayBuffer = $rt_classWithoutFields();
 function ju_HashMap$HashMapEntrySet() {
@@ -36388,14 +36468,14 @@ jm_RoundingMode_$values = () => {
 jm_RoundingMode__clinit_ = () => {
 try {
 
-    jm_RoundingMode_UP = jm_RoundingMode__init_($rt_s(1363), 0, 0);
-    jm_RoundingMode_DOWN = jm_RoundingMode__init_($rt_s(1364), 1, 1);
-    jm_RoundingMode_CEILING = jm_RoundingMode__init_($rt_s(1365), 2, 2);
-    jm_RoundingMode_FLOOR = jm_RoundingMode__init_($rt_s(1366), 3, 3);
-    jm_RoundingMode_HALF_UP = jm_RoundingMode__init_($rt_s(1367), 4, 4);
-    jm_RoundingMode_HALF_DOWN = jm_RoundingMode__init_($rt_s(1368), 5, 5);
-    jm_RoundingMode_HALF_EVEN = jm_RoundingMode__init_($rt_s(1369), 6, 6);
-    jm_RoundingMode_UNNECESSARY = jm_RoundingMode__init_($rt_s(1370), 7, 7);
+    jm_RoundingMode_UP = jm_RoundingMode__init_($rt_s(1365), 0, 0);
+    jm_RoundingMode_DOWN = jm_RoundingMode__init_($rt_s(1366), 1, 1);
+    jm_RoundingMode_CEILING = jm_RoundingMode__init_($rt_s(1367), 2, 2);
+    jm_RoundingMode_FLOOR = jm_RoundingMode__init_($rt_s(1368), 3, 3);
+    jm_RoundingMode_HALF_UP = jm_RoundingMode__init_($rt_s(1369), 4, 4);
+    jm_RoundingMode_HALF_DOWN = jm_RoundingMode__init_($rt_s(1370), 5, 5);
+    jm_RoundingMode_HALF_EVEN = jm_RoundingMode__init_($rt_s(1371), 6, 6);
+    jm_RoundingMode_UNNECESSARY = jm_RoundingMode__init_($rt_s(1372), 7, 7);
     jm_RoundingMode_$VALUES = jm_RoundingMode_$values();
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
@@ -36487,7 +36567,7 @@ cgcc_CollectPreconditions = $rt_classWithoutFields(),
 cgcc_CollectPreconditions_checkNonnegative = ($value, $name) => {
     if ($value >= 0)
         return $value;
-    $rt_throw(jl_IllegalArgumentException__init_2(((((jl_StringBuilder__init_()).$append3($name)).$append3($rt_s(1371))).$append1($value)).$toString()));
+    $rt_throw(jl_IllegalArgumentException__init_2(((((jl_StringBuilder__init_()).$append3($name)).$append3($rt_s(1373))).$append1($value)).$toString()));
 };
 function nmcr_TextureManager() {
     let a = this; jl_Object.call(a);
@@ -36735,44 +36815,44 @@ nmcgso_ControlsScreen_init = $this => {
     $topY = 34;
     $leftX = ($centerX - 150 | 0) - 4 | 0;
     $rightX = $centerX + 4 | 0;
-    $this.$addRenderableWidget(nmcgc_Button__init_($leftX, $topY, 150, 20, $rt_s(1372), nmcgso_ControlsScreen$init$lambda$_1_0__init_0($this)));
-    $this.$addRenderableWidget(nmcgc_Button__init_($rightX, $topY, 150, 20, $rt_s(1373), nmcgso_ControlsScreen$init$lambda$_1_1__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($leftX, $topY, 150, 20, $rt_s(1374), nmcgso_ControlsScreen$init$lambda$_1_0__init_0($this)));
+    $this.$addRenderableWidget(nmcgc_Button__init_($rightX, $topY, 150, 20, $rt_s(1375), nmcgso_ControlsScreen$init$lambda$_1_1__init_0($this)));
     $rowY = 62;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1374), $rt_s(1375)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $rowY, 150, 20, $rt_s(1376), var$7, !$this.$options0.$toggleCrouch ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_2__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1376), $rt_s(1377)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $rowY, 150, 20, $rt_s(1378), var$7, !$this.$options0.$toggleCrouch ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_2__init_0($this));
     $this.$addRenderableWidget(var$6);
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1374), $rt_s(1375)]);
-    nmcgc_CycleButton__init_(var$6, $rightX, $rowY, 150, 20, $rt_s(1377), var$7, !$this.$options0.$toggleSprint ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_3__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1376), $rt_s(1377)]);
+    nmcgc_CycleButton__init_(var$6, $rightX, $rowY, 150, 20, $rt_s(1379), var$7, !$this.$options0.$toggleSprint ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_3__init_0($this));
     $this.$addRenderableWidget(var$6);
     $row2Y = 86;
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1374), $rt_s(1375)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row2Y, 150, 20, $rt_s(1378), var$7, !$this.$options0.$toggleAttack ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_4__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1376), $rt_s(1377)]);
+    nmcgc_CycleButton__init_(var$6, $leftX, $row2Y, 150, 20, $rt_s(1380), var$7, !$this.$options0.$toggleAttack ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_4__init_0($this));
     $this.$addRenderableWidget(var$6);
     var$6 = new nmcgc_CycleButton;
-    var$7 = $rt_wrapArray(jl_String, [$rt_s(1374), $rt_s(1375)]);
-    nmcgc_CycleButton__init_(var$6, $rightX, $row2Y, 150, 20, $rt_s(1379), var$7, !$this.$options0.$toggleUse ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_5__init_0($this));
+    var$7 = $rt_wrapArray(jl_String, [$rt_s(1376), $rt_s(1377)]);
+    nmcgc_CycleButton__init_(var$6, $rightX, $row2Y, 150, 20, $rt_s(1381), var$7, !$this.$options0.$toggleUse ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_5__init_0($this));
     $this.$addRenderableWidget(var$6);
     $row3Y = 110;
     var$6 = new nmcgc_CycleButton;
     var$7 = $rt_wrapArray(jl_String, [$rt_s(1064), $rt_s(1065)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row3Y, 150, 20, $rt_s(1380), var$7, !$this.$options0.$autoJump ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_6__init_0($this));
+    nmcgc_CycleButton__init_(var$6, $leftX, $row3Y, 150, 20, $rt_s(1382), var$7, !$this.$options0.$autoJump ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_6__init_0($this));
     $this.$addRenderableWidget(var$6);
     $this.$addRenderableWidget(nmcgso_ControlsScreen$SprintWindowSlider__init_0($rightX, $row3Y, 150, 20, $this.$options0));
     $row4Y = 134;
     var$6 = new nmcgc_CycleButton;
     var$7 = $rt_wrapArray(jl_String, [$rt_s(1064), $rt_s(1065)]);
-    nmcgc_CycleButton__init_(var$6, $leftX, $row4Y, 150, 20, $rt_s(1381), var$7, !$this.$options0.$operatorItemsTab ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_7__init_0($this));
+    nmcgc_CycleButton__init_(var$6, $leftX, $row4Y, 150, 20, $rt_s(1383), var$7, !$this.$options0.$operatorItemsTab ? 0 : 1, nmcgso_ControlsScreen$init$lambda$_1_7__init_0($this));
     $this.$addRenderableWidget(var$6);
     $this.$addRenderableWidget(nmcgc_Button__init_($centerX - 100 | 0, ($this.$height - 33 | 0) + 6 | 0, 200, 20, $rt_s(490), nmcgso_ControlsScreen$init$lambda$_1_8__init_0($this)));
 },
 nmcgso_ControlsScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
     let $titleWidth;
     nleva_EaglerGuiImpl_drawSpriteTiled($rt_s(33), 0.0, 0.0, $this.$width, $this.$height, 0.0, 0.0, 32);
-    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1382));
-    nleva_EaglerGuiImpl_drawText($rt_s(1382), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
+    $titleWidth = nleva_EaglerGuiImpl_widthOf($rt_s(1384));
+    nleva_EaglerGuiImpl_drawText($rt_s(1384), ($this.$width / 2 | 0) - $titleWidth / 2.0, 8.0, (-1), 1);
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
 nmcgso_ControlsScreen_keyPressed = ($this, $keyCode, $scanCode, $modifiers) => {
@@ -37252,20 +37332,20 @@ nleva_SkyRenderer_clamp01 = $v => {
 },
 nleva_SkyRenderer_init = $gl => {
     nleva_SkyRenderer_$callClinit();
-    nleva_SkyRenderer_discProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1383), $rt_s(1384), $rt_s(1385));
-    nleva_SkyRenderer_tintProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1386), $rt_s(1387), $rt_s(1388));
-    nleva_SkyRenderer_celestialProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1389), $rt_s(1390), $rt_s(1391));
-    nleva_SkyRenderer_starsProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1392), $rt_s(1393), $rt_s(1394));
+    nleva_SkyRenderer_discProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1385), $rt_s(1386), $rt_s(1387));
+    nleva_SkyRenderer_tintProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1388), $rt_s(1389), $rt_s(1390));
+    nleva_SkyRenderer_celestialProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1391), $rt_s(1392), $rt_s(1393));
+    nleva_SkyRenderer_starsProgram = nleva_SkyRenderer_buildProgram($gl, $rt_s(1394), $rt_s(1395), $rt_s(1396));
     if (nleva_SkyRenderer_discProgram !== null && nleva_SkyRenderer_tintProgram !== null && nleva_SkyRenderer_celestialProgram !== null && nleva_SkyRenderer_starsProgram !== null) {
         nleva_SkyRenderer_discUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(367));
-        nleva_SkyRenderer_discUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1395));
-        nleva_SkyRenderer_discUFogColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1396));
+        nleva_SkyRenderer_discUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1397));
+        nleva_SkyRenderer_discUFogColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_discProgram, $rt_s(1398));
         nleva_SkyRenderer_tintUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(367));
-        nleva_SkyRenderer_tintUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(1395));
+        nleva_SkyRenderer_tintUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_tintProgram, $rt_s(1397));
         nleva_SkyRenderer_celestialUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(367));
-        nleva_SkyRenderer_celestialUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(1395));
+        nleva_SkyRenderer_celestialUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_celestialProgram, $rt_s(1397));
         nleva_SkyRenderer_starsUMvp = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(367));
-        nleva_SkyRenderer_starsUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(1395));
+        nleva_SkyRenderer_starsUColor = nlevi_PlatformOpenGL__wglGetUniformLocation(nleva_SkyRenderer_starsProgram, $rt_s(1397));
         nleva_SkyRenderer_topDiscVbo = nleva_SkyRenderer_buildDisc($gl, 16.0, 0);
         nleva_SkyRenderer_bottomDiscVbo = nleva_SkyRenderer_buildDisc($gl, (-16.0), 1);
         nleva_SkyRenderer_sunriseVbo = nleva_SkyRenderer_buildSunrise($gl);
@@ -37294,7 +37374,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
                     break b;
                 var$6 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($vs);
                 var$7 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1397)), $name), $rt_s(1398)), var$6);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1399)), $name), $rt_s(1400)), var$6);
                 var$6 = jl_StringBuilder_toString(var$7);
                 console.warn($rt_ustr(var$6));
                 var$6 = null;
@@ -37318,7 +37398,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
                     break c;
                 var$6 = nlevi_PlatformOpenGL__wglGetShaderInfoLog($fs);
                 var$7 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1397)), $name), $rt_s(1399)), var$6);
+                jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1399)), $name), $rt_s(1401)), var$6);
                 var$6 = jl_StringBuilder_toString(var$7);
                 console.warn($rt_ustr(var$6));
                 var$6 = null;
@@ -37355,7 +37435,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
         try {
             var$6 = nlevi_PlatformOpenGL__wglGetProgramInfoLog($program);
             var$7 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1397)), $name), $rt_s(1400)), var$6);
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1399)), $name), $rt_s(1402)), var$6);
             var$6 = jl_StringBuilder_toString(var$7);
             console.warn($rt_ustr(var$6));
             var$6 = null;
@@ -37372,7 +37452,7 @@ nleva_SkyRenderer_buildProgram = ($gl, $vshSrc, $fshSrc, $name) => {
     }
     var$6 = $t.$getMessage();
     var$7 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1397)), $name), $rt_s(1401)), var$6);
+    jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1399)), $name), $rt_s(1403)), var$6);
     console.warn($rt_ustr(jl_StringBuilder_toString(var$7)));
     return null;
 },
@@ -37563,7 +37643,7 @@ nleva_SkyRenderer_buildStars = $gl => {
     }
     var$54 = $count / 3 | 0;
     var$57 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$57, $rt_s(1397)), var$54), $rt_s(1402));
+    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$57, $rt_s(1399)), var$54), $rt_s(1404));
     console.log($rt_ustr(jl_StringBuilder_toString(var$57)));
     return nleva_SkyRenderer_upload($gl, $tris);
 },
@@ -37691,11 +37771,11 @@ nleva_SkyRenderer_pollTextures = $gl => {
         $i = 0;
         while ($i < (__safe(nleva_SkyRenderer_MOON_PHASE_NAMES).data||[]).length) {
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1403)), $i);
+            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1405)), $i);
             var$4 = jl_StringBuilder_toString(var$3);
             var$3 = (__safe(nleva_SkyRenderer_MOON_PHASE_NAMES).data||[])[$i];
             var$5 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1404)), var$3), $rt_s(44));
+            jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1406)), var$3), $rt_s(44));
             nleva_SkyRenderer_beginLoad$js_body$_38($rt_ustr(var$4), $rt_ustr(jl_StringBuilder_toString(var$5)));
             $i = $i + 1 | 0;
         }
@@ -37716,13 +37796,13 @@ nleva_SkyRenderer_pollTextures = $gl => {
     while ($i < 8) {
         if (otji_JSWrapper_unwrap((__safe(nleva_SkyRenderer_moonTextures).data||[])[$i]) === null) {
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1403)), $i);
+            jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1405)), $i);
             $data = window.__eaglerSkyTextures && window.__eaglerSkyTextures[$rt_ustr(jl_StringBuilder_toString(var$3))] || null;
             if ($data !== null) {
                 if ($data.error ? 1 : 0) {
                     nleva_SkyRenderer_texturesFailed = 1;
                     var$3 = jl_StringBuilder__init_();
-                    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1405)), $i), $rt_s(1406));
+                    jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$3, $rt_s(1407)), $i), $rt_s(1408));
                     console.warn($rt_ustr(jl_StringBuilder_toString(var$3)));
                     return;
                 }
@@ -37764,14 +37844,15 @@ nleva_SkyRenderer_camRotation = ($m, $yawDeg, $pitchDeg) => {
     $cp = jl_Math_cos(var$7);
     $sp = jl_Math_sin(var$7);
     nleva_SkyRenderer_identity($m);
-    var$4[0] = $cy;
-    var$4[2] = $sy;
-    var$4[4] = $sp * $sy;
+    var$4[0] =  -$cy;
+    var$4[1] =  -$sp * $sy;
+    var$4[2] = $cp * $sy;
+    var$4[4] = 0.0;
     var$4[5] = $cp;
-    var$4[6] =  -$sp * $cy;
-    var$4[8] =  -$cp * $sy;
-    var$4[9] = $sp;
-    var$4[10] = $cp * $cy;
+    var$4[6] = $sp;
+    var$4[8] =  -$sy;
+    var$4[9] = $sp * $cy;
+    var$4[10] =  -$cp * $cy;
 },
 nleva_SkyRenderer_identity = $m => {
     let $i, var$3;
@@ -37877,7 +37958,7 @@ nleva_SkyRenderer_scale = ($x, $y, $z, $out) => {
 nleva_SkyRenderer__clinit_ = () => {
 try {
 
-    nleva_SkyRenderer_MOON_PHASE_NAMES = $rt_wrapArray(jl_String, [$rt_s(1407), $rt_s(1408), $rt_s(1409), $rt_s(1410), $rt_s(1411), $rt_s(1412), $rt_s(1413), $rt_s(1414)]);
+    nleva_SkyRenderer_MOON_PHASE_NAMES = $rt_wrapArray(jl_String, [$rt_s(1409), $rt_s(1410), $rt_s(1411), $rt_s(1412), $rt_s(1413), $rt_s(1414), $rt_s(1415), $rt_s(1416)]);
     nleva_SkyRenderer_initialized = 0;
     nleva_SkyRenderer_discProgram = null;
     nleva_SkyRenderer_discUColor = null;
@@ -38098,7 +38179,7 @@ nmcgs_CreateWorldScreen_init = $this => {
     nmcgs_CreateWorldScreen_applyTabVisibility($this);
     nmcgs_CreateWorldScreen_applyGameModeLocks($this);
     $footerY = ($this.$height - 33 | 0) + 6 | 0;
-    $create = nmcgc_Button__init_($centerX - 154 | 0, $footerY, 150, 20, $rt_s(1331), nmcgs_CreateWorldScreen$init$lambda$_1_0__init_0($this));
+    $create = nmcgc_Button__init_($centerX - 154 | 0, $footerY, 150, 20, $rt_s(1333), nmcgs_CreateWorldScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget($create);
     $cancel = nmcgc_Button__init_($centerX + 4 | 0, $footerY, 150, 20, $rt_s(944), nmcgs_CreateWorldScreen$init$lambda$_1_1__init_0($this));
     $this.$addRenderableWidget($cancel);
@@ -38114,20 +38195,20 @@ nmcgs_CreateWorldScreen_contentY = ($this, $contentHeight) => {
 nmcgs_CreateWorldScreen_layoutGameTab = ($this, $centerX) => {
     let $y0, var$3, var$4, var$5, var$6;
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 109);
-    $this.$nameEdit = nmcgc_EditBox__init_0($centerX - 104 | 0, $y0 + 13 | 0, 208, 20, $rt_s(1415));
+    $this.$nameEdit = nmcgc_EditBox__init_0($centerX - 104 | 0, $y0 + 13 | 0, 208, 20, $rt_s(1417));
     $this.$nameEdit.$setValue0($rt_s(466));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$nameEdit);
     var$3 = new nmcgc_CycleButton;
     var$4 = $centerX - 105 | 0;
-    nmcgc_CycleButton__init_(var$3, var$4, $y0 + 41 | 0, 210, 20, $rt_s(1416), nmcgs_CreateWorldScreen_GAME_MODES, $this.$gameModeIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_0($this));
+    nmcgc_CycleButton__init_(var$3, var$4, $y0 + 41 | 0, 210, 20, $rt_s(1418), nmcgs_CreateWorldScreen_GAME_MODES, $this.$gameModeIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_0__init_0($this));
     $this.$gameModeButton = var$3;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$gameModeButton);
-    $this.$difficultyButton = nmcgc_CycleButton__init_0(var$4, $y0 + 69 | 0, 210, 20, $rt_s(1417), nmcgs_CreateWorldScreen_DIFFICULTIES, $this.$difficultyIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_0($this));
+    $this.$difficultyButton = nmcgc_CycleButton__init_0(var$4, $y0 + 69 | 0, 210, 20, $rt_s(1419), nmcgs_CreateWorldScreen_DIFFICULTIES, $this.$difficultyIndex, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_1__init_0($this));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$difficultyButton);
     var$3 = new nmcgc_CycleButton;
     var$5 = $y0 + 97 | 0;
     var$6 = $rt_wrapArray(jl_String, [$rt_s(1064), $rt_s(1065)]);
-    nmcgc_CycleButton__init_(var$3, var$4, var$5, 210, 20, $rt_s(1418), var$6, !$this.$allowCommands ? 0 : 1, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_0($this));
+    nmcgc_CycleButton__init_(var$3, var$4, var$5, 210, 20, $rt_s(1420), var$6, !$this.$allowCommands ? 0 : 1, nmcgs_CreateWorldScreen$layoutGameTab$lambda$_3_2__init_0($this));
     $this.$allowCommandsButton = var$3;
     nmcgs_CreateWorldScreen_registerTabWidget($this, 0, $this.$allowCommandsButton);
 },
@@ -38135,13 +38216,13 @@ nmcgs_CreateWorldScreen_layoutWorldTab = ($this, $centerX) => {
     let $y0, $gridLeft, $seedLabelY, var$5, var$6, var$7, var$8, var$9, var$10;
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 113);
     $gridLeft = $centerX - 155 | 0;
-    $this.$worldTypeButton = nmcgc_CycleButton__init_0($gridLeft, $y0, 150, 20, $rt_s(1419), nmcgs_CreateWorldScreen_WORLD_TYPES, 0, null);
+    $this.$worldTypeButton = nmcgc_CycleButton__init_0($gridLeft, $y0, 150, 20, $rt_s(1421), nmcgs_CreateWorldScreen_WORLD_TYPES, 0, null);
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$worldTypeButton);
-    $this.$customizeTypeButton = nmcgc_Button__init_($gridLeft + 160 | 0, $y0, 150, 20, $rt_s(1420), nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0__init_0());
+    $this.$customizeTypeButton = nmcgc_Button__init_($gridLeft + 160 | 0, $y0, 150, 20, $rt_s(1422), nmcgs_CreateWorldScreen$layoutWorldTab$lambda$_4_0__init_0());
     $this.$customizeTypeButton.$setActive(0);
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$customizeTypeButton);
     $seedLabelY = $y0 + 28 | 0;
-    $this.$seedEdit = nmcgc_EditBox__init_0($centerX - 154 | 0, $seedLabelY + 13 | 0, 308, 20, $rt_s(1421));
+    $this.$seedEdit = nmcgc_EditBox__init_0($centerX - 154 | 0, $seedLabelY + 13 | 0, 308, 20, $rt_s(1423));
     $this.$seedEdit.$setValue0($rt_s(74));
     nmcgs_CreateWorldScreen_registerTabWidget($this, 1, $this.$seedEdit);
     var$5 = new nmcgc_CycleButton;
@@ -38163,9 +38244,9 @@ nmcgs_CreateWorldScreen_layoutMoreTab = ($this, $centerX) => {
     $y0 = nmcgs_CreateWorldScreen_contentY($this, 76);
     $labels = $rt_createArray(jl_String, 3);
     var$4 = (__safe($labels).data||[]);
-    var$4[0] = $rt_s(1422);
-    var$4[1] = $rt_s(1423);
-    var$4[2] = $rt_s(1424);
+    var$4[0] = $rt_s(1424);
+    var$4[1] = $rt_s(1425);
+    var$4[2] = $rt_s(1426);
     $i = 0;
     while ($i < var$4.length) {
         $button = nmcgc_Button__init_($centerX - 105 | 0, $y0 + ($i * 28 | 0) | 0, 210, 20, var$4[$i], nmcgs_CreateWorldScreen$layoutMoreTab$lambda$_5_0__init_0());
@@ -38218,7 +38299,7 @@ nmcgs_CreateWorldScreen_onCreate = $this => {
     var$7 = $this.$worldTypeButton;
     var$7 = var$6[var$7.$getIndex()];
     var$8 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1425)), $name), $rt_s(1426)), var$3), $rt_s(1427)), var$4), $rt_s(1428)), var$5), $rt_s(1429)), var$7), $rt_s(1430)), $seed), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1427)), $name), $rt_s(1428)), var$3), $rt_s(1429)), var$4), $rt_s(1430)), var$5), $rt_s(1431)), var$7), $rt_s(1432)), $seed), 41);
     var$3 = jl_StringBuilder_toString(var$8);
     console.log($rt_ustr(var$3));
     $summary = nlev_WorldStorage$WorldSummary__init_();
@@ -38253,21 +38334,21 @@ nmcgs_CreateWorldScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialT
         nleva_EaglerGuiImpl_fillRect(0.0, 22.0, $this.$width, 2.0, (-16777216));
     if ($this.$selectedTab == 1 && $this.$generateStructuresButton !== null) {
         $labelY = $this.$generateStructuresButton.$getY0() + 6 | 0;
-        nleva_EaglerGuiImpl_drawText($rt_s(1431), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $labelY, (-1), 0);
+        nleva_EaglerGuiImpl_drawText($rt_s(1433), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $labelY, (-1), 0);
         $bonusY = $this.$bonusChestButton.$getY0() + 6 | 0;
-        nleva_EaglerGuiImpl_drawText($rt_s(1432), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $bonusY, (-1), 0);
+        nleva_EaglerGuiImpl_drawText($rt_s(1434), nmcgs_CreateWorldScreen_centerX($this) - 155 | 0, $bonusY, (-1), 0);
     }
     if ($this.$nameEdit !== null && !$this.$selectedTab) {
         var$11 = nmcgs_CreateWorldScreen_centerX($this);
         var$12 = $this.$nameEdit;
         var$13 = (var$12.$getY0() - 8 | 0) - 4 | 0;
-        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1415), var$11, var$13);
+        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1417), var$11, var$13);
     }
     if ($this.$seedEdit !== null && $this.$selectedTab == 1) {
         var$11 = nmcgs_CreateWorldScreen_centerX($this);
         var$12 = $this.$seedEdit;
         var$13 = (var$12.$getY0() - 8 | 0) - 4 | 0;
-        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1433), var$11, var$13);
+        nmcgs_CreateWorldScreen_drawCenteredLabel($this, $rt_s(1435), var$11, var$13);
     }
     nmcgs_Screen_render($this, $poseStack, $mouseX, $mouseY, $partialTick);
 },
@@ -38359,10 +38440,10 @@ nmcgs_CreateWorldScreen_lambda$init$0 = ($this, $button) => {
 nmcgs_CreateWorldScreen__clinit_ = () => {
 try {
 
-    nmcgs_CreateWorldScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1434), $rt_s(1435), $rt_s(1436)]);
-    nmcgs_CreateWorldScreen_GAME_MODES = $rt_wrapArray(jl_String, [$rt_s(954), $rt_s(1437), $rt_s(1438)]);
-    nmcgs_CreateWorldScreen_DIFFICULTIES = $rt_wrapArray(jl_String, [$rt_s(1439), $rt_s(1440), $rt_s(1340), $rt_s(1441)]);
-    nmcgs_CreateWorldScreen_WORLD_TYPES = $rt_wrapArray(jl_String, [$rt_s(1442), $rt_s(1443), $rt_s(1444), $rt_s(1445)]);
+    nmcgs_CreateWorldScreen_TAB_LABELS = $rt_wrapArray(jl_String, [$rt_s(1436), $rt_s(1437), $rt_s(1438)]);
+    nmcgs_CreateWorldScreen_GAME_MODES = $rt_wrapArray(jl_String, [$rt_s(954), $rt_s(1439), $rt_s(1440)]);
+    nmcgs_CreateWorldScreen_DIFFICULTIES = $rt_wrapArray(jl_String, [$rt_s(1441), $rt_s(1442), $rt_s(1342), $rt_s(1443)]);
+    nmcgs_CreateWorldScreen_WORLD_TYPES = $rt_wrapArray(jl_String, [$rt_s(1444), $rt_s(1445), $rt_s(1446), $rt_s(1447)]);
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nlevi_PlatformAudio = $rt_classWithoutFields(),
@@ -38435,7 +38516,7 @@ nlevi_PlatformAudio__init = () => {
                 var$3 = nlevi_PlatformAudio_sampleRate;
                 var$4 = nlevi_PlatformAudio_audioWorkletAvailable;
                 var$5 = jl_StringBuilder__init_();
-                jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1446)), var$3), $rt_s(1447)), var$4), 41);
+                jl_StringBuilder_append1(jl_StringBuilder_append3(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1448)), var$3), $rt_s(1449)), var$4), 41);
                 console.log($rt_ustr(jl_StringBuilder_toString(var$5)));
                 break a;
             } catch ($$e) {
@@ -38450,7 +38531,7 @@ nlevi_PlatformAudio__init = () => {
         }
         var$5 = $t.$getMessage();
         var$6 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1448)), var$5);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1450)), var$5);
         console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
         nlevi_PlatformAudio_initialized = 0;
     }
@@ -38581,7 +38662,7 @@ jur_UMultiLineEOLSet_hasConsumed = ($this, $matchResult) => {
     return $res;
 },
 jur_UMultiLineEOLSet_getName = $this => {
-    return $rt_s(1449);
+    return $rt_s(1451);
 };
 function nmc_Minecraft$_init_$lambda$_0_0() {
     jl_Object.call(this);
@@ -38866,13 +38947,13 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
             $this.$user0 = $gameConfig.$user === null ? nmc_Minecraft_createDefaultUser() : $gameConfig.$user.$user1;
             var$2 = $this.$user0.$getName();
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1450)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1452)), var$2);
             console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
-            $this.$window = cmbp_Window__init_0($this, null, $gameConfig.$display, $rt_s(1451));
+            $this.$window = cmbp_Window__init_0($this, null, $gameConfig.$display, $rt_s(1453));
             var$4 = $this.$window.$getWidth();
             var$5 = $this.$window.$getHeight();
             var$2 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1452)), var$4), 120), var$5);
+            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1454)), var$4), 120), var$5);
             console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
             $this.$window.$setGuiScale($this.$window.$calculateScale(2147483647, 0));
             var$4 = $this.$window.$getGuiScale();
@@ -38880,7 +38961,7 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
             var$5 = var$2.$getGuiScaledWidth();
             var$6 = $this.$window.$getGuiScaledHeight();
             var$2 = jl_StringBuilder__init_();
-            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1453)), var$4), $rt_s(1454)), var$5), 120), var$6);
+            jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$2, $rt_s(1455)), var$4), $rt_s(1456)), var$5), 120), var$6);
             var$2 = jl_StringBuilder_toString(var$2);
             console.log($rt_ustr(var$2));
             $this.$options7 = nmc_Options__init_0($this, ji_File__init_($rt_s(1114)));
@@ -38921,7 +39002,7 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
     }
     var$2 = $t.$getMessage();
     var$3 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1455)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1457)), var$2);
     console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
     $stack = $t.$getStackTrace();
     $i = 0;
@@ -38935,7 +39016,7 @@ nmc_Minecraft__init_ = ($this, $gameConfig) => {
         console.error($rt_ustr(jl_StringBuilder_toString(var$3)));
         $i = $i + 1 | 0;
     }
-    $rt_throw(jl_RuntimeException__init_3($rt_s(1456), $t));
+    $rt_throw(jl_RuntimeException__init_3($rt_s(1458), $t));
 },
 nmc_Minecraft__init_0 = var_0 => {
     let var_1 = new nmc_Minecraft();
@@ -39005,7 +39086,7 @@ nmc_Minecraft_tick = $this => {
                         if (!(var$5 instanceof jl_String))
                             break d;
                         var$2 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1457)), var$5);
+                        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1459)), var$5);
                         console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
                         $dead = $this.$connection0;
                         nmc_Minecraft_leaveWorldQuietly($this);
@@ -39138,7 +39219,7 @@ nmc_Minecraft_tick = $this => {
         }
         var$2 = $t.$getMessage();
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1458)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$5, $rt_s(1460)), var$2);
         console.warn($rt_ustr(jl_StringBuilder_toString(var$5)));
     }
 },
@@ -39159,7 +39240,7 @@ nmc_Minecraft_render = ($this, $renderLevel) => {
                 $t = $$je;
                 var$2 = $t.$getMessage();
                 var$6 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1459)), var$2);
+                jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1461)), var$2);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
                 break a;
             } else {
@@ -39199,7 +39280,7 @@ nmc_Minecraft_syncCanvasSize = $this => {
                 return;
         }
         var$4 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1460)), $drawableW), 120), $drawableH), $rt_s(1461)), $newScale), $rt_s(1462));
+        jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1462)), $drawableW), 120), $drawableH), $rt_s(1463)), $newScale), $rt_s(1464));
         console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         $this.$resizeDisplay();
         return;
@@ -39272,14 +39353,14 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
         return;
     }
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1463)), $levelName);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1465)), $levelName);
     console.log($rt_ustr(jl_StringBuilder_toString(var$2)));
     a: {
         try {
             $clientLevel = nmcm_ClientLevel__init_1($levelName, $rt_s(467));
             $this.$setLevel($clientLevel);
             var$4 = nmc_Minecraft_worldGameModeName($levelName);
-            $creative = jl_String_equals($rt_s(1438), var$4);
+            $creative = jl_String_equals($rt_s(1440), var$4);
             $this.$player = nmcp_LocalPlayer__init_0($this, $creative);
             var$2 = $this.$player;
             var$6 = $clientLevel.$getSpawnX();
@@ -39296,7 +39377,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
             var$7 = $this.$player.$y0;
             var$8 = $this.$player.$z;
             var$4 = jl_StringBuilder__init_();
-            jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1464)), var$2), $rt_s(1465)), var$6), 32), var$7), 32), var$8), 41);
+            jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append1(jl_StringBuilder_append4(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1466)), var$2), $rt_s(1467)), var$6), 32), var$7), 32), var$8), 41);
             console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -39311,7 +39392,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
     }
     var$2 = $t.$getMessage();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1466)), var$2);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$4, $rt_s(1468)), var$2);
     console.error($rt_ustr(jl_StringBuilder_toString(var$4)));
     $stack = $t.$getStackTrace();
     $i = 0;
@@ -39325,7 +39406,7 @@ nmc_Minecraft_doWorldLoad = ($this, $levelName) => {
         console.error($rt_ustr(jl_StringBuilder_toString(var$4)));
         $i = $i + 1 | 0;
     }
-    $rt_throw(jl_RuntimeException__init_3($rt_s(1467), $t));
+    $rt_throw(jl_RuntimeException__init_3($rt_s(1469), $t));
 },
 nmc_Minecraft_setLevel = ($this, $clientLevel) => {
     $this.$level = $clientLevel;
@@ -39337,7 +39418,7 @@ nmc_Minecraft_doMultiplayerJoin = ($this, $connection, $serverAddress, $entityId
         return;
     }
     var$13 = jl_StringBuilder__init_();
-    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(1468)), $serverAddress), $rt_s(1469)), $entityId), $rt_s(1470)), $gameMode), 41);
+    jl_StringBuilder_append1(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$13, $rt_s(1470)), $serverAddress), $rt_s(1471)), $entityId), $rt_s(1472)), $gameMode), 41);
     console.log($rt_ustr(jl_StringBuilder_toString(var$13)));
     $this.$connection0 = $connection;
     $clientLevel = nmcm_ClientLevel_createRemote($serverAddress);
@@ -39354,7 +39435,7 @@ nmc_Minecraft_doMultiplayerJoin = ($this, $connection, $serverAddress, $entityId
     $this.$setScreen(null);
     var$13 = jl_String_valueOf2($clientLevel);
     var$16 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$16, $rt_s(1471)), var$13);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$16, $rt_s(1473)), var$13);
     console.log($rt_ustr(jl_StringBuilder_toString(var$16)));
 },
 nmc_Minecraft_isMultiplayer = $this => {
@@ -39937,7 +40018,7 @@ jur_Lexer_movePointer = $this => {
                                         if ($nonCap > 57)
                                             break a;
                                         if ($nameBuilder === null) {
-                                            var$8 = jur_PatternSyntaxException__init_($rt_s(1472), $this.$toString(), $this.$index0);
+                                            var$8 = jur_PatternSyntaxException__init_($rt_s(1474), $this.$toString(), $this.$index0);
                                             $rt_throw(var$8);
                                         }
                                         $nameBuilder.$append0($nonCap);
@@ -40028,7 +40109,7 @@ jur_Lexer_parseCharClassName = $this => {
         if ($this.$pattern0.data[$this.$index0] != 123) {
             var$2 = jl_String__init_0($this.$pattern0, jur_Lexer_nextIndex($this), 1);
             var$3 = jl_StringBuilder__init_();
-            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1473)), var$2);
+            jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1475)), var$2);
             return jl_StringBuilder_toString(var$3);
         }
         jur_Lexer_nextIndex($this);
@@ -40049,15 +40130,15 @@ jur_Lexer_parseCharClassName = $this => {
     $res = $sb.$toString();
     if (jl_String_length($res) == 1) {
         var$2 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1473)), $res);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1475)), $res);
         return jl_StringBuilder_toString(var$2);
     }
     b: {
         c: {
             if (jl_String_length($res) > 3) {
-                if (jl_String_startsWith($res, $rt_s(1473)))
+                if (jl_String_startsWith($res, $rt_s(1475)))
                     break c;
-                if (jl_String_startsWith($res, $rt_s(1474)))
+                if (jl_String_startsWith($res, $rt_s(1476)))
                     break c;
             }
             break b;
@@ -40383,7 +40464,7 @@ function nmcgs_PauseScreen() {
 }
 let nmcgs_PauseScreen__init_ = ($this, $showPauseMenu) => {
     nmcgs_Screen__init_($this);
-    $this.$title = !$showPauseMenu ? $rt_s(1475) : $rt_s(1476);
+    $this.$title = !$showPauseMenu ? $rt_s(1477) : $rt_s(1478);
 },
 nmcgs_PauseScreen__init_0 = var_0 => {
     let var_1 = new nmcgs_PauseScreen();
@@ -40400,32 +40481,32 @@ nmcgs_PauseScreen_init = $this => {
     $colR = ($colL + 98 | 0) + 4 | 0;
     var$7 = new nmcgc_Button;
     var$8 = $gy + 50 | 0;
-    nmcgc_Button__init_0(var$7, $colL, var$8, 204, 20, $rt_s(1477), nmcgs_PauseScreen$init$lambda$_1_0__init_0($this));
+    nmcgc_Button__init_0(var$7, $colL, var$8, 204, 20, $rt_s(1479), nmcgs_PauseScreen$init$lambda$_1_0__init_0($this));
     $this.$addRenderableWidget(var$7);
     $advancements = new nmcgc_Button;
     var$10 = var$8 + 24 | 0;
-    nmcgc_Button__init_0($advancements, $colL, var$10, 98, 20, $rt_s(1478), nmcgs_PauseScreen$init$lambda$_1_1__init_0());
+    nmcgc_Button__init_0($advancements, $colL, var$10, 98, 20, $rt_s(1480), nmcgs_PauseScreen$init$lambda$_1_1__init_0());
     $advancements.$setActive(0);
     $this.$addRenderableWidget($advancements);
-    $stats = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1479), nmcgs_PauseScreen$init$lambda$_1_2__init_0());
+    $stats = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1481), nmcgs_PauseScreen$init$lambda$_1_2__init_0());
     $stats.$setActive(0);
     $this.$addRenderableWidget($stats);
     var$12 = new nmcgc_Button;
     var$10 = var$8 + 48 | 0;
-    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(1480), nmcgs_PauseScreen$init$lambda$_1_3__init_0());
+    nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(1482), nmcgs_PauseScreen$init$lambda$_1_3__init_0());
     $this.$addRenderableWidget(var$12);
-    $this.$addRenderableWidget(nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1481), nmcgs_PauseScreen$init$lambda$_1_4__init_0()));
+    $this.$addRenderableWidget(nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1483), nmcgs_PauseScreen$init$lambda$_1_4__init_0()));
     var$12 = new nmcgc_Button;
     var$10 = var$8 + 72 | 0;
     nmcgc_Button__init_0(var$12, $colL, var$10, 98, 20, $rt_s(487), nmcgs_PauseScreen$init$lambda$_1_5__init_0($this));
     $this.$addRenderableWidget(var$12);
-    $openToLan = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1482), nmcgs_PauseScreen$init$lambda$_1_6__init_0());
+    $openToLan = nmcgc_Button__init_($colR, var$10, 98, 20, $rt_s(1484), nmcgs_PauseScreen$init$lambda$_1_6__init_0());
     $openToLan.$setActive(0);
     $this.$addRenderableWidget($openToLan);
     $remote = $this.$minecraft !== null && $this.$minecraft.$isMultiplayer() ? 1 : 0;
     var$12 = new nmcgc_Button;
     var$10 = var$8 + 96 | 0;
-    nmcgc_Button__init_0(var$12, $colL, var$10, 204, 20, !$remote ? $rt_s(1483) : $rt_s(1484), nmcgs_PauseScreen$init$lambda$_1_7__init_0($this, $remote));
+    nmcgc_Button__init_0(var$12, $colL, var$10, 204, 20, !$remote ? $rt_s(1485) : $rt_s(1486), nmcgs_PauseScreen$init$lambda$_1_7__init_0($this, $remote));
     $this.$addRenderableWidget(var$12);
 },
 nmcgs_PauseScreen_render = ($this, $poseStack, $mouseX, $mouseY, $partialTick) => {
@@ -40446,7 +40527,7 @@ nmcgs_PauseScreen_isPauseScreen = $this => {
     return 1;
 },
 nmcgs_PauseScreen_lambda$init$7 = ($this, $remote, $button) => {
-    console.log($rt_ustr(!$remote ? $rt_s(1485) : $rt_s(1486)));
+    console.log($rt_ustr(!$remote ? $rt_s(1487) : $rt_s(1488)));
     if ($this.$minecraft !== null)
         $this.$minecraft.$disconnect0();
 },
@@ -40464,10 +40545,10 @@ nmcgs_PauseScreen_lambda$init$5 = ($this, $button) => {
     }
 },
 nmcgs_PauseScreen_lambda$init$4 = $button => {
-    nlevi_PlatformInput_openURL($rt_s(1487), $rt_s(1310));
+    nlevi_PlatformInput_openURL($rt_s(1489), $rt_s(1312));
 },
 nmcgs_PauseScreen_lambda$init$3 = $button => {
-    nlevi_PlatformInput_openURL($rt_s(1488), $rt_s(1310));
+    nlevi_PlatformInput_openURL($rt_s(1490), $rt_s(1312));
 },
 nmcgs_PauseScreen_lambda$init$2 = $button => {
     return;
@@ -40490,7 +40571,7 @@ function ju_IllegalFormatFlagsException() {
 let ju_IllegalFormatFlagsException__init_0 = ($this, $flags) => {
     let var$2;
     var$2 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1489)), $flags);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$2, $rt_s(1491)), $flags);
     ju_IllegalFormatException__init_($this, jl_StringBuilder_toString(var$2));
     $this.$flags5 = $flags;
 },
@@ -40542,7 +40623,7 @@ nmcgs_SelectWorldScreen$WorldEntryWidget_render = ($this, $poseStack, $mouseX, $
     nleva_EaglerGuiImpl_drawText(jl_StringBuilder_toString(var$13), var$11, ($this.$y + 2 | 0) + 12 | 0, (-8355712), 1);
     var$10 = $this.$summary.$version0;
     var$12 = jl_StringBuilder__init_();
-    jl_StringBuilder_append(jl_StringBuilder_append(var$12, $rt_s(1490)), var$10);
+    jl_StringBuilder_append(jl_StringBuilder_append(var$12, $rt_s(1492)), var$10);
     nleva_EaglerGuiImpl_drawText(jl_StringBuilder_toString(var$12), var$11, ($this.$y + 2 | 0) + 21 | 0, (-8355712), 1);
 },
 nmcgs_SelectWorldScreen$WorldEntryWidget_onClick = $this => {
@@ -40559,7 +40640,7 @@ nmcgs_SelectWorldScreen$WorldEntryWidget_onClick = $this => {
         $this.$this$0.$selectedEntry = $this;
         var$2 = $this.$summary.$name0;
         var$3 = jl_StringBuilder__init_();
-        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1491)), var$2);
+        jl_StringBuilder_append(jl_StringBuilder_append(var$3, $rt_s(1493)), var$2);
         console.log($rt_ustr(jl_StringBuilder_toString(var$3)));
     }
     nmcgs_SelectWorldScreen_updateButtonStatus($this.$this$0);
@@ -40768,7 +40849,7 @@ nmn_PacketBuffer_readVarInt = $this => {
     $shift = 0;
     while (true) {
         if ($this.$readPos >= $this.$writePos)
-            $rt_throw(nmn_PacketBuffer$PacketDecoderException__init_0($rt_s(1492)));
+            $rt_throw(nmn_PacketBuffer$PacketDecoderException__init_0($rt_s(1494)));
         var$3 = $this.$data0.data;
         var$4 = $this.$readPos;
         $this.$readPos = var$4 + 1 | 0;
@@ -40778,7 +40859,7 @@ nmn_PacketBuffer_readVarInt = $this => {
             break;
         $shift = $shift + 7 | 0;
         if ($shift >= 32)
-            $rt_throw(nmn_PacketBuffer$PacketDecoderException__init_0($rt_s(1493)));
+            $rt_throw(nmn_PacketBuffer$PacketDecoderException__init_0($rt_s(1495)));
     }
     return $value;
 },
@@ -40920,7 +41001,7 @@ nmn_PacketBuffer_writeUtf = ($this, $s) => {
         var$3 = new jl_IllegalArgumentException;
         var$4 = jl_String_length($s);
         var$5 = jl_StringBuilder__init_();
-        jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1494)), var$4);
+        jl_StringBuilder_append0(jl_StringBuilder_append(var$5, $rt_s(1496)), var$4);
         jl_IllegalArgumentException__init_(var$3, jl_StringBuilder_toString(var$5));
         $rt_throw(var$3);
     }
@@ -40938,7 +41019,7 @@ nmn_PacketBuffer_readUtf = $this => {
     }
     var$3 = new nmn_PacketBuffer$PacketDecoderException;
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1495)), $len);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1497)), $len);
     nmn_PacketBuffer$PacketDecoderException__init_(var$3, jl_StringBuilder_toString(var$4));
     $rt_throw(var$3);
 },
@@ -40960,7 +41041,7 @@ nmn_PacketBuffer_readBytes = ($this, $len) => {
     }
     var$3 = new nmn_PacketBuffer$PacketDecoderException;
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1496)), $len);
+    jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1498)), $len);
     nmn_PacketBuffer$PacketDecoderException__init_(var$3, jl_StringBuilder_toString(var$4));
     $rt_throw(var$3);
 },
@@ -41045,7 +41126,7 @@ nmn_PacketBuffer_need = ($this, $n) => {
     var$2 = new nmn_PacketBuffer$PacketDecoderException;
     var$3 = $this.$readableBytes();
     var$4 = jl_StringBuilder__init_();
-    jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1497)), $n), $rt_s(1498)), var$3);
+    jl_StringBuilder_append0(jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1499)), $n), $rt_s(1500)), var$3);
     nmn_PacketBuffer$PacketDecoderException__init_(var$2, jl_StringBuilder_toString(var$4));
     $rt_throw(var$2);
 };
@@ -41398,7 +41479,7 @@ nmcgsm_EditServerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 
 nmcgsm_EditServerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_89", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1_onPress)],
 jur_FSet$PossessiveFSet, "FSet$PossessiveFSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_FSet$PossessiveFSet__init_), "$matches", $rt_wrapFunction3(jur_FSet$PossessiveFSet_matches), "$getName", $rt_wrapFunction0(jur_FSet$PossessiveFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_FSet$PossessiveFSet_hasConsumed)],
 jur_PosCompositeGroupQuantifierSet, "PosCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_54", function(var_1, var_2, var_3, var_4, var_5) { jur_PosCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_PosCompositeGroupQuantifierSet_matches)],
-nmwlb_Blocks$Block, "Blocks$Block", 15, jl_Object, [], 17, 0, 0, ["$_init_72", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor)],
+nmwlb_Blocks$Block, "Blocks$Block", 15, jl_Object, [], 17, 0, 0, ["$_init_72", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor), "$tintForTexture", $rt_wrapFunction1(nmwlb_Blocks$Block_tintForTexture)],
 jt_DecimalFormat$TextField, "DecimalFormat$TextField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_", $rt_wrapFunction1(jt_DecimalFormat$TextField__init_0), "$render0", $rt_wrapFunction2(jt_DecimalFormat$TextField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$TextField_equals)],
 nmcgso_OptionsScreen, "OptionsScreen", 20, nmcgs_Screen, [], 1, 0, () => nmcgso_OptionsScreen_$callClinit(), ["$_init_57", $rt_wrapFunction3(nmcgso_OptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_OptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_OptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_OptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_OptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_OptionsScreen_isPauseScreen)],
 nmcm_ServerList, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcm_ServerList__init_), "$load", $rt_wrapFunction0(nmcm_ServerList_load), "$save", $rt_wrapFunction0(nmcm_ServerList_save), "$size", $rt_wrapFunction0(nmcm_ServerList_size), "$get3", $rt_wrapFunction1(nmcm_ServerList_get), "$add5", $rt_wrapFunction1(nmcm_ServerList_add), "$remove3", $rt_wrapFunction1(nmcm_ServerList_remove), "$replace1", $rt_wrapFunction2(nmcm_ServerList_replace)],
@@ -41840,15 +41921,15 @@ $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expec
 "options.toggleSprint", "options.toggleAttack", "options.toggleUse", "options.autoJump", "options.sprintWindow", "options.showSubtitles", "options.directionalAudio", "[Options] Failed to load: ", "options.recordVolume", "options.weatherVolume", "options.blockVolume", "options.hostileVolume", "options.neutralVolume", "options.playerVolume", "options.voiceVolume", "[Options] Failed to save: ", "%08x-0000-3000-8000-%012x", "[EaglerCraft] Already initialized or in progress (state=", "[EaglerCraft] ", "EaglerCraft initialization failed!\n\n",
 "  at ", "[EaglerCraft] Rendering pipeline configured (viewport: ", "[EaglerCraft] WebGL2 Version: ", "[EaglerCraft] GL Vendor: ", "[EaglerCraft] GL Renderer: ", "[EaglerCraft] Applying audio settings: master=", ", music=", ", sfx=", "/eaglercraft", "/eaglercraft/resourcepacks", "/eaglercraft/assets", "26.1.2", "EaglerCraftX", "[EaglerCraft] Constructing Minecraft(", ")...", "[EaglerCraft] MC constructor failed, using stub: ", "[EaglerCraft] Minecraft init failed: ", "[EaglerCraft] JS stack: ", "[EaglerCraft] Caused by: ",
 "[EaglerCraft] MC tick error: ", "[EaglerCraft] telemetry push failed: ", "EaglerCraftX/26.1.2", "Protocol 775", "none", "in-game", "{\"creative\":", ",\"edits\":", ",\"spawn\":[", ",\"player\":{\"x\":", ",\"y\":", ",\"z\":", ",\"yaw\":", ",\"pitch\":", ",\"onGround\":", ",\"flying\":", ",\"crouching\":", ",\"hotbar\":{\"selected\":", ",\"slots\":[", ",\"main\":[", ",\"carried\":[", ",\"carried\":null", ",\"craft\":{\"w\":", ",\"grid\":[", "],\"result\":", ",\"hit\":{\"x\":", ",\"face\":\"", ",\"hit\":null",
-",\"destroy\":null", ",\"destroy\":{\"stage\":", ",\"x\":", ",\"dayTime\":", ",\"sky\":{\"dayTime\":", ",\"skyColor\":", ",\"fogColor\":", ",\"sunAngle\":", ",\"starBrightness\":", ",\"moonPhase\":", ",\"skyLight\":", "[EaglerCraft] setDayTime(", ") via telemetry bridge", "[", ",", "{\"id\":\"", "\"", ",\"label\":\"", ",\"active\":", ",\"w\":", ",\"h\":", "}", "]", "stick", "Stick", "wooden_pickaxe", "Wooden Pickaxe", "wooden_axe", "Wooden Axe", "wooden_shovel", "Wooden Shovel", "wooden_sword", "Wooden Sword",
-"wooden_hoe", "Wooden Hoe", "stone_pickaxe", "Stone Pickaxe", "stone_axe", "Stone Axe", "stone_shovel", "Stone Shovel", "stone_sword", "Stone Sword", "stone_hoe", "Stone Hoe", "iron_ingot", "Iron Ingot", "iron_pickaxe", "Iron Pickaxe", "iron_axe", "Iron Axe", "iron_shovel", "Iron Shovel", "iron_sword", "Iron Sword", "iron_hoe", "Iron Hoe", "en", "CA", "fr", "zh", "CN", "FR", "de", "DE", "it", "IT", "ja", "JP", "ko", "KR", "TW", "GB", "US", "EOI", "object", "function", "string", "number", "undefined", "^", "Edit",
-"Delete", "Refresh", "\" will be lost forever! (A long time!)", "Are you sure you want to delete this server?", "Play Multiplayer", "No servers added - use \"Add Server\" below", "Can\'t format argument of ", " using ", " conversion", "PreviousMatch", "NonCapFSet", "Either src or dest is null", "DotAll", "Reset All...", "Attack", "Use", "Pick Block", "Gameplay", "Interface", "Creative Mode", "Miscellaneous", "Movement", "Walk Forwards", "Strafe Left", "Walk Backwards", "Strafe Right", "Jump", "Sneak", "Sprint",
-"Open/Close Inventory", "Drop Selected Item", "Hotbar Slot 1", "Hotbar Slot 2", "Hotbar Slot 3", "Hotbar Slot 4", "Hotbar Slot 5", "Hotbar Slot 6", "Hotbar Slot 7", "Hotbar Slot 8", "Hotbar Slot 9", "Chat", "Player List", "Take Screenshot", "Toggle Perspective", "Toggle Fullscreen", "Button 1", "Button 2", "Button 3", "Key Binds", "> ??? <", "Duplicate format flags: ", "decomposed Hangul syllable:", "[CraftingTableScreen] craft cell ", "[CraftingTableScreen] result ", "[CraftingTableScreen] closed with key ",
-"Missing format with for specifier ", "[ClientMain] Canvas created. WebGL2: ", "WebGL2 is not supported by your browser!\n\nEaglerCraft 26.1.2 requires WebGL2.\nPlease use a modern browser (Chrome 56+, Firefox 51+, Edge 79+, Safari 15+).", "[ClientMain] CRASH: ", "Failed to initialize EaglerCraft 26.1.2!\n\n", "game_frame", "assets.epk", "[ClientMain] Asset bundle load could not start: ", "[ClientMain] Asset bundle: ", " / ", " MiB", "[ClientMain] Asset bundle ready: ", "power of ten too big", "WordBoundary",
-"Canvas is null during PlatformInput init!", "F12", "KeyR", "KeyI", "KeyJ", "KeyC", "_blank", "[PlatformInput] Gamepad disconnected: index=", "[PlatformInput] Gamepad connected: index=", "unselected_", "selected_", "container/creative_inventory/tab_top_", "[CreativeScreen] tab -> ", "[CreativeScreen] closed with key ", "Building Blocks", "Colored Blocks", "Natural Blocks", "Menu Background Blurriness: ", "menubackgroundblurriness", "[PlatformWebService] Rendering:  ", "[PlatformWebService] Runtime:     ", "[PlatformWebService] Audio:       ",
-"[PlatformWebService] Networking:  ", "[PlatformWebService] Input:       ", "[PlatformWebService] Application: ", "[PlatformWebService] Filesystem:  ", "Play Selected World", "Create New World", "Re-Create", "[SelectWorldScreen] Delete pressed -> world \'", "[SelectWorldScreen] Play pressed -> loading world \'", "Select World", "Search...", "Sprint Window: ", " Ticks", "sprintwindow", "Normal", "Quake Pro", "FOV: ", "fovslider", "%", "(", "+", "+ ", "0-", "0x", "--#+ 0,(<", "Invert Mouse Y", "Discrete Scrolling: OFF",
-"Scrolling Smoothness: OFF", "Raw Input: ON", "Mouse Settings", "<SOL>", "servername", "WebGL2 context is null during PlatformOpenGL init!", "[PlatformOpenGL] WebGL2 initialized: ", "[PlatformOpenGL] Vendor: ", ", Renderer: ", "serveraddress", "UP", "DOWN", "CEILING", "FLOOR", "HALF_UP", "HALF_DOWN", "HALF_EVEN", "UNNECESSARY", " cannot be negative but was: ", "Mouse Settings...", "Key Binds...", "Hold", "Toggle", "Toggle Crouch", "Toggle Sprint", "Toggle Attack", "Toggle Use", "Auto-Jump", "Operator Items Tab",
-"Controls", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;out float v_sph;out float v_cyl;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_sph = length(a_pos);  v_cyl = max(length(a_pos.xz), abs(a_pos.y));}", "#version 300 es\nprecision highp float;in float v_sph;in float v_cyl;uniform vec3 u_color;uniform vec3 u_fogColor;out vec4 fragColor;float lin(float d, float s, float e) {  return d <= s ? 0.0 : (d >= e ? 1.0 : (d - s) / (e - s));}void main() {  float fog = max(lin(v_sph, 0.0, 512.0), v_cyl >= 512.0 ? 1.0 : 0.0);  fragColor = vec4(mix(u_color, u_fogColor, fog), 1.0);}",
+",\"destroy\":null", ",\"destroy\":{\"stage\":", ",\"x\":", ",\"dayTime\":", ",\"sky\":{\"dayTime\":", ",\"skyColor\":", ",\"fogColor\":", ",\"sunAngle\":", ",\"starBrightness\":", ",\"moonPhase\":", ",\"skyLight\":", "[EaglerCraft] setDayTime(", ") via telemetry bridge", "[EaglerCraft] setScene: applied ", " block(s) via telemetry bridge", "[", ",", "{\"id\":\"", "\"", ",\"label\":\"", ",\"active\":", ",\"w\":", ",\"h\":", "}", "]", "stick", "Stick", "wooden_pickaxe", "Wooden Pickaxe", "wooden_axe", "Wooden Axe",
+"wooden_shovel", "Wooden Shovel", "wooden_sword", "Wooden Sword", "wooden_hoe", "Wooden Hoe", "stone_pickaxe", "Stone Pickaxe", "stone_axe", "Stone Axe", "stone_shovel", "Stone Shovel", "stone_sword", "Stone Sword", "stone_hoe", "Stone Hoe", "iron_ingot", "Iron Ingot", "iron_pickaxe", "Iron Pickaxe", "iron_axe", "Iron Axe", "iron_shovel", "Iron Shovel", "iron_sword", "Iron Sword", "iron_hoe", "Iron Hoe", "en", "CA", "fr", "zh", "CN", "FR", "de", "DE", "it", "IT", "ja", "JP", "ko", "KR", "TW", "GB", "US", "EOI",
+"object", "function", "string", "number", "undefined", "^", "Edit", "Delete", "Refresh", "\" will be lost forever! (A long time!)", "Are you sure you want to delete this server?", "Play Multiplayer", "No servers added - use \"Add Server\" below", "Can\'t format argument of ", " using ", " conversion", "PreviousMatch", "NonCapFSet", "Either src or dest is null", "DotAll", "Reset All...", "Attack", "Use", "Pick Block", "Gameplay", "Interface", "Creative Mode", "Miscellaneous", "Movement", "Walk Forwards", "Strafe Left",
+"Walk Backwards", "Strafe Right", "Jump", "Sneak", "Sprint", "Open/Close Inventory", "Drop Selected Item", "Hotbar Slot 1", "Hotbar Slot 2", "Hotbar Slot 3", "Hotbar Slot 4", "Hotbar Slot 5", "Hotbar Slot 6", "Hotbar Slot 7", "Hotbar Slot 8", "Hotbar Slot 9", "Chat", "Player List", "Take Screenshot", "Toggle Perspective", "Toggle Fullscreen", "Button 1", "Button 2", "Button 3", "Key Binds", "> ??? <", "Duplicate format flags: ", "decomposed Hangul syllable:", "[CraftingTableScreen] craft cell ", "[CraftingTableScreen] result ",
+"[CraftingTableScreen] closed with key ", "Missing format with for specifier ", "[ClientMain] Canvas created. WebGL2: ", "WebGL2 is not supported by your browser!\n\nEaglerCraft 26.1.2 requires WebGL2.\nPlease use a modern browser (Chrome 56+, Firefox 51+, Edge 79+, Safari 15+).", "[ClientMain] CRASH: ", "Failed to initialize EaglerCraft 26.1.2!\n\n", "game_frame", "assets.epk", "[ClientMain] Asset bundle load could not start: ", "[ClientMain] Asset bundle: ", " / ", " MiB", "[ClientMain] Asset bundle ready: ",
+"power of ten too big", "WordBoundary", "Canvas is null during PlatformInput init!", "F12", "KeyR", "KeyI", "KeyJ", "KeyC", "_blank", "[PlatformInput] Gamepad disconnected: index=", "[PlatformInput] Gamepad connected: index=", "unselected_", "selected_", "container/creative_inventory/tab_top_", "[CreativeScreen] tab -> ", "[CreativeScreen] closed with key ", "Building Blocks", "Colored Blocks", "Natural Blocks", "Menu Background Blurriness: ", "menubackgroundblurriness", "[PlatformWebService] Rendering:  ",
+"[PlatformWebService] Runtime:     ", "[PlatformWebService] Audio:       ", "[PlatformWebService] Networking:  ", "[PlatformWebService] Input:       ", "[PlatformWebService] Application: ", "[PlatformWebService] Filesystem:  ", "Play Selected World", "Create New World", "Re-Create", "[SelectWorldScreen] Delete pressed -> world \'", "[SelectWorldScreen] Play pressed -> loading world \'", "Select World", "Search...", "Sprint Window: ", " Ticks", "sprintwindow", "Normal", "Quake Pro", "FOV: ", "fovslider", "%",
+"(", "+", "+ ", "0-", "0x", "--#+ 0,(<", "Invert Mouse Y", "Discrete Scrolling: OFF", "Scrolling Smoothness: OFF", "Raw Input: ON", "Mouse Settings", "<SOL>", "servername", "WebGL2 context is null during PlatformOpenGL init!", "[PlatformOpenGL] WebGL2 initialized: ", "[PlatformOpenGL] Vendor: ", ", Renderer: ", "serveraddress", "UP", "DOWN", "CEILING", "FLOOR", "HALF_UP", "HALF_DOWN", "HALF_EVEN", "UNNECESSARY", " cannot be negative but was: ", "Mouse Settings...", "Key Binds...", "Hold", "Toggle", "Toggle Crouch",
+"Toggle Sprint", "Toggle Attack", "Toggle Use", "Auto-Jump", "Operator Items Tab", "Controls", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;out float v_sph;out float v_cyl;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_sph = length(a_pos);  v_cyl = max(length(a_pos.xz), abs(a_pos.y));}", "#version 300 es\nprecision highp float;in float v_sph;in float v_cyl;uniform vec3 u_color;uniform vec3 u_fogColor;out vec4 fragColor;float lin(float d, float s, float e) {  return d <= s ? 0.0 : (d >= e ? 1.0 : (d - s) / (e - s));}void main() {  float fog = max(lin(v_sph, 0.0, 512.0), v_cyl >= 512.0 ? 1.0 : 0.0);  fragColor = vec4(mix(u_color, u_fogColor, fog), 1.0);}",
 "sky_disc", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec4 a_color;uniform mat4 u_mvp;out vec4 v_color;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_color = a_color;}", "#version 300 es\nprecision highp float;in vec4 v_color;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = v_color * u_color;}", "sky_tint", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;layout(location=1) in vec2 a_uv;uniform mat4 u_mvp;out vec2 v_uv;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);  v_uv = a_uv;}",
 "#version 300 es\nprecision highp float;in vec2 v_uv;uniform sampler2D u_tex;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = texture(u_tex, v_uv) * u_color;}", "sky_celestial", "#version 300 es\nprecision highp float;layout(location=0) in vec3 a_pos;uniform mat4 u_mvp;void main() {  gl_Position = u_mvp * vec4(a_pos, 1.0);}", "#version 300 es\nprecision highp float;uniform vec4 u_color;out vec4 fragColor;void main() {  fragColor = u_color;}", "sky_stars", "u_color", "u_fogColor", "[SkyRenderer] ",
 " vsh: ", " fsh: ", " link: ", " init failed: ", " star vertices from 1500 seeds", "moon_", "assets/world/environment/moon/", "[SkyRenderer] moon texture \'", "\' failed", "full_moon", "waning_gibbous", "third_quarter", "waning_crescent", "new_moon", "waxing_crescent", "first_quarter", "waxing_gibbous", "World Name", "Game Mode", "Difficulty", "Allow Cheats", "World Type", "Customize", "Leave blank for a random seed", "Game Rules", "Experiments", "Data Packs", "[CreateWorldScreen] Create pressed -> world \'",

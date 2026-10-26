@@ -91,6 +91,24 @@ public final class Blocks {
                         }
                         return (topTint != 0 && topTexture.equals(texture)) ? topTint : 0;
                 }
+
+                /**
+                 * Tint for a texture name, scoped to THIS block's own textures:
+                 * allTint only counts when the block actually uses the texture
+                 * (a leaves block's foliage tint must not claim unrelated
+                 * textures - the atlas bake iterates every block per texture
+                 * name and the first nonzero answer used to win for the whole
+                 * atlas, foliage-tinting stone/planks/dirt/enerything).
+                 */
+                public int tintForTexture(String texture) {
+                        boolean uses = topTexture.equals(texture)
+                                        || sideTexture.equals(texture)
+                                        || bottomTexture.equals(texture);
+                        if (!uses) {
+                                return 0;
+                        }
+                        return tintFor(texture);
+                }
         }
 
         private static final List<Block> REGISTRY = new ArrayList<Block>();

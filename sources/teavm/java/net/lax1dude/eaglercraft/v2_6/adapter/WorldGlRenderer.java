@@ -209,7 +209,7 @@ public final class WorldGlRenderer {
                 m[15] = 0.0f;
         }
 
-        /** View rotation+translation: pitch (X), then yaw (Y), then -eye pos. */
+        /** View rotation+translation: pitch (X), then yaw+180 (Y), then -eye pos. */
         public static void makeView(float[] m, double x, double y, double z, float yawDeg, float pitchDeg) {
                 float yaw = yawDeg * (float) (Math.PI / 180.0f);
                 float pitch = pitchDeg * (float) (Math.PI / 180.0f);
@@ -218,16 +218,24 @@ public final class WorldGlRenderer {
                 float cp = (float) Math.cos(pitch);
                 float sp = (float) Math.sin(pitch);
                 identity(m);
-                // Column-major rotation matrix R = Rx(pitch) * Ry(yaw), then
-                // translate by -eye (the standard FPS view).
-                m[0] = cy;
-                m[2] = sy;
-                m[4] = sp * sy;
+                // Column-major R = Rx(pitch) * Ry(yaw + 180) - exactly vanilla
+                // GameRenderer.renderLevel's poseStack order (XP pitch, then
+                // YP (yaw+180)). The +180 is load-bearing: GL cameras look
+                // down -Z, but MC yaw 0 faces +Z (south); without it the
+                // rendered view runs 180 degrees off the physics/pick
+                // convention at yaw 0 (90 off at yaw 45), which read as
+                // "inverted or half-inverted" movement and camera.
+                // Maps the vanilla look vector (-sy*cp, -sp, cy*cp) to
+                // camera (0, 0, -1).
+                m[0] = -cy;
+                m[1] = -sp * sy;
+                m[2] = cp * sy;
+                m[4] = 0.0f;
                 m[5] = cp;
-                m[6] = -sp * cy;
-                m[8] = -cp * sy;
-                m[9] = sp;
-                m[10] = cp * cy;
+                m[6] = sp;
+                m[8] = -sy;
+                m[9] = sp * cy;
+                m[10] = -cp * cy;
                 m[12] = (float) (-(m[0] * x + m[4] * y + m[8] * z));
                 m[13] = (float) (-(m[1] * x + m[5] * y + m[9] * z));
                 m[14] = (float) (-(m[2] * x + m[6] * y + m[10] * z));

@@ -44,6 +44,10 @@ public class MultiPlayerGameMode {
         private int destroyPosZ;
         private int destroyProgressStart;
         private int gameTicks;
+        /** Vanilla's post-break delay: ticks until the held attack may
+         * start destroying the next block (ServerPlayerGameMode's
+         * gameMode.destroyDelay). */
+        private int destroyDelay;
 
         public MultiPlayerGameMode(Minecraft minecraft) {
                 this.minecraft = minecraft;
@@ -159,6 +163,15 @@ public class MultiPlayerGameMode {
          */
         public void continueDestroyBlock(int x, int y, int z) {
                 if (!isDestroyingBlock) {
+                        // Vanilla: the held attack re-starts destroying on the
+                        // current target once the post-break delay expires -
+                        // without this the held dig stops forever after the
+                        // first break or target-change abort.
+                        if (destroyDelay > 0) {
+                                destroyDelay--;
+                                return;
+                        }
+                        startDestroyBlock(x, y, z);
                         return;
                 }
                 if (x != destroyPos || y != destroyPosY || z != destroyPosZ) {
@@ -190,6 +203,7 @@ public class MultiPlayerGameMode {
                         }
                         this.isDestroyingBlock = false;
                         this.destroyStage = -1;
+                        this.destroyDelay = 5;
                 }
         }
 
@@ -216,6 +230,7 @@ public class MultiPlayerGameMode {
                                         } else {
                                                 destroyBlock(x, y, z);
                                         }
+                                        this.destroyDelay = 5;
                                 } else if (minecraft.getConnection() != null) {
                                         minecraft.getConnection().sendPlayerAction(
                                                         net.minecraft.network.Connection.ACTION_ABORT_DIGGING,

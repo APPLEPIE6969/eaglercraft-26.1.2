@@ -86,13 +86,20 @@ renderState = new PanoramaRenderState(-spin);
 Asset note: the 26.1.2 jar ships **1x1 stub PNGs** in a uniform slate color
 RGB(98,111,113) and a fully transparent `panorama_overlay.png` - with the
 default assets the vanilla 26.1.2 title background is exactly that flat color
-(any texture pack can drop real panorama faces in). Our port serves the
-**official 1.8.9 panorama faces** (256x256, extracted verbatim from the
-piston-meta client jar) at
-`public/assets/gui/sprites/title/background/panorama_{0..5}.png`, so the
-title screen shows the classic slowly rotating scene through the faithful
-cubemap pipeline. Until the faces decode, `PanoramaRenderer` shows the flat
-stub color - bit-identical to vanilla-without-a-pack.
+(any texture pack can drop real panorama faces in). The port first served the
+official 1.8.9 panorama faces (256x256), but a 256x256 face stretched across
+a 1280x800 window reads as blur - the user-visible "the background is still
+blurry" complaint. Since the port now has a working world + sky renderer, the
+shipped faces are **our own 768x768 renders** of the flat world (a ring of
+oak trees around spawn, morning light, `dayTime` 3000), produced by
+`scripts/render_panorama.mjs`: it boots the real client headless, sculpts the
+scene through the telemetry bridge's `setScene`, points the camera at each
+cube face (`FOV 90`, square viewport = the exact cube-face projection) and
+screenshots it into
+`public/assets/gui/sprites/title/background/panorama_{0..5}.png`
+(GL faces `[+X,-X,+Y,-Y,+Z,-Z]` <- `panorama_[1,3,5,4,0,2].png`). Until the
+faces decode, `PanoramaRenderer` shows the flat stub color - bit-identical to
+vanilla-without-a-pack.
 
 The `options.accessibility.panorama_speed` slider (default 1.0) is honored
 as a constant; the options UI does not exist yet.
@@ -497,6 +504,50 @@ at generation time; skips logged in the generated header).
 - Known deviations: no recipe book button on the crafting table screen;
   iron tools ship as recipe data but iron_ingot has no in-world source
   until the furnace milestone; items are not in the creative tabs yet.
+
+## Engine fixes surfaced by the input e2e (Feature 9: `tests/e2e/input.spec.ts`)
+
+Three production bugs the gameplay-facing specs never caught (they aim through
+the `setLook` bridge and assert telemetry, never screen direction):
+
+- **`LocalPlayer.turn` had swapped axes** - vanilla `Entity.turn(x, y)` feeds
+  the HORIZONTAL delta into yaw (mouse right = turn right) and the VERTICAL
+  delta into pitch (mouse down = look down), both positive; the port fed the
+  vertical delta into yaw and the horizontal delta into pitch with an inverted
+  sign. Real mouse look was unusable ("movement and camera rotation inverted
+  or half inverted").
+- **The view matrix was missing vanilla's `+180`** - `WorldGlRenderer.makeView`
+  and `SkyRenderer.camRotation` built `Rx(pitch) * Ry(yaw)`; vanilla
+  GameRenderer poses `Rx(pitch) * Ry(yaw + 180)` (GL cameras look down -Z,
+  MC yaw 0 faces +Z). Without it the rendered view ran 180 degrees off the
+  physics yaw at yaw 0 and 90 degrees off at yaw 45 - pressing W walked
+  sideways or backward depending on the facing ("when you click w you go d").
+- **The world mesh was inside-out since the first build** - `emitFace` wound
+  every quad CW as seen from outside (the FACE_UP quad's cross product points
+  `(0,-1,0)`), so with `CULL_FACE BACK` every top face culled and the render
+  showed the bedrock's BOTTOM faces through the culled grass - the ground was
+  dark mottled gray and everything read as "inside-out". Fixed by reversing
+  the quad index order in `LevelRenderer`.
+
+The input spec locks the contract three ways: WASD displacement must match
+the look vector per axis at two facings, a pointer-lock drag must increase
+yaw rightward and pitch downward, and a known block placed straight down the
+physics look vector must render at screen center (the 180-degree flip puts it
+behind the camera).
+
+Two further atlas bugs fixed alongside (found by intercepting the GL state:
+uniform values, VBO bytes, per-layer FBO readbacks):
+
+- **The biome tint bake was globally contaminated** - `Blocks.Block.tintFor`
+  answers for ANY texture when `allTint != 0`, and the atlas bake's
+  first-nonzero-wins loop let the oak-leaves foliage tint claim every texture
+  name that no earlier block matched: stone, planks, dirt, logs - the whole
+  atlas except the grass top - baked dark green. `tintForTexture` now scopes
+  an allTint claim to the block's own top/side/bottom textures.
+- **The array texture mipmapped across layers** - `NEAREST_MIPMAP_LINEAR`
+  plus `GenerateMipmap` on the 191-layer 2D array sampled wrong-layer content
+  (SwiftShader), compounding the dark-world look. The atlas now uses
+  `NEAREST`/`NEAREST` with no mipmaps (vanilla's mipmap-off default look).
 
 ## Engine fixes surfaced by the crafting e2e
 

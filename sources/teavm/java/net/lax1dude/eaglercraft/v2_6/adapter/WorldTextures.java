@@ -78,19 +78,24 @@ public final class WorldTextures {
                 int[] tints = new int[NAMES.length];
                 for (int i = DESTROY_STAGE_COUNT; i < NAMES.length; i++) {
                         String tex = NAMES[i];
+                        // tintForTexture scopes an allTint claim to the block's
+                        // OWN textures - the plain tintFor lets a leaves block's
+                        // foliage tint answer for every texture name in the
+                        // registry, which foliage-tinted the entire atlas (the
+                        // "dark green world" render bug).
                         for (Blocks.Block b : Blocks.creativeBuilding()) {
-                                tints[i] = b.tintFor(tex);
+                                tints[i] = b.tintForTexture(tex);
                                 if (tints[i] != 0) break;
                         }
                         if (tints[i] == 0) {
                                 for (Blocks.Block b : Blocks.creativeColored()) {
-                                        tints[i] = b.tintFor(tex);
+                                        tints[i] = b.tintForTexture(tex);
                                         if (tints[i] != 0) break;
                                 }
                         }
                         if (tints[i] == 0) {
                                 for (Blocks.Block b : Blocks.creativeNatural()) {
-                                        tints[i] = b.tintFor(tex);
+                                        tints[i] = b.tintForTexture(tex);
                                         if (tints[i] != 0) break;
                                 }
                         }
@@ -244,10 +249,13 @@ public final class WorldTextures {
                                 0, 0, i, 16, 16, 1,
                                 WebGL2RenderingContext.RGBA, WebGL2RenderingContext.UNSIGNED_BYTE, px);
                 }
-                PlatformOpenGL._wglGenerateMipmap(WebGL2RenderingContext.TEXTURE_2D_ARRAY);
+                // NEAREST/NEAREST, no mipmaps: vanilla's mipmap-off default
+                // look, and immune to SwiftShader's 2D-array mipmap sampling
+                // (the generated levels sampled wrong layers, which read as a
+                // dark, wrong-tinted world at every distance).
                 PlatformOpenGL._wglTexParameteri(WebGL2RenderingContext.TEXTURE_2D_ARRAY,
                         WebGL2RenderingContext.TEXTURE_MIN_FILTER,
-                        WebGL2RenderingContext.NEAREST_MIPMAP_LINEAR);
+                        WebGL2RenderingContext.NEAREST);
                 PlatformOpenGL._wglTexParameteri(WebGL2RenderingContext.TEXTURE_2D_ARRAY,
                         WebGL2RenderingContext.TEXTURE_MAG_FILTER, WebGL2RenderingContext.NEAREST);
                 PlatformOpenGL._wglTexParameteri(WebGL2RenderingContext.TEXTURE_2D_ARRAY,

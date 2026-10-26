@@ -142,9 +142,12 @@ public class LocalPlayer {
         public void turn(double xo, double yo) {
                 this.yRotO = this.yRot;
                 this.xRotO = this.xRot;
-                // Vanilla: yRot += yo * 0.15; xRot -= xo * 0.15
-                this.yRot += (float) yo * 0.15F;
-                this.xRot = clampPitch(this.xRot - (float) xo * 0.15F);
+                // Vanilla Entity.turn(x, y): x = HORIZONTAL mouse delta ->
+                // yaw (mouse right = turn right), y = VERTICAL delta ->
+                // pitch (mouse down = look down); both positive, pitch
+                // clamped to +-90.
+                this.yRot += (float) xo * 0.15F;
+                this.xRot = clampPitch(this.xRot + (float) yo * 0.15F);
         }
 
         public double getEyeY() {

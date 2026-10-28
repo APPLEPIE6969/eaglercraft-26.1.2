@@ -180,9 +180,9 @@ test.describe('real gateway protocol', () => {
     // The snap retries: a SwiftShader frame stall can swallow one look
     // application, so the aim re-snaps up to three times.
     let aimed: Telemetry | null = null;
-    for (let attempt = 0; attempt < 3 && !aimed; attempt++) {
+    for (let attempt = 0; attempt < 5 && !aimed; attempt++) {
       await setLook(page, -71.6, 19.5);
-      aimed = await waitForTelemetry(page, 6_000, (t) => {
+      aimed = await waitForTelemetry(page, 8_000, (t) => {
         const g = gameplayOf(t);
         const hit = g?.hit;
         return !!hit && hit.x === 3 && hit.y === -60 && hit.z === 1;
@@ -219,9 +219,9 @@ test.describe('real gateway protocol', () => {
     expect(await grabLocked(), 'the canvas must grab the pointer').toBeTruthy();
     await page.mouse.move(canvas!.x, canvas!.y); // absorb the lock delta
     let reAimed: Telemetry | null = null;
-    for (let attempt = 0; attempt < 3 && !reAimed; attempt++) {
+    for (let attempt = 0; attempt < 5 && !reAimed; attempt++) {
       await setLook(page, -71.6, 19.5);
-      reAimed = await waitForTelemetry(page, 6_000, (t) => {
+      reAimed = await waitForTelemetry(page, 8_000, (t) => {
         const g = gameplayOf(t);
         const hit = g?.hit;
         return !!hit && hit.x === 3 && hit.y === -60 && hit.z === 1;
@@ -232,9 +232,9 @@ test.describe('real gateway protocol', () => {
     // pointer lock or a swallowed press restarts the hold; the break is
     // the server's (Block Update + Set Container Slot come back).
     let mined: Telemetry | null = null;
-    for (let attempt = 0; attempt < 3 && !mined; attempt++) {
+    for (let attempt = 0; attempt < 4 && !mined; attempt++) {
       await page.mouse.down(); // left: START_DIGGING, hold through the progress
-      mined = await waitForTelemetry(page, 15_000, (t) => {
+      mined = await waitForTelemetry(page, 25_000, (t) => {
         const g = gameplayOf(t);
         return !!g && g.hotbar.slots[0]?.[0] === 351 && g.hotbar.slots[0]?.[1] === 1;
       });

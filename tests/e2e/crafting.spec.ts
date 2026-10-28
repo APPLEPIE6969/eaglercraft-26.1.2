@@ -438,8 +438,8 @@ test.describe('crafting (Feature 8)', () => {
 
     // ── Aim at the grass one block ahead (before grabbing — setLook after
     // the grab would be dragged by the move-to-center delta) ──
-    // pitch 58° from eye height hits the ground block at (0,-61,1); its
-    // neighbor (0,-60,1) is free of the player box, unlike straight down
+    // pitch 58° from eye height hits the pad's grass block at (0,-50,1);
+    // the table then places on top of it at (0,-49,1)
     const canvas = await page.evaluate(() => {
       const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null;
       const c = byId ?? (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[]).find((k) => k.clientWidth > 0);
@@ -465,11 +465,11 @@ test.describe('crafting (Feature 8)', () => {
     // SwiftShader stall that can outlast any fixed wait, so poll for it
     await waitForTelemetry(page, 8_000, (t) => gameplayOf(t).hotbar.selected === 1);
     await page.mouse.click(canvas!.x, canvas!.y, { button: 'right' });
-    expect(await waitForCellBlock(page, 10_000, 0, -60, 1, CRAFTING_TABLE),
-      `right-click must place the table at (0,-60,1) (state: ${
+    expect(await waitForCellBlock(page, 10_000, 0, -49, 1, CRAFTING_TABLE),
+      `right-click must place the table at (0,-49,1) (state: ${
         JSON.stringify(gameplayOf((await readGameTelemetry(page))!))})`).toBeTruthy();
 
-    // ── Re-aim at the table's top face (eye->(0.5,-59,1.5) ≈ 32° down) ──
+    // ── Re-aim at the table's top face (eye->(0.5,-48,1.5) ≈ 32° down) ──
     await setLook(page, 0, 32);
     await waitForTelemetry(page, 10_000, (t) => {
       const gp = t.gameplay as Gameplay | null | undefined;
@@ -577,8 +577,8 @@ test.describe('crafting (Feature 8)', () => {
     await selectHotbarSlot(page, 1);
     await waitForTelemetry(page, 8_000, (t) => gameplayOf(t).hotbar.selected === 1);
     await page.mouse.click(canvas!.x, canvas!.y, { button: 'right' });
-    expect(await waitForCellBlock(page, 10_000, 0, -60, 1, CRAFTING_TABLE),
-      `the condensed table placement must work at (0,-60,1) (state: ${
+    expect(await waitForCellBlock(page, 10_000, 0, -49, 1, CRAFTING_TABLE),
+      `the condensed table placement must work at (0,-49,1) (state: ${
         JSON.stringify(gameplayOf((await readGameTelemetry(page))!))})`).toBeTruthy();
     await setLook(page, 0, 32);
     await waitForTelemetry(page, 10_000, (t) =>

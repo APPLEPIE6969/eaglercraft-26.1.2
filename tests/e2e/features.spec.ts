@@ -147,16 +147,16 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       `the player must spawn centered (got: ${JSON.stringify(gp.player)})`,
     ).toBe(true);
     expect(gp.player.onGround, 'the player must spawn on the ground').toBe(true);
-    expect(gp.spawn, 'the spawn point must be the flat preset surface').toEqual([0.5, -60, 0.5]);
+    expect(gp.spawn, 'the spawn point must be the spawn pad surface').toEqual([0.5, -49, 0.5]);
     expect(gp.hotbar.slots, 'the hotbar must have nine slots').toHaveLength(9);
     expect(gp.hotbar.selected, 'hotbar selection starts at slot 0').toBe(0);
 
-    // ── The flat preset layers, verified through queryBlock ──
+    // ── The generated terrain stack, verified through queryBlock ──
     expect(await queryBlock(page, 0, -64, 0), 'bedrock at the world floor').toBe(33);
-    expect(await queryBlock(page, 0, -63, 0), 'dirt layer 1').toBe(10);
-    expect(await queryBlock(page, 0, -62, 0), 'dirt layer 2').toBe(10);
-    expect(await queryBlock(page, 0, -61, 0), 'grass on top').toBe(9);
-    expect(await queryBlock(page, 0, -60, 0), 'air above the grass').toBe(0);
+    expect(await queryBlock(page, 0, -63, 0), 'stone under the spawn pad').toBe(1);
+    expect(await queryBlock(page, 0, -51, 0), 'dirt layer under the pad').toBe(10);
+    expect(await queryBlock(page, 0, -50, 0), 'grass on the spawn pad').toBe(9);
+    expect(await queryBlock(page, 0, -49, 0), 'air above the grass').toBe(0);
 
     // ── Walk forward (W): vanilla ground physics must move the player ──
     // Fixed wall-clock hold, then release and settle - the distance is
@@ -280,7 +280,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     });
     const hit = gameplayOf(aimState).hit!;
     expect(hit, `aiming down must hit the ground (last telemetry: ${JSON.stringify(aimState?.gameplay)})`).toBeTruthy();
-    expect([hit.x, hit.y, hit.z], 'the ray must hit the grass block under spawn').toEqual([0, -61, 0]);
+    expect([hit.x, hit.y, hit.z], 'the ray must hit the grass block under spawn').toEqual([0, -50, 0]);
     expect(hit.face, 'the ray must enter through the top face').toBe('up');
 
     // ── Click the canvas to grab the pointer (vanilla click-to-grab) ──
@@ -309,7 +309,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       const aimed = await waitForTelemetry(page, 6_000, (t) => {
         const gp = t.gameplay as Gameplay | null | undefined;
         const hit = gp?.hit;
-        return !!hit && hit.x === 0 && hit.y === -61 && hit.z === 0 && hit.face === 'up';
+        return !!hit && hit.x === 0 && hit.y === -50 && hit.z === 0 && hit.face === 'up';
       });
       if (aimed) break;
     }
@@ -338,7 +338,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       if (g?.destroy && g.destroy.stage >= 0) {
         sawDestroyStage = true;
       }
-      broke = (await queryBlock(page, 0, -61, 0)) === 0;
+      broke = (await queryBlock(page, 0, -50, 0)) === 0;
     }
     await page.mouse.up();
     expect(
@@ -349,7 +349,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       sawDestroyStage,
       'the survival destroy overlay must advance through the stages',
     ).toBe(true);
-    expect(await queryBlock(page, 0, -61, 0), 'the grass block is gone').toBe(0);
+    expect(await queryBlock(page, 0, -50, 0), 'the grass block is gone').toBe(0);
     await attachMilestoneScreenshot(page, testInfo, '05-block-broken');
 
     // ── The mined block went to the hotbar (vanilla pickup) ──
@@ -458,7 +458,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await attachMilestoneScreenshot(page, testInfo, '06-block-placed');
     await attachSessionSummary(testInfo, {
       gated: false,
-      brokeAt: [0, -61, 0],
+      brokeAt: [0, -50, 0],
       placedAt: [0, placeY, placeZ],
     });
     await context.close();

@@ -3,11 +3,13 @@ package net.minecraft.client.renderer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.Float32Array;
 
 import net.lax1dude.eaglercraft.v2_6.adapter.WorldGlRenderer;
 import net.lax1dude.eaglercraft.v2_6.adapter.WorldTextures;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
 import net.minecraft.client.Minecraft;
@@ -67,8 +69,11 @@ public class LevelRenderer {
         private static final float SHADE_NORTH_SOUTH = 0.8F;
         private static final float SHADE_WEST_EAST = 0.6F;
 
-        /** Mesh rebuild budget per frame (sections are tiny in a flat world). */
-        private static final int REBUILD_BUDGET = 8;
+        /** Mesh rebuild budget per frame - 64 keeps the initial view-volume
+         * churn of the hilly base (a 13x13x3 sweep is ~500 sections) under
+         * ~10s even on SwiftShader's software GL (~1fps there), and is a
+         * few milliseconds of work on any real GPU. */
+        private static final int REBUILD_BUDGET = 64;
 
         public LevelRenderer(Minecraft minecraft) {
                 this.minecraft = minecraft;
@@ -249,6 +254,110 @@ public class LevelRenderer {
         /** Meshing scratch: grows on demand (a section's visible faces are
          * typically a few hundred; 128k floats = comfortable headroom). */
         private float[] scratch = new float[128 * 1024];
+
+        // ========== Dev mesh inspection (telemetry debugMesh bridge) ==========
+
+        /**
+         * Dumps the mesh state around one block as JSON: the section key,
+         * the section mesh's vertex count, the mesher's own face decision
+         * for the block (neighbors + atlas layers), and the ACTUAL vertex
+         * tuples uploaded in the section VBO whose position falls within
+         * [x-1..x+2, y-1..y+2, z-1..z+2] (7 floats each: x,y,z,u,v,layer,
+         * color). Reading the VBO back is what turns "the trunk is in the
+         * level but not on screen" from a mystery into a fact - either the
+         * quads are missing here (mesher bug) or present (draw/depth bug).
+         */
+        public String debugMeshJson(int x, int y, int z) {
+                StringBuilder sb = new StringBuilder(4096);
+                if (!(minecraft.getLevel() instanceof ClientLevel level)) {
+                        return "{}";
+                }
+                long secKey = ClientLevel.sectionKey(x >> 4, ClientLevel.sectionIndex(y), z >> 4);
+                Mesh mesh = meshes.get(Long.valueOf(secKey));
+                sb.append("{\"section\":").append(secKey);
+                sb.append(",\"meshVerts\":").append(mesh != null ? mesh.vertices : -1);
+                sb.append(",\"meshCount\":").append(meshes.size());
+                sb.append(",\"dirtyCount\":").append(level.dirtyCount());
+                int id = level.getBlockState(x, y, z);
+                sb.append(",\"id\":").append(id);
+                sb.append(",\"neighbors\":[");
+                int[] nb = new int[] {
+                                level.getBlockState(x, y + 1, z), level.getBlockState(x, y - 1, z),
+                                level.getBlockState(x, y, z - 1), level.getBlockState(x, y, z + 1),
+                                level.getBlockState(x - 1, y, z), level.getBlockState(x + 1, y, z) };
+                for (int i = 0; i < nb.length; i++) {
+                        if (i > 0) sb.append(',');
+                        sb.append(nb[i]);
+                }
+                sb.append(']');
+                sb.append(",\"occludes\":[");
+                for (int i = 0; i < nb.length; i++) {
+                        if (i > 0) sb.append(',');
+                        sb.append(occludes(nb[i]));
+                }
+                sb.append(']');
+                Blocks.Block block = Blocks.byId(id);
+                sb.append(",\"layers\":").append("{\"top\":").append(WorldTextures.layerTop(block))
+                                .append(",\"side\":").append(WorldTextures.layerSide(block))
+                                .append(",\"bottom\":").append(WorldTextures.layerBottom(block)).append('}');
+                sb.append(",\"localVerts\":[");
+                int kept = 0;
+                if (mesh != null && mesh.vbo != null && mesh.vertices > 0) {
+                        WebGL2RenderingContext gl = ClientMain.getWebGL2();
+                        if (gl != null) {
+                                int floats = mesh.vertices * WorldGlRenderer.STRIDE_FLOATS;
+                                PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, mesh.vbo);
+                                Float32Array all = readBufferSubData(gl,
+                                                WebGL2RenderingContext.ARRAY_BUFFER, 0,
+                                                Float32Array.create(floats));
+                                PlatformOpenGL._wglBindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, null);
+                                if (all != null) {
+                                        float xLo = x - 0.5F, xHi = x + 1.5F;
+                                        float yLo = y - 0.5F, yHi = y + 1.5F;
+                                        float zLo = z - 0.5F, zHi = z + 1.5F;
+                                        for (int v = 0; v < mesh.vertices && kept < 400; v++) {
+                                                int o = v * WorldGlRenderer.STRIDE_FLOATS;
+                                                float px = all.get(o), py = all.get(o + 1), pz = all.get(o + 2);
+                                                if (px < xLo || px > xHi || py < yLo || py > yHi
+                                                                || pz < zLo || pz > zHi) {
+                                                        continue;
+                                                }
+                                                if (kept > 0) {
+                                                        sb.append(',');
+                                                }
+                                                kept++;
+                                                for (int k = 0; k < WorldGlRenderer.STRIDE_FLOATS; k++) {
+                                                        if (k > 0) {
+                                                                sb.append(',');
+                                                        }
+                                                        if (k == 6) {
+                                                                // The packed RGBA byte blob travels as
+                                                                // a float - full-bright shades pack to
+                                                                // 0xFFFFFFFF which IS a float NaN; emit
+                                                                // the raw int bits so the JSON stays valid
+                                                                sb.append(Float.floatToIntBits(all.get(o + k)));
+                                                        } else {
+                                                                sb.append(all.get(o + k));
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+                sb.append(']');
+                sb.append('}');
+                return sb.toString();
+        }
+
+        /**
+         * Reads a VBO's data store back (WebGL2 getBufferSubData) - the
+         * dev mesh dump's raw float source.
+         */
+        @JSBody(params = { "gl", "target", "srcOffset", "dst" }, script =
+                "gl.getBufferSubData(target, srcOffset, dst); return dst;")
+        private static native Float32Array readBufferSubData(WebGL2RenderingContext gl,
+                        int target, int srcOffset, Float32Array dst);
+
 
         /**
          * Vanilla's face-cull test (ChunkRenderBuilder): a face is drawn

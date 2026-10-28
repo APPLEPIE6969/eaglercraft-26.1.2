@@ -93,7 +93,18 @@ patch_teavm_artifact() {
   local url_group
   url_group=$(echo "$group_path" | tr '.' '/')
   if [ ! -s "$pristine" ]; then
-    curl -sfL -o "$pristine" "https://repo1.maven.org/maven2/${url_group}/${artifact}/${version}/${artifact}-${version}.jar"
+    local url_base
+    # repo1 rate-limits this sandbox's shared IP (429) - fall back to
+    # Central mirrors before giving up
+    for url_base in \
+      "https://repo1.maven.org/maven2" \
+      "https://maven.aliyun.com/repository/central" \
+      "https://repo.huaweicloud.com/repository/maven"; do
+      if curl -sfL -o "$pristine" "${url_base}/${url_group}/${artifact}/${version}/${artifact}-${version}.jar"; then
+        break
+      fi
+      rm -f "$pristine"
+    done
   fi
   python3 "$script" "$pristine" "$pristine.patched"
   if [ -n "$cache_jar" ]; then

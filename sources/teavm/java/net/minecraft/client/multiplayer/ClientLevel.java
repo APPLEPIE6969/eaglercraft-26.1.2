@@ -1,5 +1,6 @@
 package net.minecraft.client.multiplayer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -99,10 +100,12 @@ public class ClientLevel {
                 this.remote = remote;
                 this.gameTime = 0L;
                 this.dayTime = 1000L; // dawn, like a fresh vanilla world
-                // Spawn on the flat preset's grass surface (y=-61 top face),
-                // centered in the world like vanilla's shared spawn point
+                // Spawn on the generated terrain's surface, centered in the
+                // world like vanilla's shared spawn point (the generator
+                // keeps a tree-free clearance around the origin so the
+                // player never drops inside a trunk)
                 this.spawnX = 0.5D;
-                this.spawnY = flatTopY() + 1.0D;
+                this.spawnY = columnHeight(0, 0) + 1.0D;
                 this.spawnZ = 0.5D;
                 this.storageKey = remote ? null
                         : "eaglercraft.world.blocks."
@@ -112,6 +115,13 @@ public class ClientLevel {
                         loadDayTime();
                 }
                 this.dirtySections.add(sectionKey(0, sectionIndex(this.MIN_Y), 0));
+                if (!remote) {
+                        // The hilly base is invisible until its sections mesh -
+                        // sweep the spawn view radius up front (the mesher's
+                        // per-frame budget churns through it; on a real GPU
+                        // this is a fraction of a second)
+                        markViewRadiusDirty(6);
+                }
         }
 
         /**
@@ -238,18 +248,215 @@ public class ClientLevel {
                 return this.remote ? Blocks.AIR : generatedBlock(x, y, z);
         }
 
-        /** The vanilla flat preset base (FlatLevelGeneratorSettings.getDefault). */
+        /**
+         * The generated overworld base: rolling grass hills from 2-octave
+         * value noise with sand-floored valleys (the renderer has no
+         * translucent pass yet, so lakes are out of scope), stone and dirt
+         * below the surface, bedrock at the floor, and deterministic oak
+         * trees in noise-driven groves - the vanilla generator pipeline
+         * (biomes + features) condensed into one pure (x,y,z) function so
+         * the mesher can read any block without chunk generation steps.
+         */
         public int generatedBlock(int x, int y, int z) {
                 if (y == MIN_Y) {
                         return Blocks.BEDROCK;
                 }
-                if (y == MIN_Y + 1 || y == MIN_Y + 2) {
-                        return Blocks.DIRT;
+                int h = columnHeight(x, z);
+                if (y > h) {
+                        return this.remote ? Blocks.AIR : treeBlock(x, y, z);
                 }
-                if (y == MIN_Y + 3) {
-                        return Blocks.GRASS_BLOCK;
+                int depth = h - y;
+                if (depth == 0) {
+                        return h <= SAND_TOP ? Blocks.SAND : Blocks.GRASS_BLOCK;
+                }
+                if (depth <= 3) {
+                        return h <= SAND_TOP ? Blocks.SAND : Blocks.DIRT;
+                }
+                return Blocks.STONE;
+        }
+
+        /** Valley floors at or below this height are sand (a dry lake bed). */
+        public static final int SAND_TOP = -54;
+
+        /** The spawn pad: a flat grass clearing around the origin so the
+         * fresh-world spawn, the e2e physics walks and the panorama camera
+         * all behave on predictable ground (vanilla clears and flattens a
+         * spawn area too). */
+        public static final int SPAWN_PAD_Y = -50;
+        public static final int SPAWN_PAD_RADIUS = 24;
+        /** The pad blends into the noise hills over this band. */
+        public static final int SPAWN_PAD_BLEND = 40;
+
+        /** Highest terrain surface + tree top the generator can produce
+         * (base -50 + hill amplitude 18 + tree 8); markViewRadiusDirty
+         * sweeps up to this so view-radius meshing never misses a crown. */
+        public static final int TERRAIN_TOP_Y = -20;
+
+        /** Per-column cached surface height: packed (x,z) -> height. */
+        private final Map<Long, Integer> columnHeights = new HashMap<Long, Integer>();
+
+        /** Per-column cached tree anchor: packed (x,z) -> -1 for none, else
+         * surfaceHeight | (trunkHeight << 8). */
+        private final Map<Long, Integer> treeAnchors = new HashMap<Long, Integer>();
+
+        /** Surface height of a column (cached): the flat spawn pad near the
+         * origin, then base -50 plus two smooth value-noise octaves
+         * (rolling hills + detail) blending in over the pad's skirt,
+         * clamped above the bedrock floor. */
+        public int columnHeight(int x, int z) {
+                Long key = BlockPos.asLong(x, 0, z);
+                Integer cached = columnHeights.get(key);
+                if (cached != null) {
+                        return cached.intValue();
+                }
+                float n = valueNoise(x * (1.0F / 48.0F), z * (1.0F / 48.0F)) * 14.0F
+                                + valueNoise(x * (1.0F / 16.0F) + 31.7F, z * (1.0F / 16.0F) + 17.3F) * 4.0F;
+                // The hills ramp up with distance from the pad: full amplitude
+                // only past the skirt (a bare steep wall at the pad edge read
+                // as a dirt cliff with tree crowns poking over it)
+                int d = Math.max(Math.abs(x), Math.abs(z));
+                if (d < SPAWN_PAD_BLEND + 48) {
+                        float ramp = Math.min(1.0F, Math.max(0.0F,
+                                        (d - SPAWN_PAD_RADIUS) / (SPAWN_PAD_BLEND + 48.0F - SPAWN_PAD_RADIUS)));
+                        n *= 0.15F + 0.85F * ramp * ramp;
+                }
+                int raw = Math.max(MIN_Y + 4, Math.round(-50.0F + n));
+                int h;
+                if (d <= SPAWN_PAD_RADIUS) {
+                        h = SPAWN_PAD_Y;
+                } else if (d < SPAWN_PAD_BLEND) {
+                        float t = (d - SPAWN_PAD_RADIUS) / (float) (SPAWN_PAD_BLEND - SPAWN_PAD_RADIUS);
+                        t = t * t * (3.0F - 2.0F * t);
+                        h = Math.round(SPAWN_PAD_Y + (raw - SPAWN_PAD_Y) * t);
+                } else {
+                        h = raw;
+                }
+                h = Math.max(MIN_Y + 4, h);
+                if (columnHeights.size() > 400_000) {
+                        columnHeights.clear();
+                }
+                columnHeights.put(key, Integer.valueOf(h));
+                return h;
+        }
+
+        /** Bilinear-interpolated hash lattice with smoothstep falloff. */
+        private static float valueNoise(float fx, float fz) {
+                int x0 = floorCoord(fx);
+                int z0 = floorCoord(fz);
+                float tx = fx - x0;
+                float tz = fz - z0;
+                tx = tx * tx * (3.0F - 2.0F * tx);
+                tz = tz * tz * (3.0F - 2.0F * tz);
+                float a = lattice(x0, z0);
+                float b = lattice(x0 + 1, z0);
+                float c = lattice(x0, z0 + 1);
+                float d = lattice(x0 + 1, z0 + 1);
+                return (a + (b - a) * tx) * (1.0F - tz) + (c + (d - c) * tx) * tz;
+        }
+
+        private static int floorCoord(float v) {
+                int i = (int) v;
+                return v < i ? i - 1 : i;
+        }
+
+        /** SplitMix64-style lattice hash -> 0..1. */
+        private static float lattice(long x, long z) {
+                long h = 0x9E3779B97F4A7C15L ^ (x * 341873128712L) ^ (z * 132897987541L);
+                h = (h ^ (h >>> 30)) * 0xBF58476D1CE4E5B9L;
+                h = (h ^ (h >>> 27)) * 0x94D049BB133111EBL;
+                h = h ^ (h >>> 31);
+                return (h & 0xFFFFFFL) / (float) 0xFFFFFFL;
+        }
+
+        /** The tree anchor for one column: -1 when treeless, else
+         * ((surfaceHeight + 128) | (trunkHeight << 8)) - the +128 bias
+         * keeps the negative heights in one unsigned byte. Trees grow in
+         * groves (a coarse forest-mask noise gates the per-column hash)
+         * on grass columns, with a cleared radius around the spawn so the
+         * camera and the player never sit inside a trunk. */
+        private int treeAnchor(int x, int z) {
+                Long key = BlockPos.asLong(x, 0, z);
+                Integer cached = treeAnchors.get(key);
+                if (cached != null) {
+                        return cached.intValue();
+                }
+                int anchor = -1;
+                if (Math.max(Math.abs(x), Math.abs(z)) > SPAWN_PAD_BLEND + 24
+                                && forestMask(x, z)
+                                && lattice(x * 2 + 7919L, z * 2 - 31337L) < 0.013F) {
+                        int h = columnHeight(x, z);
+                        if (h > SAND_TOP + 1) {
+                                int th = 5 + (int) (lattice(x + 101L, z - 59L) * 3.0F);
+                                anchor = ((h + 128) & 0xFF) | (th << 8);
+                        }
+                }
+                if (treeAnchors.size() > 400_000) {
+                        treeAnchors.clear();
+                }
+                treeAnchors.put(key, Integer.valueOf(anchor));
+                return anchor;
+        }
+
+        /** Coarse grove mask: patches of forest in open grassland. */
+        private static boolean forestMask(int x, int z) {
+                return valueNoise(x * (1.0F / 160.0F) + 991.7F, z * (1.0F / 160.0F) - 613.1F) > 0.56F;
+        }
+
+        /** The generated tree block at one position above the surface: the
+         * trunk column of an anchored tree, or vanilla's oak canopy shape
+         * (5x5 minus corners on the two rows below the crown, a 3x3 plus
+         * capping the top log, and a plus on top) contributed by any
+         * anchored tree within canopy reach. */
+        private int treeBlock(int x, int y, int z) {
+                int own = treeAnchor(x, z);
+                if (own >= 0) {
+                        int h = (own & 0xFF) - 128;
+                        int th = (own >> 8) & 0xFF;
+                        if (y > h && y <= h + th) {
+                                return Blocks.OAK_LOG;
+                        }
+                }
+                for (int dx = -2; dx <= 2; dx++) {
+                        for (int dz = -2; dz <= 2; dz++) {
+                                if (dx == 0 && dz == 0) {
+                                        continue; // the trunk was handled above
+                                }
+                                int anchor = treeAnchor(x + dx, z + dz);
+                                if (anchor < 0) {
+                                        continue;
+                                }
+                                int top = ((anchor & 0xFF) - 128) + ((anchor >> 8) & 0xFF);
+                                int ly = y - top;
+                                if (ly == -2 || ly == -1) {
+                                        if (Math.abs(dx) == 2 && Math.abs(dz) == 2) {
+                                                continue; // vanilla corner trim
+                                        }
+                                        return Blocks.OAK_LEAVES;
+                                }
+                                if (ly == 0 || ly == 1) {
+                                        if (Math.abs(dx) + Math.abs(dz) <= 1) {
+                                                return Blocks.OAK_LEAVES;
+                                        }
+                                }
+                        }
                 }
                 return Blocks.AIR;
+        }
+
+        /** Marks every section in a square view radius (columns -r..r)
+         * from the bedrock floor to TERRAIN_TOP_Y dirty for meshing - the
+         * dev {@code setScene({dirtyRadius})} path (panorama face
+         * rendering): with a hilly base there is no single "flat top y"
+         * to no-op-edit, so the bridge sweeps the whole view volume. */
+        public void markViewRadiusDirty(int radius) {
+                int maxY = sectionIndex(TERRAIN_TOP_Y);
+                for (int sy = sectionIndex(MIN_Y); sy <= maxY; sy++) {
+                        for (int sx = -radius; sx <= radius; sx++) {
+                                for (int sz = -radius; sz <= radius; sz++) {
+                                        markDirty(sx, sy, sz);
+                                }
+                        }
+                }
         }
 
         /**
@@ -300,6 +507,11 @@ public class ClientLevel {
                 return next;
         }
 
+        /** Dev diagnostics: how many section rebuilds are still queued. */
+        public int dirtyCount() {
+                return dirtySections.size();
+        }
+
         /** Marks everything around a position dirty (level load / blob restore). */
         public void markRangeDirty(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
                 for (int sx = minX >> SECTION_SHIFT; sx <= maxX >> SECTION_SHIFT; sx++) {
@@ -341,7 +553,21 @@ public class ClientLevel {
                         if (!edits.isEmpty()) {
                                 ClientMain.log("[ClientLevel] restored " + edits.size()
                                         + " block edits for " + levelName);
-                                markRangeDirty(-16, MIN_Y, -16, 16, flatTopY() + 1, 16);
+                                // Mark each restored edit's own section plus the
+                                // border neighbors (the same rule setBlockState
+                                // applies) - a hilly base has no single flat top
+                                // to sweep. Copied first: re-applying an edit that
+                                // now matches the base removes it from the map,
+                                // and removing while iterating would CME.
+                                List<int[]> restored = new ArrayList<int[]>(edits.size());
+                                for (Map.Entry<Long, Integer> e : edits.entrySet()) {
+                                        long key = e.getKey().longValue();
+                                        restored.add(new int[] { BlockPos.getX(key), BlockPos.getY(key),
+                                                        BlockPos.getZ(key), e.getValue().intValue() });
+                                }
+                                for (int[] e : restored) {
+                                        setBlockState(e[0], e[1], e[2], e[3]);
+                                }
                         }
                 } catch (Throwable t) {
                         ClientMain.warn("[ClientLevel] edit restore failed: " + t.getMessage());

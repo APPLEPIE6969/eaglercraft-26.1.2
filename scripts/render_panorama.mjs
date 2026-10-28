@@ -1,6 +1,6 @@
 // Renders the title-screen panorama cubemap faces with the port's own
-// world renderer, replacing the soft 256x256 1.8.9 faces with a crisp
-// 768x768 scene of the flat world.
+// world renderer - now straight from the GENERATED world: rolling grass
+// hills with oak groves, no hand-planted trees.
 //
 // Face convention (docs/UI-FIDELITY.md, from vanilla CubeMapTexture):
 //   GL faces [+X,-X,+Y,-Y,+Z,-Z] <- panorama_[1,3,5,4,0,2].png
@@ -9,14 +9,13 @@
 //   panorama_2 = -Z (yaw 180) panorama_3 = -X (yaw 90)
 //   panorama_4 = -Y (pitch +90, straight down)
 //   panorama_5 = +Y (pitch -90, straight up)
-// Side faces need the exact 90-degree cube-face projection: square canvas,
+// Side faces use the exact 90-degree cube-face projection: square canvas,
 // fov 90, perspective -> horizontal FOV = vertical FOV = 90.
 //
-// Scene: the flat world's grass plain with a ring of oak trees around
-// spawn, morning light. The procedural base only meshes DIRTIED sections,
-// so the script no-op-edits one grass block per section in the view radius
-// (same-id setBlockState) to make the mesher build the ground out to the
-// fog line.
+// The bridge's setScene({dirtyRadius}) sweeps the whole view volume of the
+// hilly base dirty so the budgeted mesh rebuilds mesh the ground out to
+// the fog line (a no-op-edit trick cannot work when every column has its
+// own surface height).
 //
 // One-shot: server + browser in this process (the sandbox reaps background
 // processes between tool calls).
@@ -30,7 +29,7 @@ const OUT_DIR = process.env.PANO_OUT || join(ROOT, 'assets/gui/sprites/title/bac
 const PORT = 4322;
 const FACE = 768;
 const DAY_TIME = process.env.PANO_TIME ? Number(process.env.PANO_TIME) : null; // null = world default
-const VIEW_RADIUS = 6; // sections (-6..6) = 13x13 ground to the fog line
+const VIEW_RADIUS = 10; // sections (-10..10) = 21x21 ground toward the fog line
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png',
   '.svg': 'image/svg+xml', '.epk': 'application/octet-stream', '.lang': 'text/plain',
@@ -83,7 +82,7 @@ while (Date.now() < bootDeadline) {
 if (!booted) throw new Error('boot timeout: title screen never reached');
 console.log('booted, entering world...');
 
-// Enter the flat world
+// Enter the generated world
 await page.evaluate(() => self.__eaglercraftGame.enterWorld());
 await page.waitForFunction(() => {
   const t = self.__eaglercraftGame;
@@ -91,63 +90,48 @@ await page.waitForFunction(() => {
 }, undefined, { timeout: 45_000 });
 console.log('in world');
 
-// Probe the grass layer: topmost solid under the player.
-const grassY = await page.evaluate(() => {
-  const q = self.__eaglercraftGame.queryBlock;
-  for (let y = -58; y >= -64; y--) {
-    if (q(0, y, 0)) return y;
-  }
-  return null;
+const player = await page.evaluate(() => {
+  const p = self.__eaglercraftGame.gameplay.player;
+  return { x: p.x, y: p.y, z: p.z };
 });
-if (grassY === null) throw new Error('no solid ground under spawn');
-const GRASS_ID = await page.evaluate(y => self.__eaglercraftGame.queryBlock(0, y, 0), grassY);
-console.log(`grass layer y=${grassY} id=${GRASS_ID}`);
-
-// Sculpt: ring of oak trees + no-op grass edits to dirty every ground
-// section in the view radius. Oak log 351, leaves 359 (the 26.1.2 palette).
-const TREES = [];
-const treeAt = (tx, tz, h) => {
-  const base = grassY + 1;
-  for (let i = 0; i < h; i++) TREES.push([tx, base + i, tz, 351]);
-  const top = base + h - 1;
-  for (let ly = top - 2; ly <= top - 1; ly++) {
-    for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
-      if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; // vanilla corner trim
-      if (dx === 0 && dz === 0) continue; // trunk
-      TREES.push([tx + dx, ly, tz + dz, 359]);
-    }
-  }
-  for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
-    if (Math.abs(dx) + Math.abs(dz) > 1) continue; // plus cap
-    TREES.push([tx + dx, top, tz + dz, 359]);
-    TREES.push([tx + dx, top + 1, tz + dz, 359]);
-  }
-};
-// 8 trees, irregular ring 7-15 blocks out, spaced from each other.
-treeAt(7, 3, 4); treeAt(-9, 5, 5); treeAt(4, -11, 4); treeAt(-6, -8, 6);
-treeAt(13, -4, 5); treeAt(-14, -2, 4); treeAt(2, 14, 5); treeAt(-3, 16, 4);
-
-// No-op same-id edits: one per ground section -> marks it dirty so the
-// mesher builds the procedural base out to the fog line.
-const dirtyEdits = [];
-for (let sx = -VIEW_RADIUS; sx <= VIEW_RADIUS; sx++) {
-  for (let sz = -VIEW_RADIUS; sz <= VIEW_RADIUS; sz++) {
-    dirtyEdits.push([sx * 16 + 8, grassY, sz * 16 + 8, GRASS_ID]);
-  }
+console.log(`player at ${JSON.stringify(player)}`);
+if (Math.abs(player.y + 49) > 0.01) {
+  throw new Error(`spawn must be on the pad at y=-49 (got ${player.y})`);
 }
 
-await page.evaluate(({ trees, dirty, t }) => {
+// Mesh the whole view volume of the hills, then wait until the budgeted
+// rebuilds have actually drained the dirty queue (deterministic - the
+// software-GL probe rig runs at ~1fps, a real GPU drains in well under a
+// second)
+await page.evaluate(({ r, t }) => {
   if (t !== null) self.__eaglercraftGame.setDayTime(t);
-  self.__eaglercraftGame.setScene({ blocks: [...trees, ...dirty], fov: 90, hideHud: true });
-}, { trees: TREES, dirty: dirtyEdits, t: DAY_TIME });
-console.log(`scene set: ${TREES.length} tree blocks + ${dirtyEdits.length} section dirties`);
+  self.__eaglercraftGame.setScene({ dirtyRadius: r, fov: 90, hideHud: true });
+}, { r: VIEW_RADIUS, t: DAY_TIME });
+console.log(`scene set: dirtyRadius=${VIEW_RADIUS}`);
 
-// Let the budgeted mesh rebuilds chew through ~200 sections, then settle
-await page.waitForTimeout(9_000);
+const drainDeadline = Date.now() + 120_000;
+let dirty = -1;
+while (Date.now() < drainDeadline) {
+  await page.waitForTimeout(2_000);
+  dirty = await page.evaluate(() => {
+    const d = self.__eaglercraftGame.debugMesh(0, -50, 0);
+    return d ? d.dirtyCount : -1;
+  });
+  console.log(`  dirty sections left: ${dirty}`);
+  if (dirty === 0) break;
+}
+if (dirty !== 0) throw new Error(`mesh queue never drained (stuck at ${dirty})`);
 
-// Sanity: a tree block must exist away from spawn
-const probe = await page.evaluate(() => self.__eaglercraftGame.queryBlock(7, -58, 3));
-console.log('tree probe (7,-58,3) =', probe, '(expect 351)');
+// Sanity probes: the ground right under the camera and a far column
+const probes = await page.evaluate(() => {
+  const q = self.__eaglercraftGame.queryBlock;
+  return {
+    underFeet: q(0, -50, 0),
+    farGround: q(80, q(80, -50, 80) === 0 ? -52 : -50, 80),
+  };
+});
+console.log('probes:', JSON.stringify(probes));
+if (probes.underFeet !== 9) throw new Error('spawn pad grass missing: ' + probes.underFeet);
 
 const FACES = [
   { name: 'panorama_0', yaw: 0, pitch: 0 },     // +Z south

@@ -854,7 +854,8 @@ public class EaglerCraft {
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.isReady(),
                                         net.lax1dude.eaglercraft.v2_6.adapter.PanoramaRenderer.spinDegrees(),
                                         menuBackgroundBlurRadius(), menuBackgroundBlurrinessOption(),
-                                        gameplayJson, (x, y, z) -> telemetryQueryBlock(x, y, z));
+                                        gameplayJson, (x, y, z) -> telemetryQueryBlock(x, y, z),
+                                        (x, y, z) -> telemetryDebugMesh(x, y, z));
                 } catch (Throwable t) {
                         // Telemetry must never break the game loop
                 }
@@ -1029,6 +1030,32 @@ public class EaglerCraft {
                 int query(int x, int y, int z);
         }
 
+        /** The dev mesh-inspection functor: JSON mesh dump around one block
+         * (null outside a world) - root-causes mesher-vs-GPU discrepancies. */
+        @JSFunctor
+        private interface DebugMeshFn extends JSObject {
+                String dump(int x, int y, int z);
+        }
+
+        /** The telemetry bridge's debugMesh: the section mesh state around
+         * one block (face decisions, uploaded vertex floats). */
+        private static String telemetryDebugMesh(int x, int y, int z) {
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft
+                                && ((net.minecraft.client.Minecraft) minecraftInstance).getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel) {
+                        try {
+                                return ((net.minecraft.client.Minecraft) minecraftInstance)
+                                                .getLevelRenderer().debugMeshJson(x, y, z);
+                        } catch (Throwable t) {
+                                return "{\"error\":\"" + quote(String.valueOf(t.getMessage())) + "\"}";
+                        }
+                }
+                return null;
+        }
+
+        private static String quote(String s) {
+                return s == null ? "" : s.replace("\\", "\\\\").replace("\"", "\\\"");
+        }
+
         /**
          * Consumes queued {@code setHotbarSlot}/{@code selectSlot} bridge
          * requests (latest wins, vanilla key-state semantics): fills the
@@ -1164,6 +1191,16 @@ public class EaglerCraft {
                                 ClientMain.log("[EaglerCraft] setScene: applied " + n
                                                 + " block(s) via telemetry bridge");
                         }
+                        // Dev view-radius sweep ({@code setScene({dirtyRadius})})
+                        // - the panorama face generator's way to mesh the whole
+                        // view volume of the hilly base (a no-op-edit trick
+                        // cannot work when every column has its own surface)
+                        int radius = readSceneDirtyRadius();
+                        if (radius > 0 && !level.isRemote()) {
+                                level.markViewRadiusDirty(Math.min(radius, 24));
+                                ClientMain.log("[EaglerCraft] setScene: dirty radius " + radius
+                                                + " via telemetry bridge");
+                        }
                 }
                 clearSceneRequest();
         }
@@ -1204,6 +1241,10 @@ public class EaglerCraft {
 
         @JSBody(params = { "i" }, script = "return window.__eaglercraftSceneReq.blocks[i][3];")
         private static native int sceneBlockId(int i);
+
+        @JSBody(script = "var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;"
+                        + " return r && typeof r.dirtyRadius === 'number' ? Math.round(r.dirtyRadius) : -1;")
+        private static native int readSceneDirtyRadius();
 
         @JSBody(script = "window.__eaglercraftSceneReq = null;")
         private static native void clearSceneRequest();
@@ -1274,7 +1315,7 @@ public class EaglerCraft {
                 return sb.toString();
         }
 
-        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur", "menuBackgroundBlurriness", "gameplayJson", "queryBlockFn" }, script =
+        @JSBody(params = { "canEnterWorld", "gameState", "screenName", "inWorld", "ticks", "guiScale", "buttonsJson", "panoramaReady", "panoramaSpin", "panoramaBlur", "menuBackgroundBlurriness", "gameplayJson", "queryBlockFn", "debugMeshFn" }, script =
                 "if (typeof window !== 'undefined') {"
                 + " window.__eaglercraftGame = {"
                 + " canEnterWorld: canEnterWorld,"
@@ -1295,13 +1336,15 @@ public class EaglerCraft {
                 + " setHotbarSlot: function(s,i,c) { window.__eaglercraftHotbarReq = {s:s,i:i,c:c}; },"
                 + " selectSlot: function(s) { window.__eaglercraftHotbarReq = {s:s,i:-1,c:0}; },"
                 + " setLook: function(yaw,pitch) { window.__eaglercraftLookReq = {yaw:yaw,pitch:pitch}; },"
-                + " setScene: function(o) { window.__eaglercraftSceneReq = o; }"
+                + " setScene: function(o) { window.__eaglercraftSceneReq = o; },"
+                + " debugMesh: function(x,y,z) { var s = debugMeshFn(x,y,z); return s ? JSON.parse(s) : null; }"
                 + " };"
                 + "}")
         private static native void pushGameTelemetry0(boolean canEnterWorld, int gameState, String screenName,
                         boolean inWorld, int ticks, int guiScale, String buttonsJson,
                         boolean panoramaReady, float panoramaSpin, int panoramaBlur,
-                        int menuBackgroundBlurriness, String gameplayJson, BlockQueryFn queryBlockFn);
+                        int menuBackgroundBlurriness, String gameplayJson, BlockQueryFn queryBlockFn,
+                        DebugMeshFn debugMeshFn);
 
         /**
          * Consumes a pending {@code enterWorld()} request from the bridge:

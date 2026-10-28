@@ -12,6 +12,11 @@
 
 pluginManagement {
     repositories {
+        maven {
+            // Maven Central mirror first: repo1 rate-limits this sandbox's
+            // shared IP (HTTP 429), which kills cold builds mid-resolve
+            url 'https://maven.aliyun.com/repository/central'
+        }
         gradlePluginPortal()
         mavenCentral()
     }

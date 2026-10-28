@@ -37,6 +37,9 @@ public final class Blocks {
         public static final int COBBLESTONE = 4;
         public static final int OAK_PLANKS = 15;
         public static final int BEDROCK = 33;
+        public static final int SAND = 345;
+        public static final int OAK_LOG = 351;
+        public static final int OAK_LEAVES = 359;
 
         /** Creative tab keys (vanilla CreativeModeTabs groups). */
         public static final int TAB_NONE = 0;

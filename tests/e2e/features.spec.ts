@@ -735,9 +735,31 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await page.waitForTimeout(250);
     await page.mouse.click(rowClick.cssX, rowClick.cssY);
     await page.waitForTimeout(300);
+    // The ConnectScreen is transient on a fast loopback refusal: the WS
+    // onclose can land between two telemetry pushes, so the 200ms poll
+    // can legitimately never observe it (the gateway-era bundle's frozen
+    // loop kept the screen up long; a healthy client disconnects within
+    // a tick or two). Sample the screen in-page at 8ms around the join
+    // so the assert checks the client's real behavior, not poll luck.
+    await page.evaluate(() => {
+      const w = window as unknown as {
+        __screenLog?: Array<{ t: number; screen: string }>;
+        __screenSampler?: number;
+      };
+      w.__screenLog = [];
+      const t0 = performance.now();
+      w.__screenSampler = window.setInterval(() => {
+        const s = (
+          window as unknown as { __eaglercraftGame?: { screen?: string } }
+        ).__eaglercraftGame?.screen;
+        if (typeof s !== 'string' || !w.__screenLog) return;
+        const last = w.__screenLog[w.__screenLog.length - 1];
+        if (!last || last.screen !== s) {
+          w.__screenLog.push({ t: Math.round(performance.now() - t0), screen: s });
+        }
+      }, 8);
+    });
     await clickBridgeButton(page, 'joinserver', 'Join Server must be clickable after selecting a row');
-    const connectState = await waitForTelemetry(page, 15_000, (t) => t.screen.includes('ConnectScreen'));
-    expect(connectState?.screen.includes('ConnectScreen'), 'joining must show the ConnectScreen').toBe(true);
     await attachMilestoneScreenshot(page, testInfo, '12-connecting');
 
     // localhost:1 refuses fast -> the honest DisconnectedScreen
@@ -745,6 +767,21 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     expect(
       disconnected?.screen.includes('DisconnectedScreen'),
       `a refused connection must land on the DisconnectedScreen (last: ${JSON.stringify(disconnected?.screen)})`,
+    ).toBe(true);
+    const screenLog = await page.evaluate(() => {
+      const w = window as unknown as {
+        __screenLog?: Array<{ t: number; screen: string }>;
+        __screenSampler?: number;
+      };
+      if (w.__screenSampler !== undefined) {
+        window.clearInterval(w.__screenSampler);
+        w.__screenSampler = undefined;
+      }
+      return w.__screenLog ?? [];
+    });
+    expect(
+      screenLog.some((e) => e.screen.includes('ConnectScreen')),
+      `joining must pass through the ConnectScreen (transitions: ${JSON.stringify(screenLog)})`,
     ).toBe(true);
     await attachMilestoneScreenshot(page, testInfo, '13-disconnected');
 

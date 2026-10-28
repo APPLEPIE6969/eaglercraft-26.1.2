@@ -109,3 +109,5 @@ scripts/*
 !scripts/gw_real_smoke.mjs
 !scripts/render_panorama.mjs
 dfu-classes
+sources/resources/assets/
+sources/resources/_epk_manifest.json

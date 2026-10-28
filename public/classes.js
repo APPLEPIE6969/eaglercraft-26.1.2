@@ -17856,9 +17856,11 @@ function nmwlb_Blocks$Block() {
     a.$tab = 0;
     a.$topTint = 0;
     a.$allTint = 0;
+    a.$opaque = 0;
 }
 let nmwlb_Blocks$Block__init_0 = ($this, $id, $name, $displayName, $destroySpeed, $requiresCorrectTool, $topTexture, $sideTexture, $bottomTexture, $tab, $topTint, $allTint) => {
     jl_Object__init_($this);
+    $this.$opaque = 1;
     $this.$id = $id;
     $this.$name8 = $name;
     $this.$displayName = $displayName;
@@ -17876,6 +17878,10 @@ nmwlb_Blocks$Block__init_ = (var_0, var_1, var_2, var_3, var_4, var_5, var_6, va
     let var_11 = new nmwlb_Blocks$Block();
     nmwlb_Blocks$Block__init_0(var_11, var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10);
     return var_11;
+},
+nmwlb_Blocks$Block_nonOpaque = $this => {
+    $this.$opaque = 0;
+    return $this;
 },
 nmwlb_Blocks$Block_tintFor = ($this, $texture) => {
     if ($this.$allTint)
@@ -18514,9 +18520,9 @@ nmcgc_EditBox_scrollToShowCursor = $this => {
     return $this.$displayPos;
 },
 nmcgsm_DirectConnectScreen$1 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_DirectConnectScreen$1__init_ = ($this, $this$0, $arg0, $arg1, $arg2, $arg3, $arg4) => {
+nmcgsm_DirectConnectScreen$1__init_ = ($this, $this$0, $x, $y, $width, $height, $hint) => {
     ju_Objects_requireNonNull($this$0);
-    nmcgc_EditBox__init_($this, $arg0, $arg1, $arg2, $arg3, $arg4);
+    nmcgc_EditBox__init_($this, $x, $y, $width, $height, $hint);
 },
 nmcgsm_DirectConnectScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_DirectConnectScreen$1();
@@ -20305,8 +20311,8 @@ try {
     nmwlb_Blocks_register(272, $rt_s(659), $rt_s(660), 0.800000011920929, 1, $rt_s(661), $rt_s(659), $rt_s(662), 1, 0, 0);
     nmwlb_Blocks_register(273, $rt_s(663), $rt_s(664), 2.0, 1, $rt_s(661), $rt_s(661), $rt_s(661), 1, 0, 0);
     nmwlb_Blocks_register(274, $rt_s(665), $rt_s(666), 2.0, 1, $rt_s(665), $rt_s(665), $rt_s(665), 1, 0, 0);
-    nmwlb_Blocks_register(275, $rt_s(667), $rt_s(668), 0.30000001192092896, 0, $rt_s(667), $rt_s(667), $rt_s(667), 1, 0, 0);
-    nmwlb_Blocks_register(276, $rt_s(669), $rt_s(670), 0.30000001192092896, 0, $rt_s(669), $rt_s(669), $rt_s(669), 1, 0, 0);
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(275, $rt_s(667), $rt_s(668), 0.30000001192092896, 0, $rt_s(667), $rt_s(667), $rt_s(667), 1, 0, 0));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(276, $rt_s(669), $rt_s(670), 0.30000001192092896, 0, $rt_s(669), $rt_s(669), $rt_s(669), 1, 0, 0));
     nmwlb_Blocks_register(277, $rt_s(671), $rt_s(672), 50.0, 1, $rt_s(671), $rt_s(671), $rt_s(671), 1, 0, 0);
     nmwlb_Blocks_register(278, $rt_s(673), $rt_s(674), 50.0, 1, $rt_s(673), $rt_s(673), $rt_s(673), 1, 0, 0);
     nmwlb_Blocks_register(279, $rt_s(675), $rt_s(676), 1.5, 1, $rt_s(675), $rt_s(675), $rt_s(675), 1, 0, 0);
@@ -20389,15 +20395,15 @@ try {
     nmwlb_Blocks_register(356, $rt_s(838), $rt_s(839), 2.0, 0, $rt_s(840), $rt_s(838), $rt_s(840), 3, 0, 0);
     nmwlb_Blocks_register(357, $rt_s(841), $rt_s(842), 2.0, 0, $rt_s(843), $rt_s(841), $rt_s(843), 3, 0, 0);
     nmwlb_Blocks_register(358, $rt_s(844), $rt_s(845), 2.0, 0, $rt_s(846), $rt_s(844), $rt_s(846), 3, 0, 0);
-    nmwlb_Blocks_register(359, $rt_s(847), $rt_s(848), 0.20000000298023224, 0, $rt_s(847), $rt_s(847), $rt_s(847), 3, 0, 7842607);
-    nmwlb_Blocks_register(360, $rt_s(849), $rt_s(850), 0.20000000298023224, 0, $rt_s(849), $rt_s(849), $rt_s(849), 3, 0, 6396257);
-    nmwlb_Blocks_register(361, $rt_s(851), $rt_s(852), 0.20000000298023224, 0, $rt_s(851), $rt_s(851), $rt_s(851), 3, 0, 8431445);
-    nmwlb_Blocks_register(362, $rt_s(853), $rt_s(854), 0.20000000298023224, 0, $rt_s(853), $rt_s(853), $rt_s(853), 3, 0, 7842607);
-    nmwlb_Blocks_register(363, $rt_s(855), $rt_s(856), 0.20000000298023224, 0, $rt_s(855), $rt_s(855), $rt_s(855), 3, 0, 7842607);
-    nmwlb_Blocks_register(364, $rt_s(857), $rt_s(858), 0.20000000298023224, 0, $rt_s(857), $rt_s(857), $rt_s(857), 3, 0, 7842607);
-    nmwlb_Blocks_register(365, $rt_s(859), $rt_s(860), 0.20000000298023224, 0, $rt_s(859), $rt_s(859), $rt_s(859), 3, 0, 7842607);
-    nmwlb_Blocks_register(366, $rt_s(861), $rt_s(862), 0.20000000298023224, 0, $rt_s(861), $rt_s(861), $rt_s(861), 3, 0, 0);
-    nmwlb_Blocks_register(367, $rt_s(863), $rt_s(864), 0.20000000298023224, 0, $rt_s(863), $rt_s(863), $rt_s(863), 3, 0, 7842607);
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(359, $rt_s(847), $rt_s(848), 0.20000000298023224, 0, $rt_s(847), $rt_s(847), $rt_s(847), 3, 0, 7842607));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(360, $rt_s(849), $rt_s(850), 0.20000000298023224, 0, $rt_s(849), $rt_s(849), $rt_s(849), 3, 0, 6396257));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(361, $rt_s(851), $rt_s(852), 0.20000000298023224, 0, $rt_s(851), $rt_s(851), $rt_s(851), 3, 0, 8431445));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(362, $rt_s(853), $rt_s(854), 0.20000000298023224, 0, $rt_s(853), $rt_s(853), $rt_s(853), 3, 0, 7842607));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(363, $rt_s(855), $rt_s(856), 0.20000000298023224, 0, $rt_s(855), $rt_s(855), $rt_s(855), 3, 0, 7842607));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(364, $rt_s(857), $rt_s(858), 0.20000000298023224, 0, $rt_s(857), $rt_s(857), $rt_s(857), 3, 0, 7842607));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(365, $rt_s(859), $rt_s(860), 0.20000000298023224, 0, $rt_s(859), $rt_s(859), $rt_s(859), 3, 0, 7842607));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(366, $rt_s(861), $rt_s(862), 0.20000000298023224, 0, $rt_s(861), $rt_s(861), $rt_s(861), 3, 0, 0));
+    nmwlb_Blocks$Block_nonOpaque(nmwlb_Blocks_register(367, $rt_s(863), $rt_s(864), 0.20000000298023224, 0, $rt_s(863), $rt_s(863), $rt_s(863), 3, 0, 7842607));
     nmwlb_Blocks_register(368, $rt_s(865), $rt_s(866), 30.0, 1, $rt_s(867), $rt_s(868), $rt_s(867), 3, 0, 0);
     nmwlb_Blocks_register(369, $rt_s(869), $rt_s(870), 0.5, 0, $rt_s(871), $rt_s(872), $rt_s(871), 3, 0, 0);
     nmwlb_Blocks_register(370, $rt_s(873), $rt_s(874), 0.5, 0, $rt_s(875), $rt_s(876), $rt_s(875), 3, 0, 0);
@@ -32215,29 +32221,29 @@ nmcr_LevelRenderer_rebuildSection = ($this, $gl, $level, $secKey) => {
                 if ($id) {
                     $block = nmwlb_Blocks_byId($id);
                     var$20 = $y + 1 | 0;
-                    if (!$level.$getBlockState($x, var$20, $z)) {
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x, var$20, $z))) {
                         var$21 = nleva_WorldTextures_layerTop($block);
                         $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, var$20, $z, 0, var$21, 1.0);
                     }
-                    if (!$level.$getBlockState($x, $y - 1 | 0, $z)) {
-                        var$21 = nleva_WorldTextures_layerBottom($block);
-                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 1, var$21, 0.5);
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x, $y - 1 | 0, $z))) {
+                        var$22 = nleva_WorldTextures_layerBottom($block);
+                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 1, var$22, 0.5);
                     }
-                    if (!$level.$getBlockState($x, $y, $z - 1 | 0)) {
-                        var$21 = nleva_WorldTextures_layerSide($block);
-                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 2, var$21, 0.800000011920929);
-                    }
-                    if (!$level.$getBlockState($x, $y, $z + 1 | 0)) {
-                        var$21 = nleva_WorldTextures_layerSide($block);
-                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 3, var$21, 0.800000011920929);
-                    }
-                    if (!$level.$getBlockState($x - 1 | 0, $y, $z)) {
-                        var$21 = nleva_WorldTextures_layerSide($block);
-                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 4, var$21, 0.6000000238418579);
-                    }
-                    if (!$level.$getBlockState($x + 1 | 0, $y, $z)) {
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x, $y, $z - 1 | 0))) {
                         var$22 = nleva_WorldTextures_layerSide($block);
-                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 5, var$22, 0.6000000238418579);
+                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 2, var$22, 0.800000011920929);
+                    }
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x, $y, $z + 1 | 0))) {
+                        var$22 = nleva_WorldTextures_layerSide($block);
+                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 3, var$22, 0.800000011920929);
+                    }
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x - 1 | 0, $y, $z))) {
+                        var$22 = nleva_WorldTextures_layerSide($block);
+                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 4, var$22, 0.6000000238418579);
+                    }
+                    if (!nmcr_LevelRenderer_occludes($level.$getBlockState($x + 1 | 0, $y, $z))) {
+                        var$20 = nleva_WorldTextures_layerSide($block);
+                        $vi = nmcr_LevelRenderer_emitFace($this, $out, $vi, $x, $y, $z, 5, var$20, 0.6000000238418579);
                     }
                 }
                 $lx = $lx + 1 | 0;
@@ -32266,6 +32272,10 @@ nmcr_LevelRenderer_rebuildSection = ($this, $gl, $level, $secKey) => {
     }
     $mesh.$vbo = $vbo;
     $mesh.$vertices = $vertices;
+},
+nmcr_LevelRenderer_occludes = $id => {
+    nmcr_LevelRenderer_$callClinit();
+    return $id && (nmwlb_Blocks_byId($id)).$opaque ? 1 : 0;
 },
 nmcr_LevelRenderer_emitFace = ($this, $out, $vi, $x, $y, $z, $face, $layer, $shade) => {
     let var$9, $x0, $x1, $y0, $y1, $z0, $z1, $q, var$17, $shadeB, $colorPacked, $colorF, $k, var$22, $idx, $b, var$25, var$26;
@@ -36019,9 +36029,9 @@ otpp_AsyncCallbackWrapper_error = ($this, $e) => {
     $this.$realAsyncCallback.$error($e);
 },
 nmcgsm_EditServerScreen$1 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_EditServerScreen$1__init_ = ($this, $this$0, $arg0, $arg1, $arg2, $arg3, $arg4) => {
+nmcgsm_EditServerScreen$1__init_ = ($this, $this$0, $x, $y, $width, $height, $hint) => {
     ju_Objects_requireNonNull($this$0);
-    nmcgc_EditBox__init_($this, $arg0, $arg1, $arg2, $arg3, $arg4);
+    nmcgc_EditBox__init_($this, $x, $y, $width, $height, $hint);
 },
 nmcgsm_EditServerScreen$1__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_EditServerScreen$1();
@@ -36349,9 +36359,9 @@ nlevi_PlatformOpenGL_getParameterString$js_body$_2 = (var$1, var$2) => {
     return r ? '' + r : '';
 },
 nmcgsm_EditServerScreen$2 = $rt_classWithoutFields(nmcgc_EditBox),
-nmcgsm_EditServerScreen$2__init_ = ($this, var$1, var$2, $arg1, $arg2, $arg3, $arg4) => {
+nmcgsm_EditServerScreen$2__init_ = ($this, var$1, var$2, $y, $width, $height, $hint) => {
     ju_Objects_requireNonNull(var$1);
-    nmcgc_EditBox__init_($this, var$2, $arg1, $arg2, $arg3, $arg4);
+    nmcgc_EditBox__init_($this, var$2, $y, $width, $height, $hint);
 },
 nmcgsm_EditServerScreen$2__init_0 = (var_0, var_1, var_2, var_3, var_4, var_5) => {
     let var_6 = new nmcgsm_EditServerScreen$2();
@@ -41479,7 +41489,7 @@ nmcgsm_EditServerScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 
 nmcgsm_EditServerScreen$init$lambda$_1_1, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_89", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1__init_), "$onPress", $rt_wrapFunction1(nmcgsm_EditServerScreen$init$lambda$_1_1_onPress)],
 jur_FSet$PossessiveFSet, "FSet$PossessiveFSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_FSet$PossessiveFSet__init_), "$matches", $rt_wrapFunction3(jur_FSet$PossessiveFSet_matches), "$getName", $rt_wrapFunction0(jur_FSet$PossessiveFSet_getName), "$hasConsumed", $rt_wrapFunction1(jur_FSet$PossessiveFSet_hasConsumed)],
 jur_PosCompositeGroupQuantifierSet, "PosCompositeGroupQuantifierSet", 2, jur_CompositeGroupQuantifierSet, [], 0, 0, 0, ["$_init_54", function(var_1, var_2, var_3, var_4, var_5) { jur_PosCompositeGroupQuantifierSet__init_(this, var_1, var_2, var_3, var_4, var_5); }, "$matches", $rt_wrapFunction3(jur_PosCompositeGroupQuantifierSet_matches)],
-nmwlb_Blocks$Block, "Blocks$Block", 15, jl_Object, [], 17, 0, 0, ["$_init_72", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor), "$tintForTexture", $rt_wrapFunction1(nmwlb_Blocks$Block_tintForTexture)],
+nmwlb_Blocks$Block, "Blocks$Block", 15, jl_Object, [], 17, 0, 0, ["$_init_72", function(var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11) { nmwlb_Blocks$Block__init_0(this, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var_9, var_10, var_11); }, "$nonOpaque", $rt_wrapFunction0(nmwlb_Blocks$Block_nonOpaque), "$tintFor", $rt_wrapFunction1(nmwlb_Blocks$Block_tintFor), "$tintForTexture", $rt_wrapFunction1(nmwlb_Blocks$Block_tintForTexture)],
 jt_DecimalFormat$TextField, "DecimalFormat$TextField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_", $rt_wrapFunction1(jt_DecimalFormat$TextField__init_0), "$render0", $rt_wrapFunction2(jt_DecimalFormat$TextField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$TextField_equals)],
 nmcgso_OptionsScreen, "OptionsScreen", 20, nmcgs_Screen, [], 1, 0, () => nmcgso_OptionsScreen_$callClinit(), ["$_init_57", $rt_wrapFunction3(nmcgso_OptionsScreen__init_), "$init", $rt_wrapFunction0(nmcgso_OptionsScreen_init), "$render", $rt_wrapFunction4(nmcgso_OptionsScreen_render), "$keyPressed", $rt_wrapFunction3(nmcgso_OptionsScreen_keyPressed), "$onClose", $rt_wrapFunction0(nmcgso_OptionsScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgso_OptionsScreen_isPauseScreen)],
 nmcm_ServerList, 0, jl_Object, [], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcm_ServerList__init_), "$load", $rt_wrapFunction0(nmcm_ServerList_load), "$save", $rt_wrapFunction0(nmcm_ServerList_save), "$size", $rt_wrapFunction0(nmcm_ServerList_size), "$get3", $rt_wrapFunction1(nmcm_ServerList_get), "$add5", $rt_wrapFunction1(nmcm_ServerList_add), "$remove3", $rt_wrapFunction1(nmcm_ServerList_remove), "$replace1", $rt_wrapFunction2(nmcm_ServerList_replace)],

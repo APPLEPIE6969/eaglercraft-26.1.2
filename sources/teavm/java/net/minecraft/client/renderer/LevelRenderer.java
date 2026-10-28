@@ -22,8 +22,10 @@ import net.minecraft.world.level.block.Blocks;
  *
  * <p>One opaque mesh per 16x16x16 section, rebuilt only when dirty -
  * vanilla's SectionRenderDispatcher reduced to its synchronous browser
- * form. A face is emitted when the neighbor cube is air (vanilla
- * solid-render face culling for a full-cube world). Each vertex packs:</p>
+ * form. A face is emitted when the neighbor block does not occlude it
+ * (air, leaves, glass - vanilla's isOpaqueFullCube face culling; the
+ * air-only rule first used here culled leaf-leaf faces and turned every
+ * cutout texture hole into a see-through gap). Each vertex packs:</p>
  *
  * <ul>
  *   <li>position (3f) - world-space block corners</li>
@@ -163,8 +165,8 @@ public class LevelRenderer {
         // ========== Meshing ==========
 
         /**
-         * Rebuilds one section's opaque mesh. Faces are emitted against air
-         * neighbors with vanilla's directional shading.
+         * Rebuilds one section's opaque mesh. Faces are emitted against
+         * non-occluding neighbors with vanilla's directional shading.
          */
         private void rebuildSection(WebGL2RenderingContext gl, ClientLevel level, long secKey) {
                 int secX = BlockPos.getX(secKey);
@@ -188,32 +190,32 @@ public class LevelRenderer {
                                         }
                                         Blocks.Block block = Blocks.byId(id);
                                         // +Y (up face, shade 1.0) - grass uses its tinted top texture
-                                        if (level.getBlockState(x, y + 1, z) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x, y + 1, z))) {
                                                 vi = emitFace(out, vi, x, y + 1, z, FACE_UP,
                                                         WorldTextures.layerTop(block), SHADE_UP);
                                         }
                                         // -Y (down face, shade 0.5)
-                                        if (level.getBlockState(x, y - 1, z) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x, y - 1, z))) {
                                                 vi = emitFace(out, vi, x, y, z, FACE_DOWN,
                                                         WorldTextures.layerBottom(block), SHADE_DOWN);
                                         }
                                         // -Z (north, shade 0.8)
-                                        if (level.getBlockState(x, y, z - 1) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x, y, z - 1))) {
                                                 vi = emitFace(out, vi, x, y, z, FACE_NORTH,
                                                         WorldTextures.layerSide(block), SHADE_NORTH_SOUTH);
                                         }
                                         // +Z (south, shade 0.8)
-                                        if (level.getBlockState(x, y, z + 1) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x, y, z + 1))) {
                                                 vi = emitFace(out, vi, x, y, z, FACE_SOUTH,
                                                         WorldTextures.layerSide(block), SHADE_NORTH_SOUTH);
                                         }
                                         // -X (west, shade 0.6)
-                                        if (level.getBlockState(x - 1, y, z) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x - 1, y, z))) {
                                                 vi = emitFace(out, vi, x, y, z, FACE_WEST,
                                                         WorldTextures.layerSide(block), SHADE_WEST_EAST);
                                         }
                                         // +X (east, shade 0.6)
-                                        if (level.getBlockState(x + 1, y, z) == Blocks.AIR) {
+                                        if (!occludes(level.getBlockState(x + 1, y, z))) {
                                                 vi = emitFace(out, vi, x, y, z, FACE_EAST,
                                                         WorldTextures.layerSide(block), SHADE_WEST_EAST);
                                         }
@@ -247,6 +249,20 @@ public class LevelRenderer {
         /** Meshing scratch: grows on demand (a section's visible faces are
          * typically a few hundred; 128k floats = comfortable headroom). */
         private float[] scratch = new float[128 * 1024];
+
+        /**
+         * Vanilla's face-cull test (ChunkRenderBuilder): a face is drawn
+         * when the neighbor block does not occlude it - air and non-opaque
+         * renders (leaves, glass) leave the face visible, full opaque
+         * cubes hide it. The air-only rule used before culled leaf-leaf
+         * faces, so every hole in the cutout leaves texture looked
+         * straight through the canopy to the sky (the "torn scraps"
+         * title-panorama trees) - vanilla fancy leaves draw their inner
+         * faces so texture holes reveal leaves behind them.
+         */
+        private static boolean occludes(int id) {
+                return id != Blocks.AIR && Blocks.byId(id).opaque;
+        }
 
         /**
          * Emits one textured quad (6 vertices x 6 floats + 1 packed color

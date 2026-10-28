@@ -66,6 +66,13 @@ public final class Blocks {
                 public final int topTint;
                 /** Foliage tint (ARGB) applied to every face, or 0 for none. */
                 public final int allTint;
+                /** Vanilla isOpaqueFullCube(): full opaque cubes hide the
+                 * neighbor faces they touch; non-opaque renders (leaves,
+                 * glass) do not - neighbor faces are drawn against them and
+                 * their own faces are drawn against every non-opaque
+                 * neighbor, so cutout texture holes reveal more block
+                 * faces instead of the sky behind the canopy. */
+                public boolean opaque = true;
 
                 Block(int id, String name, String displayName, float destroySpeed,
                                 boolean requiresCorrectTool, String topTexture, String sideTexture,
@@ -82,6 +89,12 @@ public final class Blocks {
                         this.tab = tab;
                         this.topTint = topTint;
                         this.allTint = allTint;
+                }
+
+                /** Marks the block a non-occluding render (leaves, glass). */
+                public Block nonOpaque() {
+                        this.opaque = false;
+                        return this;
                 }
 
                 /** Tint for a specific face texture (allTint wins over topTint). */
@@ -228,8 +241,8 @@ public final class Blocks {
         register(272, "red_sandstone", "Red Sandstone", 0.8F, true, "red_sandstone_top", "red_sandstone", "red_sandstone_bottom", TAB_BUILDING, 0x000000, 0x000000);
         register(273, "smooth_red_sandstone", "Smooth Red Sandstone", 2.0F, true, "red_sandstone_top", "red_sandstone_top", "red_sandstone_top", TAB_BUILDING, 0x000000, 0x000000);
         register(274, "bricks", "Bricks", 2.0F, true, "bricks", "bricks", "bricks", TAB_BUILDING, 0x000000, 0x000000);
-        register(275, "glass", "Glass", 0.3F, false, "glass", "glass", "glass", TAB_BUILDING, 0x000000, 0x000000);
-        register(276, "tinted_glass", "Tinted Glass", 0.3F, false, "tinted_glass", "tinted_glass", "tinted_glass", TAB_BUILDING, 0x000000, 0x000000);
+        register(275, "glass", "Glass", 0.3F, false, "glass", "glass", "glass", TAB_BUILDING, 0x000000, 0x000000).nonOpaque();
+        register(276, "tinted_glass", "Tinted Glass", 0.3F, false, "tinted_glass", "tinted_glass", "tinted_glass", TAB_BUILDING, 0x000000, 0x000000).nonOpaque();
         register(277, "obsidian", "Obsidian", 50.0F, true, "obsidian", "obsidian", "obsidian", TAB_BUILDING, 0x000000, 0x000000);
         register(278, "crying_obsidian", "Crying Obsidian", 50.0F, true, "crying_obsidian", "crying_obsidian", "crying_obsidian", TAB_BUILDING, 0x000000, 0x000000);
         register(279, "purpur_block", "Purpur Block", 1.5F, true, "purpur_block", "purpur_block", "purpur_block", TAB_BUILDING, 0x000000, 0x000000);
@@ -312,15 +325,15 @@ public final class Blocks {
         register(356, "dark_oak_log", "Dark Oak Log", 2.0F, false, "dark_oak_log_top", "dark_oak_log", "dark_oak_log_top", TAB_NATURAL, 0x000000, 0x000000);
         register(357, "mangrove_log", "Mangrove Log", 2.0F, false, "mangrove_log_top", "mangrove_log", "mangrove_log_top", TAB_NATURAL, 0x000000, 0x000000);
         register(358, "cherry_log", "Cherry Log", 2.0F, false, "cherry_log_top", "cherry_log", "cherry_log_top", TAB_NATURAL, 0x000000, 0x000000);
-        register(359, "oak_leaves", "Oak Leaves", 0.2F, false, "oak_leaves", "oak_leaves", "oak_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
-        register(360, "spruce_leaves", "Spruce Leaves", 0.2F, false, "spruce_leaves", "spruce_leaves", "spruce_leaves", TAB_NATURAL, 0x000000, 0x619961);
-        register(361, "birch_leaves", "Birch Leaves", 0.2F, false, "birch_leaves", "birch_leaves", "birch_leaves", TAB_NATURAL, 0x000000, 0x80A755);
-        register(362, "jungle_leaves", "Jungle Leaves", 0.2F, false, "jungle_leaves", "jungle_leaves", "jungle_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
-        register(363, "acacia_leaves", "Acacia Leaves", 0.2F, false, "acacia_leaves", "acacia_leaves", "acacia_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
-        register(364, "dark_oak_leaves", "Dark Oak Leaves", 0.2F, false, "dark_oak_leaves", "dark_oak_leaves", "dark_oak_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
-        register(365, "mangrove_leaves", "Mangrove Leaves", 0.2F, false, "mangrove_leaves", "mangrove_leaves", "mangrove_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
-        register(366, "cherry_leaves", "Cherry Leaves", 0.2F, false, "cherry_leaves", "cherry_leaves", "cherry_leaves", TAB_NATURAL, 0x000000, 0x000000);
-        register(367, "azalea_leaves", "Azalea Leaves", 0.2F, false, "azalea_leaves", "azalea_leaves", "azalea_leaves", TAB_NATURAL, 0x000000, 0x77AB2F);
+        register(359, "oak_leaves", "Oak Leaves", 0.2F, false, "oak_leaves", "oak_leaves", "oak_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
+        register(360, "spruce_leaves", "Spruce Leaves", 0.2F, false, "spruce_leaves", "spruce_leaves", "spruce_leaves", TAB_NATURAL, 0x000000, 0x619961).nonOpaque();
+        register(361, "birch_leaves", "Birch Leaves", 0.2F, false, "birch_leaves", "birch_leaves", "birch_leaves", TAB_NATURAL, 0x000000, 0x80A755).nonOpaque();
+        register(362, "jungle_leaves", "Jungle Leaves", 0.2F, false, "jungle_leaves", "jungle_leaves", "jungle_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
+        register(363, "acacia_leaves", "Acacia Leaves", 0.2F, false, "acacia_leaves", "acacia_leaves", "acacia_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
+        register(364, "dark_oak_leaves", "Dark Oak Leaves", 0.2F, false, "dark_oak_leaves", "dark_oak_leaves", "dark_oak_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
+        register(365, "mangrove_leaves", "Mangrove Leaves", 0.2F, false, "mangrove_leaves", "mangrove_leaves", "mangrove_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
+        register(366, "cherry_leaves", "Cherry Leaves", 0.2F, false, "cherry_leaves", "cherry_leaves", "cherry_leaves", TAB_NATURAL, 0x000000, 0x000000).nonOpaque();
+        register(367, "azalea_leaves", "Azalea Leaves", 0.2F, false, "azalea_leaves", "azalea_leaves", "azalea_leaves", TAB_NATURAL, 0x000000, 0x77AB2F).nonOpaque();
         register(368, "ancient_debris", "Ancient Debris", 30.0F, true, "ancient_debris_top", "ancient_debris_side", "ancient_debris_top", TAB_NATURAL, 0x000000, 0x000000);
         register(369, "hay_block", "Hay Bale", 0.5F, false, "hay_block_top", "hay_block_side", "hay_block_top", TAB_NATURAL, 0x000000, 0x000000);
         register(370, "dried_kelp_block", "Dried Kelp Block", 0.5F, false, "dried_kelp_top", "dried_kelp_side", "dried_kelp_top", TAB_NATURAL, 0x000000, 0x000000);

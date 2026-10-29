@@ -991,7 +991,15 @@ public class EaglerCraft {
                         sb.append(",\"destroy\":null");
                 }
                 // Day/night sky state (the timeline sample the renderer used
-                // for its last frame) - the sky e2e asserts on this
+                // for its last frame) - the sky e2e asserts on this.
+                // Refresh the sample with the CURRENT level time first: the
+                // render path may lag the tick path by a frame (up to seconds
+                // on a loaded runner), and a snapshot that mixed the fresh
+                // dayTime with a stale angle raced the sky spec's gate.
+                net.minecraft.client.player.LocalPlayer skyRefreshPlayer = mc.getPlayer();
+                net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.updateState(
+                                level.getDayTime(), 0.0F,
+                                skyRefreshPlayer != null ? skyRefreshPlayer.getEyeY() : 0.0D);
                 sb.append(",\"dayTime\":").append(level.getDayTime());
                 sb.append(",\"sky\":{\"dayTime\":").append(level.getDayTime());
                 sb.append(",\"skyColor\":").append(net.lax1dude.eaglercraft.v2_6.adapter.SkyRenderer.skyColorRgb());

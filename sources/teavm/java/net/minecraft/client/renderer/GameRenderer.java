@@ -45,11 +45,15 @@ public class GameRenderer {
          * {@link EaglerGuiImpl}'s batched quad pipeline; the batch re-binds
          * lazily, so interleaved GL work (the title gradient) stays safe.</p>
          *
-         * @param partialTick   Interpolation factor (0.0 to 1.0) between ticks
-         * @param currentTimeMs Current time in milliseconds
-         * @param renderLevel   Whether to render the 3D world
+         * @param partialTick         Vanilla DeltaTracker.getGameTimeDeltaPartialTick:
+         *                             interpolation factor [0,1) between simulation ticks
+         * @param realtimeDeltaTicks  Vanilla getRealtimeDeltaTicks: this frame's
+         *                             real-time delta expressed in ticks (clocks that
+         *                             must advance with wall time, e.g. the panorama)
+         * @param currentTimeMs       Current time in milliseconds
+         * @param renderLevel         Whether to render the 3D world
          */
-        public void render(float partialTick, long currentTimeMs, boolean renderLevel) {
+        public void render(float partialTick, float realtimeDeltaTicks, long currentTimeMs, boolean renderLevel) {
                 int pxWidth = PlatformRuntime.getCanvasDrawableWidth();
                 int pxHeight = PlatformRuntime.getCanvasDrawableHeight();
                 if (pxWidth <= 0 || pxHeight <= 0) return;
@@ -106,9 +110,11 @@ public class GameRenderer {
                         // processes and blits to the screen; menu tiles are
                         // drawn on top of the blurred image by the screens.
                         if (minecraft.screen != null && !minecraft.isLevelLoaded()) {
-                                // Real-time frame delta in ticks, like vanilla's
-                                // getRealtimeDeltaTicks()
-                                PanoramaRenderer.tick(partialTick * 20.0f);
+                                // Vanilla Panorama.render uses the realtime clock
+                                // (DeltaTracker.getRealtimeDeltaTicks), not the
+                                // game-tick fraction: the menu spins even when
+                                // the game is paused
+                                PanoramaRenderer.tick(realtimeDeltaTicks);
                                 // Close the (still empty) GUI batch - the cube
                                 // switches programs, and the next GUI draw
                                 // re-opens the batch. render() also polls the
@@ -174,10 +180,13 @@ public class GameRenderer {
                                                         (SkyRenderer.skyLightRgb() >> 8 & 0xFF) / 255.0f,
                                                         (SkyRenderer.skyLightRgb() & 0xFF) / 255.0f);
                                         // Vanilla pick: from the eye along the view
-                                        // vector, BLOCK_INTERACTION_RANGE long
-                                        double eyeX = player.getEyeX();
-                                        double eyeY = player.getEyeY();
-                                        double eyeZ = player.getEyeZ();
+                                        // vector, BLOCK_INTERACTION_RANGE long.
+                                        // Vanilla Camera.setup reads getEyePosition
+                                        // (partialTick): the eye position lerped
+                                        // between the last two simulation ticks
+                                        double eyeX = player.getEyeX(partialTick);
+                                        double eyeY = player.getEyeY(partialTick);
+                                        double eyeZ = player.getEyeZ(partialTick);
                                         double yawRad = player.yRot * (Math.PI / 180.0D);
                                         double pitchRad = player.xRot * (Math.PI / 180.0D);
                                         double cosPitch = Math.cos(pitchRad);

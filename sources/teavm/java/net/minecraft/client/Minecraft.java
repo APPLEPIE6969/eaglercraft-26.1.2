@@ -12,6 +12,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
 
+import net.lax1dude.eaglercraft.v2_6.EaglerCraft;
 import net.lax1dude.eaglercraft.v2_6.EaglerCraftConfig;
 import net.lax1dude.eaglercraft.v2_6.EaglerProfile;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
@@ -351,9 +352,15 @@ public class Minecraft implements com.mojang.blaze3d.platform.WindowEventHandler
          */
         public void render(boolean renderLevel) {
                 try {
-                        // Delegate to GameRenderer
+                        // Delegate to GameRenderer. partialTick = vanilla
+                        // DeltaTracker.getGameTimeDeltaPartialTick (the [0,1)
+                        // fraction between simulation ticks); realtimeDeltaTicks
+                        // = vanilla getRealtimeDeltaTicks (the frame's real-time
+                        // delta expressed in ticks, for clocks that must advance
+                        // with wall time even when ticks don't run - panorama)
                         if (this.gameRenderer != null) {
-                                this.gameRenderer.render(PlatformRuntime.getDeltaTimeMs() / 1000.0f,
+                                this.gameRenderer.render(EaglerCraft.getGamePartialTick(),
+                                        PlatformRuntime.getDeltaTimeMs() / (float) EaglerCraftConfig.MS_PER_TICK,
                                         PlatformRuntime.getCurrentTimeMillis(), renderLevel);
                         }
                 } catch (Throwable t) {

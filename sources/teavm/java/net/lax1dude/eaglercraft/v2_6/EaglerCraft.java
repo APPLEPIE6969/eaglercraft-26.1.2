@@ -524,6 +524,20 @@ public class EaglerCraft {
         }
 
         /**
+         * Vanilla DeltaTracker.getGameTimeDeltaPartialTick: the fraction
+         * [0,1) of the next tick that has already elapsed - the
+         * interpolation factor rendering uses between the last two
+         * simulation states (camera lerp, sky, GUI animations). Only
+         * meaningful with USE_FIXED_TIMESTEP; under the old variable
+         * timestep every frame was its own tick and this was effectively
+         * always 1.
+         */
+        public static float getGamePartialTick() {
+                float partial = tickAccumulator / (float) EaglerCraftConfig.MS_PER_TICK;
+                return partial < 0.0F ? 0.0F : (partial > 1.0F ? 1.0F : partial);
+        }
+
+        /**
          * Processes input events from PlatformInput.
          *
          * <p>Polls the keyboard and mouse state from PlatformInput and

@@ -11510,11 +11510,17 @@ nmcp_LocalPlayer_turn = ($this, $xo, $yo) => {
 nmcp_LocalPlayer_getEyeY = $this => {
     return $this.$y0 + (!$this.$crouching ? 1.62 : 1.27);
 },
-nmcp_LocalPlayer_getEyeX = $this => {
-    return $this.$x0;
+nmcp_LocalPlayer_getEyeX = ($this, $partialTick) => {
+    return $this.$xo + ($this.$x0 - $this.$xo) * $partialTick;
 },
-nmcp_LocalPlayer_getEyeZ = $this => {
-    return $this.$z;
+nmcp_LocalPlayer_getEyeY0 = ($this, $partialTick) => {
+    let var$2;
+    var$2 = $this.$yo + ($this.$y0 - $this.$yo) * $partialTick;
+    var$2 = var$2 + (!$this.$crouching ? 1.62 : 1.27);
+    return var$2;
+},
+nmcp_LocalPlayer_getEyeZ = ($this, $partialTick) => {
+    return $this.$zo + ($this.$z - $this.$zo) * $partialTick;
 },
 nmcp_LocalPlayer_setSprinting = ($this, $sprinting) => {
     $this.$sprinting = $sprinting;
@@ -28149,8 +28155,8 @@ nmcr_GameRenderer__init_0 = var_0 => {
     nmcr_GameRenderer__init_(var_1, var_0);
     return var_1;
 },
-nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) => {
-    let $pxWidth, $pxHeight, $gl, $guiWidth, $guiHeight, var$9, $skyLevel, $skyPlayer, var$12, var$13, var$14, var$15, var$16, $haveTargets, $panoramaDrawn, $blurRadius, $player, $level, $aspect, $eyeX, $eyeY, $eyeZ, $yawRad, $pitchRad, $cosPitch, $dirX, $dirY, $dirZ, var$32, $hit, $stage, var$35, $screen, var$37, $t, $$je;
+nmcr_GameRenderer_render = ($this, $partialTick, $realtimeDeltaTicks, $currentTimeMs, $renderLevel) => {
+    let $pxWidth, $pxHeight, $gl, $guiWidth, $guiHeight, var$10, $skyLevel, $skyPlayer, var$13, var$14, var$15, var$16, var$17, $haveTargets, $panoramaDrawn, $blurRadius, $player, $level, $aspect, $eyeX, $eyeY, $eyeZ, $yawRad, $pitchRad, $cosPitch, $dirX, $dirY, $dirZ, var$33, $hit, $stage, var$36, $screen, var$38, $t, $$je;
     $pxWidth = nlevi_PlatformRuntime_getCanvasDrawableWidth();
     $pxHeight = nlevi_PlatformRuntime_getCanvasDrawableHeight();
     if ($pxWidth > 0 && $pxHeight > 0) {
@@ -28164,11 +28170,11 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
             a: {
                 try {
                     b: {
-                        var$9 = $this.$minecraft1.$getLevel();
-                        if (var$9 instanceof nmcm_ClientLevel) {
-                            $skyLevel = var$9;
-                            var$9 = $this.$minecraft1;
-                            if (var$9.$isLevelLoaded())
+                        var$10 = $this.$minecraft1.$getLevel();
+                        if (var$10 instanceof nmcm_ClientLevel) {
+                            $skyLevel = var$10;
+                            var$10 = $this.$minecraft1;
+                            if (var$10.$isLevelLoaded())
                                 break b;
                         }
                         $skyLevel = null;
@@ -28177,13 +28183,13 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                         nlevi_PlatformOpenGL__wglClearColor(0.6269999742507935, 0.8080000281333923, 1.0, 1.0);
                     else {
                         $skyPlayer = $this.$minecraft1.$getPlayer();
-                        var$12 = $skyLevel.$getDayTime();
-                        var$13 = $skyPlayer === null ? 0.0 : $skyPlayer.$getEyeY();
-                        nleva_SkyRenderer_updateState(var$12, $partialTick, var$13);
-                        var$14 = nleva_SkyRenderer_fogR0();
-                        var$15 = nleva_SkyRenderer_fogG0();
-                        var$16 = nleva_SkyRenderer_fogB0();
-                        nlevi_PlatformOpenGL__wglClearColor(var$14, var$15, var$16, 1.0);
+                        var$13 = $skyLevel.$getDayTime();
+                        var$14 = $skyPlayer === null ? 0.0 : $skyPlayer.$getEyeY();
+                        nleva_SkyRenderer_updateState(var$13, $partialTick, var$14);
+                        var$15 = nleva_SkyRenderer_fogR0();
+                        var$16 = nleva_SkyRenderer_fogG0();
+                        var$17 = nleva_SkyRenderer_fogB0();
+                        nlevi_PlatformOpenGL__wglClearColor(var$15, var$16, var$17, 1.0);
                     }
                     nlevi_PlatformOpenGL__wglClear(16640);
                     cmbs_RenderSystem_enableBlend();
@@ -28191,7 +28197,7 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                     cmbs_RenderSystem_disableDepthTest();
                     nleva_EaglerGuiImpl_begin($gl, $guiWidth, $guiHeight);
                     if ($this.$minecraft1.$screen !== null && !$this.$minecraft1.$isLevelLoaded()) {
-                        nleva_PanoramaRenderer_tick($partialTick * 20.0);
+                        nleva_PanoramaRenderer_tick($realtimeDeltaTicks);
                         nleva_EaglerGuiImpl_flush($gl);
                         $haveTargets = nleva_MenuBlurRenderer_bindPanoramaTarget($gl, $pxWidth, $pxHeight);
                         $panoramaDrawn = nleva_PanoramaRenderer_render($gl, $pxWidth, $pxHeight);
@@ -28201,8 +28207,8 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                                 if (!$this.$minecraft1.$screen.$shouldBlurBackground())
                                     $blurRadius = 0;
                                 else {
-                                    var$9 = $this.$minecraft1;
-                                    $blurRadius = (var$9.$getOptions()).$menuBackgroundBlurriness;
+                                    var$10 = $this.$minecraft1;
+                                    $blurRadius = (var$10.$getOptions()).$menuBackgroundBlurriness;
                                 }
                                 nleva_MenuBlurRenderer_present($gl, $pxWidth, $pxHeight, $blurRadius);
                             }
@@ -28212,23 +28218,23 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                     }
                     if ($this.$minecraft1.$isLevelLoaded()) {
                         $player = $this.$minecraft1.$getPlayer();
-                        var$9 = $this.$minecraft1.$getLevel();
-                        $level = !(var$9 instanceof nmcm_ClientLevel) ? null : var$9;
+                        var$10 = $this.$minecraft1.$getLevel();
+                        $level = !(var$10 instanceof nmcm_ClientLevel) ? null : var$10;
                         if ($player !== null && $level !== null) {
                             $aspect = $pxHeight <= 0 ? 1.0 : $pxWidth / $pxHeight;
                             nleva_EaglerGuiImpl_flush($gl);
-                            var$9 = $this.$minecraft1;
-                            var$14 = (var$9.$getOptions()).$fov;
-                            var$15 = $player.$yRot;
-                            var$16 = $player.$xRot;
-                            nleva_SkyRenderer_renderFrame($gl, $pxWidth, $pxHeight, var$14, $aspect, var$15, var$16);
-                            var$14 = (nleva_SkyRenderer_skyLightRgb() >> 16 & 255) / 255.0;
-                            var$15 = (nleva_SkyRenderer_skyLightRgb() >> 8 & 255) / 255.0;
-                            var$16 = (nleva_SkyRenderer_skyLightRgb() & 255) / 255.0;
-                            nleva_WorldGlRenderer_setSkyLight(var$14, var$15, var$16);
-                            $eyeX = $player.$getEyeX();
-                            $eyeY = $player.$getEyeY();
-                            $eyeZ = $player.$getEyeZ();
+                            var$10 = $this.$minecraft1;
+                            var$15 = (var$10.$getOptions()).$fov;
+                            var$16 = $player.$yRot;
+                            var$17 = $player.$xRot;
+                            nleva_SkyRenderer_renderFrame($gl, $pxWidth, $pxHeight, var$15, $aspect, var$16, var$17);
+                            var$15 = (nleva_SkyRenderer_skyLightRgb() >> 16 & 255) / 255.0;
+                            var$16 = (nleva_SkyRenderer_skyLightRgb() >> 8 & 255) / 255.0;
+                            var$17 = (nleva_SkyRenderer_skyLightRgb() & 255) / 255.0;
+                            nleva_WorldGlRenderer_setSkyLight(var$15, var$16, var$17);
+                            $eyeX = $player.$getEyeX($partialTick);
+                            $eyeY = $player.$getEyeY0($partialTick);
+                            $eyeZ = $player.$getEyeZ($partialTick);
                             $yawRad = $player.$yRot * 0.017453292519943295;
                             $pitchRad = $player.$xRot * 0.017453292519943295;
                             $cosPitch = jl_Math_cos($pitchRad);
@@ -28236,17 +28242,17 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                             $dirY =  -jl_Math_sin($pitchRad);
                             $dirZ = jl_Math_cos($yawRad) * $cosPitch;
                             $this.$minecraft1.$pickFromEye($eyeX, $eyeY, $eyeZ, $dirX, $dirY, $dirZ, 4.5);
-                            var$9 = $this.$minecraft1.$getLevelRenderer();
-                            var$14 = $player.$yRot;
-                            var$15 = $player.$xRot;
-                            var$32 = $this.$minecraft1;
-                            var$16 = (var$32.$getOptions()).$fov;
-                            var$9.$renderLevel($gl, $pxWidth, $pxHeight, $eyeX, $eyeY, $eyeZ, var$14, var$15, var$16);
+                            var$10 = $this.$minecraft1.$getLevelRenderer();
+                            var$15 = $player.$yRot;
+                            var$16 = $player.$xRot;
+                            var$33 = $this.$minecraft1;
+                            var$17 = (var$33.$getOptions()).$fov;
+                            var$10.$renderLevel($gl, $pxWidth, $pxHeight, $eyeX, $eyeY, $eyeZ, var$15, var$16, var$17);
                             $hit = $this.$minecraft1.$getHitResult();
                             if ($hit !== null) {
-                                var$9 = $hit.$type;
+                                var$10 = $hit.$type;
                                 nmwp_BlockHitResult$Type_$callClinit();
-                                if (var$9 === nmwp_BlockHitResult$Type_BLOCK && !nlev_EaglerCraft_isHudHidden()) {
+                                if (var$10 === nmwp_BlockHitResult$Type_BLOCK && !nlev_EaglerCraft_isHudHidden()) {
                                     ($this.$minecraft1.$getLevelRenderer()).$renderHitOutline($gl, $hit.$blockX, $hit.$blockY, $hit.$blockZ);
                                     $stage = ($this.$minecraft1.$getGameMode()).$getDestroyStage();
                                     if ($stage >= 0)
@@ -28260,21 +28266,21 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                         ($this.$minecraft1.$getGui()).$render2(cmbv_PoseStack__init_(), $partialTick);
                     nleva_EaglerGuiImpl_flush($gl);
                     if ($this.$minecraft1.$isLevelLoaded() && $this.$minecraft1.$screen !== null) {
-                        var$9 = $this.$minecraft1.$screen;
-                        if (var$9.$shouldBlurBackground()) {
-                            var$9 = $this.$minecraft1;
-                            var$35 = (var$9.$getOptions()).$menuBackgroundBlurriness;
-                            nleva_MenuBlurRenderer_blurScreenContent($gl, $pxWidth, $pxHeight, var$35);
+                        var$10 = $this.$minecraft1.$screen;
+                        if (var$10.$shouldBlurBackground()) {
+                            var$10 = $this.$minecraft1;
+                            var$36 = (var$10.$getOptions()).$menuBackgroundBlurriness;
+                            nleva_MenuBlurRenderer_blurScreenContent($gl, $pxWidth, $pxHeight, var$36);
                         }
                     }
                     $screen = $this.$minecraft1.$screen;
                     if ($screen !== null) {
-                        var$9 = cmbv_PoseStack__init_();
-                        var$32 = $this.$minecraft1;
-                        var$35 = (var$32.$getMouseHandler()).$xpos() | 0;
-                        var$32 = $this.$minecraft1;
-                        var$37 = (var$32.$getMouseHandler()).$ypos() | 0;
-                        $screen.$render(var$9, var$35, var$37, $partialTick);
+                        var$10 = cmbv_PoseStack__init_();
+                        var$33 = $this.$minecraft1;
+                        var$36 = (var$33.$getMouseHandler()).$xpos() | 0;
+                        var$33 = $this.$minecraft1;
+                        var$38 = (var$33.$getMouseHandler()).$ypos() | 0;
+                        $screen.$render(var$10, var$36, var$38, $partialTick);
                     }
                     nleva_EaglerGuiImpl_flush($gl);
                     break a;
@@ -28282,10 +28288,10 @@ nmcr_GameRenderer_render = ($this, $partialTick, $currentTimeMs, $renderLevel) =
                     $$je = $rt_wrapException($$e);
                     if ($$je instanceof jl_Throwable) {
                         $t = $$je;
-                        var$9 = $t.$getMessage();
-                        var$32 = jl_StringBuilder__init_();
-                        jl_StringBuilder_append(jl_StringBuilder_append(var$32, $rt_s(1078)), var$9);
-                        console.warn($rt_ustr(jl_StringBuilder_toString(var$32)));
+                        var$10 = $t.$getMessage();
+                        var$33 = jl_StringBuilder__init_();
+                        jl_StringBuilder_append(jl_StringBuilder_append(var$33, $rt_s(1078)), var$10);
+                        console.warn($rt_ustr(jl_StringBuilder_toString(var$33)));
                         break a;
                     } else {
                         throw $$e;
@@ -28883,7 +28889,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
             console.log("[EaglerCraft] May take several minutes on slow devices...");
             b: {
                 try {
-                    nlev_EaglerCraft_runWithJsStackCapture$js_body$_62(otji_JS_function(otji_JSWrapper_unwrap(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_0($gameConfig)), "run"));
+                    nlev_EaglerCraft_runWithJsStackCapture$js_body$_63(otji_JS_function(otji_JSWrapper_unwrap(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0__init_0($gameConfig)), "run"));
                     console.log("[EaglerCraft] Minecraft instance created!");
                     break b;
                 } catch ($$e) {
@@ -28910,7 +28916,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
                 var$18 = jl_StringBuilder__init_();
                 jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(jl_StringBuilder_append(var$18, $rt_s(1124)), var$8), $rt_s(82)), var$10);
                 console.warn($rt_ustr(jl_StringBuilder_toString(var$18)));
-                $jsStack = $rt_str(nlev_EaglerCraft_getJsErrorStack$js_body$_61());
+                $jsStack = $rt_str(nlev_EaglerCraft_getJsErrorStack$js_body$_62());
                 if ($jsStack !== null && !jl_String_isEmpty($jsStack)) {
                     var$8 = jl_StringBuilder__init_();
                     jl_StringBuilder_append(jl_StringBuilder_append(var$8, $rt_s(1125)), $jsStack);
@@ -28964,6 +28970,8 @@ nlev_EaglerCraft_tick = () => {
         return;
     $currentTime = nlevi_PlatformRuntime_getCurrentTimeMillis();
     $deltaTime = Long_sub($currentTime, nlev_EaglerCraft_lastTickTime);
+    if (Long_gt($deltaTime, Long_fromInt(250)))
+        $deltaTime = Long_fromInt(250);
     if (!nlevi_PlatformRuntime_isPageVisible()) {
         if (!nlev_EaglerCraft_paused) {
             nlev_EaglerCraft_paused = 1;
@@ -28972,19 +28980,33 @@ nlev_EaglerCraft_tick = () => {
         }
         return;
     }
-    if (!nlev_EaglerCraft_paused) {
-        nlev_EaglerCraft_processInput();
-        nlev_EaglerCraft_gameLogicTick();
-        nlev_EaglerCraft_renderFrame();
+    if (nlev_EaglerCraft_paused) {
+        nlev_EaglerCraft_paused = 0;
+        nlev_EaglerCraft_gameState = 2;
         nlev_EaglerCraft_lastTickTime = $currentTime;
-        nlev_EaglerCraft_totalFrames = Long_add(nlev_EaglerCraft_totalFrames, Long_fromInt(1));
+        nlev_EaglerCraft_tickAccumulator = Long_ZERO;
+        console.warn("[EaglerCraft] auto-resumed: page visible again");
         return;
     }
-    nlev_EaglerCraft_paused = 0;
-    nlev_EaglerCraft_gameState = 2;
+    nlev_EaglerCraft_processInput();
+    nlev_EaglerCraft_tickAccumulator = Long_add(nlev_EaglerCraft_tickAccumulator, $deltaTime);
+    while (Long_ge(nlev_EaglerCraft_tickAccumulator, Long_fromInt(50))) {
+        nlev_EaglerCraft_gameLogicTick();
+        nlev_EaglerCraft_tickAccumulator = Long_sub(nlev_EaglerCraft_tickAccumulator, Long_fromInt(50));
+    }
+    nlev_EaglerCraft_renderFrame();
     nlev_EaglerCraft_lastTickTime = $currentTime;
-    nlev_EaglerCraft_tickAccumulator = Long_ZERO;
-    console.warn("[EaglerCraft] auto-resumed: page visible again");
+    nlev_EaglerCraft_totalFrames = Long_add(nlev_EaglerCraft_totalFrames, Long_fromInt(1));
+},
+nlev_EaglerCraft_getGamePartialTick = () => {
+    let $partial;
+    nlev_EaglerCraft_$callClinit();
+    $partial = Long_toNumber(nlev_EaglerCraft_tickAccumulator) / 50.0;
+    if ($partial < 0.0)
+        $partial = 0.0;
+    else if ($partial > 1.0)
+        $partial = 1.0;
+    return $partial;
 },
 nlev_EaglerCraft_processInput = () => {
     let $mc, $mh, $mouseX, $mouseY, $button, $press, $release, $wasInGame, $wheel;
@@ -29024,7 +29046,7 @@ nlev_EaglerCraft_processInput = () => {
 nlev_EaglerCraft_gameLogicTick = () => {
     let $mc, var$2, $t, var$4, $$je;
     nlev_EaglerCraft_$callClinit();
-    if ((nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_56() ? 1 : 0) && nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
+    if ((nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_57() ? 1 : 0) && nlev_EaglerCraft_minecraftInstance instanceof nmc_Minecraft) {
         $mc = nlev_EaglerCraft_minecraftInstance;
         if (!$mc.$isLevelLoaded()) {
             console.log("[EaglerCraft] enterWorld() requested via telemetry bridge");
@@ -29139,9 +29161,9 @@ nlev_EaglerCraft_pushGameTelemetry = () => {
             var$12 = nleva_PanoramaRenderer_spinDegrees();
             var$13 = nlev_EaglerCraft_menuBackgroundBlurRadius();
             var$14 = nlev_EaglerCraft_menuBackgroundBlurrinessOption();
-            var$15 = nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_0();
-            var$16 = nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1__init_0();
-            nlev_EaglerCraft_pushGameTelemetry0$js_body$_55(!!var$7, var$8, $rt_ustr($screen), !!$inWorld, var$10, $guiScale, $rt_ustr($buttonsJson), !!var$11, var$12, var$13, var$14, $rt_ustr($gameplayJson), otji_JS_function(otji_JSWrapper_unwrap(var$15), "query"), otji_JS_function(otji_JSWrapper_unwrap(var$16), "dump"));
+            var$15 = nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0__init_0();
+            var$16 = nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1__init_0();
+            nlev_EaglerCraft_pushGameTelemetry0$js_body$_56(!!var$7, var$8, $rt_ustr($screen), !!$inWorld, var$10, $guiScale, $rt_ustr($buttonsJson), !!var$11, var$12, var$13, var$14, $rt_ustr($gameplayJson), otji_JS_function(otji_JSWrapper_unwrap(var$15), "query"), otji_JS_function(otji_JSWrapper_unwrap(var$16), "dump"));
             break a;
         } catch ($$e) {
             $$je = $rt_wrapException($$e);
@@ -29344,11 +29366,11 @@ nlev_EaglerCraft_quote = $s => {
 nlev_EaglerCraft_consumeHotbarTelemetryRequests = $mc => {
     let $slot, $id, $count, $inv;
     nlev_EaglerCraft_$callClinit();
-    $slot = nlev_EaglerCraft_peekHotbarReqSlot$js_body$_27();
+    $slot = nlev_EaglerCraft_peekHotbarReqSlot$js_body$_28();
     if ($slot < 0)
         return;
-    $id = nlev_EaglerCraft_peekHotbarReqId$js_body$_28();
-    $count = nlev_EaglerCraft_peekHotbarReqCount$js_body$_29();
+    $id = nlev_EaglerCraft_peekHotbarReqId$js_body$_29();
+    $count = nlev_EaglerCraft_peekHotbarReqCount$js_body$_30();
     window.__eaglercraftHotbarReq = null;
     $inv = $mc.$getInventory();
     if ($slot >= 0 && $slot < 9) {
@@ -29363,8 +29385,8 @@ nlev_EaglerCraft_consumeLookRequest = $mc => {
     let $yaw, $pitch, $p;
     nlev_EaglerCraft_$callClinit();
     if ($mc.$getPlayer() !== null && (window.__eaglercraftLookReq != null ? 1 : 0)) {
-        $yaw = nlev_EaglerCraft_readLookYaw$js_body$_33();
-        $pitch = nlev_EaglerCraft_readLookPitch$js_body$_34();
+        $yaw = nlev_EaglerCraft_readLookYaw$js_body$_34();
+        $pitch = nlev_EaglerCraft_readLookPitch$js_body$_35();
         window.__eaglercraftLookReq = null;
         nlevi_PlatformInput_clearMouseDeltas();
         $p = $mc.$getPlayer();
@@ -29376,7 +29398,7 @@ nlev_EaglerCraft_consumeTimeRequest = $mc => {
     let $t, var$3, $level, var$5;
     nlev_EaglerCraft_$callClinit();
     if ((window.__eaglercraftTimeReq != null ? 1 : 0) && $mc.$getLevel() !== null) {
-        $t = nlev_EaglerCraft_readTimeRequest$js_body$_38();
+        $t = nlev_EaglerCraft_readTimeRequest$js_body$_39();
         window.__eaglercraftTimeReq = null;
         var$3 = $mc.$getLevel();
         if (var$3 instanceof nmcm_ClientLevel) {
@@ -29395,16 +29417,16 @@ nlev_EaglerCraft_consumeSceneRequest = $mc => {
     nlev_EaglerCraft_$callClinit();
     if (!(typeof window !== 'undefined' && window.__eaglercraftSceneReq != null ? 1 : 0))
         return;
-    $fov = nlev_EaglerCraft_readSceneFov$js_body$_43();
+    $fov = nlev_EaglerCraft_readSceneFov$js_body$_44();
     if ($fov > 0 && $mc.$getOptions() !== null)
         ($mc.$getOptions()).$fov = $fov;
-    $hud = nlev_EaglerCraft_readSceneHideHud$js_body$_44();
+    $hud = nlev_EaglerCraft_readSceneHideHud$js_body$_45();
     if ($hud >= 0)
         nlev_EaglerCraft_hudHidden = $hud != 1 ? 0 : 1;
     var$4 = $mc.$getLevel();
     if (var$4 instanceof nmcm_ClientLevel) {
         $level = var$4;
-        $n = nlev_EaglerCraft_sceneBlockCount$js_body$_45();
+        $n = nlev_EaglerCraft_sceneBlockCount$js_body$_46();
         $i = 0;
         while ($i < $n) {
             var$8 = window.__eaglercraftSceneReq.blocks[$i][0];
@@ -29419,7 +29441,7 @@ nlev_EaglerCraft_consumeSceneRequest = $mc => {
             jl_StringBuilder_append(jl_StringBuilder_append0(jl_StringBuilder_append(var$4, $rt_s(1173)), $n), $rt_s(1174));
             console.log($rt_ustr(jl_StringBuilder_toString(var$4)));
         }
-        $radius = nlev_EaglerCraft_readSceneDirtyRadius$js_body$_50();
+        $radius = nlev_EaglerCraft_readSceneDirtyRadius$js_body$_51();
         if ($radius > 0 && !$level.$isRemote()) {
             $level.$markViewRadiusDirty(jl_Math_min($radius, 24));
             var$4 = jl_StringBuilder__init_();
@@ -29496,8 +29518,8 @@ nlev_EaglerCraft_lambda$createMinecraftInstance$0 = $gameConfig => {
     nlev_EaglerCraft_$callClinit();
     $mc = nmc_Minecraft__init_0($gameConfig);
     nlev_EaglerCraft_minecraftInstance = $mc;
-},
-nlev_EaglerCraft__clinit_ = () => {
+};
+let nlev_EaglerCraft__clinit_ = () => {
 try {
 
     nlev_EaglerCraft_gameState = 0;
@@ -29513,48 +29535,48 @@ try {
     nlev_EaglerCraft_lastMouseX = (-1);
     nlev_EaglerCraft_lastMouseY = (-1);
 
-} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
-let nlev_EaglerCraft_peekHotbarReqSlot$js_body$_27 = () => {
+} catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
+nlev_EaglerCraft_peekHotbarReqSlot$js_body$_28 = () => {
     var r = window.__eaglercraftHotbarReq;
     return r ? r.s | 0 :  -1;
 },
-nlev_EaglerCraft_peekHotbarReqId$js_body$_28 = () => {
+nlev_EaglerCraft_peekHotbarReqId$js_body$_29 = () => {
     var r = window.__eaglercraftHotbarReq;
     return r ? r.i | 0 :  -1;
 },
-nlev_EaglerCraft_peekHotbarReqCount$js_body$_29 = () => {
+nlev_EaglerCraft_peekHotbarReqCount$js_body$_30 = () => {
     var r = window.__eaglercraftHotbarReq;
     return r ? r.c | 0 : 0;
 },
-nlev_EaglerCraft_readLookYaw$js_body$_33 = () => {
+nlev_EaglerCraft_readLookYaw$js_body$_34 = () => {
     var r = window.__eaglercraftLookReq;
     return r ? r.yaw : 0;
 },
-nlev_EaglerCraft_readLookPitch$js_body$_34 = () => {
+nlev_EaglerCraft_readLookPitch$js_body$_35 = () => {
     var r = window.__eaglercraftLookReq;
     return r ? r.pitch : 0;
 },
-nlev_EaglerCraft_readTimeRequest$js_body$_38 = () => {
+nlev_EaglerCraft_readTimeRequest$js_body$_39 = () => {
     var r = window.__eaglercraftTimeReq;
     return typeof r === 'number' ? r : 0;
 },
-nlev_EaglerCraft_readSceneFov$js_body$_43 = () => {
+nlev_EaglerCraft_readSceneFov$js_body$_44 = () => {
     var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
     return r && typeof r.fov === 'number' ? Math.round(r.fov) :  -1;
 },
-nlev_EaglerCraft_readSceneHideHud$js_body$_44 = () => {
+nlev_EaglerCraft_readSceneHideHud$js_body$_45 = () => {
     var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
     return r && typeof r.hideHud === 'boolean' ? (r.hideHud ? 1 : 0) :  -1;
 },
-nlev_EaglerCraft_sceneBlockCount$js_body$_45 = () => {
+nlev_EaglerCraft_sceneBlockCount$js_body$_46 = () => {
     var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
     return r && r.blocks && r.blocks.length ? r.blocks.length : 0;
 },
-nlev_EaglerCraft_readSceneDirtyRadius$js_body$_50 = () => {
+nlev_EaglerCraft_readSceneDirtyRadius$js_body$_51 = () => {
     var r = typeof window !== 'undefined' ? window.__eaglercraftSceneReq : null;
     return r && typeof r.dirtyRadius === 'number' ? Math.round(r.dirtyRadius) :  -1;
 },
-nlev_EaglerCraft_pushGameTelemetry0$js_body$_55 = (var$1, var$2, var$3, var$4, var$5, var$6, var$7, var$8, var$9, var$10, var$11, var$12, var$13, var$14) => {
+nlev_EaglerCraft_pushGameTelemetry0$js_body$_56 = (var$1, var$2, var$3, var$4, var$5, var$6, var$7, var$8, var$9, var$10, var$11, var$12, var$13, var$14) => {
     if (typeof window !== 'undefined') {
         window.__eaglercraftGame = { canEnterWorld : var$1, gameState : var$2, screen : var$3, inWorld : var$4, ticks : var$5, guiScale : var$6, buttons : JSON.parse(var$7), panoramaReady : var$8, panoramaSpin : var$9, panoramaBlur : var$10, menuBackgroundBlurriness : var$11, gameplay : JSON.parse(var$12), enterWorld : function() {
             window.__eaglercraftWorldEntryRequested = true;
@@ -29576,21 +29598,21 @@ nlev_EaglerCraft_pushGameTelemetry0$js_body$_55 = (var$1, var$2, var$3, var$4, v
         } };
     }
 },
-nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_56 = () => {
+nlev_EaglerCraft_consumeWorldEntryRequest$js_body$_57 = () => {
     if (typeof window !== 'undefined' && window.__eaglercraftWorldEntryRequested === true) {
         window.__eaglercraftWorldEntryRequested = false;
         return true;
     }
     return false;
 },
-nlev_EaglerCraft_getJsErrorStack$js_body$_61 = () => {
+nlev_EaglerCraft_getJsErrorStack$js_body$_62 = () => {
     try {
         throw new Error('stack trace');
     } catch (e){
         return e.stack || '';
     }
 },
-nlev_EaglerCraft_runWithJsStackCapture$js_body$_62 = var$1 => {
+nlev_EaglerCraft_runWithJsStackCapture$js_body$_63 = var$1 => {
     try {
         var$1();
     } catch (e){
@@ -30075,6 +30097,26 @@ jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1__init_0 = var_0 => {
 jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1_contains = ($this, $ch) => {
     return jl_Character_isIdentifierIgnorable($ch);
 },
+nlev_EaglerCraft$BlockQueryFn = $rt_classWithoutFields(0),
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0 = $rt_classWithoutFields(),
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0__init_ = var$0 => {
+    jl_Object__init_(var$0);
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0__init_0 = () => {
+    let var_0 = new nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0();
+    nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0__init_(var_0);
+    return var_0;
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0_query = (var$0, var$1, var$2, var$3) => {
+    return nlev_EaglerCraft_lambda$pushGameTelemetry$0(var$1, var$2, var$3);
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0_query$exported$0 = (var$1, var$2, var$3, var$4) => {
+    let var$5, var$6, var$7;
+    var$5 = var$2;
+    var$6 = var$3;
+    var$7 = var$4;
+    return var$1.$query(var$5, var$6, var$7);
+},
 jl_Thread$UncaughtExceptionHandler = $rt_classWithoutFields(0),
 jl_DefaultUncaughtExceptionHandler = $rt_classWithoutFields(),
 jl_DefaultUncaughtExceptionHandler__init_ = $this => {
@@ -30119,6 +30161,26 @@ nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call = var$0 => {
 },
 nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call$exported$0 = var$1 => {
     var$1.$call0();
+},
+nlev_EaglerCraft$DebugMeshFn = $rt_classWithoutFields(0),
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1 = $rt_classWithoutFields(),
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1__init_ = var$0 => {
+    jl_Object__init_(var$0);
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1__init_0 = () => {
+    let var_0 = new nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1();
+    nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1__init_(var_0);
+    return var_0;
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1_dump = (var$0, var$1, var$2, var$3) => {
+    return nlev_EaglerCraft_lambda$pushGameTelemetry$1(var$1, var$2, var$3);
+},
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1_dump$exported$0 = (var$1, var$2, var$3, var$4) => {
+    let var$5, var$6, var$7;
+    var$5 = var$2;
+    var$6 = var$3;
+    var$7 = var$4;
+    return $rt_ustr(var$1.$dump(var$5, var$6, var$7));
 };
 function jur_AbstractCharClass$LazyJavaLetter$1() {
     jur_AbstractCharClass.call(this);
@@ -30489,46 +30551,6 @@ nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0__init_0 = () => {
 },
 nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0_onPress = (var$0, var$1) => {
     nmcgso_SoundOptionsScreen_lambda$disabledButton$0(var$1);
-},
-nlev_EaglerCraft$DebugMeshFn = $rt_classWithoutFields(0),
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1 = $rt_classWithoutFields(),
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1__init_ = var$0 => {
-    jl_Object__init_(var$0);
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1__init_0 = () => {
-    let var_0 = new nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1();
-    nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1__init_(var_0);
-    return var_0;
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1_dump = (var$0, var$1, var$2, var$3) => {
-    return nlev_EaglerCraft_lambda$pushGameTelemetry$1(var$1, var$2, var$3);
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1_dump$exported$0 = (var$1, var$2, var$3, var$4) => {
-    let var$5, var$6, var$7;
-    var$5 = var$2;
-    var$6 = var$3;
-    var$7 = var$4;
-    return $rt_ustr(var$1.$dump(var$5, var$6, var$7));
-},
-nlev_EaglerCraft$BlockQueryFn = $rt_classWithoutFields(0),
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0 = $rt_classWithoutFields(),
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_ = var$0 => {
-    jl_Object__init_(var$0);
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_0 = () => {
-    let var_0 = new nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0();
-    nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_(var_0);
-    return var_0;
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0_query = (var$0, var$1, var$2, var$3) => {
-    return nlev_EaglerCraft_lambda$pushGameTelemetry$0(var$1, var$2, var$3);
-},
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0_query$exported$0 = (var$1, var$2, var$3, var$4) => {
-    let var$5, var$6, var$7;
-    var$5 = var$2;
-    var$6 = var$3;
-    var$7 = var$4;
-    return var$1.$query(var$5, var$6, var$7);
 };
 function jur_MultiLineSOLSet() {
     jur_AbstractSet.call(this);
@@ -32567,7 +32589,53 @@ nmcr_LevelRenderer_emitFace = ($this, $out, $vi, $x, $y, $z, $face, $layer, $sha
                 var$17 = (__safe($q).data||[]);
                 var$17[0] = $x0;
                 var$17[1] = $y0;
+                var$17[2] = $z1;
+                var$17[3] = 0.0;
+                var$17[4] = 0.0;
+                var$17[5] = $x0;
+                var$17[6] = $y0;
+                var$17[7] = $z0;
+                var$17[8] = 0.0;
+                var$17[9] = 1.0;
+                var$17[10] = $x1;
+                var$17[11] = $y0;
+                var$17[12] = $z0;
+                var$17[13] = 1.0;
+                var$17[14] = 1.0;
+                var$17[15] = $x1;
+                var$17[16] = $y0;
+                var$17[17] = $z1;
+                var$17[18] = 1.0;
+                var$17[19] = 0.0;
+                break a;
+            case 2:
+                var$17 = (__safe($q).data||[]);
+                var$17[0] = $x1;
+                var$17[1] = $y1;
                 var$17[2] = $z0;
+                var$17[3] = 0.0;
+                var$17[4] = 0.0;
+                var$17[5] = $x1;
+                var$17[6] = $y0;
+                var$17[7] = $z0;
+                var$17[8] = 0.0;
+                var$17[9] = 1.0;
+                var$17[10] = $x0;
+                var$17[11] = $y0;
+                var$17[12] = $z0;
+                var$17[13] = 1.0;
+                var$17[14] = 1.0;
+                var$17[15] = $x0;
+                var$17[16] = $y1;
+                var$17[17] = $z0;
+                var$17[18] = 1.0;
+                var$17[19] = 0.0;
+                break a;
+            case 3:
+                var$17 = (__safe($q).data||[]);
+                var$17[0] = $x0;
+                var$17[1] = $y1;
+                var$17[2] = $z1;
                 var$17[3] = 0.0;
                 var$17[4] = 0.0;
                 var$17[5] = $x0;
@@ -32581,74 +32649,28 @@ nmcr_LevelRenderer_emitFace = ($this, $out, $vi, $x, $y, $z, $face, $layer, $sha
                 var$17[13] = 1.0;
                 var$17[14] = 1.0;
                 var$17[15] = $x1;
-                var$17[16] = $y0;
-                var$17[17] = $z0;
-                var$17[18] = 1.0;
-                var$17[19] = 0.0;
-                break a;
-            case 2:
-                var$17 = (__safe($q).data||[]);
-                var$17[0] = $x1;
-                var$17[1] = $y0;
-                var$17[2] = $z0;
-                var$17[3] = 1.0;
-                var$17[4] = 1.0;
-                var$17[5] = $x0;
-                var$17[6] = $y0;
-                var$17[7] = $z0;
-                var$17[8] = 0.0;
-                var$17[9] = 1.0;
-                var$17[10] = $x0;
-                var$17[11] = $y1;
-                var$17[12] = $z0;
-                var$17[13] = 0.0;
-                var$17[14] = 0.0;
-                var$17[15] = $x1;
-                var$17[16] = $y1;
-                var$17[17] = $z0;
-                var$17[18] = 1.0;
-                var$17[19] = 0.0;
-                break a;
-            case 3:
-                var$17 = (__safe($q).data||[]);
-                var$17[0] = $x0;
-                var$17[1] = $y0;
-                var$17[2] = $z1;
-                var$17[3] = 0.0;
-                var$17[4] = 1.0;
-                var$17[5] = $x1;
-                var$17[6] = $y0;
-                var$17[7] = $z1;
-                var$17[8] = 1.0;
-                var$17[9] = 1.0;
-                var$17[10] = $x1;
-                var$17[11] = $y1;
-                var$17[12] = $z1;
-                var$17[13] = 1.0;
-                var$17[14] = 0.0;
-                var$17[15] = $x0;
                 var$17[16] = $y1;
                 var$17[17] = $z1;
-                var$17[18] = 0.0;
+                var$17[18] = 1.0;
                 var$17[19] = 0.0;
                 break a;
             case 4:
                 var$17 = (__safe($q).data||[]);
                 var$17[0] = $x0;
-                var$17[1] = $y0;
-                var$17[2] = $z1;
-                var$17[3] = 1.0;
-                var$17[4] = 1.0;
+                var$17[1] = $y1;
+                var$17[2] = $z0;
+                var$17[3] = 0.0;
+                var$17[4] = 0.0;
                 var$17[5] = $x0;
                 var$17[6] = $y0;
                 var$17[7] = $z0;
                 var$17[8] = 0.0;
                 var$17[9] = 1.0;
                 var$17[10] = $x0;
-                var$17[11] = $y1;
-                var$17[12] = $z0;
-                var$17[13] = 0.0;
-                var$17[14] = 0.0;
+                var$17[11] = $y0;
+                var$17[12] = $z1;
+                var$17[13] = 1.0;
+                var$17[14] = 1.0;
                 var$17[15] = $x0;
                 var$17[16] = $y1;
                 var$17[17] = $z1;
@@ -32657,49 +32679,49 @@ nmcr_LevelRenderer_emitFace = ($this, $out, $vi, $x, $y, $z, $face, $layer, $sha
                 break a;
             default:
                 var$17 = (__safe($q).data||[]);
-                var$17[0] = $x0;
-                var$17[1] = $y0;
-                var$17[2] = $z0;
+                var$17[0] = $x1;
+                var$17[1] = $y1;
+                var$17[2] = $z1;
                 var$17[3] = 0.0;
-                var$17[4] = 1.0;
+                var$17[4] = 0.0;
                 var$17[5] = $x1;
                 var$17[6] = $y0;
-                var$17[7] = $z0;
-                var$17[8] = 1.0;
+                var$17[7] = $z1;
+                var$17[8] = 0.0;
                 var$17[9] = 1.0;
                 var$17[10] = $x1;
-                var$17[11] = $y1;
+                var$17[11] = $y0;
                 var$17[12] = $z0;
                 var$17[13] = 1.0;
-                var$17[14] = 0.0;
-                var$17[15] = $x0;
+                var$17[14] = 1.0;
+                var$17[15] = $x1;
                 var$17[16] = $y1;
                 var$17[17] = $z0;
-                var$17[18] = 0.0;
+                var$17[18] = 1.0;
                 var$17[19] = 0.0;
                 break a;
         }
         var$17 = (__safe($q).data||[]);
         var$17[0] = $x0;
         var$17[1] = $y1;
-        var$17[2] = $z1;
+        var$17[2] = $z0;
         var$17[3] = 0.0;
-        var$17[4] = 1.0;
+        var$17[4] = 0.0;
         var$17[5] = $x0;
         var$17[6] = $y1;
-        var$17[7] = $z0;
+        var$17[7] = $z1;
         var$17[8] = 0.0;
-        var$17[9] = 0.0;
+        var$17[9] = 1.0;
         var$17[10] = $x1;
         var$17[11] = $y1;
-        var$17[12] = $z0;
+        var$17[12] = $z1;
         var$17[13] = 1.0;
-        var$17[14] = 0.0;
+        var$17[14] = 1.0;
         var$17[15] = $x1;
         var$17[16] = $y1;
-        var$17[17] = $z1;
+        var$17[17] = $z0;
         var$17[18] = 1.0;
-        var$17[19] = 1.0;
+        var$17[19] = 0.0;
     }
     $shadeB = $shade * 255.0 | 0;
     $colorPacked = $shadeB | $shadeB << 8 | $shadeB << 16 | (-16777216);
@@ -32934,7 +32956,7 @@ nmcr_LevelRenderer_pushCrossY = ($out, $vi, $ya, $yb, $x, $z, $t, $xFar, $layer,
 nmcr_LevelRenderer__clinit_ = () => {
 try {
 
-    nmcr_LevelRenderer_QUAD_INDEX_ORDER = $rt_createIntArrayFromData([0, 2, 1, 0, 3, 2]);
+    nmcr_LevelRenderer_QUAD_INDEX_ORDER = $rt_createIntArrayFromData([0, 1, 2, 2, 3, 0]);
     nmcr_LevelRenderer_FACE_QUAD = $rt_createFloatArray(20);
     nmcr_LevelRenderer_QC = $rt_createFloatMultiArray([5, 4]);
 
@@ -39491,14 +39513,15 @@ nmc_Minecraft_tick = $this => {
     }
 },
 nmc_Minecraft_render = ($this, $renderLevel) => {
-    let var$2, var$3, var$4, $t, var$6, $$je;
+    let var$2, var$3, var$4, var$5, $t, var$7, $$je;
     a: {
         try {
             if ($this.$gameRenderer !== null) {
                 var$2 = $this.$gameRenderer;
-                var$3 = Long_toNumber(nlevi_PlatformRuntime_getDeltaTimeMs()) / 1000.0;
-                var$4 = nlevi_PlatformRuntime_getCurrentTimeMillis();
-                var$2.$render4(var$3, var$4, $renderLevel);
+                var$3 = nlev_EaglerCraft_getGamePartialTick();
+                var$4 = Long_toNumber(nlevi_PlatformRuntime_getDeltaTimeMs()) / 50.0;
+                var$5 = nlevi_PlatformRuntime_getCurrentTimeMillis();
+                var$2.$render4(var$3, var$4, var$5, $renderLevel);
             }
             break a;
         } catch ($$e) {
@@ -39506,9 +39529,9 @@ nmc_Minecraft_render = ($this, $renderLevel) => {
             if ($$je instanceof jl_Throwable) {
                 $t = $$je;
                 var$2 = $t.$getMessage();
-                var$6 = jl_StringBuilder__init_();
-                jl_StringBuilder_append(jl_StringBuilder_append(var$6, $rt_s(1482)), var$2);
-                console.warn($rt_ustr(jl_StringBuilder_toString(var$6)));
+                var$7 = jl_StringBuilder__init_();
+                jl_StringBuilder_append(jl_StringBuilder_append(var$7, $rt_s(1482)), var$2);
+                console.warn($rt_ustr(jl_StringBuilder_toString(var$7)));
                 break a;
             } else {
                 throw $$e;
@@ -41632,8 +41655,9 @@ otcit_FloatAnalyzer, 0, jl_Object, [], 17, 0, () => otcit_FloatAnalyzer_$callCli
 jt_DecimalFormat$FormatField, 0, jl_Object, [], 1536, 0, 0, 0,
 jt_DecimalFormat$PerMillField, "DecimalFormat$PerMillField", 3, jl_Object, [jt_DecimalFormat$FormatField], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jt_DecimalFormat$PerMillField__init_), "$render0", $rt_wrapFunction2(jt_DecimalFormat$PerMillField_render), "$equals", $rt_wrapFunction1(jt_DecimalFormat$PerMillField_equals)],
 nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_108", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_AccessibilityOptionsScreen$init$lambda$_1_0_onPress)],
-nmcp_LocalPlayer, 0, jl_Object, [], 1, 0, 0, ["$_init_150", $rt_wrapFunction2(nmcp_LocalPlayer__init_), "$absSnapTo", $rt_wrapFunction3(nmcp_LocalPlayer_absSnapTo), "$snapTo", function(var_1, var_2, var_3, var_4, var_5) { nmcp_LocalPlayer_snapTo(this, var_1, var_2, var_3, var_4, var_5); }, "$turn", $rt_wrapFunction2(nmcp_LocalPlayer_turn), "$getEyeY", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeY), "$getEyeX", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeX), "$getEyeZ", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeZ),
-"$setSprinting", $rt_wrapFunction1(nmcp_LocalPlayer_setSprinting), "$getMinX", $rt_wrapFunction0(nmcp_LocalPlayer_getMinX), "$getMaxX", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxX), "$getMinZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMinZ), "$getMaxZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxZ), "$getMinY", $rt_wrapFunction0(nmcp_LocalPlayer_getMinY), "$getMaxY", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxY), "$tick1", $rt_wrapFunction1(nmcp_LocalPlayer_tick), "$isWithinBlockInteractionRange", $rt_wrapFunction3(nmcp_LocalPlayer_isWithinBlockInteractionRange)],
+nmcp_LocalPlayer, 0, jl_Object, [], 1, 0, 0, ["$_init_150", $rt_wrapFunction2(nmcp_LocalPlayer__init_), "$absSnapTo", $rt_wrapFunction3(nmcp_LocalPlayer_absSnapTo), "$snapTo", function(var_1, var_2, var_3, var_4, var_5) { nmcp_LocalPlayer_snapTo(this, var_1, var_2, var_3, var_4, var_5); }, "$turn", $rt_wrapFunction2(nmcp_LocalPlayer_turn), "$getEyeY", $rt_wrapFunction0(nmcp_LocalPlayer_getEyeY), "$getEyeX", $rt_wrapFunction1(nmcp_LocalPlayer_getEyeX), "$getEyeY0", $rt_wrapFunction1(nmcp_LocalPlayer_getEyeY0),
+"$getEyeZ", $rt_wrapFunction1(nmcp_LocalPlayer_getEyeZ), "$setSprinting", $rt_wrapFunction1(nmcp_LocalPlayer_setSprinting), "$getMinX", $rt_wrapFunction0(nmcp_LocalPlayer_getMinX), "$getMaxX", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxX), "$getMinZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMinZ), "$getMaxZ", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxZ), "$getMinY", $rt_wrapFunction0(nmcp_LocalPlayer_getMinY), "$getMaxY", $rt_wrapFunction0(nmcp_LocalPlayer_getMaxY), "$tick1", $rt_wrapFunction1(nmcp_LocalPlayer_tick),
+"$isWithinBlockInteractionRange", $rt_wrapFunction3(nmcp_LocalPlayer_isWithinBlockInteractionRange)],
 nmcgs_PauseScreen$init$lambda$_1_5, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_151", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_5_onPress)],
 nmcgs_PauseScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_PauseScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgs_PauseScreen$init$lambda$_1_6_onPress)],
 nmcgs_TitleScreen$init$lambda$_1_6, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgs_TitleScreen$init$lambda$_1_6__init_), "$onPress", $rt_wrapFunction1(nmcgs_TitleScreen$init$lambda$_1_6_onPress)],
@@ -41937,7 +41961,7 @@ ju_Map$Entry, 0, jl_Object, [], 1537, 0, 0, 0,
 ju_MapEntry, 0, jl_Object, [ju_Map$Entry, jl_Cloneable], 0, 0, 0, ["$_init_109", $rt_wrapFunction2(ju_MapEntry__init_), "$equals", $rt_wrapFunction1(ju_MapEntry_equals), "$getKey", $rt_wrapFunction0(ju_MapEntry_getKey), "$getValue0", $rt_wrapFunction0(ju_MapEntry_getValue), "$toString", $rt_wrapFunction0(ju_MapEntry_toString)],
 ju_HashMap$HashEntry, "HashMap$HashEntry", 1, ju_MapEntry, [], 0, 0, 0, ["$_init_16", $rt_wrapFunction2(ju_HashMap$HashEntry__init_)],
 ju_LinkedHashMap$LinkedHashMapEntry, "LinkedHashMap$LinkedHashMapEntry", 1, ju_HashMap$HashEntry, [], 16, 0, 0, ["$_init_16", $rt_wrapFunction2(ju_LinkedHashMap$LinkedHashMapEntry__init_)],
-nmcr_GameRenderer, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcr_GameRenderer__init_), "$render4", $rt_wrapFunction3(nmcr_GameRenderer_render)],
+nmcr_GameRenderer, 0, jl_Object, [], 1, 0, 0, ["$_init_46", $rt_wrapFunction1(nmcr_GameRenderer__init_), "$render4", $rt_wrapFunction4(nmcr_GameRenderer_render)],
 jur_AbstractCharClass$LazyASCII, 0, jur_AbstractCharClass$LazyCharClass, [], 0, 0, 0, ["$_init_0", $rt_wrapFunction0(jur_AbstractCharClass$LazyASCII__init_), "$computeValue", $rt_wrapFunction0(jur_AbstractCharClass$LazyASCII_computeValue)],
 ji_IOException, 0, jl_Exception, [], 1, 0, 0, 0,
 nmc_Options, 0, jl_Object, [], 1, 0, 0, ["$_init_148", $rt_wrapFunction2(nmc_Options__init_), "$load", $rt_wrapFunction0(nmc_Options_load), "$save", $rt_wrapFunction0(nmc_Options_save), "$getFov", $rt_wrapFunction0(nmc_Options_getFov), "$setFov", $rt_wrapFunction1(nmc_Options_setFov), "$setMasterVolume", $rt_wrapFunction1(nmc_Options_setMasterVolume)],
@@ -41963,10 +41987,14 @@ jur_PossessiveQuantifierSet, "PossessiveQuantifierSet", 2, jur_LeafQuantifierSet
 $rt_metadata([ju_Locale, 0, jl_Object, [jl_Cloneable, ji_Serializable], 17, 0, () => ju_Locale_$callClinit(), ["$_init_64", $rt_wrapFunction2(ju_Locale__init_1), "$_init_22", $rt_wrapFunction3(ju_Locale__init_0), "$getCountry", $rt_wrapFunction0(ju_Locale_getCountry), "$getLanguage", $rt_wrapFunction0(ju_Locale_getLanguage)],
 jl_Short, 0, jl_Number, [jl_Comparable], 1, 0, () => jl_Short_$callClinit(), 0,
 jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1, "AbstractCharClass$LazyJavaIdentifierIgnorable$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_143", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaIdentifierIgnorable$1_contains)],
+nlev_EaglerCraft$BlockQueryFn, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0, "EaglerCraft$pushGameTelemetry$lambda$_21_0", 30, jl_Object, [nlev_EaglerCraft$BlockQueryFn], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0__init_), "$query", $rt_wrapFunction3(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0_query)],
 jl_Thread$UncaughtExceptionHandler, 0, jl_Object, [], 1537, 0, 0, 0,
 jl_DefaultUncaughtExceptionHandler, 0, jl_Object, [jl_Thread$UncaughtExceptionHandler], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(jl_DefaultUncaughtExceptionHandler__init_)],
 jt_DecimalFormat$1, 0, jl_Object, [], 32768, 0, () => jt_DecimalFormat$1_$callClinit(), 0,
 nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0, "PlatformRuntime$registerResizeListener$lambda$_54_0", 31, jl_Object, [nlevi_PlatformRuntime$SimpleCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0__init_), "$call0", $rt_wrapFunction0(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call)],
+nlev_EaglerCraft$DebugMeshFn, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
+nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1, "EaglerCraft$pushGameTelemetry$lambda$_21_1", 30, jl_Object, [nlev_EaglerCraft$DebugMeshFn], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1__init_), "$dump", $rt_wrapFunction3(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1_dump)],
 jur_AbstractCharClass$LazyJavaLetter$1, "AbstractCharClass$LazyJavaLetter$1", 2, jur_AbstractCharClass, [], 0, 0, 0, ["$_init_25", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1__init_), "$contains1", $rt_wrapFunction1(jur_AbstractCharClass$LazyJavaLetter$1_contains)],
 jur_ReluctantQuantifierSet, "ReluctantQuantifierSet", 2, jur_LeafQuantifierSet, [], 0, 0, 0, ["$_init_31", $rt_wrapFunction3(jur_ReluctantQuantifierSet__init_), "$matches", $rt_wrapFunction3(jur_ReluctantQuantifierSet_matches)],
 nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0, "ClientMain$beginAssetBundleLoad$lambda$_7_0", 32, jl_Object, [nlevit_EPKLoader$LoadCallback], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0__init_), "$call1", $rt_wrapFunction1(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call)],
@@ -41982,10 +42010,6 @@ otji_JSWrapper, "JSWrapper", 8, jl_Object, [], 17, 0, 0, ["$equals", $rt_wrapFun
 ju_OptionalInt, 0, jl_Object, [], 1, 0, 0, ["$orElse", $rt_wrapFunction1(ju_OptionalInt_orElse)],
 ju_HashSet, "HashSet", 1, ju_AbstractSet, [jl_Cloneable, ji_Serializable], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(ju_HashSet__init_0), "$_init_15", $rt_wrapFunction1(ju_HashSet__init_), "$add", $rt_wrapFunction1(ju_HashSet_add), "$contains", $rt_wrapFunction1(ju_HashSet_contains), "$isEmpty", $rt_wrapFunction0(ju_HashSet_isEmpty), "$iterator", $rt_wrapFunction0(ju_HashSet_iterator), "$remove2", $rt_wrapFunction1(ju_HashSet_remove), "$size", $rt_wrapFunction0(ju_HashSet_size)],
 nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0, 0, jl_Object, [nmcgc_Button$OnPress], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0__init_), "$onPress", $rt_wrapFunction1(nmcgso_SoundOptionsScreen$disabledButton$lambda$_3_0_onPress)],
-nlev_EaglerCraft$DebugMeshFn, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1, "EaglerCraft$pushGameTelemetry$lambda$_20_1", 30, jl_Object, [nlev_EaglerCraft$DebugMeshFn], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1__init_), "$dump", $rt_wrapFunction3(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1_dump)],
-nlev_EaglerCraft$BlockQueryFn, 0, jl_Object, [otj_JSObject], 1536, 0, 0, 0,
-nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0, "EaglerCraft$pushGameTelemetry$lambda$_20_0", 30, jl_Object, [nlev_EaglerCraft$BlockQueryFn], 1, 0, 0, ["$_init_0", $rt_wrapFunction0(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0__init_), "$query", $rt_wrapFunction3(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0_query)],
 jur_MultiLineSOLSet, "MultiLineSOLSet", 2, jur_AbstractSet, [], 0, 0, 0, ["$_init_82", $rt_wrapFunction1(jur_MultiLineSOLSet__init_), "$matches", $rt_wrapFunction3(jur_MultiLineSOLSet_matches), "$hasConsumed", $rt_wrapFunction1(jur_MultiLineSOLSet_hasConsumed), "$getName", $rt_wrapFunction0(jur_MultiLineSOLSet_getName)],
 nmcgsm_JoinMultiplayerScreen, "JoinMultiplayerScreen", 25, nmcgs_Screen, [], 1, 0, 0, ["$_init_58", $rt_wrapFunction1(nmcgsm_JoinMultiplayerScreen__init_), "$init", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_init), "$render", $rt_wrapFunction4(nmcgsm_JoinMultiplayerScreen_render), "$mouseClicked", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseClicked), "$mouseScrolled", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_mouseScrolled), "$keyPressed", $rt_wrapFunction3(nmcgsm_JoinMultiplayerScreen_keyPressed),
 "$onClose", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_onClose), "$isPauseScreen", $rt_wrapFunction0(nmcgsm_JoinMultiplayerScreen_isPauseScreen)],
@@ -42279,16 +42303,16 @@ let $rt_jso_marker = Symbol('jsoClass');
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformInput$suppressDragDrop$lambda$_13_1_handleEvent$exported$0);
     c = nlevi_PlatformApplication$registerFullscreenChangeListener$lambda$_7_0.prototype;
     c.handleEvent = $rt_callWithReceiver(nlevi_PlatformApplication$registerFullscreenChangeListener$lambda$_7_0_handleEvent$exported$0);
+    c = nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0.prototype;
+    c.query = $rt_callWithReceiver(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_0_query$exported$0);
     c = nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0.prototype;
     c.call = $rt_callWithReceiver(nlevi_PlatformRuntime$registerResizeListener$lambda$_54_0_call$exported$0);
+    c = nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1.prototype;
+    c.dump = $rt_callWithReceiver(nlev_EaglerCraft$pushGameTelemetry$lambda$_21_1_dump$exported$0);
     c = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0.prototype;
     c.call = $rt_callWithReceiver(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_0_call$exported$0);
     c = nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1.prototype;
     c.call = $rt_callWithReceiver(nlevit_ClientMain$beginAssetBundleLoad$lambda$_7_1_call$exported$0);
-    c = nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1.prototype;
-    c.dump = $rt_callWithReceiver(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_1_dump$exported$0);
-    c = nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0.prototype;
-    c.query = $rt_callWithReceiver(nlev_EaglerCraft$pushGameTelemetry$lambda$_20_0_query$exported$0);
     c = nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0.prototype;
     c.run = $rt_callWithReceiver(nlev_EaglerCraft$createMinecraftInstance$lambda$_5_0_run$exported$0);
     c = nlevi_PlatformRuntime$registerOrientationChangeListener$lambda$_57_0.prototype;

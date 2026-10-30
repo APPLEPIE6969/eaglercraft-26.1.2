@@ -148,8 +148,15 @@ public final class EaglerCraftConfig {
         /** Milliseconds per tick at TARGET_TPS. */
         public static final long MS_PER_TICK = 1000L / TARGET_TPS;
 
-        /** Whether to use fixed timestep (true) or variable timestep with vsync (false). */
-        public static final boolean USE_FIXED_TIMESTEP = false;
+        /** Fixed timestep: the game simulates at exactly TARGET_TPS
+         * regardless of the display's refresh rate - vanilla's Minecraft
+         * timer semantics (a 20 TPS simulation with partialTick
+         * interpolation for rendering). The old variable-timestep path
+         * ran one full game tick per requestAnimationFrame frame, i.e.
+         * 60 ticks/s on a 60Hz display and 144/s on gaming monitors -
+         * 3x to 7x the vanilla simulation rate, which is why walking
+         * (and everything else tick-driven) was "way too fast". */
+        public static final boolean USE_FIXED_TIMESTEP = true;
 
         /** Maximum frame delta time in milliseconds (prevents spiral of death). */
         public static final long MAX_FRAME_DELTA_MS = 250;

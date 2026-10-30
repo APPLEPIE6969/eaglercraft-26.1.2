@@ -154,6 +154,26 @@ public class LocalPlayer {
                 return this.y + (this.crouching ? CROUCH_EYE_HEIGHT : EYE_HEIGHT);
         }
 
+        /**
+         * The camera position: vanilla Camera.getPosition() reading
+         * Entity.getEyePosition(partialTick) - the position lerped between
+         * the last two simulation ticks (xo -> x), so the view glides at
+         * the frame rate while the simulation holds 20 TPS. Without the
+         * lerp a fixed-20-TPS simulation steps the camera at 20Hz.
+         */
+        public double getEyeX(float partialTick) {
+                return this.xo + (this.x - this.xo) * partialTick;
+        }
+
+        public double getEyeY(float partialTick) {
+                return this.yo + (this.y - this.yo) * partialTick
+                                + (this.crouching ? CROUCH_EYE_HEIGHT : EYE_HEIGHT);
+        }
+
+        public double getEyeZ(float partialTick) {
+                return this.zo + (this.z - this.zo) * partialTick;
+        }
+
         /** The camera position: vanilla Camera.getPosition(). */
         public double getEyeX() {
                 return this.x;

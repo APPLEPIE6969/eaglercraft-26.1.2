@@ -19720,30 +19720,29 @@ try {
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }},
 nleva_PanoramaRenderer = $rt_classWithoutFields(),
 nleva_PanoramaRenderer_FACE_SUFFIXES = null,
+nleva_PanoramaRenderer_FACE_YAW = null,
 nleva_PanoramaRenderer_initialized = 0,
 nleva_PanoramaRenderer_panoramaProgram = null,
 nleva_PanoramaRenderer_uYaw = null,
 nleva_PanoramaRenderer_uPitch = null,
-nleva_PanoramaRenderer_uF1 = null,
-nleva_PanoramaRenderer_uF2 = null,
+nleva_PanoramaRenderer_uTanHalfFov = null,
+nleva_PanoramaRenderer_uAspect = null,
 nleva_PanoramaRenderer_triVAO = null,
 nleva_PanoramaRenderer_triVBO = null,
 nleva_PanoramaRenderer_faceTexture = null,
 nleva_PanoramaRenderer_facesFailed = 0,
-nleva_PanoramaRenderer_panoramaTicks = 0.0,
+nleva_PanoramaRenderer_spin = 0.0,
 nleva_PanoramaRenderer_$callClinit = () => {
     nleva_PanoramaRenderer_$callClinit = $rt_eraseClinit(nleva_PanoramaRenderer);
     nleva_PanoramaRenderer__clinit_();
 },
 nleva_PanoramaRenderer_tick = $realtimeDeltaTicks => {
+    let var$2;
     nleva_PanoramaRenderer_$callClinit();
-    if (!($realtimeDeltaTicks >= 0.0))
-        $realtimeDeltaTicks = 0.0;
-    if ($realtimeDeltaTicks > 10.0)
-        $realtimeDeltaTicks = 10.0;
-    nleva_PanoramaRenderer_panoramaTicks = nleva_PanoramaRenderer_panoramaTicks + $realtimeDeltaTicks;
-    if (nleva_PanoramaRenderer_panoramaTicks >= 1440000.0)
-        nleva_PanoramaRenderer_panoramaTicks = nleva_PanoramaRenderer_panoramaTicks - 1440000.0;
+    if (!($realtimeDeltaTicks > 0.0))
+        return;
+    var$2 = jl_Math_min0($realtimeDeltaTicks, 10.0);
+    nleva_PanoramaRenderer_spin = nleva_PanoramaRenderer_wrapDegrees(nleva_PanoramaRenderer_spin + var$2 * 1.0 * 0.10000000149011612);
 },
 nleva_PanoramaRenderer_isReady = () => {
     nleva_PanoramaRenderer_$callClinit();
@@ -19751,10 +19750,10 @@ nleva_PanoramaRenderer_isReady = () => {
 },
 nleva_PanoramaRenderer_spinDegrees = () => {
     nleva_PanoramaRenderer_$callClinit();
-    return nleva_PanoramaRenderer_wrapDegrees(nleva_PanoramaRenderer_panoramaTicks * (-0.10000000149011612));
+    return nleva_PanoramaRenderer_spin;
 },
 nleva_PanoramaRenderer_render = ($gl, $fbWidth, $fbHeight) => {
-    let var$4, $pitchDeg, $yawDeg, $f, $f1, $f2, $cullWasEnabled;
+    let var$4, var$5, $cullWasEnabled;
     nleva_PanoramaRenderer_$callClinit();
     if ($gl !== null && $fbWidth > 0 && $fbHeight > 0) {
         if (!nleva_PanoramaRenderer_initialized) {
@@ -19767,17 +19766,13 @@ nleva_PanoramaRenderer_render = ($gl, $fbWidth, $fbHeight) => {
             if (nleva_PanoramaRenderer_faceTexture === null)
                 return 0;
         }
-        var$4 = nleva_PanoramaRenderer_panoramaTicks / 400.0;
-        $pitchDeg = 20.0 + 25.0 * jl_Math_sin(var$4);
-        $yawDeg = nleva_PanoramaRenderer_panoramaTicks * (-0.10000000149011612);
-        $f = 120.0 / jl_Math_max($fbWidth, $fbHeight);
-        $f1 = $fbHeight * $f / 256.0;
-        $f2 = $fbWidth * $f / 256.0;
         nlevi_PlatformOpenGL__wglUseProgram(nleva_PanoramaRenderer_panoramaProgram);
-        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uYaw, jl_Math_toRadians($yawDeg));
-        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uPitch, jl_Math_toRadians($pitchDeg));
-        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uF1, $f1);
-        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uF2, $f2);
+        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uYaw, jl_Math_toRadians(nleva_PanoramaRenderer_spin));
+        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uPitch, jl_Math_toRadians(10.0));
+        var$4 = nleva_PanoramaRenderer_uTanHalfFov;
+        var$5 = jl_Math_tan(0.7417649320975901);
+        nlevi_PlatformOpenGL__wglUniform1f(var$4, var$5);
+        nlevi_PlatformOpenGL__wglUniform1f(nleva_PanoramaRenderer_uAspect, $fbWidth / $fbHeight);
         nlevi_PlatformOpenGL__wglBindTexture(35866, nleva_PanoramaRenderer_faceTexture);
         $cullWasEnabled = nlevi_PlatformOpenGL__wglIsEnabled(2884);
         if ($cullWasEnabled)
@@ -19805,8 +19800,8 @@ nleva_PanoramaRenderer_init = $gl => {
     }
     nleva_PanoramaRenderer_uYaw = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(528));
     nleva_PanoramaRenderer_uPitch = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(529));
-    nleva_PanoramaRenderer_uF1 = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(530));
-    nleva_PanoramaRenderer_uF2 = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(531));
+    nleva_PanoramaRenderer_uTanHalfFov = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(530));
+    nleva_PanoramaRenderer_uAspect = nleva_EaglerShaderImpl_getUniformLocation(nleva_PanoramaRenderer_panoramaProgram, $rt_s(531));
     $tri = $rt_createFloatArray(6);
     var$5 = (__safe($tri).data||[]);
     var$5[0] = (-1.0);
@@ -19834,7 +19829,7 @@ nleva_PanoramaRenderer_init = $gl => {
     nlevi_PlatformOpenGL__wglBindVertexArray(null);
     nlevi_PlatformOpenGL__wglBindBuffer(34962, null);
     nleva_PanoramaRenderer_initialized = 1;
-    console.log("[PanoramaRenderer] vanilla 1.8 panorama pass ready");
+    console.log("[PanoramaRenderer] program + face-array pass ready");
 },
 nleva_PanoramaRenderer_pollFaces = $gl => {
     let $f, $faceW, $faceH, $tex, var$6, var$7, $data, var$9, var$10, $name;
@@ -19932,17 +19927,18 @@ nleva_PanoramaRenderer__clinit_ = () => {
 try {
 
     nleva_PanoramaRenderer_FACE_SUFFIXES = $rt_wrapArray(jl_String, [$rt_s(358), $rt_s(539), $rt_s(540), $rt_s(541), $rt_s(542), $rt_s(543)]);
+    nleva_PanoramaRenderer_FACE_YAW = $rt_createFloatArrayFromData([0.0, (-90.0), 180.0, 90.0]);
     nleva_PanoramaRenderer_initialized = 0;
     nleva_PanoramaRenderer_panoramaProgram = null;
     nleva_PanoramaRenderer_uYaw = null;
     nleva_PanoramaRenderer_uPitch = null;
-    nleva_PanoramaRenderer_uF1 = null;
-    nleva_PanoramaRenderer_uF2 = null;
+    nleva_PanoramaRenderer_uTanHalfFov = null;
+    nleva_PanoramaRenderer_uAspect = null;
     nleva_PanoramaRenderer_triVAO = null;
     nleva_PanoramaRenderer_triVBO = null;
     nleva_PanoramaRenderer_faceTexture = null;
     nleva_PanoramaRenderer_facesFailed = 0;
-    nleva_PanoramaRenderer_panoramaTicks = 0.0;
+    nleva_PanoramaRenderer_spin = 0.0;
 
 } catch(__e) { if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));window.__eaglerClinitErrors++;} }};
 function jl_Object$Monitor() {
@@ -42169,23 +42165,23 @@ $rt_stringPool(["Can\'t enter monitor from another thread synchronously", "expec
 "Connection failed: the server did not respond", "Connection lost: the server closed the connection", "text", "translate", "Overflow", "Underflow", ".", "EaglerCraftX 26.1.2", "[PlatformApplication] Unhandled promise rejection: ", "[PlatformApplication] Uncaught error: ", " at ", "[PlatformApplication] Stack: ", "CI ", "[PlatformRuntime] Runtime initialized (namespace: ", "eaglercraft", "<EOL>", "UCI ", "AtomicFSet", "New World", "minecraft:overworld", "eaglercraft.world.blocks.", "Server: ", "[ClientLevel] restored ",
 " block edits for ", "[ClientLevel] edit restore failed: ", "[ClientLevel] saved ", " block edits", "eaglercraft.world.time.", "[ClientLevel] restored day time ", "[ClientLevel] bad day time \'", "ClientLevel[", " in ", ", gameTime=", ", edits=", "Illegal format flags ", " for conversion ", "Singleplayer", "Multiplayer", "Realms", "Options...", "Quit Game", "posFSet", "Done", "Accessibility...", "Controls...", "Sound Settings...", "Options", "Skin Customization", "Video Settings", "Language...", "Resource Packs",
 "Telemetry", "Chat Settings...", "Credits & Attribution", "serverlist", "\u0001", "<MultiLine $>", "WebGL2 (EaglerCraft)", "directaddress", "Crafting", "Inventory", "take", "craft-all", "[InventoryScreen] result ", "[InventoryScreen] craft cell ", " button ", "[InventoryScreen] closed with key ", "up", "north", "south", "west", "east", "down", "This exception should not been thrown", "Illegal precision: ", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nout vec2 v_ndc;\nvoid main() {\n  v_ndc = a_pos;\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n}\n",
-"#version 300 es\nprecision highp float;\nin vec2 v_ndc;\nuniform highp sampler2DArray u_faces;\nuniform float u_yaw;\nuniform float u_pitch;\nuniform float u_f1;\nuniform float u_f2;\nout vec4 fragColor;\nvoid main() {\n  float sqx = 2.0 * u_f1 * v_ndc.y;\n  float sqy = -2.0 * u_f2 * v_ndc.x;\n  vec3 base = vec3(-sqy * 1.7320508, -sqx * 1.7320508, 1.0);\n  float cp = cos(u_pitch), sp = sin(u_pitch);\n  vec3 d1 = vec3(base.x, base.y * cp + base.z * sp,\n                    base.z * cp - base.y * sp);\n  float cy = cos(u_yaw"
-+ "), sy = sin(u_yaw);\n  vec3 d2 = vec3(d1.x * cy - d1.z * sy, d1.y,\n                  d1.x * sy + d1.z * cy);\n  vec2 uv = vec2(0.5);\n  float layer = 0.0;\n  bool found = false;\n  for (int k = 0; k < 6; k++) {\n    vec3 l;\n    float ly;\n    if (k == 0) { l = vec3(d2.x, d2.y, d2.z); ly = 0.0; }\n    else if (k == 1) { l = vec3(-d2.z, d2.y, d2.x); ly = 1.0; }\n    else if (k == 2) { l = vec3(-d2.x, d2.y, -d2.z); ly = 2.0; }\n    else if (k == 3) { l = vec3(d2.z, d2.y, -d2.x); ly = 3.0; }\n    else if (k == 4) { l = ve"
-+ "c3(d2.x, d2.z, -d2.y); ly = 5.0; }\n    else { l = vec3(d2.x, -d2.z, d2.y); ly = 4.0; }\n    if (!found && l.z > 0.0 && abs(l.x) <= l.z && abs(l.y) <= l.z) {\n      uv = vec2((l.x / l.z + 1.0) * 0.5, (l.y / l.z + 1.0) * 0.5);\n      layer = ly;\n      found = true;\n    }\n  }\n  fragColor = textureLod(u_faces, vec3(uv, layer), 0.0);\n}\n", "panorama_faces", "u_yaw", "u_pitch", "u_f1", "u_f2", "[PanoramaRenderer] face array built (", " x6)", "[PanoramaRenderer] face size mismatch on layer ", " (", " vs ",
-"[PanoramaRenderer] face \'", "\' failed to load - keeping the flat stub background", "1", "2", "3", "4", "5", "air", "Air", "stone", "Stone", "cobblestone", "Cobblestone", "grass_block", "Grass Block", "grass_block_top", "grass_block_side", "dirt", "Dirt", "oak_planks", "Oak Planks", "bedrock", "Bedrock", "smooth_stone", "Smooth Stone", "stone_bricks", "Stone Bricks", "mossy_stone_bricks", "Mossy Stone Bricks", "cracked_stone_bricks", "Cracked Stone Bricks", "coarse_dirt", "Coarse Dirt", "podzol", "Podzol",
-"podzol_top", "podzol_side", "rooted_dirt", "Rooted Dirt", "mud", "Mud", "spruce_planks", "Spruce Planks", "birch_planks", "Birch Planks", "jungle_planks", "Jungle Planks", "acacia_planks", "Acacia Planks", "dark_oak_planks", "Dark Oak Planks", "mangrove_planks", "Mangrove Planks", "cherry_planks", "Cherry Planks", "bamboo_planks", "Bamboo Planks", "iron_ore", "Iron Ore", "deepslate_iron_ore", "Deepslate Iron Ore", "copper_ore", "Copper Ore", "deepslate_copper_ore", "Deepslate Copper Ore", "gold_ore", "Gold Ore",
-"deepslate_gold_ore", "Deepslate Gold Ore", "redstone_ore", "Redstone Ore", "deepslate_redstone_ore", "Deepslate Redstone Ore", "emerald_ore", "Emerald Ore", "deepslate_emerald_ore", "Deepslate Emerald Ore", "lapis_ore", "Lapis Ore", "deepslate_lapis_ore", "Deepslate Lapis Ore", "diamond_ore", "Diamond Ore", "deepslate_diamond_ore", "Deepslate Diamond Ore", "coal_ore", "Coal Ore", "deepslate_coal_ore", "Deepslate Coal Ore", "granite", "Granite", "polished_granite", "Polished Granite", "diorite", "Diorite", "polished_diorite",
-"Polished Diorite", "andesite", "Andesite", "polished_andesite", "Polished Andesite", "deepslate", "Deepslate", "deepslate_top", "cobbled_deepslate", "Cobbled Deepslate", "polished_deepslate", "Polished Deepslate", "deepslate_bricks", "Deepslate Bricks", "deepslate_tiles", "Deepslate Tiles", "blackstone", "Blackstone", "blackstone_top", "polished_blackstone", "Polished Blackstone", "polished_blackstone_bricks", "Polished Blackstone Bricks", "sandstone", "Sandstone", "sandstone_top", "sandstone_bottom", "smooth_sandstone",
-"Smooth Sandstone", "red_sandstone", "Red Sandstone", "red_sandstone_top", "red_sandstone_bottom", "smooth_red_sandstone", "Smooth Red Sandstone", "bricks", "Bricks", "glass", "Glass", "tinted_glass", "Tinted Glass", "obsidian", "Obsidian", "crying_obsidian", "Crying Obsidian", "purpur_block", "Purpur Block", "end_stone", "End Stone", "end_stone_bricks", "End Stone Bricks", "netherrack", "Netherrack", "nether_bricks", "Nether Bricks", "red_nether_bricks", "Red Nether Bricks", "quartz_block", "Block of Quartz",
-"quartz_block_top", "quartz_block_side", "smooth_quartz", "Smooth Quartz Block", "quartz_block_bottom", "prismarine", "Prismarine", "dark_prismarine", "Dark Prismarine", "bookshelf", "Bookshelf", "iron_block", "Block of Iron", "gold_block", "Block of Gold", "diamond_block", "Block of Diamond", "emerald_block", "Block of Emerald", "lapis_block", "Block of Lapis", "coal_block", "Block of Coal", "copper_block", "Block of Copper", "white_wool", "White Wool", "orange_wool", "Orange Wool", "magenta_wool", "Magenta Wool",
-"light_blue_wool", "Light Blue Wool", "yellow_wool", "Yellow Wool", "lime_wool", "Lime Wool", "pink_wool", "Pink Wool", "gray_wool", "Gray Wool", "light_gray_wool", "Light Gray Wool", "cyan_wool", "Cyan Wool", "purple_wool", "Purple Wool", "blue_wool", "Blue Wool", "brown_wool", "Brown Wool", "green_wool", "Green Wool", "red_wool", "Red Wool", "black_wool", "Black Wool", "white_concrete", "White Concrete", "orange_concrete", "Orange Concrete", "magenta_concrete", "Magenta Concrete", "light_blue_concrete", "Light Blue Concrete",
-"yellow_concrete", "Yellow Concrete", "lime_concrete", "Lime Concrete", "pink_concrete", "Pink Concrete", "gray_concrete", "Gray Concrete", "light_gray_concrete", "Light Gray Concrete", "cyan_concrete", "Cyan Concrete", "purple_concrete", "Purple Concrete", "blue_concrete", "Blue Concrete", "brown_concrete", "Brown Concrete", "green_concrete", "Green Concrete", "red_concrete", "Red Concrete", "black_concrete", "Black Concrete", "white_terracotta", "White Terracotta", "orange_terracotta", "Orange Terracotta",
-"magenta_terracotta", "Magenta Terracotta", "light_blue_terracotta", "Light Blue Terracotta", "yellow_terracotta", "Yellow Terracotta", "lime_terracotta", "Lime Terracotta", "pink_terracotta", "Pink Terracotta", "gray_terracotta", "Gray Terracotta", "light_gray_terracotta", "Light Gray Terracotta", "cyan_terracotta", "Cyan Terracotta", "purple_terracotta", "Purple Terracotta", "blue_terracotta", "Blue Terracotta", "brown_terracotta", "Brown Terracotta", "green_terracotta", "Green Terracotta", "red_terracotta",
-"Red Terracotta", "black_terracotta", "Black Terracotta", "sand", "Sand", "red_sand", "Red Sand", "gravel", "Gravel", "clay", "Clay", "snow_block", "Snow Block", "snow", "moss_block", "Moss Block", "oak_log", "Oak Log", "oak_log_top", "spruce_log", "Spruce Log", "spruce_log_top", "birch_log", "Birch Log", "birch_log_top", "jungle_log", "Jungle Log", "jungle_log_top", "acacia_log", "Acacia Log", "acacia_log_top", "dark_oak_log", "Dark Oak Log", "dark_oak_log_top", "mangrove_log", "Mangrove Log", "mangrove_log_top",
-"cherry_log", "Cherry Log", "cherry_log_top", "oak_leaves", "Oak Leaves", "spruce_leaves", "Spruce Leaves", "birch_leaves", "Birch Leaves", "jungle_leaves", "Jungle Leaves", "acacia_leaves", "Acacia Leaves", "dark_oak_leaves", "Dark Oak Leaves", "mangrove_leaves", "Mangrove Leaves", "cherry_leaves", "Cherry Leaves", "azalea_leaves", "Azalea Leaves", "ancient_debris", "Ancient Debris", "ancient_debris_top", "ancient_debris_side", "hay_block", "Hay Bale", "hay_block_top", "hay_block_side", "dried_kelp_block",
-"Dried Kelp Block", "dried_kelp_top", "dried_kelp_side", "pumpkin", "Pumpkin", "pumpkin_top", "pumpkin_side", "melon", "Melon", "melon_top", "melon_side", "cactus", "Cactus", "cactus_top", "cactus_side", "cactus_bottom", "mushroom_stem", "Mushroom Stem", "crafting_table", "Crafting Table", "crafting_table_top", "crafting_table_front", "Positive number pattern not found in ", "Expected \';\' at ", "Prefix contains special character at ", "Quote opened at ", " was not closed in ", "Two group separators at ", "Unexpected \'#\' at non-optional digit part at ",
-"Pattern does not specify integer digits at ", "Group separator at the end of number at ", "Group separator found at fractional part at ", "Unexpected second decimal separator at ", "Unexpected \'0\' at optional digit part at ", "Unexpected char at exponent at ", "Pattern does not specify exponent digits at ", "Patter is null", "\\Q", "\\E", "\\\\E\\Q", "[MenuBlurRenderer] targets ready (", "[MenuBlurRenderer] framebuffer incomplete: A=", " B=", " - blur disabled", "#version 300 es\nprecision highp float;\nin vec2 a_pos;\nin vec2 a_uv;\nout vec2 texCoord;\nvoid main() {\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n  texCoord = a_uv;\n}\n",
-"#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nuniform vec2 u_blurDir;\nuniform float u_radius;\nuniform vec2 u_inSize;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  vec2 oneTexel = 1.0 / u_inSize;\n  vec2 sampleStep = oneTexel * u_blurDir;\n  vec4 blurred = vec4(0.0);\n  float actualRadius = u_radius >= 0.5 ? floor(u_radius + 0.5) : 5.0;\n  for (float a = -actualRadius + 0.5; a <= actualRadius; a += 2.0) {\n    blurred += texture(InSampler, texCoord + sampleStep * a);\n  }\n  blurred +="
+"#version 300 es\nprecision highp float;\nin vec2 v_ndc;\nuniform highp sampler2DArray u_faces;\nuniform float u_yaw;\nuniform float u_pitch;\nuniform float u_tanHalfFov;\nuniform float u_aspect;\nout vec4 fragColor;\nfloat wrapDeg(float d) {\n  d = mod(d + 180.0, 360.0) - 180.0;\n  return d;\n}\nvoid main() {\n  vec3 dir = normalize(vec3(v_ndc.x * u_tanHalfFov * u_aspect,\n                             v_ndc.y * u_tanHalfFov, -1.0));\n  float cp = cos(u_pitch), sp = sin(u_pitch);\n  vec3 d1 = vec3(dir.x, dir.y * cp - dir.z *"
++ " sp, dir.y * sp + dir.z * cp);\n  float cy = cos(u_yaw), sy = sin(u_yaw);\n  vec3 d2 = vec3(d1.x * cy + d1.z * sy, d1.y, -d1.x * sy + d1.z * cy);\n  float pitchDeg = degrees(asin(clamp(d2.y, -1.0, 1.0)));\n  float yawDeg = wrapDeg(degrees(atan(-d2.x, d2.z)));\n  float layer;\n  float centerYaw;\n  if (yawDeg > -45.0 && yawDeg <= 45.0) { layer = 0.0; centerYaw = 0.0; }\n  else if (yawDeg > -135.0 && yawDeg <= -45.0) { layer = 1.0; centerYaw = -90.0; }\n  else if (yawDeg > 45.0 && yawDeg <= 135.0) { layer = 3.0; cente"
++ "rYaw = 90.0; }\n  else { layer = 2.0; centerYaw = 180.0; }\n  float rel = wrapDeg(yawDeg - centerYaw);\n  float u = 0.5 - rel / 90.0;\n  // Row 0 of each uploaded face is the rendered view\'s\n  // top (pitch +45), so v ramps down as the ray pitches down\n  float v = clamp((45.0 - pitchDeg) / 90.0, 0.0, 1.0);\n  fragColor = texture(u_faces, vec3(u, v, layer));\n}\n", "panorama_faces", "u_yaw", "u_pitch", "u_tanHalfFov", "u_aspect", "[PanoramaRenderer] face array built (", " x6)", "[PanoramaRenderer] face size mismatch on layer ",
+" (", " vs ", "[PanoramaRenderer] face \'", "\' failed to load - keeping the flat stub background", "1", "2", "3", "4", "5", "air", "Air", "stone", "Stone", "cobblestone", "Cobblestone", "grass_block", "Grass Block", "grass_block_top", "grass_block_side", "dirt", "Dirt", "oak_planks", "Oak Planks", "bedrock", "Bedrock", "smooth_stone", "Smooth Stone", "stone_bricks", "Stone Bricks", "mossy_stone_bricks", "Mossy Stone Bricks", "cracked_stone_bricks", "Cracked Stone Bricks", "coarse_dirt", "Coarse Dirt", "podzol",
+"Podzol", "podzol_top", "podzol_side", "rooted_dirt", "Rooted Dirt", "mud", "Mud", "spruce_planks", "Spruce Planks", "birch_planks", "Birch Planks", "jungle_planks", "Jungle Planks", "acacia_planks", "Acacia Planks", "dark_oak_planks", "Dark Oak Planks", "mangrove_planks", "Mangrove Planks", "cherry_planks", "Cherry Planks", "bamboo_planks", "Bamboo Planks", "iron_ore", "Iron Ore", "deepslate_iron_ore", "Deepslate Iron Ore", "copper_ore", "Copper Ore", "deepslate_copper_ore", "Deepslate Copper Ore", "gold_ore",
+"Gold Ore", "deepslate_gold_ore", "Deepslate Gold Ore", "redstone_ore", "Redstone Ore", "deepslate_redstone_ore", "Deepslate Redstone Ore", "emerald_ore", "Emerald Ore", "deepslate_emerald_ore", "Deepslate Emerald Ore", "lapis_ore", "Lapis Ore", "deepslate_lapis_ore", "Deepslate Lapis Ore", "diamond_ore", "Diamond Ore", "deepslate_diamond_ore", "Deepslate Diamond Ore", "coal_ore", "Coal Ore", "deepslate_coal_ore", "Deepslate Coal Ore", "granite", "Granite", "polished_granite", "Polished Granite", "diorite",
+"Diorite", "polished_diorite", "Polished Diorite", "andesite", "Andesite", "polished_andesite", "Polished Andesite", "deepslate", "Deepslate", "deepslate_top", "cobbled_deepslate", "Cobbled Deepslate", "polished_deepslate", "Polished Deepslate", "deepslate_bricks", "Deepslate Bricks", "deepslate_tiles", "Deepslate Tiles", "blackstone", "Blackstone", "blackstone_top", "polished_blackstone", "Polished Blackstone", "polished_blackstone_bricks", "Polished Blackstone Bricks", "sandstone", "Sandstone", "sandstone_top",
+"sandstone_bottom", "smooth_sandstone", "Smooth Sandstone", "red_sandstone", "Red Sandstone", "red_sandstone_top", "red_sandstone_bottom", "smooth_red_sandstone", "Smooth Red Sandstone", "bricks", "Bricks", "glass", "Glass", "tinted_glass", "Tinted Glass", "obsidian", "Obsidian", "crying_obsidian", "Crying Obsidian", "purpur_block", "Purpur Block", "end_stone", "End Stone", "end_stone_bricks", "End Stone Bricks", "netherrack", "Netherrack", "nether_bricks", "Nether Bricks", "red_nether_bricks", "Red Nether Bricks",
+"quartz_block", "Block of Quartz", "quartz_block_top", "quartz_block_side", "smooth_quartz", "Smooth Quartz Block", "quartz_block_bottom", "prismarine", "Prismarine", "dark_prismarine", "Dark Prismarine", "bookshelf", "Bookshelf", "iron_block", "Block of Iron", "gold_block", "Block of Gold", "diamond_block", "Block of Diamond", "emerald_block", "Block of Emerald", "lapis_block", "Block of Lapis", "coal_block", "Block of Coal", "copper_block", "Block of Copper", "white_wool", "White Wool", "orange_wool", "Orange Wool",
+"magenta_wool", "Magenta Wool", "light_blue_wool", "Light Blue Wool", "yellow_wool", "Yellow Wool", "lime_wool", "Lime Wool", "pink_wool", "Pink Wool", "gray_wool", "Gray Wool", "light_gray_wool", "Light Gray Wool", "cyan_wool", "Cyan Wool", "purple_wool", "Purple Wool", "blue_wool", "Blue Wool", "brown_wool", "Brown Wool", "green_wool", "Green Wool", "red_wool", "Red Wool", "black_wool", "Black Wool", "white_concrete", "White Concrete", "orange_concrete", "Orange Concrete", "magenta_concrete", "Magenta Concrete",
+"light_blue_concrete", "Light Blue Concrete", "yellow_concrete", "Yellow Concrete", "lime_concrete", "Lime Concrete", "pink_concrete", "Pink Concrete", "gray_concrete", "Gray Concrete", "light_gray_concrete", "Light Gray Concrete", "cyan_concrete", "Cyan Concrete", "purple_concrete", "Purple Concrete", "blue_concrete", "Blue Concrete", "brown_concrete", "Brown Concrete", "green_concrete", "Green Concrete", "red_concrete", "Red Concrete", "black_concrete", "Black Concrete", "white_terracotta", "White Terracotta",
+"orange_terracotta", "Orange Terracotta", "magenta_terracotta", "Magenta Terracotta", "light_blue_terracotta", "Light Blue Terracotta", "yellow_terracotta", "Yellow Terracotta", "lime_terracotta", "Lime Terracotta", "pink_terracotta", "Pink Terracotta", "gray_terracotta", "Gray Terracotta", "light_gray_terracotta", "Light Gray Terracotta", "cyan_terracotta", "Cyan Terracotta", "purple_terracotta", "Purple Terracotta", "blue_terracotta", "Blue Terracotta", "brown_terracotta", "Brown Terracotta", "green_terracotta",
+"Green Terracotta", "red_terracotta", "Red Terracotta", "black_terracotta", "Black Terracotta", "sand", "Sand", "red_sand", "Red Sand", "gravel", "Gravel", "clay", "Clay", "snow_block", "Snow Block", "snow", "moss_block", "Moss Block", "oak_log", "Oak Log", "oak_log_top", "spruce_log", "Spruce Log", "spruce_log_top", "birch_log", "Birch Log", "birch_log_top", "jungle_log", "Jungle Log", "jungle_log_top", "acacia_log", "Acacia Log", "acacia_log_top", "dark_oak_log", "Dark Oak Log", "dark_oak_log_top", "mangrove_log",
+"Mangrove Log", "mangrove_log_top", "cherry_log", "Cherry Log", "cherry_log_top", "oak_leaves", "Oak Leaves", "spruce_leaves", "Spruce Leaves", "birch_leaves", "Birch Leaves", "jungle_leaves", "Jungle Leaves", "acacia_leaves", "Acacia Leaves", "dark_oak_leaves", "Dark Oak Leaves", "mangrove_leaves", "Mangrove Leaves", "cherry_leaves", "Cherry Leaves", "azalea_leaves", "Azalea Leaves", "ancient_debris", "Ancient Debris", "ancient_debris_top", "ancient_debris_side", "hay_block", "Hay Bale", "hay_block_top", "hay_block_side",
+"dried_kelp_block", "Dried Kelp Block", "dried_kelp_top", "dried_kelp_side", "pumpkin", "Pumpkin", "pumpkin_top", "pumpkin_side", "melon", "Melon", "melon_top", "melon_side", "cactus", "Cactus", "cactus_top", "cactus_side", "cactus_bottom", "mushroom_stem", "Mushroom Stem", "crafting_table", "Crafting Table", "crafting_table_top", "crafting_table_front", "Positive number pattern not found in ", "Expected \';\' at ", "Prefix contains special character at ", "Quote opened at ", " was not closed in ", "Two group separators at ",
+"Unexpected \'#\' at non-optional digit part at ", "Pattern does not specify integer digits at ", "Group separator at the end of number at ", "Group separator found at fractional part at ", "Unexpected second decimal separator at ", "Unexpected \'0\' at optional digit part at ", "Unexpected char at exponent at ", "Pattern does not specify exponent digits at ", "Patter is null", "\\Q", "\\E", "\\\\E\\Q", "[MenuBlurRenderer] targets ready (", "[MenuBlurRenderer] framebuffer incomplete: A=", " B=", " - blur disabled",
+"#version 300 es\nprecision highp float;\nin vec2 a_pos;\nin vec2 a_uv;\nout vec2 texCoord;\nvoid main() {\n  gl_Position = vec4(a_pos, 0.0, 1.0);\n  texCoord = a_uv;\n}\n", "#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nuniform vec2 u_blurDir;\nuniform float u_radius;\nuniform vec2 u_inSize;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  vec2 oneTexel = 1.0 / u_inSize;\n  vec2 sampleStep = oneTexel * u_blurDir;\n  vec4 blurred = vec4(0.0);\n  float actualRadius = u_radius >= 0.5 ? floor(u_radius + 0.5) : 5.0;\n  for (float a = -actualRadius + 0.5; a <= actualRadius; a += 2.0) {\n    blurred += texture(InSampler, texCoord + sampleStep * a);\n  }\n  blurred +="
 + " texture(InSampler, texCoord + sampleStep * actualRadius) / 2.0;\n  fragColor = blurred / (actualRadius + 0.5);\n}\n", "#version 300 es\nprecision highp float;\nuniform sampler2D InSampler;\nin vec2 texCoord;\nout vec4 fragColor;\nvoid main() {\n  fragColor = texture(InSampler, texCoord);\n}\n", "menu_box_blur", "menu_blit", "InSampler", "u_blurDir", "u_radius", "u_inSize", "a_uv", "Connecting to the server...", "[ClientPacketListener] server brand: ", "Joining world...", "eaglercraft-26.1.2-web", "[ClientPacketListener] registry ",
 " entries)", "[chat] ", "[ClientPacketListener] unhandled play packet 0x", "[ClientPacketListener] play login: entity=", " gamemode=", " dimension=", " levelType=", " view=", "disconnect.quitting", ": OFF", "Cancel", "Minecraft Server", "Add Server", "Edit Server Info", "Server Name", "Server Address", "Join Server", "Direct Connection", "eaglercraft.worlds", "eaglercraft.worlds.seeded", "Survival", "[^a-z0-9]+", "[PlatformNetworking] Failed to connect: ", "[PlatformNetworking] Outgoing message too large: ",
 " bytes", "[PlatformNetworking] Send failed: ", "[PlatformNetworking] Reconnecting in ", "ms (attempt ", "[PlatformNetworking] Connection error: ", "[PlatformNetworking] Disconnected (code=", ", reason=", "[PlatformNetworking] Connected to ", " (compression=", "expectedSize", "/", "options.keybinds", "[KeyMapping] Saved ", " binds", ";", "[KeyMapping] Loaded ", "???", "Tab", "Q", "E", "T", "Left Ctrl", "A", "Left Shift", "\\", "F2", "F5", "F11", "Key #", "Esc", "key.forward", "key.left", "key.back", "key.right",

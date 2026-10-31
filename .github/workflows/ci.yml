@@ -419,6 +419,35 @@ jobs:
       # The deployment lives in its own job so it can depend on the
       # Playwright suite. A browser regression must block publishing.
 
+  # ── JVM geometry unit tests ────────────────────────────────
+  # The face tables are pure Java - their vanilla invariants (corners from
+  # the decompiled FaceInfo, per-face planes, outward winding, UV order,
+  # byte-packed color) run on a JVM in seconds, no browser needed. This is
+  # the fast layer that catches geometry regressions BEFORE the ~20-minute
+  # TeaVM build; the e2e VBO spec (geometry.spec.ts) covers the call sites
+  # end-to-end on top of it.
+  geometry-unit:
+    name: JVM Geometry Unit Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 26
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '26'
+
+      - name: Compile and run FaceTablesTest
+        run: |
+          mkdir -p /tmp/gt-classes
+          javac -d /tmp/gt-classes tests/geometry/FaceTablesTest.java \
+            sources/teavm/java/net/minecraft/client/renderer/FaceTables.java
+          java -cp /tmp/gt-classes FaceTablesTest
+
   # ── Browser tests ──────────────────────────────────────────
   # Runs the Playwright suite against the artifact produced above. It is
   # wired in before the deployment so a broken client never reaches
@@ -436,7 +465,7 @@ jobs:
   # ── Deploy ─────────────────────────────────────────────────
   deploy:
     name: Deploy to GitHub Pages
-    needs: [build, e2e]
+    needs: [build, e2e, geometry-unit]
     runs-on: ubuntu-latest
     permissions:
       contents: write

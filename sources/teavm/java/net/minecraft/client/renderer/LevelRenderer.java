@@ -380,116 +380,29 @@ public class LevelRenderer {
         }
 
         /**
-         * Emits one textured quad (6 vertices x 6 floats + 1 packed color
-         * float each... interleaved: 5 floats + 1 color float per vertex).
+         * Emits one textured quad (6 vertices x 7 floats) for the face of
+         * the block at (x,y,z) - the geometry lives in {@link FaceTables}
+         * so the JVM unit test can lock the vanilla invariants (outward
+         * winding, per-face plane, UV order) without a browser.
          * Returns the new write offset.
          */
         private int emitFace(float[] out, int vi, int x, int y, int z, int face,
                 int layer, float shade) {
-                if (layer < 0) {
-                        return vi; // texture not in the atlas (defensive)
-                }
                 if (vi + 6 * 7 > out.length) {
                         ClientMain.warn("[LevelRenderer] mesh scratch overflow");
                         return vi;
                 }
-                // The quad's 4 corners (axis-aligned unit cube face) and
-                // their uvs, verbatim from the 26.1.2 decompile:
-                // net.minecraft.client.renderer.FaceInfo (the per-direction
-                // corner table), FaceBakery.defaultFaceUV (the per-direction
-                // uv projection), and CuboidFace.UVs.getVertexU/V (the
-                // per-vertex (minU,minV)(minU,maxV)(maxU,maxV)(maxU,minV)
-                // assignment). In FaceInfo's corner order every face's uv
-                // pattern is exactly (0,0)(0,1)(1,1)(1,0) - the per-direction
-                // differences live entirely in the corner table. Vanilla
-                // texture convention: v=0 is the texture's TOP row, so side
-                // faces map v to (1 - y).
-                float x0 = x, x1 = x + 1;
-                float y0 = y, y1 = y + 1;
-                float z0 = z, z1 = z + 1;
-                float[] q = FACE_QUAD;
-                switch (face) {
-                        case FACE_UP:
-                                // FaceInfo.UP: (x0,y1,z0)(x0,y1,z1)(x1,y1,z1)(x1,y1,z0)
-                                q[0] = x0; q[1] = y1; q[2] = z0; q[3] = 0f; q[4] = 0f;
-                                q[5] = x0; q[6] = y1; q[7] = z1; q[8] = 0f; q[9] = 1f;
-                                q[10] = x1; q[11] = y1; q[12] = z1; q[13] = 1f; q[14] = 1f;
-                                q[15] = x1; q[16] = y1; q[17] = z0; q[18] = 1f; q[19] = 0f;
-                                break;
-                        case FACE_DOWN:
-                                // FaceInfo.DOWN: (x0,y0,z1)(x0,y0,z0)(x1,y0,z0)(x1,y0,z1)
-                                q[0] = x0; q[1] = y0; q[2] = z1; q[3] = 0f; q[4] = 0f;
-                                q[5] = x0; q[6] = y0; q[7] = z0; q[8] = 0f; q[9] = 1f;
-                                q[10] = x1; q[11] = y0; q[12] = z0; q[13] = 1f; q[14] = 1f;
-                                q[15] = x1; q[16] = y0; q[17] = z1; q[18] = 1f; q[19] = 0f;
-                                break;
-                        case FACE_NORTH:
-                                // FaceInfo.NORTH (-Z): (x1,y1,z0)(x1,y0,z0)(x0,y0,z0)(x0,y1,z0)
-                                q[0] = x1; q[1] = y1; q[2] = z0; q[3] = 0f; q[4] = 0f;
-                                q[5] = x1; q[6] = y0; q[7] = z0; q[8] = 0f; q[9] = 1f;
-                                q[10] = x0; q[11] = y0; q[12] = z0; q[13] = 1f; q[14] = 1f;
-                                q[15] = x0; q[16] = y1; q[17] = z0; q[18] = 1f; q[19] = 0f;
-                                break;
-                        case FACE_SOUTH:
-                                // FaceInfo.SOUTH (+Z): (x0,y1,z1)(x0,y0,z1)(x1,y0,z1)(x1,y1,z1)
-                                q[0] = x0; q[1] = y1; q[2] = z1; q[3] = 0f; q[4] = 0f;
-                                q[5] = x0; q[6] = y0; q[7] = z1; q[8] = 0f; q[9] = 1f;
-                                q[10] = x1; q[11] = y0; q[12] = z1; q[13] = 1f; q[14] = 1f;
-                                q[15] = x1; q[16] = y1; q[17] = z1; q[18] = 1f; q[19] = 0f;
-                                break;
-                        case FACE_WEST:
-                                // FaceInfo.WEST (-X): (x0,y1,z0)(x0,y0,z0)(x0,y0,z1)(x0,y1,z1)
-                                q[0] = x0; q[1] = y1; q[2] = z0; q[3] = 0f; q[4] = 0f;
-                                q[5] = x0; q[6] = y0; q[7] = z0; q[8] = 0f; q[9] = 1f;
-                                q[10] = x0; q[11] = y0; q[12] = z1; q[13] = 1f; q[14] = 1f;
-                                q[15] = x0; q[16] = y1; q[17] = z1; q[18] = 1f; q[19] = 0f;
-                                break;
-                        default: // FACE_EAST
-                                // FaceInfo.EAST (+X): (x1,y1,z1)(x1,y0,z1)(x1,y0,z0)(x1,y1,z0)
-                                q[0] = x1; q[1] = y1; q[2] = z1; q[3] = 0f; q[4] = 0f;
-                                q[5] = x1; q[6] = y0; q[7] = z1; q[8] = 0f; q[9] = 1f;
-                                q[10] = x1; q[11] = y0; q[12] = z0; q[13] = 1f; q[14] = 1f;
-                                q[15] = x1; q[16] = y1; q[17] = z0; q[18] = 1f; q[19] = 0f;
-                                break;
-                }
-                int shadeB = (int) (shade * 255.0f);
-                int colorPacked = shadeB | (shadeB << 8) | (shadeB << 16) | (255 << 24);
-                float colorF = Float.intBitsToFloat(colorPacked);
-                // Two triangles: (0,1,2) (2,3,0) - vanilla's quad index
-                // diagonal split, and the order FaceInfo's corners are wound
-                // for: cross-product checking all six tables shows every
-                // emitted triangle's geometric normal points outward, which
-                // is GL-CCW front for CULL_FACE BACK.
-                for (int k = 0; k < QUAD_INDEX_ORDER.length; k++) {
-                        int idx = QUAD_INDEX_ORDER[k];
-                        int b = idx * 5;
-                        out[vi++] = q[b];
-                        out[vi++] = q[b + 1];
-                        out[vi++] = q[b + 2];
-                        out[vi++] = q[b + 3];
-                        out[vi++] = q[b + 4];
-                        out[vi++] = (float) layer;
-                        out[vi++] = colorF;
-                }
-                return vi;
+                return FaceTables.emitFace(out, vi, x, y, z, face, layer, shade);
         }
 
-        // The old corner tables were hand-authored to a different winding,
-        // so this order was reversed to (0,2,1)(0,3,2) to compensate - a
-        // double negative that left only UP/DOWN/WEST front-facing: NORTH
-        // and SOUTH computed to the inward normal and were culled, and
-        // EAST was a copy of the NORTH quad on the wrong plane (the +X face
-        // never existed at all) - the "sides of blocks are invisible" bug.
-        // With the verbatim FaceInfo tables the vanilla order is correct.
-        private static final int[] QUAD_INDEX_ORDER = { 0, 1, 2, 2, 3, 0 };
-        private static final float[] FACE_QUAD = new float[20];
-
-        private static final int FACE_UP = 0;
-        private static final int FACE_DOWN = 1;
-        private static final int FACE_NORTH = 2;
-        private static final int FACE_SOUTH = 3;
-        private static final int FACE_WEST = 4;
-        private static final int FACE_EAST = 5;
+        // Face-geometry tables live in FaceTables (shared with the JVM
+        // unit test). These aliases keep the mesher call sites readable.
+        private static final int FACE_UP = FaceTables.FACE_UP;
+        private static final int FACE_DOWN = FaceTables.FACE_DOWN;
+        private static final int FACE_NORTH = FaceTables.FACE_NORTH;
+        private static final int FACE_SOUTH = FaceTables.FACE_SOUTH;
+        private static final int FACE_WEST = FaceTables.FACE_WEST;
+        private static final int FACE_EAST = FaceTables.FACE_EAST;
 
         // ========== Overlay geometry ==========
         // Corner-array quad writer shared by both overlays: 4 corners with

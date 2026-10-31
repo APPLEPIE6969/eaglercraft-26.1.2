@@ -229,7 +229,7 @@ async function bootSurvival(
   await page.goto('/index.html', { waitUntil: 'commit' });
   expect(await waitForClientBootstrap(page, BOOT_TIMEOUT), 'the TeaVM bundle must export self.main').toBe(true);
   expect(await waitForReadyState(page, READY_TIMEOUT), 'the client must reach the title screen').toBe(true);
-  await waitForFpsReading(page, 15_000);
+  await waitForFpsReading(page, 30_000);
 
   const telemetry = await readGameTelemetry(page);
   if (!telemetry?.canEnterWorld) {
@@ -520,7 +520,12 @@ test.describe('crafting (Feature 8)', () => {
   });
 
   test('mirrored axe placement and the stone tool tag both resolve', async ({}, testInfo) => {
-    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 180_000);
+    // The in-world tail of this test is a long chain of tick-quantized
+    // actions at the vanilla 20 TPS clock - on the software-GL CI runners
+    // the whole flow ran ~6.8 min against the old 7.0 min cap, so the
+    // in-world budget is sized to the tick clock now (the boot/ready
+    // constants stay unchanged).
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 600_000);
     const browser = await freshBrowser();
     const context = await browser.newContext();
     const page = await context.newPage();

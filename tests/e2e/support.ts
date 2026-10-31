@@ -242,7 +242,10 @@ export function parseFps(fpsText: string | null): number {
  */
 export async function waitForFpsReading(
   page: Page,
-  timeoutMs = 15_000,
+  // 30s: the first reading rides requestAnimationFrame, and on the
+  // software-GL CI runners the title-screen frame rate can stall long
+  // enough that the old 15s default expired before the first sample.
+  timeoutMs = 30_000,
 ): Promise<{ state: GameSessionState; fps: number }> {
   const deadline = Date.now() + timeoutMs;
   let state = await readGameSessionState(page);
@@ -271,7 +274,16 @@ export async function attachMilestoneScreenshot(
   testInfo: TestInfo,
   name: string,
 ): Promise<Buffer> {
-  const shot = await page.screenshot({ fullPage: false });
+  // In-world captures on the software-GL CI runners can outlive the 60s
+  // default action timeout while the compositor waits for a frame (the
+  // sky spec's screenshot stall), so the capture carries its own
+  // generous deadline and one retry before giving up.
+  let shot: Buffer;
+  try {
+    shot = await page.screenshot({ fullPage: false, timeout: 120_000 });
+  } catch {
+    shot = await page.screenshot({ fullPage: false, timeout: 120_000 });
+  }
   const dir = resolve(process.cwd(), SCREENSHOTS_DIR);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, `${name}.png`), shot);

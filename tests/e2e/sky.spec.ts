@@ -91,6 +91,11 @@ test.describe('day/night sky timeline', () => {
   test('noon, dusk, midnight and dawn follow the vanilla day timeline (capability-gated)', async ({
     clientPage: page,
   }, testInfo) => {
+    // Four setDayTime cycles plus five in-world screenshots: on the
+    // software-GL CI runners the captures alone can outlive the old
+    // global 300s budget (the "60s screenshot stall"), so the sky
+    // tests carry their own tick-clock-sized budget.
+    test.setTimeout(600_000);
     test.skip(!(await waitForBridge(page)), 'requires the gameplay + setDayTime bridge');
     await enterWorld(page);
 
@@ -162,6 +167,7 @@ test.describe('day/night sky timeline', () => {
   test('day time persists across save-and-quit (capability-gated)', async ({
     clientPage: page,
   }) => {
+    test.setTimeout(600_000);
     test.skip(!(await waitForBridge(page)), 'requires the gameplay + setDayTime bridge');
     await enterWorld(page);
 

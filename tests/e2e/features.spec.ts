@@ -124,7 +124,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await page.goto('/index.html', { waitUntil: 'commit' });
     expect(await waitForClientBootstrap(page, BOOT_TIMEOUT), 'the TeaVM bundle must export self.main').toBe(true);
     expect(await waitForReadyState(page, READY_TIMEOUT), 'the client must reach the title screen').toBe(true);
-    await waitForFpsReading(page, 15_000);
+    await waitForFpsReading(page, 30_000);
 
     const telemetry = await readGameTelemetry(page);
     if (!telemetry?.canEnterWorld) {
@@ -238,7 +238,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
   test('survival block breaking and placing work through the real mouse path (capability-gated)', async ({
     browser,
   }, testInfo) => {
-    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 150_000);
+    // The dig and place chains are tick-quantized at the vanilla 20 TPS
+    // clock - 3x the wall time the old budgets assumed, before the CI
+    // runner's software-GL slowness is even counted.
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 450_000);
     const context = await browser.newContext();
     const page = await context.newPage();
     const pageErrors: string[] = [];
@@ -248,7 +251,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await page.goto('/index.html', { waitUntil: 'commit' });
     expect(await waitForClientBootstrap(page, BOOT_TIMEOUT), 'the TeaVM bundle must export self.main').toBe(true);
     expect(await waitForReadyState(page, READY_TIMEOUT), 'the client must reach the title screen').toBe(true);
-    await waitForFpsReading(page, 15_000);
+    await waitForFpsReading(page, 30_000);
 
     const telemetry = await readGameTelemetry(page);
     if (!telemetry?.canEnterWorld) {
@@ -315,11 +318,70 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     }
 
     // ── Hold left mouse: survival destroy progress must advance ──
+    // Node-side polling cannot see this dig at tick granularity on a
+    // software-GL rig: whole frame bursts (up to the accumulator cap)
+    // land between two 150ms polls, so the old loop never observed the
+    // destroy overlay at all, and its release round-trip was slower
+    // than vanilla's 5-tick continue-the-dig delay - the held attack
+    // ate the block below too and the player ended up two blocks deep
+    // (which then broke the place stage: from a 2-deep hole every
+    // down-forward ray exits into the hole wall). The hold is therefore
+    // armed IN-PAGE: a setter trap on window.__eaglercraftGame records
+    // every per-tick destroy stage (the bundle REPLACES the bridge
+    // object once per tick, so the trap sees every tick even mid-burst),
+    // and an 8ms watcher queries the target cell synchronously through
+    // the bridge and releases the attack with a canvas mouseup the
+    // moment it turns to air - at most one tick of slop.
+    await page.evaluate(() => {
+      const w = window as unknown as Record<string, unknown>;
+      const stages: number[] = [];
+      const ctl = {
+        broke: false,
+        released: false,
+      };
+      let current: unknown = (w as { __eaglercraftGame?: unknown }).__eaglercraftGame;
+      Object.defineProperty(window, '__eaglercraftGame', {
+        configurable: true,
+        get() {
+          return current;
+        },
+        set(v: { gameplay?: { destroy?: { stage: number } | null } | null }) {
+          current = v;
+          const d = v?.gameplay?.destroy ?? null;
+          if (d && !ctl.broke) {
+            stages.push(d.stage);
+          }
+        },
+      });
+      const canvas =
+        (document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null) ??
+        (Array.from(document.querySelectorAll('canvas')) as HTMLCanvasElement[]).find(
+          (c) => c.clientWidth > 0,
+        ) ??
+        null;
+      const sampler = window.setInterval(() => {
+        if (ctl.broke) return;
+        const game = current as
+          | { queryBlock?: (x: number, y: number, z: number) => number }
+          | undefined;
+        if (!game || typeof game.queryBlock !== 'function') return;
+        if (game.queryBlock(0, -50, 0) === 0) {
+          ctl.broke = true;
+          if (canvas) {
+            canvas.dispatchEvent(new MouseEvent('mouseup', { button: 0, bubbles: true }));
+          }
+          ctl.released = true;
+          window.clearInterval(sampler);
+        }
+      }, 8);
+      (w as { __digCtl?: unknown }).__digCtl = {
+        state: () => ({ stages: stages.slice(), ...ctl }),
+        stop: () => window.clearInterval(sampler),
+      };
+    });
     await page.mouse.down();
-    // The lock grant / press itself can land one pointer-jump delta that
-    // whips the camera; the dig follows the crosshair, so re-snap once the
-    // hold is live and the destroy re-targets the grass under spawn.
-    await page.waitForTimeout(200);
+    // The press itself can land one pointer-lock whip delta; re-pin once
+    // the hold is live so the dig starts on the grass under spawn.
     await page.evaluate(() => {
       const game = (
         self as unknown as {
@@ -328,27 +390,43 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       ).__eaglercraftGame;
       game?.setLook?.(0, 90);
     });
-    let sawDestroyStage = false;
-    let broke = false;
-    const destroyDeadline = Date.now() + 20_000;
-    while (Date.now() < destroyDeadline && !broke) {
-      await page.waitForTimeout(150);
-      const t = await readGameTelemetry(page);
-      const g = t?.gameplay ? gameplayOf(t) : null;
-      if (g?.destroy && g.destroy.stage >= 0) {
-        sawDestroyStage = true;
-      }
-      broke = (await queryBlock(page, 0, -50, 0)) === 0;
+    const digDeadline = Date.now() + 30_000;
+    let digBroke = false;
+    while (Date.now() < digDeadline && !digBroke) {
+      await page.waitForTimeout(250);
+      digBroke = await page.evaluate(() => {
+        const ctl = (
+          window as unknown as { __digCtl?: { state: () => { broke: boolean } } }
+        ).__digCtl;
+        return ctl ? ctl.state().broke : false;
+      });
     }
-    await page.mouse.up();
+    await page.mouse.up(); // belt and braces - the in-page release fired first
+    const dig = await page.evaluate(() => {
+      const ctl = (
+        window as unknown as {
+          __digCtl?: {
+            state: () => { stages: number[]; broke: boolean; released: boolean };
+            stop?: () => void;
+          };
+        }
+      ).__digCtl;
+      const state = ctl?.state() ?? { stages: [], broke: false, released: false };
+      ctl?.stop?.();
+      return state;
+    });
     expect(
-      broke,
+      digBroke && dig.broke,
       'holding the attack key on grass must break it (vanilla fist: ~0.9s)',
     ).toBe(true);
     expect(
-      sawDestroyStage,
-      'the survival destroy overlay must advance through the stages',
+      dig.released,
+      'the in-page watcher must release the attack the moment the block breaks',
     ).toBe(true);
+    expect(
+      dig.stages.length,
+      'the survival destroy overlay must advance through the stages (per-tick captures)',
+    ).toBeGreaterThan(0);
     expect(await queryBlock(page, 0, -50, 0), 'the grass block is gone').toBe(0);
     await attachMilestoneScreenshot(page, testInfo, '05-block-broken');
 
@@ -361,12 +439,27 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
 
     // ── Place it back: aim at the ground a few blocks south ──
     // Synthetic CDP pointer deltas drift the camera between ticks even
-    // after the snap, so the aim is re-pinned every round until the
-    // snapshot shows pitch ~30 with a valid top-face hit whose placement
-    // cell is not the player's own occupied block (vanilla canSurvive
-    // rejects that - as does this poll).
-    let placeHit: Gameplay['hit'] = null;
-    for (let i = 0; i < 25 && !placeHit; i++) {
+    // after the snap, and at the true 20 TPS a setLook request only
+    // lands one to three ticks after it is queued, so the whole
+    // aim -> right-click -> edit-verify sequence is ONE retry loop:
+    // every round re-pins the camera, verifies the crosshair actually
+    // shows a placeable top-face cell (not the player's own - vanilla
+    // canSurvive rejects that), then right-clicks with a press window
+    // WIDER than one slow CI frame. The old 120ms window coalesced
+    // press+release into a single input poll on a loaded runner and the
+    // use-edge vanished (the edits counter froze). A rejected placement
+    // consumes nothing, so retries are free.
+    const editsBefore = await (async () => {
+      const t = await readGameTelemetry(page);
+      return t?.gameplay ? gameplayOf(t).edits : -1;
+    })();
+    let placed = false;
+    let placedAt: string | null = null;
+    let placeX = -1;
+    let placeY = -1;
+    let placeZ = -1;
+    const placeDeadline = Date.now() + 60_000;
+    for (let i = 0; i < 25 && !placed && Date.now() < placeDeadline; i++) {
       await page.evaluate(() => {
         const game = (
           self as unknown as {
@@ -377,7 +470,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
         // hole the ray clears the hole wall and lands ~1.5 blocks away
         game?.setLook?.(0, 30);
       });
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(250);
       const t = await readGameTelemetry(page);
       const gp = t?.gameplay ? gameplayOf(t) : null;
       if (!gp?.hit || gp.hit.face !== 'up') {
@@ -395,47 +488,26 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
       if (cellX === feetX && cellY === feetY && cellZ === feetZ) {
         continue; // the player's own cell - placement would be rejected
       }
-      placeHit = gp.hit;
-    }
-    expect(placeHit, 'the forward-down ray must find a placeable ground cell').toBeTruthy();
-    expect(placeHit!.face, 'the placement surface must be the top face').toBe('up');
-    const placeY = placeHit!.y + 1;
-    const placeZ = placeHit!.z;
-    const placeX = placeHit!.x;
-    // Re-pin once more and click immediately - the pick refreshes per
-    // frame, so the click races at most ~1 frame of drift
-    await page.evaluate(() => {
-      const game = (
-        self as unknown as {
-          __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
-        }
-      ).__eaglercraftGame;
-      game?.setLook?.(0, 30);
-    });
-    await page.waitForTimeout(80);
-    const editsBefore = (await (async () => {
-      const t = await readGameTelemetry(page);
-      return t?.gameplay ? gameplayOf(t).edits : -1;
-    })());
-    await page.mouse.down({ button: 'right' });
-    await page.waitForTimeout(120);
-    await page.mouse.up({ button: 'right' });
-
-    // Survival placement consumes the held stack and adds exactly one
-    // edit - position-independent success signals (the camera can drift
-    // a cell between the aim read and the click, so the position check
-    // scans the neighborhood instead of pinning one cell)
-    let placed = false;
-    let placedAt: string | null = null;
-    const placeDeadline = Date.now() + 8_000;
-    while (Date.now() < placeDeadline && !placed) {
-      await page.waitForTimeout(250);
-      const t = await readGameTelemetry(page);
-      const gp = t?.gameplay ? gameplayOf(t) : null;
-      if (!gp) continue;
-      const sel = gp.hotbar.slots[gp.hotbar.selected];
-      const consumed = !sel || sel[1] === 0;
-      if (gp.edits >= editsBefore + 1 && consumed) {
+      placeX = cellX;
+      placeY = cellY;
+      placeZ = cellZ;
+      // The verified aim is live: right-click now, press held wide.
+      await page.mouse.down({ button: 'right' });
+      await page.waitForTimeout(300);
+      await page.mouse.up({ button: 'right' });
+      // Survival placement consumes the held stack and adds exactly one
+      // edit - position-independent success signals (the camera can
+      // drift a cell between the aim read and the click, so the position
+      // check scans the neighborhood after success instead of pinning
+      // one cell).
+      const ok = await waitForTelemetry(page, 5_000, (t2) => {
+        const g2 = t2.gameplay ? gameplayOf(t2) : null;
+        if (!g2) return false;
+        const sel = g2.hotbar.slots[g2.hotbar.selected];
+        const consumed = !sel || sel[1] === 0;
+        return g2.edits >= editsBefore + 1 && consumed;
+      });
+      if (ok) {
         placed = true;
         for (let dx = -2; dx <= 2 && !placedAt; dx++) {
           for (let dz = -2; dz <= 2 && !placedAt; dz++) {
@@ -467,7 +539,10 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
   test('Options sub-screens (Controls, Key Binds, Sound) and the multiplayer gateway screens work (capability-gated)', async ({
     browser,
   }, testInfo) => {
-    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 150_000);
+    // The join tail retries now (see below) and every menu transition
+    // consumes ticks at the vanilla 20 TPS clock, so the budget scales
+    // the same way as the mouse-path test's.
+    test.setTimeout(BOOT_TIMEOUT + READY_TIMEOUT + 450_000);
     const context = await browser.newContext();
     const page = await context.newPage();
     const pageErrors: string[] = [];
@@ -477,7 +552,7 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     await page.goto('/index.html', { waitUntil: 'commit' });
     expect(await waitForClientBootstrap(page, BOOT_TIMEOUT), 'the TeaVM bundle must export self.main').toBe(true);
     expect(await waitForReadyState(page, READY_TIMEOUT), 'the client must reach the title screen').toBe(true);
-    await waitForFpsReading(page, 15_000);
+    await waitForFpsReading(page, 30_000);
 
     const telemetry = await readGameTelemetry(page);
     if (!telemetry) {
@@ -729,41 +804,72 @@ test.describe('gameplay, options sub-screens and multiplayer gateway', () => {
     // ── Select the row and join: ConnectScreen -> DisconnectedScreen ──
     // First row: listTop 32, row height 36 -> click at GUI (245, 50).
     // The row highlight is computed at render time, so the pointer must
-    // rest on the row for a frame before the click lands.
-    const rowClick = await getGuiCssCoords(page, 245, 50);
-    await page.mouse.move(rowClick.cssX, rowClick.cssY);
-    await page.waitForTimeout(250);
-    await page.mouse.click(rowClick.cssX, rowClick.cssY);
-    await page.waitForTimeout(300);
-    // The ConnectScreen is transient on a fast loopback refusal: the WS
-    // onclose can land between two telemetry pushes, so the 200ms poll
-    // can legitimately never observe it (the gateway-era bundle's frozen
-    // loop kept the screen up long; a healthy client disconnects within
-    // a tick or two). Sample the screen in-page at 8ms around the join
-    // so the assert checks the client's real behavior, not poll luck.
-    await page.evaluate(() => {
-      const w = window as unknown as {
-        __screenLog?: Array<{ t: number; screen: string }>;
-        __screenSampler?: number;
-      };
-      w.__screenLog = [];
-      const t0 = performance.now();
-      w.__screenSampler = window.setInterval(() => {
-        const s = (
-          window as unknown as { __eaglercraftGame?: { screen?: string } }
-        ).__eaglercraftGame?.screen;
-        if (typeof s !== 'string' || !w.__screenLog) return;
-        const last = w.__screenLog[w.__screenLog.length - 1];
-        if (!last || last.screen !== s) {
-          w.__screenLog.push({ t: Math.round(performance.now() - t0), screen: s });
+    // rest on the row for a frame before the click lands. On a loaded CI
+    // runner one dropped row/join click strands the whole tail (the old
+    // failure: the client sat on the server browser / bounced back to
+    // the TitleScreen and the ConnectScreen transition was never
+    // observed), so the select -> join -> observe sequence is retried
+    // from whatever screen the failed attempt left behind.
+    let disconnected: Telemetry | null = null;
+    for (let joinAttempt = 0; joinAttempt < 3 && !disconnected; joinAttempt++) {
+      if (joinAttempt > 0) {
+        // Walk back to the server browser from wherever the failed
+        // attempt stranded the flow.
+        const left = await readGameTelemetry(page);
+        const leftScreen = left?.screen ?? '';
+        if (
+          leftScreen.includes('EditServerScreen') ||
+          leftScreen.includes('DisconnectedScreen') ||
+          leftScreen.includes('ConnectScreen')
+        ) {
+          const back = (left?.buttons ?? []).find(
+            (b) => b.id === 'cancel' || b.id === 'back' || b.id === 'backtoserverlist',
+          );
+          if (back) {
+            await clickBridgeButton(page, back.id, 'the stranded screen must offer a way back');
+            await waitForTelemetry(page, 15_000, (t) => t.screen.includes('JoinMultiplayerScreen') || t.screen.includes('TitleScreen'));
+          }
         }
-      }, 8);
-    });
-    await clickBridgeButton(page, 'joinserver', 'Join Server must be clickable after selecting a row');
-    await attachMilestoneScreenshot(page, testInfo, '12-connecting');
+        if (!(await readGameTelemetry(page))?.screen.includes('JoinMultiplayerScreen')) {
+          await clickBridgeButton(page, 'multiplayer', 'Multiplayer must be reachable again for the join retry');
+          await waitForTelemetry(page, 15_000, (t) => t.screen.includes('JoinMultiplayerScreen'));
+        }
+      }
+      const rowClick = await getGuiCssCoords(page, 245, 50);
+      await page.mouse.move(rowClick.cssX, rowClick.cssY);
+      await page.waitForTimeout(250);
+      await page.mouse.click(rowClick.cssX, rowClick.cssY);
+      await page.waitForTimeout(300);
+      // The ConnectScreen is transient on a fast loopback refusal: the WS
+      // onclose can land between two telemetry pushes, so the 200ms poll
+      // can legitimately never observe it (the gateway-era bundle's frozen
+      // loop kept the screen up long; a healthy client disconnects within
+      // a tick or two). Sample the screen in-page at 8ms around the join
+      // so the assert checks the client's real behavior, not poll luck.
+      await page.evaluate(() => {
+        const w = window as unknown as {
+          __screenLog?: Array<{ t: number; screen: string }>;
+          __screenSampler?: number;
+        };
+        w.__screenLog = [];
+        const t0 = performance.now();
+        w.__screenSampler = window.setInterval(() => {
+          const s = (
+            window as unknown as { __eaglercraftGame?: { screen?: string } }
+          ).__eaglercraftGame?.screen;
+          if (typeof s !== 'string' || !w.__screenLog) return;
+          const last = w.__screenLog[w.__screenLog.length - 1];
+          if (!last || last.screen !== s) {
+            w.__screenLog.push({ t: Math.round(performance.now() - t0), screen: s });
+          }
+        }, 8);
+      });
+      await clickBridgeButton(page, 'joinserver', 'Join Server must be clickable after selecting a row');
+      await attachMilestoneScreenshot(page, testInfo, '12-connecting');
 
-    // localhost:1 refuses fast -> the honest DisconnectedScreen
-    const disconnected = await waitForTelemetry(page, 45_000, (t) => t.screen.includes('DisconnectedScreen'));
+      // localhost:1 refuses fast -> the honest DisconnectedScreen
+      disconnected = await waitForTelemetry(page, 45_000, (t) => t.screen.includes('DisconnectedScreen'));
+    }
     expect(
       disconnected?.screen.includes('DisconnectedScreen'),
       `a refused connection must land on the DisconnectedScreen (last: ${JSON.stringify(disconnected?.screen)})`,

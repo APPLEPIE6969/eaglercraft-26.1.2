@@ -24,27 +24,40 @@ import {
 const BOOT_TIMEOUT = 150_000;
 const READY_TIMEOUT = 90_000;
 
-/** Waits until the mesher's dirty-section queue drains (all edits meshed). */
-async function waitForMeshDrain(page: Page, timeoutMs = 45_000): Promise<void> {
-  const ok = await page
-    .waitForFunction(() => {
-      const game = (
-        self as unknown as {
-          __eaglercraftGame?: {
-            gameplay?: { player?: { x: number; y: number; z: number } };
-            debugMesh?: (x: number, y: number, z: number) => { dirtyCount: number } | null;
-          };
-        }
-      ).__eaglercraftGame;
-      const p = game?.gameplay?.player;
-      const d = game?.debugMesh;
-      if (!p || !d) return false;
-      const m = d(Math.floor(p.x), Math.floor(p.y), Math.floor(p.z));
-      return !!m && m.dirtyCount === 0;
-    }, { timeout: timeoutMs })
+/**
+ * Waits until the scene edit is VISIBLE in the level data (queryBlock at
+ * the spot returns the placed id) AND the mesher's dirty queue has drained.
+ * Both gates matter: dirtyCount alone races the setScene CONSUMPTION - on a
+ * 1-4 fps runner the request sits unconsumed for seconds while dirtyCount
+ * is still 0, and reading the VBO then yields the pre-edit mesh.
+ */
+async function waitForSceneApplied(
+  page: Page,
+  spot: [number, number, number],
+  id: number,
+  timeoutMs = 60_000,
+): Promise<void> {
+  const ok = await page.waitForFunction(([s, want]) => {
+    const game = (
+      self as unknown as {
+        __eaglercraftGame?: {
+          gameplay?: { player?: { x: number; y: number; z: number } };
+          debugMesh?: (x: number, y: number, z: number) => { dirtyCount: number } | null;
+          queryBlock?: (x: number, y: number, z: number) => number;
+        };
+      }
+    ).__eaglercraftGame;
+    const p = game?.gameplay?.player;
+    const d = game?.debugMesh;
+    const q = game?.queryBlock;
+    if (!p || !d || !q) return false;
+    if (q(s[0], s[1], s[2]) !== want) return false; // scene not consumed yet
+    const m = d(Math.floor(p.x), Math.floor(p.y), Math.floor(p.z));
+    return !!m && m.dirtyCount === 0; // and fully remeshed
+  }, [spot, id], { timeout: timeoutMs })
     .then(() => true)
     .catch(() => false);
-  expect(ok, 'the mesh queue must drain after edits').toBe(true);
+  expect(ok, `the scene edit at ${spot} must apply and the mesh queue must drain`).toBe(true);
 }
 
 interface FaceAnalysis {
@@ -147,7 +160,7 @@ test('VBO plane invariants: floating block, dug hole, placed block', async ({ br
     return null;
   }, [fx, fy, fz]);
   expect(floatSpot, 'air space must exist above spawn for the floating probe').toBeTruthy();
-  await waitForMeshDrain(page);
+  await waitForSceneApplied(page, floatSpot!, 1);
   const floatVerts = await readLocalVerts(page, floatSpot!);
   expect(floatVerts.length / 7, 'a lone block emits exactly 6 quads = 36 verts').toBe(36);
   const floatFaces = analyzeBlock(floatVerts, floatSpot!);
@@ -183,7 +196,7 @@ test('VBO plane invariants: floating block, dug hole, placed block', async ({ br
     return null;
   }, [fx, fy, fz]);
   expect(hole, 'a diggable surface block must exist near spawn').toBeTruthy();
-  await waitForMeshDrain(page);
+  await waitForSceneApplied(page, hole!, 0);
   const walls = await page.evaluate(([hx, hy, hz]) => {
     const g = (self as unknown as { __eaglercraftGame?: GameBridge }).__eaglercraftGame!;
     const out: Record<string, number> = {};
@@ -229,7 +242,7 @@ test('VBO plane invariants: floating block, dug hole, placed block', async ({ br
     return null;
   }, [fx, fy, fz]);
   expect(placed, 'a clean surface to build on must exist near spawn').toBeTruthy();
-  await waitForMeshDrain(page);
+  await waitForSceneApplied(page, placed!, 4);
   const placedId = await page.evaluate((s) =>
     (self as unknown as { __eaglercraftGame?: GameBridge }).__eaglercraftGame!
       .queryBlock!(s[0], s[1], s[2]), placed!);

@@ -194,9 +194,15 @@ public class LevelRenderer {
                                                 continue;
                                         }
                                         Blocks.Block block = Blocks.byId(id);
-                                        // +Y (up face, shade 1.0) - grass uses its tinted top texture
+                                        // +Y (up face, shade 1.0) - grass uses its tinted top texture.
+                                        // emitFace takes the BLOCK's own origin and its FaceInfo.UP
+                                        // table adds MAX_Y (=+1) itself: pass plain y. The old call
+                                        // passed the plane (y+1), so every top face was emitted at
+                                        // y+2 - a canopy floating one block above the side quads,
+                                        // leaving a 1-block void band at every terrain edge and
+                                        // black voids around every dug hole ("sides invisible").
                                         if (!occludes(level.getBlockState(x, y + 1, z))) {
-                                                vi = emitFace(out, vi, x, y + 1, z, FACE_UP,
+                                                vi = emitFace(out, vi, x, y, z, FACE_UP,
                                                         WorldTextures.layerTop(block), SHADE_UP);
                                         }
                                         // -Y (down face, shade 0.5)

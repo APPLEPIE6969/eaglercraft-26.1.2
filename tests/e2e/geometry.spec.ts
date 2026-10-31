@@ -162,11 +162,20 @@ test('VBO plane invariants: floating block, dug hole, placed block', async ({ br
   expect(floatFaces.plane.EAST).toBe(floatSpot![0] + 1);
 
   // ── Scene 2: dig a hole (walls + floor re-emitted) ──
+  // The hole cell must be solid with 4 solid horizontal neighbors (so the
+  // 4 wall faces exist) and a solid floor - a canopy leaf would leave air
+  // neighbors with no walls to assert on.
   const hole: [number, number, number] | null = await page.evaluate(([fx, fy, fz]) => {
     const g = (self as unknown as { __eaglercraftGame?: GameBridge }).__eaglercraftGame!;
-    const x = fx + 3, z = fz + 3;
-    for (let y = fy + 6; y >= fy - 8; y--) {
-      if (g.queryBlock!(x, y, z) !== 0) {
+    for (let cand = 0; cand < 36; cand++) {
+      const x = fx + 2 + (cand % 6), z = fz + 2 + Math.floor(cand / 6);
+      for (let y = fy + 4; y >= fy - 6; y--) {
+        if (g.queryBlock!(x, y, z) === 0) continue;
+        if (g.queryBlock!(x, y + 1, z) !== 0) continue; // open above the hole
+        if (g.queryBlock!(x, y - 1, z) === 0) continue; // solid floor
+        const walls4 = g.queryBlock!(x, y, z - 1) !== 0 && g.queryBlock!(x, y, z + 1) !== 0
+          && g.queryBlock!(x - 1, y, z) !== 0 && g.queryBlock!(x + 1, y, z) !== 0;
+        if (!walls4) continue;
         g.setScene!({ blocks: [[x, y, z, 0]], hideHud: 1 });
         return [x, y, z];
       }
@@ -192,19 +201,39 @@ test('VBO plane invariants: floating block, dug hole, placed block', async ({ br
   expect(walls.FLOOR, 'hole floor top face emitted (>=6 verts)').toBeGreaterThanOrEqual(6);
 
   // ── Scene 3: place a block against the terrain ──
+  // The placement cell must be air in a clean 3x3x3 above the surface, so
+  // the placed block cannot end up buried inside a slope or canopy (a
+  // buried block has every face culled - that failure mode is the
+  // mesher behaving CORRECTLY, and this scene is asserting placement,
+  // not burial).
   const placed: [number, number, number] | null = await page.evaluate(([fx, fy, fz]) => {
     const g = (self as unknown as { __eaglercraftGame?: GameBridge }).__eaglercraftGame!;
-    const x = fx + 2, z = fz + 2;
-    for (let y = fy + 6; y >= fy - 8; y--) {
-      if (g.queryBlock!(x, y, z) !== 0) {
-        g.setScene!({ blocks: [[x, y + 1, z, 4]], hideHud: 1 });
-        return [x, y + 1, z];
+    for (let cand = 0; cand < 36; cand++) {
+      const x = fx + 1 + (cand % 6), z = fz + 1 + Math.floor(cand / 6);
+      for (let y = fy + 4; y >= fy - 6; y--) {
+        if (g.queryBlock!(x, y, z) === 0) continue;
+        const py = y + 1;
+        let clean = true;
+        for (let dy = 0; dy <= 1 && clean; dy++) {
+          for (let dz = -1; dz <= 1 && clean; dz++) {
+            for (let dx = -1; dx <= 1 && clean; dx++) {
+              if (g.queryBlock!(x + dx, py + dy, z + dz) !== 0) clean = false;
+            }
+          }
+        }
+        if (!clean) continue;
+        g.setScene!({ blocks: [[x, py, z, 4]], hideHud: 1 });
+        return [x, py, z];
       }
     }
     return null;
   }, [fx, fy, fz]);
-  expect(placed, 'a surface to build on must exist near spawn').toBeTruthy();
+  expect(placed, 'a clean surface to build on must exist near spawn').toBeTruthy();
   await waitForMeshDrain(page);
+  const placedId = await page.evaluate((s) =>
+    (self as unknown as { __eaglercraftGame?: GameBridge }).__eaglercraftGame!
+      .queryBlock!(s[0], s[1], s[2]), placed!);
+  expect(placedId, 'the placed block is cobblestone').toBe(4);
   const placedVerts = await readLocalVerts(page, placed!);
   const placedFaces = analyzeBlock(placedVerts, placed!);
   for (const dir of ['UP', 'NORTH', 'SOUTH', 'WEST', 'EAST']) {

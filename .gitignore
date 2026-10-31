@@ -35,7 +35,6 @@ skills/
 src/
 tool-results/
 upload/
-worklog.md
 .zscripts/
 Caddyfile
 components.json

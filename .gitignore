@@ -111,3 +111,13 @@ scripts/*
 dfu-classes
 sources/resources/assets/
 sources/resources/_epk_manifest.json
+
+# Build scaffolding (recreated by build_init/build_workspace/build_compile)
+.eaglercraft-init
+/workspace/
+/buildtools/lib/
+/sources/minecraft-classes/
+/sources/libs/
+/sources/build/
+/sources/teavm/patch/classes/
+/teavm.log

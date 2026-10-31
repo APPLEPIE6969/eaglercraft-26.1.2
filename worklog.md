@@ -371,3 +371,28 @@ geometry-unit job) + tests/e2e/geometry.spec.ts (VBO plane invariants:
 culled). Full-jar decompile completed and archived
 (docs/decompiled-26.1.2-full-src.zip, 6,882 files); audit doc
 docs/IMPLEMENTATION-COVERAGE.md; worklog moved into the repo.
+
+## Task 12 — verification + the two harness races the e2e caught (2026-10-31)
+
+Production verification of the y+2 fix (run 41212854639, commit 1c165c4,
+deployed): probe_face_repro rerun - floating blocks x-ray 6/6 faces
+outward with UP on the correct plane, placed block's top at y=-48
+(FaceTables plane invariant), hole walls + floor emitted, and the
+screenshots show the placed cobblestone sitting flush with the grass,
+hole walls rendering as dirt cross-sections, zero black bands at
+terraces or the horizon (pre-fix: black voids everywhere).
+
+Two CI-only failures taught harness lessons worth keeping:
+1. Scene selection without guards buried the placed block inside a
+   slope/canopy overhang - every face correctly culled, UP=0. The
+   mesher was RIGHT; the scan needed a clean 3x3x2 air requirement.
+2. dirtyCount==0 is NOT a valid "edit applied" gate: a fresh setScene
+   request sits unconsumed for seconds at 1-4 fps while dirtyCount is
+   still 0, so the VBO read the pre-edit mesh. Gate = queryBlock(spot)
+   == placed id (atomic with the dirty marks) THEN dirtyCount==0.
+
+Also archived: docs/decompiled-26.1.2-full-src.zip (the complete jar
+decompile, 6,882 files), docs/IMPLEMENTATION-COVERAGE.md (honest audit:
+decompile complete; port = 411 files; mobs/redstone/dimensions listed
+missing), FaceTables JVM test proven by mutation (shifting the UP plane
+by +1 makes it fail), CI geometry-unit job green on every run.

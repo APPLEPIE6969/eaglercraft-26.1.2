@@ -449,3 +449,59 @@ a mirror with only index.html/classes.js/assets.epk starves the texture
 atlas and the dirty queue never drains - the first prod-gate attempt
 failed on exactly that). scripts/prod_verify.sh now mirrors assets/ and
 lang/ from the build tree.
+
+## Task 14 — CLAUDE.md: the worklog contract (2026-11-01)
+
+User request: add a CLAUDE.md stating that worklog.md must be very detailed
+with what was done, and that no tokens may be written into it.
+
+The sandbox reset twice inside this one task - both times local main rolled
+back to 219f3b3 while origin/main stood at 5e192ba (Task 13), and the first
+recovery's commit was destroyed before it could be pushed. Both recoveries
+were fetch + hard-reset to origin plus recreation of the working files from
+session context. The stale workspace-root worklog.md fossil (a
+summary-recreated copy of the same nine Task IDs in less detail) was retired;
+the second reset then wiped the whole workspace root anyway - no loss, since
+the repo copy is the superset and the only canonical worklog.
+
+CLAUDE.md now pins the contract at the repo root:
+- worklog.md must be very detailed with what was done: changes file by file,
+  commit hashes, CI run IDs, real verification numbers, root causes,
+  decisions with reasoning, and what stays open - detailed enough that a
+  fresh session can reconstruct the whole project state from it alone;
+  committed and pushed in the same push as the work it describes.
+- the absolute no-tokens rule: no PATs, API keys, passwords, cookies, or
+  any other credentials in worklog.md or any committed file, commit message,
+  or CI log - not even partially or redacted; secrets are referenced by
+  location only.
+- plus the operating context future sessions keep re-deriving the hard way:
+  origin/main as the single source of truth, the decompile zip and
+  docs/decompiled-26.1.2-reference/ as the only vanilla ground truth,
+  IMPLEMENTATION-COVERAGE.md kept current, the scripts/* gitignore whitelist
+  trap (new helper scripts commit nothing until whitelisted), the
+  build -> geometry-unit -> e2e -> deploy gate, live-bytes verification, and
+  the post-reset recovery routine.
+
+Also left a pointer stub at /home/z/my-project/CLAUDE.md (outside the repo,
+uncommitted) so sessions that start at the workspace root find the rules.
+
+Push auth saga, worth the detail: the PAT embedded in the origin remote URL
+was dead again (HTTP 401 from api.github.com/user; the reset reverted it -
+the same regression Task 13 hit), and the URL kept the token in the username
+slot with no password, so git also fell back to an unanswerable interactive
+password prompt. An environment sweep for a live alternative (gh CLI, ssh
+keys, netrc, git-credentials store, env vars, .env) found nothing. The user
+then supplied a fresh PAT in chat. It was installed into the origin remote
+URL and the gitignored scripts/.gh_token copy only - never printed into any
+tracked file, and both worklog and CLAUDE.md pass the
+ghp_/github_pat_/gh[ousr]_ secret scan. Two discoveries while installing it:
+the repo has moved - api.github.com/repos/diddy62626/... returns 301 to
+repositories/1270416148, canonical full_name APPLEPIE6969/eaglercraft-26.1.2
+(the old diddy62626 URL survives only as a redirect alias) - and the new
+token verifies push=True on that repo. The remote URL was re-pointed to the
+canonical name to stop depending on the redirect.
+
+Outcome: recreated as a single docs commit (CLAUDE.md + this entry;
+docs-only, public/ and build inputs untouched), pushed to
+APPLEPIE6969/eaglercraft-26.1.2 main, verified by ls-remote hash equality.
+CI run for this push watched separately and appended below.

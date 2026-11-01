@@ -321,29 +321,44 @@ public class LevelRenderer {
                                         float xLo = x - 0.5F, xHi = x + 1.5F;
                                         float yLo = y - 0.5F, yHi = y + 1.5F;
                                         float zLo = z - 0.5F, zHi = z + 1.5F;
-                                        for (int v = 0; v < mesh.vertices && kept < 400; v++) {
-                                                int o = v * WorldGlRenderer.STRIDE_FLOATS;
-                                                float px = all.get(o), py = all.get(o + 1), pz = all.get(o + 2);
-                                                if (px < xLo || px > xHi || py < yLo || py > yHi
-                                                                || pz < zLo || pz > zHi) {
+                                        // Triangle-wise filter: a quad that merely STRADDLES the
+                                        // box edge (e.g. a neighbor terrain top face next to a
+                                        // placed block) would otherwise contribute some of its
+                                        // verts and break the stride-3 alignment every consumer
+                                        // of localVerts relies on. Keep a triangle only when ALL
+                                        // three of its verts are inside the box.
+                                        for (int t = 0; t + 2 < mesh.vertices && kept < 396; t += 3) {
+                                                boolean allIn = true;
+                                                for (int k = 0; k < 3 && allIn; k++) {
+                                                        int o = (t + k) * WorldGlRenderer.STRIDE_FLOATS;
+                                                        float px = all.get(o), py = all.get(o + 1), pz = all.get(o + 2);
+                                                        if (px < xLo || px > xHi || py < yLo || py > yHi
+                                                                        || pz < zLo || pz > zHi) {
+                                                                allIn = false;
+                                                        }
+                                                }
+                                                if (!allIn) {
                                                         continue;
                                                 }
-                                                if (kept > 0) {
-                                                        sb.append(',');
-                                                }
-                                                kept++;
-                                                for (int k = 0; k < WorldGlRenderer.STRIDE_FLOATS; k++) {
-                                                        if (k > 0) {
+                                                for (int k = 0; k < 3; k++) {
+                                                        int o = (t + k) * WorldGlRenderer.STRIDE_FLOATS;
+                                                        if (kept > 0) {
                                                                 sb.append(',');
                                                         }
-                                                        if (k == 6) {
-                                                                // The packed RGBA byte blob travels as
-                                                                // a float - full-bright shades pack to
-                                                                // 0xFFFFFFFF which IS a float NaN; emit
-                                                                // the raw int bits so the JSON stays valid
-                                                                sb.append(Float.floatToIntBits(all.get(o + k)));
-                                                        } else {
-                                                                sb.append(all.get(o + k));
+                                                        kept++;
+                                                        for (int f = 0; f < WorldGlRenderer.STRIDE_FLOATS; f++) {
+                                                                if (f > 0) {
+                                                                        sb.append(',');
+                                                                }
+                                                                if (f == 6) {
+                                                                        // The packed RGBA byte blob travels as
+                                                                        // a float - full-bright shades pack to
+                                                                        // 0xFFFFFFFF which IS a float NaN; emit
+                                                                        // the raw int bits so the JSON stays valid
+                                                                        sb.append(Float.floatToIntBits(all.get(o + f)));
+                                                                } else {
+                                                                        sb.append(all.get(o + f));
+                                                                }
                                                         }
                                                 }
                                         }

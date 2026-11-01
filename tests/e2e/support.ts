@@ -268,21 +268,32 @@ export const SCREENSHOTS_DIR = 'screenshots';
  * to the Playwright report under the given milestone name. Playwright
  * captures through the browser compositor, so this also works while the
  * client bootstrap blocks the page main thread.
+ *
+ * Milestone captures are ARTIFACTS, not assertions: every spec's real
+ * checks ride the telemetry bridge. A capture that misses its deadline
+ * (the compositor can starve for minutes on the 1-4 fps software-GL CI
+ * runners - the sky spec's screenshot stall) must cost the suite seconds,
+ * never fail the test, so the helper is best-effort and never throws.
  */
 export async function attachMilestoneScreenshot(
   page: Page,
   testInfo: TestInfo,
   name: string,
-): Promise<Buffer> {
-  // In-world captures on the software-GL CI runners can outlive the 60s
-  // default action timeout while the compositor waits for a frame (the
-  // sky spec's screenshot stall), so the capture carries its own
-  // generous deadline and one retry before giving up.
-  let shot: Buffer;
-  try {
-    shot = await page.screenshot({ fullPage: false, timeout: 120_000 });
-  } catch {
-    shot = await page.screenshot({ fullPage: false, timeout: 120_000 });
+): Promise<Buffer | null> {
+  let shot: Buffer | null = null;
+  for (let attempt = 0; attempt < 2 && !shot; attempt++) {
+    try {
+      shot = await page.screenshot({ fullPage: false, timeout: 20_000 });
+    } catch (err) {
+      console.log(`[capture] ${name} attempt ${attempt + 1} missed its deadline: ${String(err).split('\n')[0]}`);
+    }
+  }
+  if (!shot) {
+    await testInfo.attach(`${name}-skipped`, {
+      body: 'screenshot capture starved on the software-GL runner; the test assertions are telemetry-based and unaffected',
+      contentType: 'text/plain',
+    });
+    return null;
   }
   const dir = resolve(process.cwd(), SCREENSHOTS_DIR);
   mkdirSync(dir, { recursive: true });

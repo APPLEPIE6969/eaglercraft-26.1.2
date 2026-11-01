@@ -505,3 +505,11 @@ Outcome: recreated as a single docs commit (CLAUDE.md + this entry;
 docs-only, public/ and build inputs untouched), pushed to
 APPLEPIE6969/eaglercraft-26.1.2 main, verified by ls-remote hash equality.
 CI run for this push watched separately and appended below.
+
+CI outcome (run 41325712694, commit 6208738): fully green in ~46 minutes -
+build success, JVM Geometry Unit Tests success, E2E Browser Tests / Playwright
+browser tests success (the suite's full length on the software-GL runner is
+normal; read the job steps, not the wall clock, to tell progress from a hang),
+Deploy to GitHub Pages success. Docs-only push, so the deployed bytes are
+unchanged from the Task 13 build - the live site already carries the verified
+mesher fixes; post-deploy HEAD check on the Pages URL returned HTTP 200.

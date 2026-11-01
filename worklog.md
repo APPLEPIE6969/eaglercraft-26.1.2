@@ -435,3 +435,17 @@ telemetry-asserted test, and a mesh-dump helper that can return
 half-a-quad will poison every stride-based consumer downstream.
 Committed as e2f0130; CI watch + production e2e against the deployed
 bytes to follow.
+
+Outcome (same day): CI run for e2f0130 fully green - build, JVM
+geometry-unit, all 48 e2e tests, Deploy. The gh-pages deploy carries
+build 55d9bd7 and the live classes.js is byte-identical to it. The
+production gate then ran against the LIVE bytes (downloaded site +
+geometry.spec): floating block 6 faces on vanilla planes with UP=y+1,
+dug hole walls + floor re-emitted, placed block all four sides + top
+with the bottom culled - 1 passed. One operational note: verifying the
+deployed bundle needs the FULL public/ tree mirrored (the client pulls
+loose GUI sprites like assets/gui/sprites/widget/button.png over HTTP;
+a mirror with only index.html/classes.js/assets.epk starves the texture
+atlas and the dirty queue never drains - the first prod-gate attempt
+failed on exactly that). scripts/prod_verify.sh now mirrors assets/ and
+lang/ from the build tree.

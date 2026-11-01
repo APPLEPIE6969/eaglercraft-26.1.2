@@ -396,3 +396,42 @@ decompile, 6,882 files), docs/IMPLEMENTATION-COVERAGE.md (honest audit:
 decompile complete; port = 411 files; mobs/redstone/dimensions listed
 missing), FaceTables JVM test proven by mutation (shifting the UP plane
 by +1 makes it fail), CI geometry-unit job green on every run.
+
+## Task 13 — the "still red" gate was the test, not the world (2026-11-01)
+
+Post-reset recovery round: local main had rolled back to 219f3b3 again,
+the PAT file had reverted to the dead token, and the TeaVM toolchain
+caches (~/.gradle, tools/pristine, sources/libs, the client jar) were
+gone - local_build.sh re-fetched and re-patched everything from scratch
+in two passes. Origin itself was fine: production was verified by
+provenance - the live classes.js is byte-identical to the gh-pages deploy
+commit that names build 1c165c4 (the y+2 fix), so the site the user
+sees IS the fixed mesher.
+
+But origin/main was red for five straight runs, and two of those reds
+were real test bugs worth writing down:
+
+1. geometry.spec scene 3 failed every run since it landed: "placed
+   block UP face: 2 outward triangles / Received: 0". The mesher was
+   innocent (scene 1's floating block passed all six faces and planes
+   in the same run). debugMeshJson's box filter kept INDIVIDUAL verts,
+   and a neighbor terrain top quad straddling the [x-0.5..x+1.5] box
+   edge contributed some of its verts - shattering the stride-3
+   triangle alignment analyzeBlock assumes. A block placed ON terrain
+   always has straddling neighbor tops; a floating one never does,
+   which is why only scene 3 broke, everywhere, every run. Fix:
+   filter triangle-wise (keep a tri only when all three verts are in
+   the box). A throwaway diagnostic spec (5 clean pockets) proved the
+   shape of it: pre-rebuild bundle showed UP at y+2 (stale public/),
+   post-rebuild showed 36 verts / 6 faces / UP=y+1 on every pocket.
+2. sky.spec's 4.5m failures were the milestone captures: 120s timeout,
+   one retry, THROW on both - two starved captures on a software-GL
+   runner could kill a test whose real assertions ride the telemetry
+   bridge. attachMilestoneScreenshot is now best-effort: 20s cap, two
+   tries, never throws, attaches a note instead.
+
+Lesson: a screenshot artifact must never be able to fail a
+telemetry-asserted test, and a mesh-dump helper that can return
+half-a-quad will poison every stride-based consumer downstream.
+Committed as e2f0130; CI watch + production e2e against the deployed
+bytes to follow.

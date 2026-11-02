@@ -156,76 +156,57 @@ test('block placement: six-face culling matrix, section borders, real right-clic
   }
 
   // ── Scene B: the section border remeshes both sections ──
-  // Sections are 16x16x16; a block placed across a section boundary must
-  // remesh BOTH sections - the neighbor across the border must cull its
-  // facing quad exactly like a same-section one. The scan accepts any
-  // boundary line (x or z) in any of the four horizontal directions with
-  // a generous y window, because the terrain around the flat spawn pad
-  // varies; node-side then picks the first candidate whose facing quad is
-  // actually exposed (2 outward triangles), self-healing against
-  // unmeshed sections.
-  const borderSites: Array<{ surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' }> =
-    await page.evaluate(([ox, oy, oz]) => {
-      const q = (
-        self as unknown as {
-          __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
-        }
-      ).__eaglercraftGame?.queryBlock;
-      if (!q) return [];
-      const sites: Array<{ surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' }> = [];
-      const DIRS: Array<{ name: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST'; d: [number, number, number] }> = [
-        { name: 'EAST', d: [1, 0, 0] },
-        { name: 'WEST', d: [-1, 0, 0] },
-        { name: 'SOUTH', d: [0, 0, 1] },
-        { name: 'NORTH', d: [0, 0, -1] },
-      ];
-      const sectionOf = (a: number, b: number) => Math.floor(a / 16) !== Math.floor(b / 16);
-      for (let cand = 0; cand < 220 && sites.length < 8; cand++) {
-        const x = ox - 6 + (cand % 15);
-        const z = oz - 6 + Math.floor(cand / 15);
-        for (let y = oy + 6; y >= oy - 12; y--) {
-          if (q(x, y, z) === 0) continue; // the surface block
-          if (q(x, y + 1, z) !== 0) continue; // open above it
-          for (const dir of DIRS) {
-            const cx = x + dir.d[0];
-            const cz = z + dir.d[2];
-            if (!sectionOf(x, cx) && !sectionOf(z, cz)) continue; // must cross a section line
-            if (q(cx, y, cz) !== 0) continue; // the cross cell must be air at surface level
-            if (q(cx, y + 1, cz) !== 0) continue;
-            if (q(cx, y + 2, cz) !== 0) continue;
-            sites.push({ surface: [x, y, z], cross: [cx, y, cz], dir: dir.name });
-            break;
-          }
-          break; // only the topmost surface of this column
-        }
+  // Sections are 16x16x16; an edit that changes a block's neighbor across
+  // a section line must re-mesh BOTH sections. On the flat spawn pad
+  // (radius 24, grass at y=-50) every horizontal quad is legitimately
+  // culled - the pad's own solidity hides them - so the honest cross-
+  // section scenario is DIG-driven: remove the pad block in section 1 at
+  // (16,-50,z) and the pad block in section 0 at (15,-50,z) must RE-
+  // EXPOSE its EAST quad; restore the block and the quad must re-cull.
+  // Both remesh directions, across the boundary, no terrain assumptions.
+  const borderZ: number | null = await page.evaluate((oz) => {
+    const q = (
+      self as unknown as {
+        __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
       }
-      return sites;
-    }, origin);
-  expect(borderSites.length, 'clean section-border sites must exist near spawn (terrain scan)').toBeGreaterThanOrEqual(1);
-  let border: { surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' } | null = null;
-  for (const site of borderSites) {
-    const mesh = await readMesh(page, site.surface);
-    if (outwardTris(mesh?.localVerts ?? [], site.dir) === 2) {
-      border = site;
-      break;
+    ).__eaglercraftGame?.queryBlock;
+    if (!q) return null;
+    for (let z = oz - 8; z <= oz + 8; z++) {
+      // both sides of the x=15|16 section line: pad grass with open air above
+      if (q(15, -50, z) !== 9) continue;
+      if (q(16, -50, z) !== 9) continue;
+      if (q(15, -49, z) !== 0 || q(16, -49, z) !== 0) continue; // tree-free columns
+      if (q(15, -48, z) !== 0 || q(16, -48, z) !== 0) continue;
+      return z;
     }
-  }
-  expect(border, 'a border site with an exposed facing quad must exist (candidates: '
-    + JSON.stringify(borderSites) + ')').toBeTruthy();
-  await setSceneBlocks(page, [[border!.cross[0], border!.cross[1], border!.cross[2], 4]]);
-  await waitForEditApplied(page, border!.cross, 4);
-  // The placed block is across the section boundary - its own section must
-  // have remeshed around it (its UP quad renders on the vanilla plane):
-  const crossMesh = await readMesh(page, border!.cross);
-  expect(outwardTris(crossMesh?.localVerts ?? [], 'UP'), 'border-placed block UP quad renders').toBe(2);
-  // AND the neighbor across the border must have re-meshed to cull its facing quad:
-  const afterMesh = await readMesh(page, border!.surface);
+    return null;
+  }, origin[2]);
+  expect(borderZ, 'a tree-free pad column pair across the x=15|16 section line must exist').toBeTruthy();
+  const west: [number, number, number] = [15, -50, borderZ!];
+  const east: [number, number, number] = [16, -50, borderZ!];
+  // before: the west block's EAST quad is culled by the solid pad neighbor
+  const westBefore = await readMesh(page, west);
   expect(
-    outwardTris(afterMesh?.localVerts ?? [], border!.dir),
-    'the neighbor across the section border must cull after the build',
+    outwardTris(westBefore?.localVerts ?? [], 'EAST'),
+    'the pad block must have its EAST quad culled while the neighbor is solid',
   ).toBe(0);
-  // restore the world (the placed block's edit stays - queryBlock proves it)
-  expect(await readBlockAt(page, border!.cross[0], border!.cross[1], border!.cross[2])).toBe(4);
+  // dig across the section line: the west block must RE-EXPOSE its EAST quad
+  await setSceneBlocks(page, [[east[0], east[1], east[2], 0]]);
+  await waitForEditApplied(page, east, 0);
+  const westAfterDig = await readMesh(page, west);
+  expect(
+    outwardTris(westAfterDig?.localVerts ?? [], 'EAST'),
+    'digging the neighbor across the section line must re-expose the WEST block EAST quad',
+  ).toBe(2);
+  // restore the block: the quad must re-cull (both remesh directions)
+  await setSceneBlocks(page, [[east[0], east[1], east[2], 9]]);
+  await waitForEditApplied(page, east, 9);
+  const westAfterRestore = await readMesh(page, west);
+  expect(
+    outwardTris(westAfterRestore?.localVerts ?? [], 'EAST'),
+    'restoring the neighbor across the section line must re-cull the WEST block EAST quad',
+  ).toBe(0);
+  expect(await readBlockAt(page, east[0], east[1], east[2]), 'the pad is restored to grass').toBe(9);
 
   // ── Scene C: the real right-click use path ──
   // Fill hotbar slot 0 (already selected on spawn) with cobblestone, aim

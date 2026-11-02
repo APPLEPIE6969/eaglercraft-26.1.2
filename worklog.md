@@ -648,3 +648,18 @@ line - all four horizontal directions, x and z borders, y window
 facing quad is genuinely exposed. Also API rate limit lesson: polling
 GitHub every 20s burns the token's budget and even the LOG download
 403s; the poller now sleeps 90s between polls.
+
+Fix round 4 (run of 8d2eaed): the wide scan STILL found zero sites -
+and reading the generator explained why: ClientLevel spawns on a FLAT
+PAD (SPAWN_PAD_RADIUS=24, grass at y=-50, tree-free clearance), so
+near spawn every pad block's horizontal neighbor is SOLID and every
+horizontal quad is legitimately culled. There is no exposed side quad
+to build against near spawn at any y - the premise of the scan was
+wrong, not its window. Scene B is now dig-driven and deterministic:
+pick a tree-free pad column pair across the x=15|16 section line,
+assert the west block's EAST quad is culled (0), DIG the east block
+across the line, assert the quad RE-EXPOSES (2), RESTORE the block and
+assert it re-culls (0). That exercises the neighbor-update propagation
+ACROSS the section boundary in both remesh directions - and if the
+mesher ever fails to dirty the adjacent section on a border edit, this
+scene is the tripwire.

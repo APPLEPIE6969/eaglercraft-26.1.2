@@ -155,14 +155,16 @@ test('block placement: six-face culling matrix, section borders, real right-clic
     ).toBe(2);
   }
 
-  // ── Scene B: the section border (x = 16k) remeshes both sections ──
-  // Collect candidate sites in-page: a solid surface block west of the
-  // x=16 border with clean air at and above the border cell (the cell the
-  // surface's EAST quad points into must be air, or the quad would be
-  // legitimately culled). Node-side then picks the first candidate whose
-  // EAST quad is actually exposed (2 outward triangles) - self-healing
-  // against unmeshed sections or scan misses.
-  const borderSites: Array<{ surface: [number, number, number]; cross: [number, number, number] }> =
+  // ── Scene B: the section border remeshes both sections ──
+  // Sections are 16x16x16; a block placed across a section boundary must
+  // remesh BOTH sections - the neighbor across the border must cull its
+  // facing quad exactly like a same-section one. The scan accepts any
+  // boundary line (x or z) in any of the four horizontal directions with
+  // a generous y window, because the terrain around the flat spawn pad
+  // varies; node-side then picks the first candidate whose facing quad is
+  // actually exposed (2 outward triangles), self-healing against
+  // unmeshed sections.
+  const borderSites: Array<{ surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' }> =
     await page.evaluate(([ox, oy, oz]) => {
       const q = (
         self as unknown as {
@@ -170,33 +172,45 @@ test('block placement: six-face culling matrix, section borders, real right-clic
         }
       ).__eaglercraftGame?.queryBlock;
       if (!q) return [];
-      const sites: Array<{ surface: [number, number, number]; cross: [number, number, number] }> = [];
-      for (let cand = 0; cand < 32 && sites.length < 6; cand++) {
-        // section 15 is x 0..15; the border sits between x=15 and x=16
-        const bx = 15 - (cand % 4);
-        const bz = oz + 2 + Math.floor(cand / 4);
-        for (let y = oy + 2; y >= oy - 6; y--) {
-          if (q(bx, y, bz) === 0) continue;
-          if (q(bx, y + 1, bz) !== 0) continue;
-          if (q(bx + 1, y, bz) !== 0) continue; // the border cell AT surface level must be air
-          if (q(bx + 1, y + 1, bz) !== 0) continue;
-          if (q(bx + 1, y + 2, bz) !== 0) continue;
-          sites.push({ surface: [bx, y, bz], cross: [bx + 1, y + 1, bz] });
-          break;
+      const sites: Array<{ surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' }> = [];
+      const DIRS: Array<{ name: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST'; d: [number, number, number] }> = [
+        { name: 'EAST', d: [1, 0, 0] },
+        { name: 'WEST', d: [-1, 0, 0] },
+        { name: 'SOUTH', d: [0, 0, 1] },
+        { name: 'NORTH', d: [0, 0, -1] },
+      ];
+      const sectionOf = (a: number, b: number) => Math.floor(a / 16) !== Math.floor(b / 16);
+      for (let cand = 0; cand < 220 && sites.length < 8; cand++) {
+        const x = ox - 6 + (cand % 15);
+        const z = oz - 6 + Math.floor(cand / 15);
+        for (let y = oy + 6; y >= oy - 12; y--) {
+          if (q(x, y, z) === 0) continue; // the surface block
+          if (q(x, y + 1, z) !== 0) continue; // open above it
+          for (const dir of DIRS) {
+            const cx = x + dir.d[0];
+            const cz = z + dir.d[2];
+            if (!sectionOf(x, cx) && !sectionOf(z, cz)) continue; // must cross a section line
+            if (q(cx, y, cz) !== 0) continue; // the cross cell must be air at surface level
+            if (q(cx, y + 1, cz) !== 0) continue;
+            if (q(cx, y + 2, cz) !== 0) continue;
+            sites.push({ surface: [x, y, z], cross: [cx, y, cz], dir: dir.name });
+            break;
+          }
+          break; // only the topmost surface of this column
         }
       }
       return sites;
     }, origin);
-  expect(borderSites.length, 'clean x=16k border sites must exist near spawn').toBeGreaterThanOrEqual(1);
-  let border: { surface: [number, number, number]; cross: [number, number, number] } | null = null;
+  expect(borderSites.length, 'clean section-border sites must exist near spawn (terrain scan)').toBeGreaterThanOrEqual(1);
+  let border: { surface: [number, number, number]; cross: [number, number, number]; dir: 'NORTH' | 'SOUTH' | 'WEST' | 'EAST' } | null = null;
   for (const site of borderSites) {
     const mesh = await readMesh(page, site.surface);
-    if (outwardTris(mesh?.localVerts ?? [], 'EAST') === 2) {
+    if (outwardTris(mesh?.localVerts ?? [], site.dir) === 2) {
       border = site;
       break;
     }
   }
-  expect(border, 'a border site with an exposed EAST quad must exist (candidates: '
+  expect(border, 'a border site with an exposed facing quad must exist (candidates: '
     + JSON.stringify(borderSites) + ')').toBeTruthy();
   await setSceneBlocks(page, [[border!.cross[0], border!.cross[1], border!.cross[2], 4]]);
   await waitForEditApplied(page, border!.cross, 4);
@@ -204,12 +218,14 @@ test('block placement: six-face culling matrix, section borders, real right-clic
   // have remeshed around it (its UP quad renders on the vanilla plane):
   const crossMesh = await readMesh(page, border!.cross);
   expect(outwardTris(crossMesh?.localVerts ?? [], 'UP'), 'border-placed block UP quad renders').toBe(2);
-  // AND the west-section neighbor must have re-meshed to cull its EAST quad:
+  // AND the neighbor across the border must have re-meshed to cull its facing quad:
   const afterMesh = await readMesh(page, border!.surface);
   expect(
-    outwardTris(afterMesh?.localVerts ?? [], 'EAST'),
+    outwardTris(afterMesh?.localVerts ?? [], border!.dir),
     'the neighbor across the section border must cull after the build',
   ).toBe(0);
+  // restore the world (the placed block's edit stays - queryBlock proves it)
+  expect(await readBlockAt(page, border!.cross[0], border!.cross[1], border!.cross[2])).toBe(4);
 
   // ── Scene C: the real right-click use path ──
   // Fill hotbar slot 0 (already selected on spawn) with cobblestone, aim

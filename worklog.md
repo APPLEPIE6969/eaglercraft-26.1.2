@@ -637,3 +637,14 @@ now passes and the failure moved on. Two more test bugs surfaced:
   scan now requires that cell to be air, and node-side picks the first
   of up to 6 candidates whose EAST quad is actually exposed (2 outward
   triangles), self-healing against unmeshed sections.
+
+Fix round 3 (run 41379977718): persistence now PASSES (the day-time
+range assert was the last of it). Placement's border scan still found
+zero sites: the terrain around the small flat spawn pad does not fit a
+narrow EAST-only x=12..15 window with a +/-6 y range (trees, slopes and
+canopy eat the candidates). Scene B now scans ANY 16-section boundary
+line - all four horizontal directions, x and z borders, y window
++6/-12, up to 8 candidate sites - and node-side picks the first whose
+facing quad is genuinely exposed. Also API rate limit lesson: polling
+GitHub every 20s burns the token's budget and even the LOG download
+403s; the poller now sleeps 90s between polls.

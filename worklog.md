@@ -663,3 +663,16 @@ assert it re-culls (0). That exercises the neighbor-update propagation
 ACROSS the section boundary in both remesh directions - and if the
 mesher ever fails to dirty the adjacent section on a border edit, this
 scene is the tripwire.
+
+Fix round 5 (run 41384823574): scenes A and B now PASS on CI - the
+six-face culling matrix and the border tripwire are green, the mesher
+survives. Scene C failed for a principled reason: aiming straight down
+from the pad makes the placement target the player's own feet cell,
+which vanilla canSurvive (correctly) rejects - every attempt was a
+correct rejection. Scene C now uses the features.spec-proven geometry:
+dev-dig a 1-deep hole, the player drops in, setLook(0, 30) aims
+down-forward so the ray clears the hole wall onto a top face, every
+retry re-pins the camera and verifies the crosshair (face 'up', aim
+settled, target != feet cell) before a wide right-press, success is
+verified by the edits counter + stack consumption, and the placed
+cobblestone is located near the aimed cell.

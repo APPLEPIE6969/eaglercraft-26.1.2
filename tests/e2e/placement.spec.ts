@@ -209,22 +209,25 @@ test('block placement: six-face culling matrix, section borders, real right-clic
   expect(await readBlockAt(page, east[0], east[1], east[2]), 'the pad is restored to grass').toBe(9);
 
   // ── Scene C: the real right-click use path ──
-  // Fill hotbar slot 0 (already selected on spawn) with cobblestone, aim
-  // straight down, grab the pointer, and press the real right button.
+  // Hotbar slot 0 (selected on spawn) is filled with cobblestone through
+  // the bridge. Vanilla canSurvive rejects placing into the player's own
+  // cell - aiming straight down from the pad makes the target the feet
+  // cell and every placement is (correctly) rejected - so the scene uses
+  // the features.spec-proven geometry: a 1-deep hole (dev-set via the
+  // real setBlockState path), the player drops in, setLook(0, 30) aims
+  // down-forward so the ray clears the hole wall onto a top face ~1.5
+  // blocks away, and every retry re-pins the camera, verifies the crosshair
+  // (face 'up', aim settled, target != feet cell), then right-clicks with
+  // a press window wider than one slow CI frame. Success is verified by
+  // the edits counter + held-stack consumption (the camera can drift a
+  // cell between the aim read and the click), then the placed block is
+  // located near the aimed cell.
   await setHotbarSlot(page, 0, 4, 64);
-  await page.evaluate(() => {
-    const game = (
-      self as unknown as {
-        __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
-      }
-    ).__eaglercraftGame;
-    game?.setLook?.(0, 90);
-  });
-  const aimed = await waitForTelemetry(page, 15_000, (t) => {
+  await setSceneBlocks(page, [[0, -50, 0, 0]]); // dev-dig the hole under the player
+  await waitForTelemetry(page, 20_000, (t) => {
     const gp = t.gameplay as ReturnType<typeof gameplayOf> | null | undefined;
-    return !!gp?.hit && gp.hit.x === 0 && gp.hit.y === -50 && gp.hit.z === 0;
+    return gp?.player.onGround === true && Math.floor(gp.player.y) === -50;
   });
-  expect(aimed, 'aiming down must hit the spawn-pad grass').toBeTruthy();
   const canvas = await page.evaluate(() => {
     const byId = document.getElementById('EaglerCraftX_26_1_2_Canvas') as HTMLCanvasElement | null;
     const c =
@@ -237,35 +240,70 @@ test('block placement: six-face culling matrix, section borders, real right-clic
   expect(canvas, 'the game canvas must exist').toBeTruthy();
   await page.mouse.click(canvas!.x, canvas!.y); // vanilla click-to-grab
   await page.waitForTimeout(700);
+  const editsBefore = await (async () => {
+    const t = await readGameTelemetry(page);
+    return t?.gameplay ? gameplayOf(t).edits : -1;
+  })();
   let placedReal = false;
-  for (let attempt = 0; attempt < 6 && !placedReal; attempt++) {
+  let placeX = -1;
+  let placeY = -1;
+  let placeZ = -1;
+  const placeDeadline = Date.now() + 60_000;
+  for (let i = 0; i < 25 && !placedReal && Date.now() < placeDeadline; i++) {
     await page.evaluate(() => {
       const game = (
         self as unknown as {
           __eaglercraftGame?: { setLook?: (yaw: number, pitch: number) => void };
         }
       ).__eaglercraftGame;
-      game?.setLook?.(0, 90);
+      // yaw 0 faces +Z, pitch 30 down-forward: the ray clears the hole
+      // wall and lands ~1.5 blocks away on a placeable top face
+      game?.setLook?.(0, 30);
     });
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(250);
+    const t = await readGameTelemetry(page);
+    const gp = t?.gameplay ? gameplayOf(t) : null;
+    if (!gp?.hit || gp.hit.face !== 'up') continue;
+    if (Math.abs(gp.player.pitch - 30) >= 2) continue;
+    const cellX = gp.hit.x;
+    const cellY = gp.hit.y + 1;
+    const cellZ = gp.hit.z;
+    if (cellX === Math.floor(gp.player.x) && cellY === Math.floor(gp.player.y) && cellZ === Math.floor(gp.player.z)) {
+      continue; // the player's own cell - vanilla rejects that placement
+    }
+    placeX = cellX;
+    placeY = cellY;
+    placeZ = cellZ;
     await page.mouse.down({ button: 'right' });
     await page.waitForTimeout(300);
     await page.mouse.up({ button: 'right' });
-    // vanilla use path: the block lands on the hit face above the grass
-    placedReal = await page
-      .waitForFunction(() => {
-        const game = (
-          self as unknown as {
-            __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
-          }
-        ).__eaglercraftGame;
-        return game?.queryBlock?.(0, -49, 0) === 4;
-      }, undefined, { timeout: 8_000 })
-      .then(() => true)
-      .catch(() => false);
+    // survival placement consumes the held stack and adds exactly one edit
+    const ok = await waitForTelemetry(page, 5_000, (t2) => {
+      const g2 = t2.gameplay ? gameplayOf(t2) : null;
+      if (!g2) return false;
+      const sel = g2.hotbar.slots[g2.hotbar.selected];
+      const consumed = !sel || sel[1] === 0 || sel[1] < 64;
+      return g2.edits >= editsBefore + 1 && consumed;
+    });
+    placedReal = !!ok;
   }
-  expect(placedReal, 'the real right-click path must place the hotbar cobblestone above the pad').toBe(true);
-  expect(await readBlockAt(page, 0, -49, 0), 'the placed block is cobblestone (id 4)').toBe(4);
+  expect(
+    placedReal,
+    `the real right-click path must place the hotbar cobblestone (aimed near ${placeX},${placeY},${placeZ}; editsBefore=${editsBefore})`,
+  ).toBe(true);
+  // locate the placed cobblestone near the aimed cell (the camera can
+  // drift a cell between the aim read and the click)
+  let placedAt: string | null = null;
+  for (let dx = -2; dx <= 2 && !placedAt; dx++) {
+    for (let dz = -2; dz <= 2 && !placedAt; dz++) {
+      for (let dy = -1; dy <= 1 && !placedAt; dy++) {
+        if (await readBlockAt(page, placeX + dx, placeY + dy, placeZ + dz) === 4) {
+          placedAt = `${placeX + dx},${placeY + dy},${placeZ + dz}`;
+        }
+      }
+    }
+  }
+  expect(placedAt, 'the placed cobblestone must sit near the aimed cell').toBeTruthy();
 
   expect(pageErrors, 'the placement matrix must not throw uncaught page errors').toEqual([]);
   await attachMilestoneScreenshot(page, testInfo, '99-placement-final');

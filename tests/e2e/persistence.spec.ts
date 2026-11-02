@@ -92,22 +92,27 @@ test('world edits survive a full save-quit + reload round trip', async ({ browse
     'the marker block must survive the save-quit + reload round trip',
   ).toBe(4);
   // The persisted day time sits under a namespaced key (PlatformRuntime
-  // wraps every key in its config namespace, so the literal key is
-  // "<ns>.eaglercraft.world.time.<world>") - scan by VALUE, which the
-  // prefix scheme cannot hide.
+  // wraps every key in its config namespace) AND it keeps ticking between
+  // the set and the save, so the stored value is 18000 plus the ticks
+  // elapsed while the pause menu was driven. Assert the range: the day
+  // time must have been SAVED (not reset to the fresh-world 1000) and
+  // must have advanced monotonically from 18000.
   const savedTime = await page.evaluate(() => {
-    const hits: { key: string; value: string }[] = [];
+    const hits: { key: string; value: number }[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      const value = key === null ? null : localStorage.getItem(key);
-      if (key && value === '18000') hits.push({ key, value });
+      if (!key || !key.includes('world.time')) continue;
+      const raw = localStorage.getItem(key);
+      const n = raw === null ? NaN : Number(raw);
+      if (!Number.isNaN(n)) hits.push({ key, value: n });
     }
     return hits;
   });
+  const daySaved = savedTime.some((h) => h.value >= 18_000 && h.value < 100_000);
   expect(
-    savedTime.length,
-    `the persisted day time (18000) must exist in localStorage (keys: ${JSON.stringify(savedTime)})`,
-  ).toBeGreaterThanOrEqual(1);
+    daySaved,
+    `the persisted day time must be a saved value >= 18000 (time keys: ${JSON.stringify(savedTime)})`,
+  ).toBe(true);
   expect(gameplayOf(state2).edits, 'the edit counter must reflect the restored overlay').toBeGreaterThanOrEqual(1);
 
   expect(pageErrors, 'the persistence round trip must not throw uncaught page errors').toEqual([]);

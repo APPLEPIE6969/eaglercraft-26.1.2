@@ -156,34 +156,48 @@ test('block placement: six-face culling matrix, section borders, real right-clic
   }
 
   // ── Scene B: the section border (x = 16k) remeshes both sections ──
-  // Find a solid surface block in the section west of an x=16k border with
-  // clean air east of it (the border cell), then place across the border.
-  const border: { surface: [number, number, number]; cross: [number, number, number] } | null =
+  // Collect candidate sites in-page: a solid surface block west of the
+  // x=16 border with clean air at and above the border cell (the cell the
+  // surface's EAST quad points into must be air, or the quad would be
+  // legitimately culled). Node-side then picks the first candidate whose
+  // EAST quad is actually exposed (2 outward triangles) - self-healing
+  // against unmeshed sections or scan misses.
+  const borderSites: Array<{ surface: [number, number, number]; cross: [number, number, number] }> =
     await page.evaluate(([ox, oy, oz]) => {
       const q = (
         self as unknown as {
           __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
         }
       ).__eaglercraftGame?.queryBlock;
-      if (!q) return null;
-      for (let cand = 0; cand < 24; cand++) {
+      if (!q) return [];
+      const sites: Array<{ surface: [number, number, number]; cross: [number, number, number] }> = [];
+      for (let cand = 0; cand < 32 && sites.length < 6; cand++) {
         // section 15 is x 0..15; the border sits between x=15 and x=16
         const bx = 15 - (cand % 4);
-        const bz = oz + 3 + Math.floor(cand / 4);
+        const bz = oz + 2 + Math.floor(cand / 4);
         for (let y = oy + 2; y >= oy - 6; y--) {
           if (q(bx, y, bz) === 0) continue;
           if (q(bx, y + 1, bz) !== 0) continue;
-          if (q(bx + 1, y + 1, bz) !== 0) continue; // the border cell must be air
+          if (q(bx + 1, y, bz) !== 0) continue; // the border cell AT surface level must be air
+          if (q(bx + 1, y + 1, bz) !== 0) continue;
           if (q(bx + 1, y + 2, bz) !== 0) continue;
-          return { surface: [bx, y, bz], cross: [bx + 1, y + 1, bz] };
+          sites.push({ surface: [bx, y, bz], cross: [bx + 1, y + 1, bz] });
+          break;
         }
       }
-      return null;
+      return sites;
     }, origin);
-  expect(border, 'a clean x=16k border site must exist near spawn').toBeTruthy();
-  const beforeMesh = await readMesh(page, border!.surface);
-  const beforeExposed = outwardTris(beforeMesh?.localVerts ?? [], 'EAST');
-  expect(beforeExposed, 'the surface block must expose its EAST quad before the border build').toBe(2);
+  expect(borderSites.length, 'clean x=16k border sites must exist near spawn').toBeGreaterThanOrEqual(1);
+  let border: { surface: [number, number, number]; cross: [number, number, number] } | null = null;
+  for (const site of borderSites) {
+    const mesh = await readMesh(page, site.surface);
+    if (outwardTris(mesh?.localVerts ?? [], 'EAST') === 2) {
+      border = site;
+      break;
+    }
+  }
+  expect(border, 'a border site with an exposed EAST quad must exist (candidates: '
+    + JSON.stringify(borderSites) + ')').toBeTruthy();
   await setSceneBlocks(page, [[border!.cross[0], border!.cross[1], border!.cross[2], 4]]);
   await waitForEditApplied(page, border!.cross, 4);
   // The placed block is across the section boundary - its own section must

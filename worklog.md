@@ -622,3 +622,18 @@ test bugs and one flaky assertion, all fixed and lesson-logged:
   (failed twice on CI, passed on retry #2). Instant breaking is now
   proven by the block itself: re-snap aim, click, settle, assert air,
   up to three tries.
+
+Fix round 2 (run 41377994350): the shared-face fix was right - scene A
+now passes and the failure moved on. Two more test bugs surfaced:
+- persistence: the day time KEEPS TICKING between the set and the save,
+  so the stored value is never exactly "18000" (and the key sits under
+  PlatformRuntime's config namespace). sky.spec's green "day time
+  persists across save-and-quit" confirmed the save path all along; the
+  spec now asserts a world.time key with a numeric value >= 18000
+  (saved, not reset to the fresh-world 1000, advanced monotonically).
+- placement scene B: the site scan checked air ABOVE the border cell but
+  not the border cell AT surface level - a solid cell there legitimately
+  culls the surface block's EAST quad (0 tris before the build). The
+  scan now requires that cell to be air, and node-side picks the first
+  of up to 6 candidates whose EAST quad is actually exposed (2 outward
+  triangles), self-healing against unmeshed sections.

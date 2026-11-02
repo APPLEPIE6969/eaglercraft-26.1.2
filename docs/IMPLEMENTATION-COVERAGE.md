@@ -57,9 +57,12 @@ existing entity walk).
 
 | Layer | Runtime | What it locks | Files |
 | --- | --- | --- | --- |
-| JVM unit (CI job `geometry-unit`) | ~20 s incl. checkout | face geometry invariants vs the decompile: corners, planes (UP=y+1), outward winding, UV order, RGBA byte packing | `tests/geometry/FaceTablesTest.java` |
-| Playwright e2e (17 specs, 48 tests) | the deploy gate | boot, title/worlds/options screens, world entry, HUD, movement tick clock, dig/place mechanics, inventory + creative picker, crafting recipes, sky cycle, multiplayer navigation, gateway protocol, WebGL context, VBO plane invariants incl. hole walls | `tests/e2e/*.spec.ts` |
+| JVM unit (CI job `geometry-unit`) | ~25 s incl. checkout | face geometry invariants vs the decompile (corners, planes, winding, UV, packing) + decompile-canary parity for the block registry (159 blocks), movement constants (gravity/jump/friction/accel/fly/walk), the generated recipe table (structure + vanilla truths) and seeded wire-codec fuzz (12k+ round-trips, differential encoder, malformed-input rejection) | `tests/geometry/*Test.java` (5 tests) |
+| Playwright e2e (21 specs, 53 tests, CI shard 3×) | the deploy gate | boot, title/worlds/options screens, world entry, HUD, movement tick clock, dig/place mechanics, the six-face placement culling matrix + section-border remesh + real right-click path, creative world creation through the real UI + vanilla flight rules + instant break, save-quit + full-reload persistence round trip, seeded input-chaos fuzz with per-round crash/NaN/responsiveness invariants, inventory + creative picker, crafting recipes, sky cycle, multiplayer navigation, gateway protocol, WebGL context, VBO plane invariants incl. hole walls | `tests/e2e/*.spec.ts` |
 | Production probes (manual, after deploys) | minutes | live-site panorama spin, walk b/tick vs vanilla, mesh x-rays via `debugMesh`, screenshots with cull on/off | `scripts/probe_*.mjs` |
+
+The full matrix, the budget reasoning and the Playwright-vs-faster
+verdict live in `docs/TEST-STRATEGY.md`.
 
 The y+2 canopy bug ("block sides invisible", round 3) is the case study
 for why the layers are ordered this way: it passed screenshots because

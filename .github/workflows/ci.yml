@@ -441,12 +441,24 @@ jobs:
           distribution: 'temurin'
           java-version: '26'
 
-      - name: Compile and run FaceTablesTest
+      - name: Compile and run the JVM test suite
         run: |
           mkdir -p /tmp/gt-classes
-          javac -d /tmp/gt-classes tests/geometry/FaceTablesTest.java \
-            sources/teavm/java/net/minecraft/client/renderer/FaceTables.java
-          java -cp /tmp/gt-classes FaceTablesTest
+          # Every JVM-layer test plus the port sources each one exercises:
+          #   FaceTablesTest     - vanilla face geometry invariants
+          #   RegistryParityTest - port block registry vs the decompile zip
+          #   PhysicsParityTest  - movement constants vs the decompile zip
+          #   RecipeParityTest   - generated recipe table vs the registry
+          #   ProtocolFuzzTest   - seeded wire-codec fuzz + differential
+          javac -d /tmp/gt-classes \
+            tests/geometry/*.java \
+            sources/teavm/java/net/minecraft/client/renderer/FaceTables.java \
+            sources/teavm/java/net/minecraft/world/item/crafting/CraftingRecipes.java \
+            gateway/PlaceholderServer/src/main/java/net/lax1dude/eaglercraft/v2_6/placeholder_server/mc/McVarInt.java
+          for t in FaceTablesTest RegistryParityTest PhysicsParityTest RecipeParityTest ProtocolFuzzTest; do
+            echo "── $t"
+            java -cp /tmp/gt-classes "$t"
+          done
 
   # ── Browser tests ──────────────────────────────────────────
   # Runs the Playwright suite against the artifact produced above. It is

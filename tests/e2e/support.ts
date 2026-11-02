@@ -608,6 +608,18 @@ export async function setHotbarSlot(
   }, { slot, blockId, count });
 }
 
+/** Queues a day-time set through the bridge (vanilla /time set path). */
+export async function setDayTime(page: Page, ticks: number): Promise<void> {
+  await page.evaluate((t) => {
+    const game = (
+      self as unknown as {
+        __eaglercraftGame?: { setDayTime?: (t: number) => void };
+      }
+    ).__eaglercraftGame;
+    game?.setDayTime?.(t);
+  }, ticks);
+}
+
 /** Converts arbitrary GUI-pixel coordinates to canvas CSS coordinates. */
 export async function getGuiCssCoords(
   page: Page,
@@ -639,4 +651,128 @@ export async function getGuiCssCoords(
       cssY: rect.top + gy * guiScale * backingToCss,
     };
   }, { guiX, guiY });
+}
+
+// ========== Dev scene helpers (setScene rides the real setBlockState path) ==========
+
+/**
+ * Queues a setScene batch of block edits through the telemetry bridge. The
+ * edits apply on a later game tick through Level.setBlockState, so the
+ * standard consumption gate is waitForEditApplied below.
+ */
+export async function setSceneBlocks(
+  page: Page,
+  blocks: [number, number, number, number][],
+  hideHud = 1,
+): Promise<void> {
+  await page.evaluate(({ blocks: b, hideHud: h }) => {
+    const game = (
+      self as unknown as {
+        __eaglercraftGame?: {
+          setScene?: (o: { blocks: [number, number, number, number][]; hideHud?: number }) => void;
+        };
+      }
+    ).__eaglercraftGame;
+    game?.setScene?.({ blocks: b, hideHud: h });
+  }, { blocks, hideHud });
+}
+
+/** Reads a world block id through the bridge's synchronous queryBlock. */
+export async function readBlockAt(page: Page, x: number, y: number, z: number): Promise<number> {
+  return page.evaluate(({ x: bx, y: by, z: bz }) => {
+    const game = (
+      self as unknown as {
+        __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
+      }
+    ).__eaglercraftGame;
+    return game?.queryBlock ? game.queryBlock(bx, by, bz) : -2;
+  }, { x, y, z });
+}
+
+/**
+ * Waits until a block edit is VISIBLE in the level data (queryBlock at the
+ * spot returns the expected id) AND the section containing the spot has
+ * fully remeshed (debugMesh(spot).dirtyCount === 0). Both gates matter:
+ * dirtyCount alone races the setScene CONSUMPTION - on a 1-4 fps runner the
+ * request sits unconsumed for seconds while dirtyCount is still 0 - and
+ * queryBlock alone would ignore a stale mesh. Gating on the edit spot's own
+ * section (unlike the player-section proxy the geometry spec used for
+ * near-spawn edits) keeps the gate honest for edits anywhere in the world.
+ */
+export async function waitForEditApplied(
+  page: Page,
+  spot: [number, number, number],
+  id: number,
+  timeoutMs = 90_000,
+): Promise<void> {
+  const ok = await page
+    .waitForFunction(
+      ([s, want]) => {
+        const game = (
+          self as unknown as {
+            __eaglercraftGame?: {
+              queryBlock?: (x: number, y: number, z: number) => number;
+              debugMesh?: (
+                x: number,
+                y: number,
+                z: number,
+              ) => { dirtyCount: number } | null;
+            };
+          }
+        ).__eaglercraftGame;
+        if (!game?.queryBlock || !game?.debugMesh) return false;
+        if (game.queryBlock(s[0], s[1], s[2]) !== want) return false;
+        const m = game.debugMesh(s[0], s[1], s[2]);
+        return !!m && m.dirtyCount === 0;
+      },
+      [spot, id] as [[number, number, number], number],
+      { timeout: timeoutMs },
+    )
+    .then(() => true)
+    .catch(() => false);
+  if (!ok) {
+    const got = await readBlockAt(page, spot[0], spot[1], spot[2]);
+    throw new Error(
+      `the edit at [${spot}] never applied (want id ${id}, queryBlock says ${got}, mesh queue did not drain in ${timeoutMs}ms)`,
+    );
+  }
+}
+
+/**
+ * Scans outward from an origin for a cell whose whole size^3 neighborhood
+ * is air (id 0), for probes that must not touch terrain. Runs fully
+ * in-page so no round-trips are spent per candidate. Returns null when
+ * nothing clean exists in range.
+ */
+export async function findCleanAirCell(
+  page: Page,
+  origin: [number, number, number],
+  radius = 8,
+  size = 3,
+): Promise<[number, number, number] | null> {
+  return page.evaluate(
+    ([o, r, n]) => {
+      const q = (
+        self as unknown as {
+          __eaglercraftGame?: { queryBlock?: (x: number, y: number, z: number) => number };
+        }
+      ).__eaglercraftGame?.queryBlock;
+      if (!q) return null;
+      const half = Math.floor(n / 2);
+      for (let cand = 0; cand < (2 * r + 1) ** 2; cand++) {
+        const x = o[0] - r + (cand % (2 * r + 1));
+        const z = o[2] - r + Math.floor(cand / (2 * r + 1));
+        for (let y = o[1] + 4; y >= o[1] - r; y--) {
+          let clean = true;
+          for (let dy = -half; dy <= half && clean; dy++)
+            for (let dz = -half; dz <= half && clean; dz++)
+              for (let dx = -half; dx <= half && clean; dx++)
+                if (q(x + dx, y + dy, z + dz) !== 0) clean = false;
+          if (clean) return [x, y, z];
+        }
+      }
+      return null;
+    },
+    [origin, radius, size] as [[number, number, number], number, number],
+  );
 }

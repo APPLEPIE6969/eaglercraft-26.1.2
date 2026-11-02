@@ -51,8 +51,16 @@ permissions:
 
 jobs:
   playwright:
-    name: Playwright browser tests
+    name: Playwright browser tests (shard ${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
+    # The suite is split across three fresh runners. Each shard boots its
+    # own client and serves its own world, so shards cannot collide, and
+    # the wall clock stays roughly a third of the serial suite even as
+    # specs are added.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     # The TeaVM client bootstrap blocks the browser main thread for about a
     # minute, so the suite needs a generous budget to finish on a cold runner.
     timeout-minutes: 60
@@ -113,14 +121,14 @@ jobs:
           E2E_PUBLIC_DIR: ${{ steps.client.outputs.dir }}
           E2E_STRICT_GAME: ${{ inputs.strict_game && '1' || '0' }}
           E2E_BROWSER_CHANNEL: ${{ inputs.browser_channel }}
-        run: env -u DBUS_SESSION_BUS_ADDRESS npx playwright test
+        run: env -u DBUS_SESSION_BUS_ADDRESS npx playwright test --shard=${{ matrix.shard }}/3
 
       # ── Always publish the evidence ───────────────────────────
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}
+          name: playwright-report-shard${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             playwright-report/
             test-results/

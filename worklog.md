@@ -513,3 +513,89 @@ normal; read the job steps, not the wall clock, to tell progress from a hang),
 Deploy to GitHub Pages success. Docs-only push, so the deployed bytes are
 unchanged from the Task 13 build - the live site already carries the verified
 mesher fixes; post-deploy HEAD check on the Pages URL returned HTTP 200.
+
+## Task 15 — 100% CI coverage: parity canaries, chaos fuzz, sharding (2026-11-02)
+
+User request: extend CI coverage to "test everything", including the
+simple things (placing blocks, creative mode), plus out-of-the-box
+angles; and settle whether Playwright is actually needed or a faster
+alternative can keep the same output.
+
+Recon first: the coverage doc's honest table (port = 411 files, mobs/
+redstone/dimensions missing) scoped what CAN be tested - the implemented
+subset. The bridge's id scheme turned out to be fully documented in the
+sources: Button ids slugify their label ("saveandquittotitle"), CycleButtons
+expose prefix:value ("gamemode:survival" -> "gamemode:hardcore" ->
+"gamemode:creative"), which made driving the real world-creation UI
+practical without guessing.
+
+JVM layer (runs ~25s into the pipeline, no browser) - four new tests in
+tests/geometry/, all green locally before push:
+- RegistryParityTest: parses the decompile zip's vanilla Blocks.java
+  (1144 fields) and asserts every one of the port's 159 registered block
+  names exists in vanilla, ids resolve/unique, all 192 world textures are
+  referenced by the registry (no dead assets), destroy_stage_0..9 exist.
+  The first run caught my own parser assuming literal ids - registrations
+  use named constants (new Block(STONE, ...)), fixed with a two-pass
+  constant-resolving parse.
+- PhysicsParityTest: twin canaries for each movement constant - the value
+  must appear in BOTH the port source and the named vanilla decompile
+  file. The first run REDLINED five assumed locations (vanilla 26.x moved
+  gravity into LivingEntity.DEFAULT_BASE_GRAVITY + the gravity attribute,
+  friction into INPUT_FRICTION, jump into BASE_JUMP_POWER - which the
+  port mirrors by NAME). Final table: 7 verified canaries incl. the
+  ground-acceleration 0.216... constant behind the walk invariant.
+- RecipeParityTest: the 25-recipe generated bake is structurally sound,
+  references only real registry ids (176), and carries vanilla truths
+  (planks x4, sticks 1x2 x4, 2x2 table, pickaxe XXX/_S_/_S_). My first
+  spot locks assumed torch/furnace exist - they are legitimately outside
+  the registry-supported bake; replaced with the iron/stone pickaxe
+  patterns.
+- ProtocolFuzzTest: 8209 int + 4105 long seeded round-trips, byte-exact
+  differential vs an independent reference encoder, and 8 malformed-input
+  cases (overlong VarInt/VarLong, truncation, hostile string lengths)
+  rejected cleanly.
+
+Browser layer - four new specs (suite now 21 files / 53 tests):
+- placement.spec: the six-face culling matrix (attach neighbor -> probe
+  quad culls -> neighbor's opposite quad renders on its vanilla plane ->
+  detach -> quad re-emerges, all six directions), the x=16k section-border
+  remesh (BOTH sections update; the cross-border neighbor culls its quad
+  exactly like a same-section one), and the real right-click use path
+  (hotbar fill -> aim -> pointer grab -> right press) landing cobblestone
+  on the spawn pad.
+- creative.spec: world CREATION through the real UI (Singleplayer ->
+  Create New World -> gamemode cycle asserted at each value -> Create),
+  gameplay.creative true, double-tap flight inside the vanilla 7-tick
+  window, Space ascend / Shift descend, landing cancels flight, a single
+  click breaks a block instantly, the picker opens on E and closes on
+  Escape - plus a guard that the default world stays Survival.
+- persistence.spec: marker block + day time 18000 survive the REAL
+  save-and-quit button -> full page reload (a whole TeaVM reboot) ->
+  re-enter round trip; the persisted time key is checked in localStorage.
+- chaos.spec: 24 seeded LCG rounds of mixed real inputs (movement keys,
+  look snaps, attack/use, hotbar digits/wheel, inventory + pause toggles,
+  day-time jumps, scene edits) with per-round invariants: finite bounded
+  player position, never STATE_CRASHED, tick clock advancing, zero
+  uncaught errors; final probe proves the world still accepts edits.
+
+CI: the geometry-unit job now compiles and runs all five JVM tests; the
+e2e job shards 3x (strategy.matrix, fail-fast false, per-shard report
+artifacts) so the larger suite keeps its wall-clock budget. Suiteside
+helpers added to support.ts (waitForEditApplied gating on the EDIT
+spot's own section, setSceneBlocks, readBlockAt, findCleanAirCell,
+setDayTime). playwright --list compiles all 21 specs clean.
+
+The Playwright verdict (recorded in docs/TEST-STRATEGY.md): Playwright
+STAYS - the browser layer asserts WebGL, real input plumbing, DOM
+screens and the deployed bytes, which no faster alternative reproduces;
+raw CDP would forfeit sharding/retries/traces for seconds of savings.
+The real speed levers, in impact order: JVM layer for all pure logic,
+3-way sharding, worker-shared boots, telemetry assertions instead of
+pixel waits. Budgets stay sized to the vanilla 20 TPS clock.
+
+Commit ships: 4 JVM tests + ci.yml geometry-unit wiring, 4 e2e specs +
+support.ts helpers, e2e.yml shard matrix, docs/TEST-STRATEGY.md,
+IMPLEMENTATION-COVERAGE.md test-table refresh, this entry. No product
+code changed - this round only adds tests and CI wiring, so the deployed
+bytes stay at the Task 13 build.

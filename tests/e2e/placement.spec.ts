@@ -2,12 +2,12 @@
 //
 //   Scene A - the six-face matrix: a lone stone probe gets a cobblestone
 //     neighbor attached to each of its 6 faces in turn. After every
-//     attachment the probe's facing quad must CULL (vanilla face rule:
-//     the neighbor's occlusion shape is a full cube) and the neighbor's
-//     opposite quad must appear on its exact vanilla plane; after every
-//     removal the probe's quad must re-emerge. This is the visibility
-//     rule the "invisible block sides" reports were about, driven in all
-//     six directions.
+//     attachment BOTH sides of the shared interface must cull (vanilla
+//     occlusion: a full-cube neighbor hides the facing quad on both
+//     blocks), a non-shared quad of the neighbor must render, and after
+//     every removal the probe's quad must re-emerge. This is the
+//     visibility rule the "invisible block sides" reports were about,
+//     driven in all six directions.
 //   Scene B - the section border: the world is meshed in 16x16x16
 //     sections; a block placed on a x=16k boundary must remesh BOTH
 //     sections - the terrain block across the border must cull its
@@ -130,11 +130,20 @@ test('block placement: six-face culling matrix, section borders, real right-clic
       outwardTris(probeMeshAttached?.localVerts ?? [], dir.name),
       `probe ${dir.name} quad must cull while a full cube sits there`,
     ).toBe(0);
-    // and the neighbor's opposite quad must appear, 2 outward triangles
+    // Vanilla occlusion hides the shared interface from BOTH sides: the
+    // neighbor's face toward the probe (a full cube) must cull too - the
+    // same rule geometry.spec asserts as "the placed block's bottom is
+    // culled against the ground". A non-shared quad proves the neighbor
+    // itself actually remeshed.
     const neighborMesh = await readMesh(page, neighbor);
     expect(
       outwardTris(neighborMesh?.localVerts ?? [], dir.opp),
-      `neighbor ${dir.opp} quad must render when attached to the probe`,
+      `neighbor ${dir.opp} quad must cull against the probe (a full cube)`,
+    ).toBe(0);
+    const exposed: 'UP' | 'NORTH' = dir.opp === 'UP' ? 'NORTH' : 'UP';
+    expect(
+      outwardTris(neighborMesh?.localVerts ?? [], exposed),
+      `neighbor ${exposed} quad must render (the neighbor itself must mesh)`,
     ).toBe(2);
     // detach: the probe's quad must re-emerge (neighbor visibility updates)
     await setSceneBlocks(page, [[neighbor[0], neighbor[1], neighbor[2], 0]]);

@@ -599,3 +599,26 @@ support.ts helpers, e2e.yml shard matrix, docs/TEST-STRATEGY.md,
 IMPLEMENTATION-COVERAGE.md test-table refresh, this entry. No product
 code changed - this round only adds tests and CI wiring, so the deployed
 bytes stay at the Task 13 build.
+
+Fix round (same day): the first CI run (41374674903) proved the design -
+build green, all five JVM tests green (~seconds into the pipeline), the
+3 shards ran in parallel, chaos.spec passed FIRST TRY and the heavy shard
+1 (crafting 9.2m + features + creative) was green. Shard 3 found two real
+test bugs and one flaky assertion, all fixed and lesson-logged:
+- placement.spec asserted the neighbor's shared quad RENDERS when
+  attached - wrong vanilla semantics: occlusion hides the shared
+  interface from BOTH sides (the same rule geometry.spec's "placed
+  block's bottom is culled against the ground" uses). The fix asserts
+  the shared quad culls (0) and a NON-shared quad renders (2) so the
+  neighbor still proves it remeshed.
+- persistence.spec scanned localStorage for a key starting
+  "eaglercraft.world.time." - but PlatformRuntime wraps every key in its
+  config namespace, so the real key is "<ns>.eaglercraft.world.time.<world>"
+  (double prefix). The save path itself is correct (disconnect() ->
+  saveEdits + saveDayTime). The scan now matches by VALUE (18000), which
+  no prefix scheme can hide.
+- creative.spec's "the aim must be off the broken cell" assertion raced
+  the player falling into the hole they just broke under their feet
+  (failed twice on CI, passed on retry #2). Instant breaking is now
+  proven by the block itself: re-snap aim, click, settle, assert air,
+  up to three tries.

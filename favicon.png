@@ -1,0 +1,31 @@
+EaglerCraft 26.1.2 - Favicon Placeholder
+==========================================
+
+This file is a placeholder note. In a production build, replace this with
+an actual favicon.png file (32x32 or 64x64 pixels recommended).
+
+The favicon should be a Minecraft-style icon representing EaglerCraft.
+Common approaches:
+  - An eagle silhouette over a Minecraft block
+  - A pixelated "E" in EaglerCraft brand colors (#e94560)
+  - A simplified Minecraft grass block icon
+
+Requirements:
+  - Format: PNG (preferred) or ICO
+  - Recommended sizes: 16x16, 32x32, 64x64, 128x128
+  - Transparency: Use alpha channel for clean edges
+  - Color space: sRGB
+
+To generate a proper favicon from an image:
+  1. Create a 64x64 or larger source image
+  2. Use an online favicon generator or ImageMagick:
+     convert source.png -resize 32x32 favicon.png
+     convert source.png -resize 16x16 favicon-16.png
+     convert source.png -resize 32x32 favicon-32.png
+     convert source.png -resize 64x64 favicon-64.png
+
+The index.html references this file via:
+  <link rel="icon" type="image/png" href="favicon.png">
+
+Note: The offline download template may embed the favicon as a data URI
+to ensure it works without external file access.

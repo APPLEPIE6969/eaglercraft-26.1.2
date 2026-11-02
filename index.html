@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Play Minecraft 26.1.2 in your browser - EaglerCraftX">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta property="og:title" content="EaglerCraftX 26.1.2">
+    <meta property="og:description" content="Play Minecraft 26.1.2 in your browser">
+    <meta property="og:type" content="website">
+    <title>EaglerCraftX 26.1.2</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; }
+        
+        /* Loading screen */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 1000; color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-screen.hidden { opacity: 0; pointer-events: none; }
+        
+        .loading-title {
+            font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5, #00d2ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        .loading-subtitle { font-size: 1rem; opacity: 0.7; margin-bottom: 2rem; }
+        
+        .progress-container {
+            width: 320px; height: 6px; background: rgba(255,255,255,0.1);
+            border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;
+        }
+        .progress-bar {
+            height: 100%; width: 0%; border-radius: 3px;
+            background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+            transition: width 0.3s ease;
+        }
+        .progress-text { font-size: 0.85rem; opacity: 0.6; }
+        
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* Game canvas */
+        #game_frame {
+            width: 100vw; height: 100vh; display: block;
+            background: #000; outline: none;
+        }
+
+        /* Error overlay */
+        #error-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none; z-index: 2000;
+            color: #ff4444; font-family: 'Courier New', monospace;
+            padding: 2rem; overflow: auto;
+        }
+        #error-overlay.visible { display: flex; flex-direction: column; }
+        .error-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #ff6666; }
+        .error-msg { font-size: 0.9rem; color: #ccc; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-title">EaglerCraftX 26.1.2</div>
+        <div class="loading-subtitle">Minecraft in your browser</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Initializing...</div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="game_frame" tabindex="1"></canvas>
+
+    <!-- Title Screen Overlay (shown after WebGL2 initializes) -->
+    <div id="title-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;display:none;font-family:'Segoe UI',system-ui,sans-serif;">
+        <div style="position:absolute;top:12%;left:50%;transform:translateX(-50%);text-align:center;">
+            <div style="font-size:3rem;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.5);letter-spacing:2px;">EaglerCraftX</div>
+            <div style="font-size:1.2rem;color:rgba(255,255,255,0.8);margin-top:4px;">Minecraft 26.1.2</div>
+        </div>
+        <div style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);text-align:center;">
+            <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);">WebGL2 Client - Protocol 775</div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;" id="title-fps"></div>
+        </div>
+    </div>
+
+    <!-- Error Overlay -->
+    <div id="error-overlay">
+        <div class="error-title">Game Crashed</div>
+        <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // EaglerCraftX 26.1.2 Configuration
+        // ============================================================
+        // IMPORTANT: Change these settings to match your setup!
+        //
+        // - "servers": List of WebSocket servers the client can connect to.
+        //   You CANNOT host WebSocket game servers on Vercel. You need a
+        //   separate server (VPS, Docker, etc.) running EaglercraftXBungee
+        //   or EaglercraftXVelocity gateway plugin connected to your
+        //   Minecraft Java Edition server.
+        //
+        // - "relays": Shared world (LAN) relay servers for singleplayer
+        //   invite codes. These also cannot run on Vercel.
+        //
+        // - "assetsURI": Path to the compiled assets EPK file
+        // - "localesURI": Path to language files directory
+        // ============================================================
+
+        var relayId = Math.floor(Math.random() * 3);
+
+        window.eaglercraftXOpts = {
+            container: "game_frame",
+            assetsURI: "assets.epk",
+            localesURI: "lang/",
+            worldsDB: "worlds",
+            resourcePacksDB: "resourcePacks",
+
+            // ====== IMPORTANT: Configure your server here ======
+            servers: [
+                // Example: Connect to a VPS running the gateway plugin
+                // { addr: "wss://your-vps.example.com/", name: "My MC Server" }
+                //
+                // For local testing with a gateway on your machine:
+                // { addr: "ws://localhost:8081/", name: "Local Server" }
+                { addr: "ws://localhost:8081/", name: "Local Test Server" }
+            ],
+
+            // Shared world relay servers (for singleplayer invite codes)
+            relays: [
+                { addr: "wss://relay.deev.is/", comment: "lax1dude relay #1", primary: relayId == 0 },
+                { addr: "wss://relay.lax1dude.net/", comment: "lax1dude relay #2", primary: relayId == 1 },
+                { addr: "wss://relay.shhnowisnottheti.me/", comment: "ayunami relay #1", primary: relayId == 2 }
+            ],
+
+            // Other options
+            demoMode: false,
+            allowVoiceClient: true,
+            allowFNAWSkins: true,
+            enableDownloadOfflineButton: true,
+            html5CursorSupport: true,
+            enableMinceraft: true,
+            localStorageNamespace: "_eaglercraftX26"
+        };
+
+        // ============================================================
+        // Loading screen logic
+        // ============================================================
+        var progressBar = document.getElementById("progress-bar");
+        var progressText = document.getElementById("progress-text");
+        var loadingScreen = document.getElementById("loading-screen");
+        var errorOverlay = document.getElementById("error-overlay");
+        var errorMsg = document.getElementById("error-msg");
+
+        function setProgress(pct, text) {
+            progressBar.style.width = pct + "%";
+            if (text) progressText.textContent = text;
+        }
+
+        window.__eaglercraftLoadingProgress = function(pct, text) {
+            setProgress(pct, text);
+        };
+
+        // Called by the real game when it's ready to show the canvas
+        window.__eaglercraftReady = function() {
+            setTimeout(function() {
+                loadingScreen.classList.add("hidden");
+                setTimeout(function() {
+                    loadingScreen.style.display = "none";
+                    // Show the title screen overlay
+                    document.getElementById("title-overlay").style.display = "block";
+                    // Update FPS counter periodically
+                    var fpsEl = document.getElementById("title-fps");
+                    var overlayEl = document.getElementById("title-overlay");
+                    var lastTime = performance.now();
+                    var frameCount = 0;
+                    function updateFPS() {
+                        frameCount++;
+                        var now = performance.now();
+                        if (now - lastTime >= 1000) {
+                            if (fpsEl) fpsEl.textContent = frameCount + " FPS";
+                            frameCount = 0;
+                            lastTime = now;
+                        }
+                        // The DOM banner is the boot-frame stand-in for the
+                        // vanilla logo: it belongs on the title screen only.
+                        // Any sub-screen (Select World, Options, ...) and the
+                        // in-world HUD must render without DOM chrome, so the
+                        // overlay visibility tracks the bridge's screen state.
+                        // The style is only written on CHANGE - a same-value
+                        // display write every frame keeps the element on the
+                        // compositor's dirty list for no reason. The loop also
+                        // stays alive in-world so the banner comes back when a
+                        // world is quit to the title screen.
+                        var game = window.__eaglercraftGame;
+                        if (game) {
+                            var screenId = String(game.screen || "none");
+                            var onTitle = !game.inWorld
+                                && (screenId === "none" || screenId.indexOf("TitleScreen") !== -1);
+                            var want = onTitle ? "block" : "none";
+                            if (overlayEl.style.display !== want) {
+                                overlayEl.style.display = want;
+                            }
+                        }
+                        requestAnimationFrame(updateFPS);
+                    }
+                    requestAnimationFrame(updateFPS);
+                }, 500);
+            }, 300);
+        };
+
+        // Also listen for the CustomEvent dispatched by TeaVM-compiled code
+        window.addEventListener('eaglercraftReady', function() {
+            if (typeof window.__eaglercraftReady === 'function') {
+                window.__eaglercraftReady();
+            }
+        });
+
+        window.onerror = function(msg, url, line, col, err) {
+            errorOverlay.classList.add("visible");
+            errorMsg.textContent = "Error: " + msg + "\n\n" +
+                "File: " + url + "\n" +
+                "Line: " + line + ", Col: " + col + "\n\n" +
+                (err && err.stack ? err.stack : "");
+            return true;
+        };
+
+        // Start loading
+        setProgress(5, "Downloading game (~15MB)...");
+
+        // Load the compiled game script
+        var script = document.createElement("script");
+        script.src = "classes.js";
+        script.onload = function() {
+            console.log("[EaglerCraft] classes.js loaded, calling main()...");
+            setProgress(50, "Starting game engine...");
+            // TeaVM exports a UMD module with main() — call it
+            setTimeout(function() {
+                try {
+                    if (typeof self.main === 'function') {
+                        console.log("[EaglerCraft] Calling self.main()...");
+                        self.main(null);
+                    } else {
+                        console.error("[EaglerCraft] main() not found in global scope!");
+                    }
+                } catch(e) {
+                    console.error("[EaglerCraft] Error: " + e.message);
+                    console.error(e.stack);
+                }
+            }, 100);
+        };
+        script.onerror = function() {
+            errorOverlay.classList.add("visible");
+            errorMsg.textContent = "Failed to load classes.js!\n\n" +
+                "Make sure the game is compiled and classes.js is in the same directory as index.html.\n\n" +
+                "Run: ./build_compile.sh to compile the client.";
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

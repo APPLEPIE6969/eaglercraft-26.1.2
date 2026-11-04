@@ -1,4 +1,4 @@
-# EaglercraftX 26.1.2
+# Eaglercraft 26.1.2
 
 > Play Minecraft 26.1.2 in your browser — optimized and modernized for the unobfuscated era.
 
